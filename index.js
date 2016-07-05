@@ -60,8 +60,13 @@ function createApp(config) {
   return app;
 }
 
-function loadConfig() {
-  return JSON.parse(fs.readFileSync('example/config.json'));
+function loadConfig(fileName) {
+  if (fs.existsSync(fileName)) {
+    return JSON.parse(fs.readFileSync(fileName));
+  } else {
+    console.log(`Cannot find config file ${fileName}`);
+    return null;
+  }
 }
 
 function attachMiddleware(app, config) {
@@ -72,7 +77,11 @@ function attachMiddleware(app, config) {
 }
 
 if (require.main === module) {
-  let config = loadConfig();
+  let config = loadConfig(process.argv[2] || '/etc/lunchbadger-gateway.conf');
+  if (!config) {
+    process.exit(1);
+  }
+
   let app = createApp(config);
   if (!app) {
     process.exit(1);
