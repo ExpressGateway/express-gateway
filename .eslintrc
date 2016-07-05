@@ -1,0 +1,12 @@
+{
+  "extends": "loopback",
+  "env": {
+    "es6": true
+  },
+  "rules": {
+    "comma-dangle": "off",
+    "no-var": "error",
+    "prefer-arrow-callback": "error"
+  },
+  "root": true
+}

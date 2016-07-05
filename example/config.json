@@ -1,0 +1,14 @@
+{
+  "bindPort": 3000,
+  "bindHost": "0.0.0.0",
+  "rootPath": "http://gateway.root",
+  "pipelines": [
+    {
+      "policies": [],
+      "proxies": [{
+        "privateEndpoint": "http://www.example.com",
+        "contextPath": "/"
+      }]
+    }
+  ]
+}
