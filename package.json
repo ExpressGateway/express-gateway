@@ -6,6 +6,7 @@
   "scripts": {
     "build": "babel -d dist index.js lib",
     "start": "babel-node .",
+    "serve": "node dist/index.js",
     "pretest": "eslint .",
     "test": "mocha --compilers js:babel-register tests"
   },
@@ -23,7 +24,6 @@
   "dependencies": {
     "express": "^4.14.0",
     "http-proxy": "^1.14.0",
-    "morgan": "^1.7.0",
-    "vhost": "^3.0.2"
+    "morgan": "^1.7.0"
   }
 }
