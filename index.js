@@ -77,7 +77,7 @@ function attachMiddleware(app, config) {
 }
 
 if (require.main === module) {
-  let config = loadConfig(process.argv[2] || '/etc/lunchbadger-gateway.conf');
+  let config = loadConfig(process.argv[2] || '/etc/lunchbadger/gateway.conf');
   if (!config) {
     process.exit(1);
   }

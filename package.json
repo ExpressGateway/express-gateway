@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "babel -d dist index.js lib",
-    "start": "babel-node .",
-    "serve": "node dist/index.js",
+    "start": "node dist/index.js",
+    "dev": "babel-node .",
     "pretest": "eslint .",
     "test": "mocha --compilers js:babel-register tests"
   },
