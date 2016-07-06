@@ -1,0 +1,67 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gateway-foobar-dev
+  labels:
+    producer: foobar
+    environment: dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: gateway
+    spec:
+      containers:
+        - name: gateway
+          image: localhost:31000/gateway:0.0.1
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - mountPath: /etc/lunchbadger
+              name: config
+      volumes:
+        - name: config
+          configMap:
+            name: gateway-foobar-dev
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-foobar-dev
+  namespace: default
+  labels:
+    producer: foobar
+    environment: dev
+  annotations:
+    config-revision: <tbd>
+data:
+  gateway.conf: |-
+    {
+      "bindPort": 3000,
+      "bindHost": "0.0.0.0",
+      "rootPath": "http://gateway.root",
+      "pipelines": [
+        {
+          "policies": [],
+          "proxies": [{
+            "privateEndpoint": "http://notesapp.default",
+            "contextPath": "/"
+          }]
+        }
+      ]
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  labels:
+    run: gateway
+spec:
+  ports:
+    - port: 3000
+      protocol: TCP
+  selector:
+    run: gateway
+  type: LoadBalancer
