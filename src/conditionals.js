@@ -29,14 +29,22 @@ const CONDITIONALS = module.exports = {
   },
 
   pathMatch: function(req, pattern) {
+    return req.originalUrl.match(new RegExp(pattern)) != null;
   },
 
   pathExact: function(req, path) {
+    return req.originalUrl === path;
   },
 
   method: function(req, method) {
+    if (typeof method === 'Array') {
+      return method.includes(req.method);
+    } else {
+      return req.method === method;
+    }
   },
 
   authScope: function(req, scope) {
+    return false;
   }
 };
