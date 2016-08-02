@@ -37,7 +37,7 @@ function readJsonFile(fileName) {
 }
 
 function attachStandardMiddleware(app) {
-  morgan.token('target', (req, res) => req.target ? req.target : '-');
+  morgan.token('target', (req, _res) => req.target ? req.target : '-');
   app.use(morgan(
     ':method (:target) :url :status :response-time ms - :res[content-length]'));
 }
@@ -55,7 +55,7 @@ function loadProcessors(spec, config) {
       throw Error(`could not find action ${procSpec.action}`);
     }
 
-    router.use((req, res, next) => {
+    router.use((_req, _res, next) => {
       debug(`checking predicate for ${procSpec.action}`);
       if (predicate(req)) {
         debug(`request matched predicate for ${procSpec.action}`);

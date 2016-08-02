@@ -12,8 +12,14 @@ function run(context, [functionName, ...args]) {
 const CONDITIONALS = module.exports = {
   run,
 
-  always: function(req) {
+  always: function(_req) {
     return true;
+  },
+
+  never: function(_req) {
+    // Not sure if anyone would ever use this in real life, but it is a
+    // "legitimate" conditional, and is useful during tests.
+    return false;
   },
 
   allOf: function(req, ...subItems) {
@@ -21,7 +27,7 @@ const CONDITIONALS = module.exports = {
   },
 
   oneOf: function(req, ...subItems) {
-    return someItems.some(subItem => run(req, subItem));
+    return subItems.some(subItem => run(req, subItem));
   },
 
   not: function(req, subItem) {
@@ -37,14 +43,14 @@ const CONDITIONALS = module.exports = {
   },
 
   method: function(req, method) {
-    if (typeof method === 'Array') {
+    if (Array.isArray(method)) {
       return method.includes(req.method);
     } else {
       return req.method === method;
     }
   },
 
-  authScope: function(req, scope) {
+  authScope: function(_req, _scope) {
     return false;
   }
 };

@@ -16,12 +16,12 @@ module.exports = function createMiddleware(params, config) {
     target: privateEndpoint,
     changeOrigin: true
   });
-  proxy.on('error', (err, req, res) => {
+  proxy.on('error', (err, _req, res) => {
     console.warn('Error', err);
     res.status(502).send('Bad gateway.');
   });
 
-  return function proxyHandler(req, res, next) {
+  return function proxyHandler(req, res, _next) {
     debug(`proxying to ${privateEndpoint}`);
     proxy.web(req, res);
   };

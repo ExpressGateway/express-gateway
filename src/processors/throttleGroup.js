@@ -2,8 +2,8 @@
 
 const debug = require('debug')('gateway:throttleGroup');
 
-module.exports = function createMiddleware(params) {
-  return function proxyMiddleware(req, res, next) {
+module.exports = function createMiddleware(_params) {
+  return function proxyMiddleware(_req, _res, next) {
     debug('throttleGroup middleware');
     next();
   };
