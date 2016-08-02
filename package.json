@@ -2,11 +2,11 @@
   "name": "gateway",
   "version": "0.0.1",
   "description": "Proxies HTTP requests with flexible policies",
-  "main": "index.js",
+  "main": "src/main.js",
   "scripts": {
-    "build": "babel -d dist index.js lib",
-    "start": "node dist/index.js",
-    "dev": "babel-node .",
+    "build": "babel -d dist src",
+    "start": "node dist/main.js",
+    "dev": "DEBUG=gateway:* babel-node .",
     "pretest": "eslint .",
     "test": "mocha --compilers js:babel-register tests"
   },

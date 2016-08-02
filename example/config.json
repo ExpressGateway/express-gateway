@@ -1,14 +1,57 @@
 {
-  "bindPort": 3000,
-  "bindHost": "0.0.0.0",
-  "rootPath": "http://gateway.root",
+  "privateEndpoints": {
+    "backend": {
+      "url": "http://www.example.com"
+    }
+  },
   "pipelines": [
     {
-      "policies": [],
-      "proxies": [{
-        "privateEndpoint": "http://www.example.com",
-        "contextPath": "/"
-      }]
+      "name": "ecommerce",
+      "publicEndpoints": [
+        { "path": "/products" },
+        { "path": "/orders" },
+        { "path": "/users" }
+      ],
+      "processors": [
+        {
+          "condition":
+            ["allOf",
+              ["pathMatch", "/products"],
+              ["method", "POST"]],
+          "action": "throttleGroup",
+          "params": {
+            "key": "products"
+          }
+        },
+        {
+          "condition": ["always"],
+          "action": "throttleGroup",
+          "params": {
+            "key": "all"
+          }
+        },
+        {
+          "condition": ["always"],
+          "action": "throttle",
+          "params": {
+            "all": {
+              "rate": 1000,
+              "period": "minute"
+            },
+            "products": {
+              "rate": 100,
+              "period": "minute"
+            }
+          }
+        },
+        {
+          "condition": ["always"],
+          "action": "proxy",
+          "params": {
+            "privateEndpoint": "backend"
+          }
+        }
+      ]
     }
   ]
 }
