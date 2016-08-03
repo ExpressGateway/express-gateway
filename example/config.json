@@ -14,10 +14,7 @@
       ],
       "processors": [
         {
-          "condition":
-            ["allOf",
-              ["pathMatch", "/products"],
-              ["method", "POST"]],
+          "condition": ["pathMatch", "/products"],
           "action": "throttleGroup",
           "params": {
             "key": "products"
@@ -35,7 +32,7 @@
           "action": "throttle",
           "params": {
             "all": {
-              "rate": 1000,
+              "rate": 5,
               "period": "minute"
             },
             "products": {
