@@ -4,12 +4,15 @@ const httpProxy = require('http-proxy');
 const lodash = require('lodash');
 const debug = require('debug')('gateway:proxy');
 
+const MisconfigurationError = require('./errors').MisconfigurationError;
+
 function createMiddleware(params, config) {
   let privateEndpoint = lodash.get(config, ['privateEndpoints',
                                             params.privateEndpoint, 'url']);
   if (!privateEndpoint) {
-    // TODO: use error subclass
-    throw Error(`Private endpoint ${params.privateEndpoint} does not exist`);
+    throw new MisconfigurationError(
+      `Private endpoint ${params.privateEndpoint} (referenced in 'proxy' ` +
+      'processor configuration) does not exist');
   }
 
   let proxy = httpProxy.createProxyServer({

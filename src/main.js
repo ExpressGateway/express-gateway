@@ -1,12 +1,19 @@
 'use strict';
 
-let loadConfig = require('./config.js');
+let configParser = require('./config');
 
 if (require.main === module) {
-  let [app, config] = loadConfig(process.argv[2] ||
-                                 '/etc/lunchbadger/gateway.conf');
-  if (!app || !config) {
-    process.exit(1);
+  let app = undefined;
+  let config = undefined;
+  try {
+    [app, config] = configParser.loadConfig(process.argv[2] ||
+                                            '/etc/lunchbadger/gateway.conf');
+  } catch (err) {
+    if (err instanceof configParser.MisconfigurationError) {
+      console.error(err.message);
+      process.exit(1);
+    }
+    throw err;
   }
 
   const bindPort = config.bindPort || 8080;

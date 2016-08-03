@@ -5,23 +5,21 @@ const express = require('express');
 const debug = require('debug')('gateway:config');
 const morgan = require('morgan');
 
-const runConditional = require('./conditionals').run;
+const MisconfigurationError = require('./errors').MisconfigurationError;
 const processors = require('./processors');
+const runConditional = require('./conditionals').run;
 
-module.exports = function loadConfig(fileName) {
+function loadConfig(fileName) {
   let config = readJsonFile(fileName);
-  if (!config) {
-    return [null, null];
-  }
-
   let app = express();
-  attachStandardMiddleware(app);
 
+  attachStandardMiddleware(app);
   parseConfig(app, config);
+
   return [app, config];
 };
 
-const parseConfig = module.exports.parseConfig = (app, config) => {
+function parseConfig(app, config) {
   for (const pipeline of config.pipelines) {
     debug(`processing pipeline ${pipeline.name}`);
 
@@ -32,10 +30,18 @@ const parseConfig = module.exports.parseConfig = (app, config) => {
 
 function readJsonFile(fileName) {
   if (fs.existsSync(fileName)) {
-    return JSON.parse(fs.readFileSync(fileName));
+    try {
+      return JSON.parse(fs.readFileSync(fileName));
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        throw new MisconfigurationError(`Bad config file format: ${err}`);
+      } else if ('errno' in err) {
+        throw new MisconfigurationError(`Could not read config file: ${err}`);
+      }
+      throw err;
+    }
   } else {
-    debug(`could not find config file ${fileName}`);
-    return null;
+    throw new MisconfigurationError(`Could not find config file ${fileName}`);
   }
 }
 
@@ -54,8 +60,8 @@ function loadProcessors(spec, config) {
     const predicate = (req => runConditional(req, procSpec.condition));
     const action = processors(procSpec.action)(procSpec.params, config);
     if (!action) {
-      // TODO: use an Exception subclass
-      throw Error(`could not find action ${procSpec.action}`);
+      throw new MisconfigurationError(
+        `Could not find action ${procSpec.action}`);
     }
 
     router.use((req, res, next) => {
@@ -77,3 +83,9 @@ function attachToApp(app, router, publicEndpoints) {
     app.use(ep.path, router);
   }
 }
+
+module.exports = {
+  loadConfig,
+  parseConfig,
+  MisconfigurationError
+};
