@@ -48,9 +48,5 @@ const CONDITIONALS = module.exports = {
     } else {
       return req.method === method;
     }
-  },
-
-  authScope: function(_req, _scope) {
-    return false;
   }
 };
