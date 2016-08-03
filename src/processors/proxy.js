@@ -4,7 +4,7 @@ const httpProxy = require('http-proxy');
 const lodash = require('lodash');
 const debug = require('debug')('gateway:proxy');
 
-module.exports = function createMiddleware(params, config) {
+function createMiddleware(params, config) {
   let privateEndpoint = lodash.get(config, ['privateEndpoints',
                                             params.privateEndpoint, 'url']);
   if (!privateEndpoint) {
@@ -25,4 +25,8 @@ module.exports = function createMiddleware(params, config) {
     debug(`proxying to ${privateEndpoint}`);
     proxy.web(req, res);
   };
+};
+
+module.exports = {
+  proxy: createMiddleware
 };

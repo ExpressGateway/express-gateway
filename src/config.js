@@ -58,7 +58,7 @@ function loadProcessors(spec, config) {
       throw Error(`could not find action ${procSpec.action}`);
     }
 
-    router.use((_req, _res, next) => {
+    router.use((req, res, next) => {
       debug(`checking predicate for ${procSpec.action}`);
       if (predicate(req)) {
         debug(`request matched predicate for ${procSpec.action}`);

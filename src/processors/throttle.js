@@ -1,7 +1,14 @@
 'use strict';
 
-module.exports = function createMiddleware(_params) {
-  return function proxyMiddleware(_req, _res, next) {
-    next();
-  };
+function throttleGroupMiddleware(_req, _res, next) {
+  next();
+}
+
+function throttleMiddleware(_req, _res, next) {
+  next();
+};
+
+module.exports = {
+  throttleGroup: _ => throttleGroupMiddleware,
+  throttle: _ => throttleMiddleware
 };
