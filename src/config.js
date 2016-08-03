@@ -56,8 +56,9 @@ function loadProcessors(spec, config) {
 
   for (const procSpec of spec) {
     // TODO: compile all nested s-expressions in advance. This will allow
-    // for better validation of the condition spec.
-    const predicate = (req => runConditional(req, procSpec.condition));
+    // for better validation of the condition spec
+    const condition = procSpec.condition || ['always'];
+    const predicate = (req => runConditional(req, condition));
     const action = processors(procSpec.action)(procSpec.params, config);
     if (!action) {
       throw new MisconfigurationError(
