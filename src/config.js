@@ -8,7 +8,7 @@ const morgan = require('morgan');
 const runConditional = require('./conditionals').run;
 const processors = require('./processors');
 
-let loadConfig = module.exports = function loadConfig(fileName) {
+module.exports = function loadConfig(fileName) {
   let config = readJsonFile(fileName);
   if (!config) {
     return [null, null];
@@ -17,14 +17,17 @@ let loadConfig = module.exports = function loadConfig(fileName) {
   let app = express();
   attachStandardMiddleware(app);
 
+  parseConfig(app, config);
+  return [app, config];
+};
+
+const parseConfig = module.exports.parseConfig = (app, config) => {
   for (const pipeline of config.pipelines) {
     debug(`processing pipeline ${pipeline.name}`);
 
     let router = loadProcessors(pipeline.processors || [], config);
     attachToApp(app, router, pipeline.publicEndpoints || {});
   }
-
-  return [app, config];
 };
 
 function readJsonFile(fileName) {
@@ -73,8 +76,4 @@ function attachToApp(app, router, publicEndpoints) {
   for (const ep of publicEndpoints) {
     app.use(ep.path, router);
   }
-}
-
-if (require.main === module) {
-  debug(loadConfig('example/config.json'));
 }
