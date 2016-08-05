@@ -4,7 +4,7 @@ const httpProxy = require('http-proxy');
 const lodash = require('lodash');
 const debug = require('debug')('gateway:proxy');
 
-const MisconfigurationError = require('./errors').MisconfigurationError;
+const MisconfigurationError = require('../errors').MisconfigurationError;
 
 function createMiddleware(params, config) {
   let privateEndpoint = lodash.get(config, ['privateEndpoints',
