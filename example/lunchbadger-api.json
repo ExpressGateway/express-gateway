@@ -1,0 +1,42 @@
+{
+  "privateEndpoints": {
+    "backend": {
+      "url": "http://localhost:3001"
+    }
+  },
+  "pipelines": [
+    {
+      "name": "lunchbadger-api",
+      "publicEndpoints": [
+        { "path": "/" }
+      ],
+      "processors": [
+        {
+          "condition": ["always"],
+          "action": "cors",
+          "params": {
+            "origin": ["http://localhost:8000"],
+            "credentials": true
+          }
+        },
+        {
+          "condition": ["always"],
+          "action": "oauth2",
+          "params": {
+            "issuer": "https://www.lunchbadger.com",
+            "audience": "4kzhU5LqlUpQJmjbMevWkWyt9adeKK",
+            "algorithms": ["RS256"],
+            "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvfjNBl0+VTV3Bg9Yk5vb\n2U4jrnQ7E8zOerwmMJHd4T432CpUqdLIhCupbz3wjvnW4K3zSc23wB/DHjhvpPEj\nH40kFfeIBKetv0/aoC8yEpkMDoRHNxsj+PfAHGnZwuCIU9S9CpcDdfHlWzM8YlKx\nbhLymO3mMkWlwApa3ryAw/3WAZqxcvdRQGfh+9bDym5OOkjg9ygAtf1oBTrEeK88\nwjsm7LUBxQ/CYzUHEmuTK66UxLZZYt8xY6wJ9OE+ZQauPlgfS2c+kA2NZMFqVVSe\nEkNj7jjkVlLgL4bqAxYk60RxkWe/ROKyiTdZkEsQz0MCmtkxTdmWRfbn7CM6MuJm\nQwIDAQAB\n-----END PUBLIC KEY-----"
+          }
+        },
+        {
+          "condition": ["always"],
+          "action": "proxy",
+          "params": {
+            "privateEndpoint": "backend"
+          }
+        }
+      ]
+    }
+  ]
+}

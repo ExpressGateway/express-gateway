@@ -59,11 +59,12 @@ function loadProcessors(spec, config) {
     // for better validation of the condition spec
     const condition = procSpec.condition || ['always'];
     const predicate = (req => runConditional(req, condition));
-    const action = processors(procSpec.action)(procSpec.params, config);
-    if (!action) {
+    const actionCtr = processors(procSpec.action);
+    if (!actionCtr) {
       throw new MisconfigurationError(
-        `Could not find action ${procSpec.action}`);
+        `Could not find action "${procSpec.action}"`);
     }
+    const action = actionCtr(procSpec.params, config);
 
     router.use((req, res, next) => {
       debug(`checking predicate for ${procSpec.action}`);

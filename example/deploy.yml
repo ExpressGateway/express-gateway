@@ -1,37 +1,46 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: gateway-foobar-dev
+  name: gateway-lunchbadger-dev
   labels:
-    producer: foobar
+    producer: lunchbadger
     environment: dev
 spec:
   replicas: 1
+  revisionHistoryLimit: 1
   template:
     metadata:
       labels:
-        run: gateway
+        app: gateway
+        producer: lunchbadger
+        environment: dev
     spec:
       containers:
         - name: gateway
-          image: localhost:31000/gateway:0.0.1
+          image: localhost:31000/gateway:0.0.2
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           volumeMounts:
             - mountPath: /etc/lunchbadger
               name: config
+          env:
+            - name: DEBUG
+              value: gateway:*
       volumes:
         - name: config
           configMap:
-            name: gateway-foobar-dev
+            name: gateway-lunchbadger-dev
+      nodeSelector:
+        lunchbadger.com/node-type: worker
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gateway-foobar-dev
+  name: gateway-lunchbadger-dev
   namespace: default
   labels:
-    producer: foobar
+    producer: lunchbadger
     environment: dev
   annotations:
     config-revision: <tbd>
@@ -40,14 +49,44 @@ data:
     {
       "bindPort": 3000,
       "bindHost": "0.0.0.0",
-      "rootPath": "http://gateway.root",
+      "privateEndpoints": {
+        "backend": {
+          "url": "http://configstore.default:3001"
+        }
+      },
       "pipelines": [
         {
-          "policies": [],
-          "proxies": [{
-            "privateEndpoint": "http://notesapp.default",
-            "contextPath": "/"
-          }]
+          "name": "lunchbadger-api",
+          "publicEndpoints": [
+            { "path": "/" }
+          ],
+          "processors": [
+            {
+              "condition": ["always"],
+              "action": "cors",
+              "params": {
+                "origin": ["http://localhost:8000"],
+                "credentials": true
+              }
+            },
+            {
+              "condition": ["always"],
+              "action": "oauth2",
+              "params": {
+                "issuer": "https://www.lunchbadger.com",
+                "audience": "4kzhU5LqlUpQJmjbMevWkWyt9adeKK",
+                "algorithms": ["RS256"],
+                "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvfjNBl0+VTV3Bg9Yk5vb\n2U4jrnQ7E8zOerwmMJHd4T432CpUqdLIhCupbz3wjvnW4K3zSc23wB/DHjhvpPEj\nH40kFfeIBKetv0/aoC8yEpkMDoRHNxsj+PfAHGnZwuCIU9S9CpcDdfHlWzM8YlKx\nbhLymO3mMkWlwApa3ryAw/3WAZqxcvdRQGfh+9bDym5OOkjg9ygAtf1oBTrEeK88\nwjsm7LUBxQ/CYzUHEmuTK66UxLZZYt8xY6wJ9OE+ZQauPlgfS2c+kA2NZMFqVVSe\nEkNj7jjkVlLgL4bqAxYk60RxkWe/ROKyiTdZkEsQz0MCmtkxTdmWRfbn7CM6MuJm\nQwIDAQAB\n-----END PUBLIC KEY-----"
+              }
+            },
+            {
+              "condition": ["always"],
+              "action": "proxy",
+              "params": {
+                "privateEndpoint": "backend"
+              }
+            }
+          ]
         }
       ]
     }
@@ -55,7 +94,7 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway
+  name: gateway-lunchbadger-dev
   labels:
     run: gateway
 spec:
@@ -63,5 +102,20 @@ spec:
     - port: 3000
       protocol: TCP
   selector:
-    run: gateway
-  type: LoadBalancer
+    app: gateway
+    producer: lunchbadger
+    environment: dev
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-lunchbadger-dev
+spec:
+  rules:
+    - host: api.lunchbadger.com
+      http:
+        paths:
+          - backend:
+              serviceName: gateway-lunchbadger-dev
+              servicePort: 3000
