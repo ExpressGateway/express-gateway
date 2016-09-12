@@ -25,7 +25,14 @@ function createOauth2Middleware(params) {
       }
       if (!user) {
         debug(`authentication failed: ${info.message}`);
-        res.status(401).send(`Unauthorized (${info.message})`);
+        res.status(401).send({
+          error: {
+            name: 'Unauthorized',
+            message: info.message,
+            status: 401,
+            statusCode: 401
+          }
+        });
         return;
       }
       return next();
