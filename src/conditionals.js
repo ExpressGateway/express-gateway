@@ -1,5 +1,7 @@
 'use strict';
 
+const minimatch = require('minimatch');
+
 function run(context, [functionName, ...args]) {
   const func = CONDITIONALS[functionName];
   if (!func) {
@@ -48,5 +50,12 @@ const CONDITIONALS = module.exports = {
     } else {
       return req.method === method;
     }
+  },
+
+  hostMatch: function(req, pattern) {
+    if (req.headers.host) {
+      return minimatch(req.headers.host, pattern);
+    }
+    return false;
   }
 };

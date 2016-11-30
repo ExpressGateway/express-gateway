@@ -30,6 +30,7 @@
     "express": "^4.14.0",
     "http-proxy": "^1.14.0",
     "limiter": "^1.1.0",
+    "minimatch": "^3.0.3",
     "morgan": "^1.7.0",
     "passport": "^0.3.2",
     "passport-jwt": "^2.1.0"
