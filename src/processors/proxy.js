@@ -17,7 +17,7 @@ function createMiddleware(params, config) {
 
   let proxy = httpProxy.createProxyServer({
     target: privateEndpoint,
-    changeOrigin: true
+    changeOrigin: params.changeOrigin || false
   });
   proxy.on('error', (err, _req, res) => {
     console.warn('Error', err);
