@@ -4,7 +4,8 @@ const MODULES = [
   './throttle',
   './proxy',
   './oauth2',
-  './cors'
+  './cors',
+  './log'
 ];
 
 const PROCESSORS = MODULES.reduce((pre, modName) => {
