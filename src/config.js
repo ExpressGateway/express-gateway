@@ -2,6 +2,8 @@
 
 const fs = require('fs');
 const express = require('express');
+const http = require('http');
+const https = require('https');
 const debug = require('debug')('gateway:config');
 const morgan = require('morgan');
 
@@ -16,7 +18,17 @@ function loadConfig(fileName) {
   attachStandardMiddleware(app);
   parseConfig(app, config);
 
-  return [app, config];
+  let server = undefined;
+  if (config.tls) {
+    server = https.createServer({
+      key: fs.readFileSync(config.tls.key),
+      cert: fs.readFileSync(config.tls.cert)
+    }, app);
+  } else {
+    server = http.createServer(app);
+  }
+
+  return [server, config];
 };
 
 function parseConfig(app, config) {

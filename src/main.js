@@ -3,11 +3,11 @@
 let configParser = require('./config');
 
 if (require.main === module) {
-  let app = undefined;
+  let server = undefined;
   let config = undefined;
   try {
-    [app, config] = configParser.loadConfig(process.argv[2] ||
-                                            '/etc/lunchbadger/gateway.conf');
+    [server, config] = configParser.loadConfig(process.argv[2] ||
+                                               '/etc/lunchbadger/gateway.conf');
   } catch (err) {
     if (err instanceof configParser.MisconfigurationError) {
       console.error(err.message);
@@ -19,7 +19,7 @@ if (require.main === module) {
   const bindPort = config.bindPort || 8080;
   const bindHost = config.bindHost || '127.0.0.1';
 
-  app.listen(bindPort, bindHost, () => {
+  server.listen(bindPort, bindHost, () => {
     console.log(`Listening on ${bindHost}:${bindPort}`);
   });
 }
