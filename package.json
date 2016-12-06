@@ -1,38 +1,63 @@
 {
-  "name": "gateway",
+  "name": "express-gateway",
   "version": "0.0.3",
-  "description": "Proxies HTTP requests with flexible policies",
+  "description": "A microservices API gateway built on top of ExpressJS",
+  "homepage": "https://www.express-gateway.io",
+  "repository": "expressgateway/express-gateway",
+  "keywords": [
+    "microservices",
+    "apis",
+    "api gateway",
+    "rest",
+    "express",
+    "middleware",
+    "endpoints",
+    "policies",
+    "pipelines",
+    "nodejs gateway",
+    "oauth2"
+  ],
+  "contributors": [
+    "Roman Lisagor <roman@lunchbadger.com>",
+    "Serhii Kuts <serhii@lunchbadger.com>",
+    "Irfan Baqui <irfan@lunchbadger.com>",
+    "Kevin Swiber <kevin@lunchbadger.com>",
+    "Al Tsang <al@lunchbadger.com>"
+  ],
+  "license": "Apache-2.0",
   "main": "src/main.js",
-  "scripts": {
-    "dist": "npm run clean && babel -d dist src",
-    "start": "DEBUG=gateway:* babel-watch .",
-    "start:dist": "node dist/main.js",
-    "pretest": "eslint .",
-    "clean": "rimraf dist/",
-    "test": "mocha --compilers js:babel-register tests"
+  "engines": {
+    "node" : ">= 6.0.0"
   },
-  "author": "Roman Lisagor <roman@lunchbadger.com>",
-  "license": "UNLICENSED",
-  "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "babel-core": "^6.10.4",
-    "babel-eslint": "^6.1.2",
-    "babel-plugin-transform-async-to-generator": "^6.8.0",
-    "babel-watch": "^2.0.2",
-    "chai": "^3.5.0",
-    "eslint": "^2.13.1",
-    "eslint-config-loopback": "^4.0.0",
-    "mocha": "^2.5.3",
-    "sinon": "^1.17.5"
+  "scripts": {
+    "start": "node src/index.js",
+    "start-dev": "LOG_LEVEL=debug node src/index.js",
+    "start:dist": "node dist/index.js",
+    "lint": "eslint --fix .",
+    "clean": "rimraf dist/",
+    "pretest": "eslint .",
+    "test": "EG_CONFIG_DIR=test/config mocha --recursive test/*"
   },
   "dependencies": {
-    "cors": "^2.8.1",
-    "express": "^4.14.0",
-    "http-proxy": "^1.14.0",
-    "limiter": "^1.1.0",
-    "minimatch": "^3.0.3",
-    "morgan": "^1.7.0",
-    "passport": "^0.3.2",
-    "passport-jwt": "^2.1.0"
+    "cors": "2.8.1",
+    "express": "4.14.0",
+    "http-proxy": "1.14.0",
+    "limiter": "1.1.0",
+    "minimatch": "3.0.3",
+    "morgan": "1.7.0",
+    "passport": "0.3.2",
+    "passport-jwt": "2.1.0"
+  },
+  "devDependencies": {
+    "babel-cli": "6.10.1",
+    "babel-core": "6.10.4",
+    "babel-eslint": "6.1.2",
+    "babel-plugin-transform-async-to-generator": "6.8.0",
+    "babel-watch": "2.0.2",
+    "chai": "3.5.0",
+    "eslint": "2.13.1",
+    "eslint-config-loopback": "4.0.0",
+    "mocha": "2.5.3",
+    "sinon": "1.17.5"
   }
 }

@@ -2,4 +2,8 @@ dist/
 node_modules/
 npm-debug.log
 example/keys/*.pem
+.DS_Store
+.idea
+**/.DS_Store
+**/.idea
 
