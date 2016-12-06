@@ -37,11 +37,11 @@ const CONDITIONALS = module.exports = {
   },
 
   pathMatch: function(req, pattern) {
-    return req.originalUrl.match(new RegExp(pattern)) != null;
+    return req.url.match(new RegExp(pattern)) != null;
   },
 
   pathExact: function(req, path) {
-    return req.originalUrl === path;
+    return req.url === path;
   },
 
   method: function(req, method) {

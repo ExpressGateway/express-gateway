@@ -55,18 +55,18 @@ describe('not', function() {
 describe('pathExact', function() {
   it('should return true if request url is the same', function() {
     assert.isTrue(run({
-      originalUrl: '/foo/bar/baz'
+      url: '/foo/bar/baz'
     }, ['pathExact', '/foo/bar/baz']));
   });
   it('should return false if request url is not the same', function() {
     assert.isFalse(run({
-      originalUrl: '/foo/bar'
+      url: '/foo/bar'
     }, ['pathExact', '/foo/bar/baz']));
     assert.isFalse(run({
-      originalUrl: '/foo/bar'
+      url: '/foo/bar'
     }, ['pathExact', '/flippyflip']));
     assert.isFalse(run({
-      originalUrl: '/foo/bar'
+      url: '/foo/bar'
     }, ['pathExact', 'is this even a url?']));
   });
 });
@@ -74,21 +74,21 @@ describe('pathExact', function() {
 describe('pathMatch', function() {
   it('should return true if request url matches', function() {
     assert.isTrue(run({
-      originalUrl: '/foo/bar'
+      url: '/foo/bar'
     }, ['pathMatch', '(/(foo|bar|baz))+/?']));
     assert.isTrue(run({
-      originalUrl: '/foo/bar/baz'
+      url: '/foo/bar/baz'
     }, ['pathMatch', '(/(foo|bar|baz))+/?']));
     assert.isTrue(run({
-      originalUrl: '/foo/bar/baz/blahblah'
+      url: '/foo/bar/baz/blahblah'
     }, ['pathMatch', '(/(foo|bar|baz))+/?']));
   });
   it('should return false if request url does not match', function() {
     assert.isTrue(run({
-      originalUrl: '/foo/bar/baz/blahblah'
+      url: '/foo/bar/baz/blahblah'
     }, ['pathMatch', '(/(foo|bar|baz))+/?']));
     assert.isFalse(run({
-      originalUrl: '/froo/brar'
+      url: '/froo/brar'
     }, ['pathMatch', '(/(foo|bar|baz))/?']));
   });
 });
@@ -130,8 +130,8 @@ describe('run', function() {
       ['pathMatch', '/foo(/baz)?(/bar)?']
     ];
 
-    assert.isTrue(run({originalUrl: '/foo/bar'}, rule));
+    assert.isTrue(run({url: '/foo/bar'}, rule));
     control[0] = 'always';
-    assert.isFalse(run({originalUrl: '/foo/bar'}, rule));
+    assert.isFalse(run({url: '/foo/bar'}, rule));
   });
 });
