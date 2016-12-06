@@ -6,7 +6,6 @@ metadata:
     producer: lunchbadger
     environment: dev
 spec:
-  replicas: 1
   revisionHistoryLimit: 1
   template:
     metadata:
@@ -17,13 +16,17 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: localhost:31000/gateway:0.0.2
+          image: 410240865662.dkr.ecr.us-west-2.amazonaws.com/gateway:0.0.3
           imagePullPolicy: Always
           ports:
-            - containerPort: 3000
+            - containerPort: 443
           volumeMounts:
             - mountPath: /etc/lunchbadger
               name: config
+              readOnly: true
+            - mountPath: /etc/lunchbadger-keys
+              name: keys
+              readOnly: true
           env:
             - name: DEBUG
               value: gateway:*
@@ -31,8 +34,16 @@ spec:
         - name: config
           configMap:
             name: gateway-lunchbadger-dev
+        - name: keys
+          secret:
+            secretName: gateway-lunchbadger-dev-tls
+      # It is not possible for the gateway to use hostPort to expose itself
+      # on the host as this does not work with CNI, so hostNetwork has to be
+      # used.
+      # (see https://github.com/kubernetes/kubernetes/issues/23920)
+      hostNetwork: true
       nodeSelector:
-        lunchbadger.com/node-type: worker
+        lunchbadger.com/node-type: public
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -47,12 +58,16 @@ metadata:
 data:
   gateway.conf: |-
     {
-      "bindPort": 3000,
+      "bindPort": 443,
       "bindHost": "0.0.0.0",
       "privateEndpoints": {
         "backend": {
-          "url": "http://configstore.default:3001"
+          "url": "http://10.3.0.11"
         }
+      },
+      "tls": {
+        "key": "/etc/lunchbadger-keys/key.pem",
+        "cert": "/etc/lunchbadger-keys/cert.pem"
       },
       "pipelines": [
         {
@@ -65,18 +80,32 @@ data:
               "condition": ["always"],
               "action": "cors",
               "params": {
-                "origin": ["http://localhost:8000"],
+                "origin": ["http://localhost:8000", "https://app.lunchbadger.com"],
                 "credentials": true
               }
             },
             {
-              "condition": ["always"],
+              "condition": ["pathMatch", "/[^/]+/explorer$"],
+              "action": "rewrite",
+              "params": {
+                "match": "/explorer$",
+                "replace": "/explorer/",
+                "redirect": 301
+              }
+            },
+            {
+              "condition": ["not",
+                ["allOf",
+                  ["hostMatch", "*.lunchbadger.io"],
+                  ["pathMatch", "/workspace(/.*)?$"]
+                ]
+              ],
               "action": "oauth2",
               "params": {
                 "issuer": "https://www.lunchbadger.com",
                 "audience": "4kzhU5LqlUpQJmjbMevWkWyt9adeKK",
                 "algorithms": ["RS256"],
-                "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvfjNBl0+VTV3Bg9Yk5vb\n2U4jrnQ7E8zOerwmMJHd4T432CpUqdLIhCupbz3wjvnW4K3zSc23wB/DHjhvpPEj\nH40kFfeIBKetv0/aoC8yEpkMDoRHNxsj+PfAHGnZwuCIU9S9CpcDdfHlWzM8YlKx\nbhLymO3mMkWlwApa3ryAw/3WAZqxcvdRQGfh+9bDym5OOkjg9ygAtf1oBTrEeK88\nwjsm7LUBxQ/CYzUHEmuTK66UxLZZYt8xY6wJ9OE+ZQauPlgfS2c+kA2NZMFqVVSe\nEkNj7jjkVlLgL4bqAxYk60RxkWe/ROKyiTdZkEsQz0MCmtkxTdmWRfbn7CM6MuJm\nQwIDAQAB\n-----END PUBLIC KEY-----"
+                "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7ATrA/pvXdzabRID6pBA\nA+i2zez6FG3SXw5peAV2oQUmd64JbO2vUMih4PIt5D/o6gHfzQDwI/5e8wpiNKKp\n81dpvy3uYecyfGT4x+FYQ4xj0p7dnczPlp5t1ottCXYQyyB07UZ4UsOT063CRhgi\n00HhlURBm+yjLwnlZv/VGDNzXNFX1+t+PbGC5Ab7R02Fsnp8TGfjUgzA6NDgerKi\nJcq/fSxRb5WSB/gscCGGWjvgIJrHOLI9ofaXFpoHCxePCsVkaR0JNz8Q89tIWvWv\n5msm062aD7y1ThfP6I3HeGf3dT6IavLOVD6Wk82/WN+aaQ7BKOstglWqzjJvcEvU\nOQIDAQAB\n-----END PUBLIC KEY-----"
               }
             },
             {
@@ -90,32 +119,3 @@ data:
         }
       ]
     }
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: gateway-lunchbadger-dev
-  labels:
-    run: gateway
-spec:
-  ports:
-    - port: 3000
-      protocol: TCP
-  selector:
-    app: gateway
-    producer: lunchbadger
-    environment: dev
-  type: ClusterIP
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: gateway-lunchbadger-dev
-spec:
-  rules:
-    - host: api.lunchbadger.com
-      http:
-        paths:
-          - backend:
-              serviceName: gateway-lunchbadger-dev
-              servicePort: 3000

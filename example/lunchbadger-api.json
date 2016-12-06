@@ -1,7 +1,7 @@
 {
   "privateEndpoints": {
     "backend": {
-      "url": "http://localhost:3001"
+      "url": "http://localhost:3000"
     }
   },
   "pipelines": [
@@ -26,7 +26,14 @@
             "issuer": "https://www.lunchbadger.com",
             "audience": "4kzhU5LqlUpQJmjbMevWkWyt9adeKK",
             "algorithms": ["RS256"],
-            "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvfjNBl0+VTV3Bg9Yk5vb\n2U4jrnQ7E8zOerwmMJHd4T432CpUqdLIhCupbz3wjvnW4K3zSc23wB/DHjhvpPEj\nH40kFfeIBKetv0/aoC8yEpkMDoRHNxsj+PfAHGnZwuCIU9S9CpcDdfHlWzM8YlKx\nbhLymO3mMkWlwApa3ryAw/3WAZqxcvdRQGfh+9bDym5OOkjg9ygAtf1oBTrEeK88\nwjsm7LUBxQ/CYzUHEmuTK66UxLZZYt8xY6wJ9OE+ZQauPlgfS2c+kA2NZMFqVVSe\nEkNj7jjkVlLgL4bqAxYk60RxkWe/ROKyiTdZkEsQz0MCmtkxTdmWRfbn7CM6MuJm\nQwIDAQAB\n-----END PUBLIC KEY-----"
+            "key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7ATrA/pvXdzabRID6pBA\nA+i2zez6FG3SXw5peAV2oQUmd64JbO2vUMih4PIt5D/o6gHfzQDwI/5e8wpiNKKp\n81dpvy3uYecyfGT4x+FYQ4xj0p7dnczPlp5t1ottCXYQyyB07UZ4UsOT063CRhgi\n00HhlURBm+yjLwnlZv/VGDNzXNFX1+t+PbGC5Ab7R02Fsnp8TGfjUgzA6NDgerKi\nJcq/fSxRb5WSB/gscCGGWjvgIJrHOLI9ofaXFpoHCxePCsVkaR0JNz8Q89tIWvWv\n5msm062aD7y1ThfP6I3HeGf3dT6IavLOVD6Wk82/WN+aaQ7BKOstglWqzjJvcEvU\nOQIDAQAB\n-----END PUBLIC KEY-----"
+          }
+        },
+        {
+          "condition": ["always"],
+          "action": "log",
+          "params": {
+            "message": "${req.method} ${req.originalUrl}"
           }
         },
         {
