@@ -5,7 +5,7 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const debug = require('debug')('gateway:oauth2');
 
-function createOauth2Middleware(params) {
+function createJwtMiddleware(params) {
   let jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeader(),
     issuer: params.issuer,
@@ -17,7 +17,7 @@ function createOauth2Middleware(params) {
   passport.use(new JwtStrategy(jwtOptions, (jwt, done) => {
     done(null, jwt);
   }));
-  return function oauth2Middleware(req, res, next) {
+  return function jwtMiddleware(req, res, next) {
     debug('authenticating with JWT token');
     passport.authenticate('jwt', (err, user, info) => {
       if (err) {
@@ -41,5 +41,5 @@ function createOauth2Middleware(params) {
 }
 
 module.exports = {
-  oauth2: createOauth2Middleware
+  jwt: createJwtMiddleware
 };

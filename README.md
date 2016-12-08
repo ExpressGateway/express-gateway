@@ -53,6 +53,8 @@ The name specifies a conditional function. This can be one of the following:
 
   - `method`. Parameter can be either a string (e.g. 'GET') or an array of such
     strings. Matches if the request's method matches the parameter.
+  - `hostMatch`. Parameter should be a regular expression. Matches if the
+    `Host` header passed with the request matches the parameter.
 
 In addition, several functions are provided that allow you to create logical
 combinations of conditions. The parameters to these functions should be other
@@ -147,6 +149,95 @@ with the following keys:
 - `privateEndpoint`: the name of the private endpoint to forward to.
 
 This processor type should generally be placed last in the list.
+
+#### JWT authentication
+
+Authenticates the request via a JWT token. Requests will need to supply an
+`Authentication` header with the value formatted as `JWT <token>`.
+
+The parameters are:
+
+- `issuer`: the required issuer name. This will be matched against the value
+  in the token provided with the request.
+- `audience`: the required audience name. This will be matched against the
+  value in the token provided with the request.
+- `key`: the public key for verifying the token signature, in PEM format.
+- `algorithms`: An array of the supported encryption/signing algorithms.
+
+Example:
+
+```json
+{
+  "params": {
+    "issuer": "https://www.lunchbadger.com",
+    "audience": "4kzhU5LqlUpQJmjbMevWkWyt9adeKK",
+    "algorithms": ["RS256"],
+    "key": "-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
+  }
+}
+```
+
+#### CORS
+
+Provides [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
+support via the [cors](https://www.npmjs.com/package/cors) node package. The
+parameters are passed through to the `cors`. See the module's documentation for
+details.
+
+Example:
+
+```json
+...
+"processors": [
+  {
+    "condition": ["always"],
+    "action": "cors",
+    "params": {
+      "origin": ["http://www.example.com"],
+      "credentials": true
+    }
+  }
+]
+```
+
+#### Logging
+
+Provides capability for simple logging. The only parameter is `message`, with
+a string specifying the message to log. This can include placeholders using
+the JavaScript [ES6 template literal syntax](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Template_literals).
+
+Example:
+
+```json
+...
+"processors": [
+  {
+    "condition": ["always"],
+    "action": "log",
+    "params": {
+      "message": "${req.method} ${req.originalUrl}"
+    }
+  }
+]
+```
+
+#### URL Rewriting
+
+Allows the URL path to be modified using regular expressions. This can be
+useful if the target URL that needs to be proxied to is different from the
+request. Takes the following parameters:
+
+- `match`: the regular expression to match. Can include capturing groups.
+- `replace`: the string to replace the matched text with. Can include
+   references to the captured groups.
+- `flags`: flags for the regular expression engine, described
+  [here](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp#Parameters)
+- `redirect`: if this is not specified then all following processors, including
+  the proxy, will treat the request as if it had been made to the rewritten
+  URL. This parameter changes the operation into a redirection instead. The
+  value of the parameter should be the HTTP status code to return (must be in
+  the 300-range). Note that this will terminate the flow and no subsequent
+  processors will be executed.
 
 ### Full config example
 

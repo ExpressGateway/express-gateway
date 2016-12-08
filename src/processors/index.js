@@ -3,7 +3,7 @@
 const MODULES = [
   './throttle',
   './proxy',
-  './oauth2',
+  './jwt',
   './cors',
   './log',
   './rewrite'

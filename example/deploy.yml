@@ -100,7 +100,7 @@ data:
                   ["pathMatch", "/workspace(/.*)?$"]
                 ]
               ],
-              "action": "oauth2",
+              "action": "jwt",
               "params": {
                 "issuer": "https://www.lunchbadger.com",
                 "audience": "4kzhU5LqlUpQJmjbMevWkWyt9adeKK",
