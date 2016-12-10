@@ -11,6 +11,7 @@ top level, with the following keys:
 
 - `bindPort`: the port to listen on. Defaults to 8080
 - `bindHost`: the IP address to listen on. Defaults to "0.0.0.0"
+- `tls`: described below
 - `privateEndpoints`: the URLs that the gateway will proxy to. Represented as a
   mapping of endpoint name to an object with the following keys:
   - `url`: the URL to forward requests to
@@ -26,6 +27,37 @@ top level, with the following keys:
     - `condition`. This condition must be satisfied to trigger the action.
     - `action`. The name of the action to carry out.
     - `params`. The parameters for the action.
+
+### TLS
+
+The gateway supports TLS, including SNI (domain-specific TLS certificates). To
+configure, use the `tls` option. This option should be an object. Each key
+should be a wildcard pattern for matching the domain, and the value should be
+an object with `key` and `cert` as keys and paths to the files containing the
+data in PEM format.
+
+The special key `default` specifies the cert data to be used if none of the
+other domain patterns can be matched, or if SNI is not being used by the
+client.
+
+For example:
+
+```json
+  {
+    "*.lunchbadger.io": {
+      "key": "example/keys/lunchbadger.io.key.pem",
+      "cert": "example/keys/lunchbadger.io.cert.pem"
+    },
+    "api.lunchbadger.com": {
+      "key": "example/keys/lunchbadger.com.key.pem",
+      "cert": "example/keys/lunchbadger.com.cert.pem"
+    },
+    "default": {
+      "key": "example/keys/lunchbadger.io.key.pem",
+      "cert": "example/keys/lunchbadger.io.cert.pem"
+    }
+  }
+```
 
 ### Processor conditions
 

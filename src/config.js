@@ -6,6 +6,8 @@ const http = require('http');
 const https = require('https');
 const debug = require('debug')('gateway:config');
 const morgan = require('morgan');
+const minimatch = require('minimatch');
+const tls = require('tls');
 
 const MisconfigurationError = require('./errors').MisconfigurationError;
 const processors = require('./processors');
@@ -20,16 +22,59 @@ function loadConfig(fileName) {
 
   let server = undefined;
   if (config.tls) {
-    server = https.createServer({
-      key: fs.readFileSync(config.tls.key),
-      cert: fs.readFileSync(config.tls.cert)
-    }, app);
+    server = createTlsServer(config.tls, app);
   } else {
     server = http.createServer(app);
   }
 
   return [server, config];
 };
+
+function createTlsServer(tlsConfig, app) {
+  let defaultCert = null;
+  let sniCerts = [];
+
+  for (let [domain, certPaths] of Object.entries(tlsConfig)) {
+    let cert;
+    if (domain === 'default') {
+      cert = defaultCert = {};
+    } else {
+      cert = {};
+      sniCerts.push([domain, cert]);
+    }
+
+    cert.key = fs.readFileSync(certPaths.key, 'utf-8');
+    cert.cert = fs.readFileSync(certPaths.cert, 'utf-8');
+  }
+
+  let options = {};
+
+  if (defaultCert) {
+    options.key = defaultCert.key;
+    options.cert = defaultCert.cert;
+  }
+
+  if (sniCerts.length > 0) {
+    options.SNICallback = (servername, cb) => {
+      for (let [domain, cert] of sniCerts) {
+        if (minimatch(servername, domain)) {
+          debug(`sni: using cert for ${domain}`);
+          cb(null, tls.createSecureContext(cert));
+          return;
+        }
+      }
+      if (defaultCert) {
+        debug('sni: using default cert');
+        cb(null, tls.createSecureContext(defaultCert));
+      } else {
+        debug('sni: no cert!');
+        cb(new Error('cannot start TLS - no cert configured'));
+      }
+    };
+  }
+
+  return https.createServer(options, app);
+}
 
 function parseConfig(app, config) {
   for (const pipeline of config.pipelines) {
