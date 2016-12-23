@@ -21,7 +21,12 @@ function createMiddleware(params, config) {
   });
   proxy.on('error', (err, _req, res) => {
     console.warn('Error', err);
-    res.status(502).send('Bad gateway.');
+
+    if (!res.headersSent) {
+      res.status(502).send('Bad gateway.');
+    } else {
+      res.end();
+    }
   });
 
   return function proxyHandler(req, res, _next) {
