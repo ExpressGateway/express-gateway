@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: 410240865662.dkr.ecr.us-west-2.amazonaws.com/gateway:0.0.3
+          image: 410240865662.dkr.ecr.us-west-2.amazonaws.com/gateway:0.0.4
           imagePullPolicy: Always
           ports:
             - containerPort: 443
@@ -24,8 +24,8 @@ spec:
             - mountPath: /etc/lunchbadger
               name: config
               readOnly: true
-            - mountPath: /etc/lunchbadger-keys
-              name: keys
+            - mountPath: /etc/lunchbadger-tls
+              name: lunchbadger-tls
               readOnly: true
           env:
             - name: DEBUG
@@ -34,9 +34,9 @@ spec:
         - name: config
           configMap:
             name: gateway-lunchbadger-dev
-        - name: keys
+        - name: lunchbadger-tls
           secret:
-            secretName: gateway-lunchbadger-dev-tls
+            secretName: lunchbadger-tls
       # It is not possible for the gateway to use hostPort to expose itself
       # on the host as this does not work with CNI, so hostNetwork has to be
       # used.
@@ -66,8 +66,18 @@ data:
         }
       },
       "tls": {
-        "key": "/etc/lunchbadger-keys/key.pem",
-        "cert": "/etc/lunchbadger-keys/cert.pem"
+        "*.lunchbadger.io": {
+          "key": "/etc/lunchbadger-tls/lunchbadger.io.key.pem",
+          "cert": "/etc/lunchbadger-tls/lunchbadger.io.cert.pem"
+        },
+        "api.lunchbadger.com": {
+          "key": "/etc/lunchbadger-tls/lunchbadger.com.key.pem",
+          "cert": "/etc/lunchbadger-tls/lunchbadger.com.cert.pem"
+        },
+        "default": {
+          "key": "/etc/lunchbadger-tls/lunchbadger.io.key.pem",
+          "cert": "/etc/lunchbadger-tls/lunchbadger.io.cert.pem"
+        }
       },
       "pipelines": [
         {
@@ -95,9 +105,15 @@ data:
             },
             {
               "condition": ["not",
-                ["allOf",
-                  ["hostMatch", "*.lunchbadger.io"],
-                  ["pathMatch", "/workspace(/.*)?$"]
+                ["oneOf",
+                  ["allOf",
+                    ["hostMatch", "*.lunchbadger.io"],
+                    ["pathMatch", "/workspace(/.*)?$"]
+                  ],
+                  ["allOf",
+                    ["hostMatch", "api.lunchbadger.com"],
+                    ["pathMatch", "^/git"]
+                  ]
                 ]
               ],
               "action": "jwt",

@@ -1,6 +1,6 @@
 {
   "name": "gateway",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Proxies HTTP requests with flexible policies",
   "main": "src/main.js",
   "scripts": {

@@ -1,4 +1,19 @@
 {
+  "bindPort": 443,
+  "tls": {
+    "*.lunchbadger.io": {
+      "key": "example/keys/lunchbadger.io.key.pem",
+      "cert": "example/keys/lunchbadger.io.cert.pem"
+    },
+    "api.lunchbadger.com": {
+      "key": "example/keys/lunchbadger.com.key.pem",
+      "cert": "example/keys/lunchbadger.com.cert.pem"
+    },
+    "default": {
+      "key": "example/keys/lunchbadger.io.key.pem",
+      "cert": "example/keys/lunchbadger.io.cert.pem"
+    }
+  },
   "privateEndpoints": {
     "backend": {
       "url": "http://localhost:3000"
