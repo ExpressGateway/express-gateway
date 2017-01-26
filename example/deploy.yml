@@ -108,7 +108,7 @@ data:
                 ["oneOf",
                   ["allOf",
                     ["hostMatch", "*.lunchbadger.io"],
-                    ["pathMatch", "/workspace(/.*)?$"]
+                    ["not", ["hostMatch", "internal-*.lunchbadger.io"]]
                   ],
                   ["allOf",
                     ["hostMatch", "api.lunchbadger.com"],
