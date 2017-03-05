@@ -1,7 +1,7 @@
-Gateway
+Express Gateway
 =======
 
-This is a PoC of a simple HTTP proxy.
+This is an API Gateway built using Express and Express middleware.
 
 Configuration
 -------------
