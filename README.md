@@ -157,11 +157,11 @@ Example:
   "action": "throttle",
   "params": {
     "all": {
-      "rate": 100,
+      "rate": 1000,
       "period": "minute"
     },
     "foo": {
-      "rate": 1000,
+      "rate": 100,
       "period": "minute"
     }
   }
