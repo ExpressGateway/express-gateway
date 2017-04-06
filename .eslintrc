@@ -12,7 +12,7 @@
     "no-var": "error",
     "no-unused-vars": ["error", {
       "argsIgnorePattern": "^_.*",
-      "args": "all"
+      "args": "after-used"
     }],
     "prefer-arrow-callback": "error"
   },

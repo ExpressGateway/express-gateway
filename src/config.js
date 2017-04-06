@@ -16,9 +16,21 @@ const runConditional = require('./conditionals').run;
 function loadConfig(fileName) {
   let config = readJsonFile(fileName);
   let app = express();
-
+  let rootRouter;
   attachStandardMiddleware(app);
-  parseConfig(app, config);
+  rootRouter = parseConfig(config);
+
+  app.use((req, res, next) => {
+    rootRouter(req, res, next);
+  });
+
+  //hot swap router
+  fs.watch(fileName, (evt, name)=>{
+    console.log(`watch file triggered ${evt} file ${name}
+      note: loading file ${fileName}`);
+    let config = readJsonFile(fileName);
+    rootRouter = parseConfig(config);
+  });
 
   let server = undefined;
   if (config.tls) {
@@ -76,13 +88,15 @@ function createTlsServer(tlsConfig, app) {
   return https.createServer(options, app);
 }
 
-function parseConfig(app, config) {
+function parseConfig(config) {
+  let app = express.Router();
   for (const pipeline of config.pipelines) {
     debug(`processing pipeline ${pipeline.name}`);
 
     let router = loadProcessors(pipeline.processors || [], config);
     attachToApp(app, router, pipeline.publicEndpoints || {});
   }
+  return app;
 };
 
 function readJsonFile(fileName) {

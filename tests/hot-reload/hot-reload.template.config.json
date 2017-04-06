@@ -1,0 +1,31 @@
+{
+  "privateEndpoints": {
+    "backend": {
+      "url": ""
+    }
+  },
+  "pipelines": [
+    {
+      "name": "api",
+      "publicEndpoints": [
+        { "path": "/" }
+      ],
+      "processors": [
+        {
+          "condition": ["always"],
+          "action": "log",
+          "params": {
+            "message": "${req.method} ${req.originalUrl}"
+          }
+        },
+        {
+          "condition": ["always"],
+          "action": "proxy",
+          "params": {
+            "privateEndpoint": "backend"
+          }
+        }
+      ]
+    }
+  ]
+}

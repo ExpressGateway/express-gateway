@@ -1,18 +1,13 @@
 'use strict';
 
 const assert = require('chai').assert;
-const sinon = require('sinon');
-
 const parseConfig = require('../src/config').parseConfig;
 
 describe('config parser', function() {
-  let app = undefined;
+  let router = undefined;
 
   before(function() {
-    app = {
-      use: sinon.spy()
-    };
-    parseConfig(app, {
+    router = parseConfig({
       privateEndpoints: {
         backend: {
           url: 'http://www.example.com'
@@ -44,13 +39,14 @@ describe('config parser', function() {
     });
   });
 
-  it('sets up handlers for each public endpoint', function() {
-    assert(app.use.calledWithMatch('/foo', sinon.match.func));
-    assert(app.use.calledWithMatch('/bar', sinon.match.func));
+  it('sets up handlers for public endpoint foo', function() {
+    assert(router.stack[0].regexp.toString().indexOf('/foo') >= 0);
+  });
+  it('sets up handlers for public endpoint bar', function() {
+    assert(router.stack[1].regexp.toString().indexOf('/bar') >= 0);
   });
 
   it('sets up processors correctly', function() {
-    let router = app.use.getCall(0).args[1];
     assert.property(router, 'stack');
     assert.isArray(router.stack);
     assert.lengthOf(router.stack, 2);
