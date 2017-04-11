@@ -1,0 +1,36 @@
+{
+  "privateEndpoints": {
+    "backend": {
+      "url": "http://localhost:3000"
+    }
+  },
+  "pipelines": [
+    {
+      "name": "example-pipeline",
+      "policies": [
+        {
+          "condition": ["always"],
+          "action": "cors",
+          "params": {
+            "origin": ["http://localhost:8000"],
+            "credentials": true
+          }
+        },
+        {
+          "condition": ["always"],
+          "action": "log",
+          "params": {
+            "message": "${req.method} ${req.originalUrl}"
+          }
+        },
+        {
+          "condition": ["always"],
+          "action": "proxy",
+          "params": {
+            "privateEndpoint": "backend"
+          }
+        }
+      ]
+    }
+  ]
+}

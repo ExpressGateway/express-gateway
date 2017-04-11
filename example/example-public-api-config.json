@@ -1,0 +1,19 @@
+{
+  "example-api":{
+    "endpoints":[
+      {
+        "host": "*.example.io",
+        "bindPort":443,
+        "tls": {
+          "key": "example/keys/example.io.key.pem",
+          "cert": "example/keys/example.io.cert.pem"
+        }
+      },
+      {
+        "host": "*.example.io",
+        "bindPort":80
+      }
+    ],
+    "pipeline":"example-pipeline"
+  }
+}
