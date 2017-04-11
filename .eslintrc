@@ -3,9 +3,10 @@
   "parserOptions": {
     "sourceType": "script"
   },
-  "extends": "loopback",
+  "extends": "defaults",
   "env": {
-    "es6": true
+    "es6": true,
+    "node": true
   },
   "rules": {
     "comma-dangle": "off",
@@ -14,7 +15,8 @@
       "argsIgnorePattern": "^_.*",
       "args": "after-used"
     }],
-    "prefer-arrow-callback": "error"
+    "prefer-arrow-callback": "warn",
+    "no-console": "warn"
   },
   "root": true
 }

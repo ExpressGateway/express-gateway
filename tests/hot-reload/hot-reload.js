@@ -31,16 +31,16 @@ describe('hot-reload', () => {
       .then((srvTarget) => {
         appTarget = srvTarget.app;
         done();
-      }).catch(err=> {
+      }).catch(err => {
         done(err);
       });
   });
 
   it('should proxy to server on ' + port1, (done) => {
-    request('http://localhost:' + gatewayPort, (error, response, body) =>  {
+    request('http://localhost:' + gatewayPort, (error, response, body) => {
       if (error) {
-        done(err);
-      };
+        done(error);
+      }
       assert.ok(body.indexOf(port1) >= 0);
       done();
     });
@@ -49,10 +49,10 @@ describe('hot-reload', () => {
   it('should proxy to server on ' + port2, (done) => {
     configTemplate.privateEndpoints.backend.url = 'http://localhost:' + port2;
     fs.writeFileSync(tmpConfigFile.name, JSON.stringify(configTemplate));
-    request('http://localhost:' + gatewayPort, (error, response, body) =>  {
+    request('http://localhost:' + gatewayPort, (error, response, body) => {
       if (error) {
-        done(err);
-      };
+        done(error);
+      }
       assert.ok(body.indexOf(port2) >= 0);
       done();
     });

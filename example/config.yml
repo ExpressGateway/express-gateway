@@ -1,0 +1,70 @@
+public_endpoints: # specify pipeline per domain and path
+  cats:
+    host: "*.cats.com"
+    path: /
+    pipeline: cats_pipeline
+  mycats:
+    host: "*.mycats.com"
+    path: /cats
+    pipeline: cats_pipeline
+  dogs:
+    host: big-dogs.com
+    path: /
+    pipeline: dogs_pipeline
+
+http:
+  port: 9080
+
+https: # enable https server
+  port: 9443
+  certificates: # will use SNI callback to provide proper certificate for domain
+      "*.lunchbadger.io":
+        key: "example/keys/lunchbadger.io.key.pem"
+        cert: "example/keys/lunchbadger.io.cert.pem"
+      "api.lunchbadger.com":
+        key: "example/keys/lunchbadger.com.key.pem"
+        cert: "example/keys/lunchbadger.com.cert.pem"
+      "default":
+        key: "example/keys/lunchbadger.io.key.pem"
+        cert: "example/keys/lunchbadger.io.cert.pem"
+
+private_endpoints: # urls to downstream services
+  cats_service:
+    url: "http://localhost:3000"
+  dogs_service:
+    url: http://localhost:3000
+
+pipelines:
+  cats_pipeline:
+    title: Cats Pipeline
+    policies:
+      action: proxy, # proxy to cats_service downstream service
+      params:
+          private_endpoint: cats_service
+
+  dogs_pipeline:
+    title: dogs Pipeline
+    policies:
+      - condition: always,
+        action: oauth2-basic,
+        params:
+      - action: oauth2-bearer,
+      - action: ensure-autenticated,
+      - action: proxy, # proxy to dogs_service downstream service
+        params:
+          private_endpoint: dogs_service
+
+apis:
+  animals:
+    name: animals
+    plan: free
+    public_endpoints:
+    - cats
+    - mycats
+    - dogs
+
+
+
+
+
+

@@ -6,7 +6,7 @@ const MODULES = [
   './jwt',
   './cors',
   './log',
-  './rewrite'
+  './rewrite',
 ];
 
 const PROCESSORS = MODULES.reduce((pre, modName) => {

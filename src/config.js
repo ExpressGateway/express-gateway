@@ -7,14 +7,16 @@ const https = require('https');
 const debug = require('debug')('gateway:config');
 const morgan = require('morgan');
 const minimatch = require('minimatch');
+const path = require('path')
 const tls = require('tls');
+const yaml = require('js-yaml');
 
 const MisconfigurationError = require('./errors').MisconfigurationError;
-const processors = require('./processors');
+const policies = require('./policies');
 const runConditional = require('./conditionals').run;
 
 function loadConfig(fileName) {
-  let config = readJsonFile(fileName);
+  let config = readConfigFile(fileName);
   let app = express();
   let rootRouter;
   attachStandardMiddleware(app);
@@ -25,10 +27,10 @@ function loadConfig(fileName) {
   });
 
   //hot swap router
-  fs.watch(fileName, (evt, name)=>{
+  fs.watch(fileName, (evt, name) => {
     console.log(`watch file triggered ${evt} file ${name}
       note: loading file ${fileName}`);
-    let config = readJsonFile(fileName);
+    let config = readConfigFile(fileName);
     rootRouter = parseConfig(config);
   });
 
@@ -40,7 +42,7 @@ function loadConfig(fileName) {
   }
 
   return [server, config];
-};
+}
 
 function createTlsServer(tlsConfig, app) {
   let defaultCert = null;
@@ -93,16 +95,21 @@ function parseConfig(config) {
   for (const pipeline of config.pipelines) {
     debug(`processing pipeline ${pipeline.name}`);
 
-    let router = loadProcessors(pipeline.processors || [], config);
+    let router = loadpolicies(pipeline.policies || [], config);
     attachToApp(app, router, pipeline.publicEndpoints || {});
   }
   return app;
-};
+}
 
-function readJsonFile(fileName) {
+function readConfigFile(fileName) {
   if (fs.existsSync(fileName)) {
     try {
-      return JSON.parse(fs.readFileSync(fileName));
+      let fileContent = fs.readFileSync(fileName);
+      if (path.extname(fileName) === '.json') {
+        return JSON.parse(fileContent);
+      } else { // defaults to yaml
+        return yaml.load(fileContent);
+      }
     } catch (err) {
       if (err instanceof SyntaxError) {
         throw new MisconfigurationError(`Bad config file format: ${err}`);
@@ -122,7 +129,7 @@ function attachStandardMiddleware(app) {
     ':method (:target) :url :status :response-time ms - :res[content-length]'));
 }
 
-function loadProcessors(spec, config) {
+function loadpolicies(spec, config) {
   let router = express.Router();
 
   for (const procSpec of spec) {
@@ -130,7 +137,7 @@ function loadProcessors(spec, config) {
     // for better validation of the condition spec
     const condition = procSpec.condition || ['always'];
     const predicate = (req => runConditional(req, condition));
-    const actionCtr = processors(procSpec.action);
+    const actionCtr = policies(procSpec.action);
     if (!actionCtr) {
       throw new MisconfigurationError(
         `Could not find action "${procSpec.action}"`);
