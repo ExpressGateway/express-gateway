@@ -1,6 +1,6 @@
 {
   "example-api":{
-    "endpoints":[
+    "publicEndpoints":[
       {
         "host": "*.example.io",
         "bindPort":443,
