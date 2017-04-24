@@ -1,0 +1,47 @@
+http:                 # if not specified EG will not start http server
+  port: 9080
+
+
+publicEndpoints: # specify pipeline per domain and path
+  cats:
+    host: "*.cats.com"  # regexp support
+    path: /             # optional defaults to /
+    pipeline: cats_pipeline
+  mycats:
+    host: "*.mycats.com"
+    path: /cats
+    pipeline: cats_pipeline
+  big-dogs:
+    host: big-dogs.com
+    pipeline: dogs_pipeline
+  animals-cats:
+    host: "animals.com"
+    path: /cats
+    pipeline: cats_pipeline
+  animals-dogs:
+    host: "animals.com"
+    path: /dogs
+    pipeline: dogs_pipeline
+
+
+privateEndpoints: # urls to downstream services
+  cats_service:
+    url: "http://localhost"
+    port: 3000
+    path: /             # optional defaults to /
+  dogs_service:
+    url: http://localhost
+    port: 4000
+
+pipelines:
+  cats_pipeline:
+    title: Cats Pipeline
+    policies:
+      - action:
+          name: srv1
+
+  dogs_pipeline:
+    title: dogs Pipeline
+    policies:
+      - action:
+          name: srv2

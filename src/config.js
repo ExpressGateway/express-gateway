@@ -4,11 +4,12 @@ const fs = require('fs');
 const express = require('express');
 const http = require('http');
 const https = require('https');
-const debug = require('debug')('gateway:config');
+const debug = require('debug')('EG:config');
 const morgan = require('morgan');
 const minimatch = require('minimatch');
 const path = require('path')
 const tls = require('tls');
+const vhost = require('vhost');
 const yaml = require('js-yaml');
 
 const MisconfigurationError = require('./errors').MisconfigurationError;
@@ -28,7 +29,7 @@ function loadConfig(fileName) {
 
   //hot swap router
   fs.watch(fileName, (evt, name) => {
-    console.log(`watch file triggered ${evt} file ${name}
+    debug(`watch file triggered ${evt} file ${name}
       note: loading file ${fileName}`);
     let config = readConfigFile(fileName);
     rootRouter = parseConfig(config);
@@ -91,14 +92,54 @@ function createTlsServer(tlsConfig, app) {
 }
 
 function parseConfig(config) {
-  let app = express.Router();
-  for (const pipeline of config.pipelines) {
-    debug(`processing pipeline ${pipeline.name}`);
+  let app = express.Router()
+  let pipelineRoutes = parsePipelines(config)
 
-    let router = loadpolicies(pipeline.policies || [], config);
-    attachToApp(app, router, pipeline.publicEndpoints || {});
+  let publicEndpoints = parsePublicEndpoints(config)
+  for (let host of Object.keys(publicEndpoints)) {
+    let publicEndpoint = publicEndpoints[host]
+    debug(`creating vhost for ${host}`);
+    let vhostRouter = express.Router()
+    for (let route of publicEndpoint.routes) {
+      debug(`registering vhost route ${host} ${route.path} pipeline: ${route.pipeline}`);
+      let pipeline = pipelineRoutes[route.pipeline]
+      if (!pipeline) {
+        throw new MisconfigurationError(`Failed to find pipeline ${route.pipeline} for ${host} ${route.path}`)
+      }
+      vhostRouter.use(route.path, pipeline)
+    }
+    app.use(vhost(host, vhostRouter));
   }
   return app;
+}
+
+function parsePipelines(config) {
+  let pipelineRoutes = {};
+  for (let pipelineId in config.pipelines) {
+    let pipeline = config.pipelines[pipelineId];
+    debug(`processing pipeline ${pipeline.title || pipelineId}`);
+    let router = loadPolicies(pipeline.policies || [], config);
+    if (pipelineRoutes[pipelineId]) {
+      throw new MisconfigurationError("Duplicate pipeline id " + pipelineId);
+    }
+    pipelineRoutes[pipelineId] = router;
+  }
+  return pipelineRoutes;
+}
+
+function parsePublicEndpoints(config) {
+  let publicEndpoints = config.publicEndpoints;
+  let endpointsConfig = {};
+  for (let endpointName in publicEndpoints) {
+    let pe = publicEndpoints[endpointName];
+    endpointsConfig[pe.host] = endpointsConfig[pe.host] || { routes: [] }
+    endpointsConfig[pe.host].routes.push({
+      name: endpointName,
+      path: pe.path || '/',
+      pipeline: pe.pipeline
+    })
+  }
+  return endpointsConfig;
 }
 
 function readConfigFile(fileName) {
@@ -129,25 +170,25 @@ function attachStandardMiddleware(app) {
     ':method (:target) :url :status :response-time ms - :res[content-length]'));
 }
 
-function loadpolicies(spec, config) {
+function loadPolicies(spec, config) {
   let router = express.Router();
-
-  for (const procSpec of spec) {
+  for (const policySpec of spec) {
     // TODO: compile all nested s-expressions in advance. This will allow
     // for better validation of the condition spec
-    const condition = procSpec.condition || ['always'];
+    const condition = policySpec.condition || {};
+    condition.name = condition.name || 'always'
     const predicate = (req => runConditional(req, condition));
-    const actionCtr = policies(procSpec.action);
+    const actionCtr = policies.resolve(policySpec.action.name);
     if (!actionCtr) {
       throw new MisconfigurationError(
-        `Could not find action "${procSpec.action}"`);
+        `Could not find action "${policySpec.action.name}"`);
     }
-    const action = actionCtr(procSpec.params, config);
+    const action = actionCtr(policySpec.action, config);
 
     router.use((req, res, next) => {
-      debug(`checking predicate for ${procSpec.action}`);
+      debug(`checking predicate for ${policySpec.action}`);
       if (predicate(req)) {
-        debug(`request matched predicate for ${procSpec.action}`);
+        debug(`request matched predicate for ${policySpec.action}`);
         action(req, res, next);
       } else {
         next();
@@ -158,14 +199,9 @@ function loadpolicies(spec, config) {
   return router;
 }
 
-function attachToApp(app, router, publicEndpoints) {
-  for (const ep of publicEndpoints) {
-    app.use(ep.path, router);
-  }
-}
-
 module.exports = {
   loadConfig,
   parseConfig,
+  readConfigFile,
   MisconfigurationError
 };

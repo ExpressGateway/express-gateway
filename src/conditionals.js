@@ -2,12 +2,12 @@
 
 const minimatch = require('minimatch');
 
-function run(context, [functionName, ...args]) {
-  const func = CONDITIONALS[functionName];
+function run(context, conditionConfig) {
+  const func = CONDITIONALS[conditionConfig.name];
   if (!func) {
     return null;
   } else {
-    return func(context, ...args);
+    return func(context, conditionConfig);
   }
 }
 
@@ -32,23 +32,23 @@ const CONDITIONALS = module.exports = {
     return subItems.some(subItem => run(req, subItem));
   },
 
-  not: function(req, subItem) {
-    return !run(req, subItem);
+  not: function(req, actionConfig) {
+    return !run(req, actionConfig.condition);
   },
 
-  pathMatch: function(req, pattern) {
-    return req.url.match(new RegExp(pattern)) != null;
+  pathMatch: function(req, actionConfig) {
+    return req.url.match(new RegExp(actionConfig.pattern)) != null;
   },
 
-  pathExact: function(req, path) {
-    return req.url === path;
+  pathExact: function(req, actionConfig) {
+    return req.url === actionConfig.path;
   },
 
-  method: function(req, method) {
-    if (Array.isArray(method)) {
-      return method.includes(req.method);
+  method: function(req, actionConfig) {
+    if (Array.isArray(actionConfig.method)) {
+      return actionConfig.method.includes(req.method);
     } else {
-      return req.method === method;
+      return req.method === actionConfig.method;
     }
   },
 
