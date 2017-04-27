@@ -94,7 +94,10 @@ function createTlsServer(tlsConfig, app) {
 function parseConfig(config) {
   let app = express.Router()
   let pipelineRoutes = parsePipelines(config)
-
+  app.use((req, res, next) => {
+    debug("processing app %s", req.hostname)
+    return next();
+  })
   let publicEndpoints = parsePublicEndpoints(config)
   for (let host of Object.keys(publicEndpoints)) {
     let publicEndpoint = publicEndpoints[host]
@@ -106,9 +109,18 @@ function parseConfig(config) {
       if (!pipeline) {
         throw new MisconfigurationError(`Failed to find pipeline ${route.pipeline} for ${host} ${route.path}`)
       }
-      vhostRouter.use(route.path, pipeline)
+      vhostRouter.use((req, res, next) => {
+        debug("processing vhost %s", host)
+        return next();
+      })
+      let vpath = route.path || '/';
+      if (route.path_regex) {
+        vpath = new RegExp(route.path_regex);
+      }
+      vhostRouter.use(vpath, pipeline)
     }
-    app.use(vhost(host, vhostRouter));
+    let virtualHost = publicEndpoint.isRegex ? new RegExp(host) : host
+    app.use(vhost(virtualHost, vhostRouter));
   }
   return app;
 }
@@ -132,10 +144,23 @@ function parsePublicEndpoints(config) {
   let endpointsConfig = {};
   for (let endpointName in publicEndpoints) {
     let pe = publicEndpoints[endpointName];
-    endpointsConfig[pe.host] = endpointsConfig[pe.host] || { routes: [] }
-    endpointsConfig[pe.host].routes.push({
+    let host = pe.host;
+    let isRegex = false;
+    if (!host) {
+      host = pe.host_regex;
+      isRegex = true
+    }
+    if (!host) {
+      throw new MisconfigurationError('Public domain must have host or host_regex defined');
+    }
+    endpointsConfig[host] = endpointsConfig[host] || {
+      routes: [],
+      isRegex
+    }
+    endpointsConfig[host].routes.push({
       name: endpointName,
-      path: pe.path || '/',
+      path: pe.path,
+      path_regex: pe.path_regex,
       pipeline: pe.pipeline
     })
   }
@@ -172,6 +197,10 @@ function attachStandardMiddleware(app) {
 
 function loadPolicies(spec, config) {
   let router = express.Router();
+  router.use((req, res, next) => {
+    debug("processing pipeline %o %o", spec, config)
+    return next();
+  })
   for (const policySpec of spec) {
     // TODO: compile all nested s-expressions in advance. This will allow
     // for better validation of the condition spec

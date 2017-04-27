@@ -24,12 +24,12 @@ const CONDITIONALS = module.exports = {
     return false;
   },
 
-  allOf: function(req, ...subItems) {
-    return subItems.every(subItem => run(req, subItem));
+  allOf: function(req, actionConfig) {
+    return actionConfig.conditions.every(subItem => run(req, subItem));
   },
 
-  oneOf: function(req, ...subItems) {
-    return subItems.some(subItem => run(req, subItem));
+  oneOf: function(req, actionConfig) {
+    return actionConfig.conditions.some(subItem => run(req, subItem));
   },
 
   not: function(req, actionConfig) {
@@ -45,16 +45,16 @@ const CONDITIONALS = module.exports = {
   },
 
   method: function(req, actionConfig) {
-    if (Array.isArray(actionConfig.method)) {
-      return actionConfig.method.includes(req.method);
+    if (Array.isArray(actionConfig.methods)) {
+      return actionConfig.methods.includes(req.method);
     } else {
-      return req.method === actionConfig.method;
+      return req.method === actionConfig.methods;
     }
   },
 
-  hostMatch: function(req, pattern) {
+  hostMatch: function(req, actionConfig) {
     if (req.headers.host) {
-      return minimatch(req.headers.host, pattern);
+      return minimatch(req.headers.host, actionConfig.pattern);
     }
     return false;
   }

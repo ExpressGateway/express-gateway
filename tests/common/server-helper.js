@@ -1,5 +1,6 @@
 'use strict';
 const express = require('express');
+
 function generateBackendServer(port) {
   let app = express();
 
@@ -8,7 +9,6 @@ function generateBackendServer(port) {
   });
   return new Promise((resolve) => {
     let runningApp = app.listen(port, () => {
-      console.log(`Example app listening on port ${port}!`);
       resolve({
         app: runningApp
       });

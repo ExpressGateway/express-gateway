@@ -4,24 +4,26 @@ http:                 # if not specified EG will not start http server
 
 publicEndpoints: # specify pipeline per domain and path
   cats:
-    host: "*.cats.com"  # regexp support
+    host: "*.cats.com"  # wildcard support, matches foo.cats.com; does NOT match cats.com
     path: /             # optional defaults to /
     pipeline: cats_pipeline
-  mycats:
-    host: "*.mycats.com"
-    path: /cats
-    pipeline: cats_pipeline
-  big-dogs:
-    host: big-dogs.com
-    pipeline: dogs_pipeline
-  animals-cats:
-    host: "animals.com"
-    path: /cats
-    pipeline: cats_pipeline
+  kitten.com:
+    host: "kitten.com"
+    path: /             # optional defaults to /
+    pipeline: kittens_pipeline
+  parrots.com:
+    host_regex: '[a-z]{3}.parrots.com' #regex support, use host_regex instead of host
+    path: /             # optional defaults to /
+    pipeline: parrots_pipeline
   animals-dogs:
     host: "animals.com"
-    path: /dogs
-    pipeline: dogs_pipeline
+    path: /dogs         # only pathes under /dogs will be served by animal_dogs_pipeline pipeline
+    pipeline: animals_dogs_pipeline
+  animals-cats:
+    host: "animals.com"
+    path_regex: '/cats-id-[0-9]{3}'
+    pipeline: cats_pipeline
+
 
 
 privateEndpoints: # urls to downstream services
@@ -38,10 +40,22 @@ pipelines:
     title: Cats Pipeline
     policies:
       - action:
-          name: srv1
+          name: cats_policy
 
-  dogs_pipeline:
-    title: dogs Pipeline
+  kittens_pipeline:
+    title: Kittens Pipeline
     policies:
       - action:
-          name: srv2
+          name: kittens_policy
+
+  parrots_pipeline:
+    title: Parrots Pipeline
+    policies:
+      - action:
+          name: parrot_policy
+
+  animals_dogs_pipeline:
+      title: Animals dogs Pipeline
+      policies:
+        - action:
+            name: animals_dogs_policy

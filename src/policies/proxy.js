@@ -21,7 +21,7 @@ function createMiddleware(params, config) {
     changeOrigin: params.changeOrigin || false
   });
   proxy.on('error', (err, _req, res) => {
-    console.warn('Error', err);
+    debug('Error %O', err);
 
     if (!res.headersSent) {
       res.status(502).send('Bad gateway.');
