@@ -1,0 +1,28 @@
+publicEndpoints: # specify pipeline per domain and path
+  cats:
+    host: "cats.com"  # regexp support
+    path: /             # optional defaults to /
+    pipeline: plugins_pipeline
+
+
+http:                 # if not specified EG will not start http server
+  port: 9080
+
+privateEndpoints:
+    backend:
+        url: 'http://localhost'
+
+pipelines:
+  plugins_pipeline:
+    title: Plugin Pipeline
+    policies:
+      -
+        condition:
+          name: plugin-conditional
+        action:
+          name: plugin-policy
+
+plugins:
+  -
+    package: 'plugin-test'
+    someParam: plugin test param

@@ -3,17 +3,21 @@
 const minimatch = require('minimatch');
 
 function run(context, conditionConfig) {
+
   const func = CONDITIONALS[conditionConfig.name];
   if (!func) {
     return null;
   } else {
+
     return func(context, conditionConfig);
   }
 }
 
 const CONDITIONALS = module.exports = {
   run,
-
+  register: function({ name, handler }) {
+    CONDITIONALS[name] = handler
+  },
   always: function(_req) {
     return true;
   },
