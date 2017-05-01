@@ -1,23 +1,18 @@
-publicEndpoints: # specify pipeline per domain and path
+APIEndpoints: # specify pipeline per domain and path
   cats:
     host: "*.cats.com"  # regexp support
     path: /             # optional defaults to /
-    pipeline: cats_pipeline
   mycats:
     host: "*.mycats.com"
     path: /cats
-    pipeline: cats_pipeline
   big-dogs:
     host: big-dogs.com
-    pipeline: dogs_pipeline
   animals-cats:
     host: "animals.com"
     path: /cats
-    pipeline: cats_pipeline
   animals-dogs:
     host: "animals.com"
     path: /dogs
-    pipeline: dogs_pipeline
 
 
 http:                 # if not specified EG will not start http server
@@ -36,7 +31,7 @@ https:                # if not specified EG will not start https server
         key: "example/keys/lunchbadger.io.key.pem"
         cert: "example/keys/lunchbadger.io.cert.pem"
 
-privateEndpoints: # urls to downstream services
+serviceEndpoints: # urls to downstream services
   cats_service:
     url: "http://localhost"
     port: 3000
@@ -47,31 +42,38 @@ privateEndpoints: # urls to downstream services
 
 pipelines:
   cats_pipeline:
+    APIEndpoints:
+      - cats
+      - mycats
+      - animals-cats
+
     title: Cats Pipeline
     policies:
       - action:
           name: proxy # proxy to cats_service downstream service
-          privateEndpoint: cats_service
+          serviceEndpoint: cats_service
 
   dogs_pipeline:
+    APIEndpoints:
+      - big-dogs
+      - animals-dogs
     title: dogs Pipeline
     policies:
       - condition:
           name: always
       #   action:
       #     name: oauth2-basic
-      #   params:
       # - action:
       #     name: oauth2-bearer
       # - action:
-      #     name: ensure-autenticated # ensure user has logged in 403 otherwise
+      #     name: ensure-autenticated # ensure user has logged in, 403 otherwise
       # - action:
       #     name: oauth2-scope
       #     allow-scopes:
       #       - '/dogs'
         action:
           name: proxy # proxy to dogs_service downstream service
-          privateEndpoint: dogs_service
+          serviceEndpoint: dogs_service
 
 apis:
   animals:

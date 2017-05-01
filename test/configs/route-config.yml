@@ -2,59 +2,62 @@ http:                 # if not specified EG will not start http server
   port: 9080
 
 
-publicEndpoints: # specify pipeline per domain and path
+APIEndpoints: # specify pipeline per domain and path
   cats:
     host: "*.cats.com"  # wildcard support, matches foo.cats.com; does NOT match cats.com
-    path: /             # optional defaults to /
-    pipeline: cats_pipeline
+    path: /
   kitten.com:
-    host: "kitten.com"
-    path: /             # optional defaults to /
-    pipeline: kittens_pipeline
+    host: "kitten.com"  # path defaults to /
   parrots.com:
     host_regex: '[a-z]{3}.parrots.com' #regex support, use host_regex instead of host
-    path: /             # optional defaults to /
-    pipeline: parrots_pipeline
+    path: /
   animals-dogs:
     host: "animals.com"
-    path: /dogs         # only pathes under /dogs will be served by animal_dogs_pipeline pipeline
-    pipeline: animals_dogs_pipeline
+    path: /dogs         # only pathes under /dogs will be served by pipeline
   animals-cats:
     host: "animals.com"
     path_regex: '/cats-id-[0-9]{3}'
-    pipeline: cats_pipeline
-
-
-
-privateEndpoints: # urls to downstream services
-  cats_service:
-    url: "http://localhost"
-    port: 3000
-    path: /             # optional defaults to /
-  dogs_service:
-    url: http://localhost
-    port: 4000
+  wild-cats:
+    host: "*"           # any host will be accepted, alternative syntax host:'' or no host property at all
+    path_regex: '/wild-cats'
 
 pipelines:
   cats_pipeline:
+    APIEndpoints:
+      - cats
+      - animals-cats
     title: Cats Pipeline
     policies:
       - action:
           name: cats_policy
 
+  wild_cats_pipeline:
+    APIEndpoints:
+      - wild-cats
+    title: Wild Cats Pipeline
+    policies:
+      - action:
+          name: wild_cats_policy
+
   kittens_pipeline:
+    APIEndpoints:
+      - kitten.com
     title: Kittens Pipeline
     policies:
       - action:
           name: kittens_policy
 
   parrots_pipeline:
+    APIEndpoints:
+      - parrots.com
     title: Parrots Pipeline
     policies:
       - action:
           name: parrot_policy
 
   animals_dogs_pipeline:
+      APIEndpoints:
+        - animals-dogs
       title: Animals dogs Pipeline
       policies:
         - action:

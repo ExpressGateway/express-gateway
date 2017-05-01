@@ -7,17 +7,16 @@ const debug = require('debug')('EG:proxy');
 const MisconfigurationError = require('../errors').MisconfigurationError;
 
 function createMiddleware(params, config) {
-  let privateEndpoint = lodash.get(config, ['privateEndpoints',
-    params.privateEndpoint, 'url'
+  let serviceEndpoint = lodash.get(config, ['serviceEndpoints',
+    params.serviceEndpoint, 'url'
   ]);
-  if (!privateEndpoint) {
+  if (!serviceEndpoint) {
     throw new MisconfigurationError(
-      `Private endpoint ${params.privateEndpoint} (referenced in 'proxy' ` +
+      `Private endpoint ${params.serviceEndpoint} (referenced in 'proxy' ` +
       'processor configuration) does not exist');
   }
-
   let proxy = httpProxy.createProxyServer({
-    target: privateEndpoint,
+    target: serviceEndpoint,
     changeOrigin: params.changeOrigin || false
   });
   proxy.on('error', (err, _req, res) => {
@@ -31,7 +30,7 @@ function createMiddleware(params, config) {
   });
 
   return function proxyHandler(req, res, _next) {
-    debug(`proxying to ${privateEndpoint}`);
+    debug(`proxying to ${serviceEndpoint}`);
     proxy.web(req, res);
   };
 }

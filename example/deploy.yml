@@ -44,7 +44,7 @@ spec:
       hostNetwork: true
       nodeSelector:
         lunchbadger.com/node-type: public
----
+#---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -60,7 +60,7 @@ data:
     {
       "bindPort": 443,
       "bindHost": "0.0.0.0",
-      "privateEndpoints": {
+      "serviceEndpoints": {
         "backend": {
           "url": "http://10.3.0.11"
         }
@@ -82,7 +82,7 @@ data:
       "pipelines": [
         {
           "name": "lunchbadger-api",
-          "publicEndpoints": [
+          "APIEndpoints": [
             { "path": "/" }
           ],
           "processors": [
@@ -128,7 +128,7 @@ data:
               "condition": ["always"],
               "action": "proxy",
               "params": {
-                "privateEndpoint": "backend"
+                "serviceEndpoint": "backend"
               }
             }
           ]

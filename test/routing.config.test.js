@@ -9,7 +9,7 @@ let policies = require('../src/policies');
 describe('Should process host names', function() {
   before(function(done) {
     // registering test policies, they will collect data that is validateSuccessd in the "validateSuccess" method
-    ['kittens_policy', 'cats_policy', 'parrot_policy', 'animals_dogs_policy'].forEach((key) => {
+    ['kittens_policy', 'cats_policy', 'parrot_policy', 'animals_dogs_policy', 'wild_cats_policy'].forEach((key) => {
       policies.register(key, (params) => {
         return (req, res) => {
           res.json({ result: key, params, hostname: req.hostname, url: req.url })
@@ -26,6 +26,41 @@ describe('Should process host names', function() {
       done()
     }).catch(done);
   });
+  describe('wildcard domain', () => {
+    it('random host provided', (done) => {
+      request(app)
+        .get('/wild-cats')
+        .set('Host', 'zu.io')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect((res) => {
+          assert.equal(res.body.result, 'wild_cats_policy')
+          assert.equal(res.body.url, '/')
+          assert.equal(res.body.hostname, 'zu.io')
+        })
+        .end(function(err, res) {
+          if (err) { debug(res.body) }
+          err ? done(err) : done();
+        });
+    })
+    it('default host provided', (done) => {
+      request(app)
+        .get('/wild-cats')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .expect((res) => {
+          assert.equal(res.body.result, 'wild_cats_policy')
+          assert.equal(res.body.url, '/')
+          assert.equal(res.body.hostname, '127.0.0.1')
+        })
+        .end(function(err, res) {
+          if (err) { debug(res.body) }
+          err ? done(err) : done();
+        });
+    })
+  })
 
   describe('exact host name configuration', () => {
     it('kitten.com/', validateSuccess({
@@ -63,7 +98,7 @@ describe('Should process host names', function() {
     }));
   })
 
-  describe('filtering by part of url animals.com/dogs....', () => {
+  describe('filtering by part of url animals.com/....', () => {
     it('animals.com/dogs/lassie', validateSuccess({
       setup: {
         host: 'animals.com',

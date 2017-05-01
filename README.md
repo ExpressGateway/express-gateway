@@ -6,32 +6,31 @@ This is an API Gateway built using Express and Express middleware.
 Configuration
 -------------
 
-The configuration file is a JSON document. It should be a JSON object at the
-top level, with the following keys:
+The configuration file is a YAML(or JSON) document.
+It consists of the following sections:
+* http
+* https
+* APIEndpoints
+* ServiceEndpoints
+* policies
+* pipelines
 
-- `bindPort`: the port to listen on. Defaults to 8080
-- `bindHost`: the IP address to listen on. Defaults to "0.0.0.0"
-- `tls`: described below
-- `privateEndpoints`: the URLs that the gateway will proxy to. Represented as a
-  mapping of endpoint name to an object with the following keys:
-  - `url`: the URL to forward requests to
-- `pipelines`: a list of objects with the following keys:
-  - `name`: the name of the pipeline
-  - `publicEndpoints`: the list of URL paths for which requests will be
-     handled. Represented as a list of objects with the following keys:
-      - `path`: the URL path, e.g. "/products" or "/orders". The gateway will
-        listen for requests for any URL that starts with the given string.
-  - `Policies`: the set of actions that should take place when a request is
-    received on one of the public endpoints. Represented as a list of objects
-    with the following keys (see below for more information):
-    - `condition`. This condition must be satisfied to trigger the action.
-    - `action`. The name of the action to carry out.
-    - `params`. The parameters for the action.
+### http
+The section defines how to setup EG HTTP server.
+If http section is not provided EG will not listen to HTTP protocol
+- `port`: the port to listen to
+```yaml
+https:
+  port: 9080
+```
 
-### TLS
+### https
+Configures EG HTTPS server. If not provided EG will not serve HTTPS requests (useful for dev environment or if https resolving is handled by upstream proxy)
+- `port`: the port to listen to
+- `tls`: list of certificates
 
 The gateway supports TLS, including SNI (domain-specific TLS certificates). To
-configure, use the `https` option. This option should be an object. Each key
+configure, use the `https.tls` option. Each key
 should be a wildcard pattern for matching the domain, and the value should be
 an object with `key` and `cert` as keys and paths to the files containing the
 data in PEM format.
@@ -41,27 +40,134 @@ other domain patterns can be matched, or if SNI is not being used by the
 client.
 
 For example:
+```yaml
 
-```json
-  {
-    "*.lunchbadger.io": {
-      "key": "example/keys/lunchbadger.io.key.pem",
-      "cert": "example/keys/lunchbadger.io.cert.pem"
-    },
-    "api.lunchbadger.com": {
-      "key": "example/keys/lunchbadger.com.key.pem",
-      "cert": "example/keys/lunchbadger.com.cert.pem"
-    },
-    "default": {
-      "key": "example/keys/lunchbadger.io.key.pem",
-      "cert": "example/keys/lunchbadger.io.cert.pem"
-    }
-  }
+https:
+  port: 9443
+  tls:
+    - "*.demo.io":
+        key: example/keys/demo.io.key.pem
+        cert: example/keys/demo.io.cert.pem
+    - "api.acme.com":
+        key: example/keys/acme.com.key.pem
+        cert: example/keys/acme.com.cert.pem
+    - "default":
+        key: example/keys/lunchbadger.io.key.pem
+        cert: example/keys/lunchbadger.io.cert.pem
+
+```
+### APIEndpoints:
+A list of domain + path combinations that your EG will listen to
+
+#### Standard usage
+```yaml
+APIEndpoints:
+  api: # name, used as reference in pipeline
+    host: '*' # wildcard support, by default accepts all hosts
+    path: /v1   # optional default /
 ```
 
-### Processor conditions
+#### Regex usage
+```yaml
+APIEndpoints:
+  api: # name, used as reference in pipeline
+    host_regex: '[a-z]{3}.parrots.com' # use instead of host
+    path_regex: '/cats-id-[0-9]{3}'  # use instead of path
+```
 
-Each processor in a pipeline can be gated with a condition specification. Each
+`host` has higger priority over `host_regex` if none of them is provided will ignore HOST header and process all requests
+`path` has higger priority over `path_regex` if none is provided will use `/`
+
+serviceEndpoints
+----------------
+serviceEndpoints map of URLs that the gateway will proxy to.
+
+```yaml
+serviceEndpoints: # urls to downstream services
+  cats_service:
+    url: "http://localhost"
+    port: 3000
+    path: /             # optional defaults to /
+  dogs_service:
+    url: http://localhost
+    port: 4000
+```
+Use name of properties (`cats_service` etc.) to reference in pipelines
+
+
+policies
+--------
+White-list Array of enabled policies with settings (if needed)
+
+#### Referencing well-known policies
+```yaml
+policies:
+  - name: 'name-test'
+```
+EG will try to find and load package with prefix `express-gateway-policy-`
+
+in this case  `express-gateway-policy-name-test` npm package
+
+#### Referencing custom package
+```yaml
+policies:
+  - package: 'plugin-test'
+    someParam: "plugin test param"
+```
+if property `package` is used instead of `name` EG will try to install exactly what is in the value.
+
+`package` accepts any variant supported by [npm install](https://docs.npmjs.com/cli/install), e.g. git url, github, tarball etc.
+
+See custom policy development manual
+
+Pipelines
+---------
+
+Represented as a
+  mapping of endpoint name to an object with the following keys:
+  - `url`: the URL to forward requests to
+- `pipelines`: a list of objects with the following keys:
+  - `name`: the name of the pipeline
+  - `Policies`: the set of actions that should take place when a request is
+    received on one of the public endpoints. Represented as a list of objects
+    with the following keys (see below for more information):
+    - `condition`. This condition must be satisfied to trigger the action.
+    - `action`. The name of the action to carry out.
+    - `params`. The parameters for the action.
+
+```yaml
+http:
+  port: 3000
+serviceEndpoints:
+  example: # will be referenced in proxy policy
+    url: 'http://example.com'
+APIEndpoints:
+  api:
+    host: '*'
+    path: /
+pipelines:
+  api:
+    APIEndpoints:
+      - api
+    policies:
+      -
+        condition:
+          name: pathExact
+          path: /v1
+        action:
+          name: log
+          message: "${req.method} ${req.originalUrl}"
+      -
+        action:
+          name: proxy
+          serviceEndpoint: example # see declaration above
+
+```
+
+
+### Policy conditions
+
+Each Policy in a pipeline can be gated with a condition specification. Each
 condition specification is in the format:
 
 ```js
@@ -118,7 +224,7 @@ request is *not* a POST or HEAD.
 Several Policies are available. Please note that the order of Policies
 is important.
 
-#### Throttling
+#### Throttling (TODO:Update doc, non relevant)
 
 Throttles the requests to a specific rate limit. If the rate limit is reached,
 the gateway will return an HTTP 429 return code with an error message.
@@ -179,16 +285,16 @@ specific limit for requests to `/foo` of 100 req/minute. Note that since the
 overall limit matches *all* requests, successful `/foo` requests will also
 count against the overall limit.
 
-#### Proxying
+#### Proxying (TODO:Update doc, non relevant)
 
 Forwards the request to a private endpoint. The params format is an object
 with the following keys:
 
-- `privateEndpoint`: the name of the private endpoint to forward to.
+- `serviceEndpoint`: the name of the private endpoint to forward to.
 
-This processor type should generally be placed last in the list.
+This Policy type should generally be placed last in the list.
 
-#### JWT authentication
+#### JWT authentication (TODO:Update doc, non relevant)
 
 Authenticates the request via a JWT token. Requests will need to supply an
 `Authentication` header with the value formatted as `JWT <token>`.
@@ -216,7 +322,7 @@ Example:
 }
 ```
 
-#### CORS
+#### CORS (TODO:Update doc, non relevant)
 
 Provides [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 support via the [cors](https://www.npmjs.com/package/cors) node package. The
@@ -238,7 +344,7 @@ Example:
 ]
 ```
 
-#### Logging
+#### Logging (TODO:Update doc, non relevant)
 
 Provides capability for simple logging. The only parameter is `message`, with
 a string specifying the message to log. This can include placeholders using
@@ -258,7 +364,7 @@ Example:
 ]
 ```
 
-#### URL Rewriting
+#### URL Rewriting (TODO:Update doc, non relevant)
 
 Allows the URL path to be modified using regular expressions. This can be
 useful if the target URL that needs to be proxied to is different from the
@@ -281,22 +387,22 @@ request. Takes the following parameters:
 ```yaml
 http:
   port: 3000
-privateEndpoints:
+serviceEndpoints:
   google: # will be referenced in proxy policy
     url: 'http://google.com'
   example: # will be referenced in proxy policy
     url: 'http://example.com'
 
-publicEndpoints:
+APIEndpoints:
   api:
     host: '*'
     path: /
-    pipeline: api
 pipelines:
   api:
+    APIEndpoints:
+      - api
     policies:
       -
-
         action:
           name: log
           message: "${req.method} ${req.originalUrl}"
@@ -306,20 +412,25 @@ pipelines:
           path: /google
         action:
           name: proxy
-          privateEndpoint: google # see declaration above
+          serviceEndpoint: google # see declaration above
       -
         condition:
           name: pathExact
           path: /example
         action:
           name: proxy
-          privateEndpoint: example # see declaration above
+          serviceEndpoint: example # see declaration above
 
 ```
 
 In the above example, a request to `http://127.0.0.1:3000/example` will be
 forwarded to `http://www.example.com`, while a request to
 `http://127.0.0.1:3000/google` will be forwarded to `http://www.google.com`.
+
+Troubleshooting
+---------------
+EG uses [debug](https://www.npmjs.com/package/debug) module
+set env variable ```DEBUG=EG:*``` to see full logging
 
 Build and run
 -------------
@@ -330,6 +441,9 @@ npm run build
 
 # start
 npm start
+
+# test
+npm test
 
 # create Docker container
 docker build -t gateway .

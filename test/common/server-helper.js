@@ -1,7 +1,8 @@
 'use strict';
 const express = require('express');
+const debug = require('debug')('EG:test:stub-server');
 
-function generateBackendServer(port) {
+async function generateBackendServer(port) {
   let app = express();
 
   app.get('/', (req, res) => {
@@ -9,6 +10,7 @@ function generateBackendServer(port) {
   });
   return new Promise((resolve) => {
     let runningApp = app.listen(port, () => {
+      debug('running test stub server at ' + port);
       resolve({
         app: runningApp
       });

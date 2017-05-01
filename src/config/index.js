@@ -11,33 +11,34 @@ const path = require('path')
 const tls = require('tls');
 const vhost = require('vhost');
 const yaml = require('js-yaml');
+const pluginLoader = require('./plugin-loader');
 
-const MisconfigurationError = require('./errors').MisconfigurationError;
-const policies = require('./policies');
-const runConditional = require('./conditionals').run;
+const MisconfigurationError = require('../errors').MisconfigurationError;
+const policies = require('../policies');
+const conditionals = require('../conditionals');
 
-function loadConfig(fileName) {
+async function loadConfig(fileName) {
   let config = readConfigFile(fileName);
   let app = express();
   let rootRouter;
   attachStandardMiddleware(app);
-  rootRouter = parseConfig(config);
+  rootRouter = await parseConfig(config);
 
   app.use((req, res, next) => {
     rootRouter(req, res, next);
   });
 
   //hot swap router
-  fs.watch(fileName, (evt, name) => {
+  fs.watch(fileName, async(evt, name) => {
     debug(`watch file triggered ${evt} file ${name}
       note: loading file ${fileName}`);
     let config = readConfigFile(fileName);
-    rootRouter = parseConfig(config);
+    rootRouter = await parseConfig(config);
   });
 
   let server = undefined;
-  if (config.tls) {
-    server = createTlsServer(config.tls, app);
+  if (config.https && config.https.tls) {
+    server = createTlsServer(config.https.tls, app);
   } else {
     server = http.createServer(app);
   }
@@ -91,25 +92,33 @@ function createTlsServer(tlsConfig, app) {
   return https.createServer(options, app);
 }
 
-function parseConfig(config) {
+
+async function parseConfig(config) {
   let app = express.Router()
-  let pipelineRoutes = parsePipelines(config)
+
+  // No error handling, fail if misconfigured
+  await pluginLoader.loadPlugins(app, config)
+
+  let apiPipelines = parsePipelines(config)
   app.use((req, res, next) => {
     debug("processing app %s", req.hostname)
     return next();
   })
-  let publicEndpoints = parsePublicEndpoints(config)
-  for (let host of Object.keys(publicEndpoints)) {
-    let publicEndpoint = publicEndpoints[host]
+  let APIEndpoints = parseAPIEndpoints(config)
+
+  for (let host of Object.keys(APIEndpoints)) {
+    let publicEndpoint = APIEndpoints[host]
     debug(`creating vhost for ${host}`);
-    let vhostRouter = express.Router()
+    let router = express.Router()
     for (let route of publicEndpoint.routes) {
-      debug(`registering vhost route ${host} ${route.path} pipeline: ${route.pipeline}`);
-      let pipeline = pipelineRoutes[route.pipeline]
-      if (!pipeline) {
-        throw new MisconfigurationError(`Failed to find pipeline ${route.pipeline} for ${host} ${route.path}`)
+      debug(`registering pipeline router for host:${host} path:${route.path} api name: ${route.name}`);
+      let pipelineRouter = apiPipelines[route.name]
+      if (!pipelineRouter) {
+        //throw new MisconfigurationError(`Failed to find pipeline for ${route.name} host: ${host} path: ${route.path}`)
+        debug(`WARNING: Failed to find pipeline for ${route.name} host: ${host} path: ${route.path}, `)
+        continue;
       }
-      vhostRouter.use((req, res, next) => {
+      router.use((req, res, next) => {
         debug("processing vhost %s", host)
         return next();
       })
@@ -117,33 +126,39 @@ function parseConfig(config) {
       if (route.path_regex) {
         vpath = new RegExp(route.path_regex);
       }
-      vhostRouter.use(vpath, pipeline)
+      router.use(vpath, pipelineRouter)
     }
     let virtualHost = publicEndpoint.isRegex ? new RegExp(host) : host
-    app.use(vhost(virtualHost, vhostRouter));
+    if (!virtualHost || virtualHost == '*') {
+      app.use(router);
+    } else {
+      app.use(vhost(virtualHost, router));
+    }
   }
   return app;
 }
 
 function parsePipelines(config) {
-  let pipelineRoutes = {};
+  let apiPipelines = {};
   for (let pipelineId in config.pipelines) {
     let pipeline = config.pipelines[pipelineId];
     debug(`processing pipeline ${pipeline.title || pipelineId}`);
     let router = loadPolicies(pipeline.policies || [], config);
-    if (pipelineRoutes[pipelineId]) {
-      throw new MisconfigurationError("Duplicate pipeline id " + pipelineId);
+    // pipeline with all its policies is a router instance
+    // returning a map of APIEndpoint name : router
+    // it can be the same router (pipeline) processing different APIEndpoints
+    for (let endpoint of pipeline.APIEndpoints) {
+      apiPipelines[endpoint] = router;
     }
-    pipelineRoutes[pipelineId] = router;
   }
-  return pipelineRoutes;
+  return apiPipelines;
 }
 
-function parsePublicEndpoints(config) {
-  let publicEndpoints = config.publicEndpoints;
+function parseAPIEndpoints(config) {
+  let APIEndpoints = config.APIEndpoints;
   let endpointsConfig = {};
-  for (let endpointName in publicEndpoints) {
-    let pe = publicEndpoints[endpointName];
+  for (let endpointName in APIEndpoints) {
+    let pe = APIEndpoints[endpointName];
     let host = pe.host;
     let isRegex = false;
     if (!host) {
@@ -161,7 +176,6 @@ function parsePublicEndpoints(config) {
       name: endpointName,
       path: pe.path,
       path_regex: pe.path_regex,
-      pipeline: pe.pipeline
     })
   }
   return endpointsConfig;
@@ -206,18 +220,18 @@ function loadPolicies(spec, config) {
     // for better validation of the condition spec
     const condition = policySpec.condition || {};
     condition.name = condition.name || 'always'
-    const predicate = (req => runConditional(req, condition));
+    const predicate = (req => conditionals.run(req, condition));
+
     const actionCtr = policies.resolve(policySpec.action.name);
     if (!actionCtr) {
       throw new MisconfigurationError(
         `Could not find action "${policySpec.action.name}"`);
     }
     const action = actionCtr(policySpec.action, config);
-
     router.use((req, res, next) => {
-      debug(`checking predicate for ${policySpec.action}`);
+      debug(`checking predicate for ${policySpec.action.name}`);
       if (predicate(req)) {
-        debug(`request matched predicate for ${policySpec.action}`);
+        debug(`request matched predicate for ${policySpec.action.name}`);
         action(req, res, next);
       } else {
         next();
