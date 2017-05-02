@@ -10,7 +10,7 @@
     "pretest": "eslint .",
     "clean": "rimraf dist/",
     "test": "mocha --recursive --compilers js:babel-register tests",
-    "dev-test": "DEBUG=EG:* mocha  --recursive --compilers js:babel-register tests"
+    "dev-test": "DEBUG=EG:* mocha --grep plugins --recursive --compilers js:babel-register tests"
   },
   "author": "Roman Lisagor <roman@lunchbadger.com>",
   "license": "UNLICENSED",
@@ -24,6 +24,7 @@
     "eslint": "^3.19.0",
     "eslint-config-defaults": "^9.0.0",
     "eslint-config-loopback": "^8.0.0",
+    "express-gateway-limiter": "./src/plugins/express-gateway-limiter",
     "mocha": "^3.3.0",
     "pre-commit": "^1.2.2",
     "request": "^2.81.0",
@@ -41,6 +42,7 @@
     "morgan": "^1.8.1",
     "passport": "^0.3.2",
     "passport-jwt": "^2.2.1",
+    "plugin-test": "file:tests/common/plugin-test",
     "vhost": "^3.0.2"
   }
 }

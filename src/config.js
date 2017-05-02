@@ -14,7 +14,7 @@ const yaml = require('js-yaml');
 
 const MisconfigurationError = require('./errors').MisconfigurationError;
 const policies = require('./policies');
-const runConditional = require('./conditionals').run;
+const conditionals = require('./conditionals');
 
 function loadConfig(fileName) {
   let config = readConfigFile(fileName);
@@ -91,8 +91,24 @@ function createTlsServer(tlsConfig, app) {
   return https.createServer(options, app);
 }
 
+function loadPlugins(app, config) {
+  debug('running plugins' + JSON.stringify(config.plugins));
+  for (let plugin of config.plugins || []) {
+    try {
+      require(plugin.package)(plugin, {
+        app, // the express app. can attach handlers
+        policies, // can attach policies using register method
+        conditionals, // can attach conditionals using register method
+      });
+    } catch (err) {
+      debug('Failed to load plugin %j, %o', plugin.package, err)
+    }
+  }
+}
+
 function parseConfig(config) {
   let app = express.Router()
+  loadPlugins(app, config)
   let pipelineRoutes = parsePipelines(config)
   app.use((req, res, next) => {
     debug("processing app %s", req.hostname)
@@ -206,14 +222,14 @@ function loadPolicies(spec, config) {
     // for better validation of the condition spec
     const condition = policySpec.condition || {};
     condition.name = condition.name || 'always'
-    const predicate = (req => runConditional(req, condition));
+    const predicate = (req => conditionals.run(req, condition));
+
     const actionCtr = policies.resolve(policySpec.action.name);
     if (!actionCtr) {
       throw new MisconfigurationError(
         `Could not find action "${policySpec.action.name}"`);
     }
     const action = actionCtr(policySpec.action, config);
-
     router.use((req, res, next) => {
       debug(`checking predicate for ${policySpec.action}`);
       if (predicate(req)) {
