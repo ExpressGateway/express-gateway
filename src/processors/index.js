@@ -9,8 +9,8 @@ const MODULES = [
   './rewrite'
 ];
 
-const PROCESSORS = MODULES.reduce((pre, modName) => {
+const POLICIES = MODULES.reduce((pre, modName) => {
   return Object.assign({}, pre, require(modName));
 }, {});
 
-module.exports = name => PROCESSORS[name];
+module.exports = name => POLICIES[name];

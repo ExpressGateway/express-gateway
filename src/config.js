@@ -10,7 +10,7 @@ const minimatch = require('minimatch');
 const tls = require('tls');
 
 const MisconfigurationError = require('./errors').MisconfigurationError;
-const processors = require('./processors');
+const policies = require('./policies');
 const runConditional = require('./conditionals').run;
 
 function loadConfig(fileName) {
@@ -80,7 +80,7 @@ function parseConfig(app, config) {
   for (const pipeline of config.pipelines) {
     debug(`processing pipeline ${pipeline.name}`);
 
-    let router = loadProcessors(pipeline.processors || [], config);
+    let router = loadPolicies(pipeline.policies || [], config);
     attachToApp(app, router, pipeline.publicEndpoints || {});
   }
 };
@@ -108,7 +108,7 @@ function attachStandardMiddleware(app) {
     ':method (:target) :url :status :response-time ms - :res[content-length]'));
 }
 
-function loadProcessors(spec, config) {
+function loadPolicies(spec, config) {
   let router = express.Router();
 
   for (const procSpec of spec) {
@@ -116,7 +116,7 @@ function loadProcessors(spec, config) {
     // for better validation of the condition spec
     const condition = procSpec.condition || ['always'];
     const predicate = (req => runConditional(req, condition));
-    const actionCtr = processors(procSpec.action);
+    const actionCtr = policies(procSpec.action);
     if (!actionCtr) {
       throw new MisconfigurationError(
         `Could not find action "${procSpec.action}"`);

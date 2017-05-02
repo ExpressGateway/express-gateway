@@ -25,7 +25,7 @@
       "publicEndpoints": [
         { "path": "/" }
       ],
-      "processors": [
+      "policies": [
         {
           "condition": ["always"],
           "action": "cors",

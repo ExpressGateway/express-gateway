@@ -21,7 +21,7 @@ top level, with the following keys:
      handled. Represented as a list of objects with the following keys:
       - `path`: the URL path, e.g. "/products" or "/orders". The gateway will
         listen for requests for any URL that starts with the given string.
-  - `processors`: the set of actions that should take place when a request is
+  - `policies`: the set of actions that should take place when a request is
     received on one of the public endpoints. Represented as a list of objects
     with the following keys (see below for more information):
     - `condition`. This condition must be satisfied to trigger the action.
@@ -59,9 +59,9 @@ For example:
   }
 ```
 
-### Processor conditions
+### Policy conditions
 
-Each processor in a pipeline can be gated with a condition specification. Each
+Each policy in a pipeline can be gated with a condition specification. Each
 condition specification is in the format:
 
 ```js
@@ -108,9 +108,9 @@ Example:
 The above will match only if the exact request path is "/foo/bar" and the
 request is *not* a POST or HEAD.
 
-### Processors
+### Policies
 
-Several processors are available. Please note that the order of processors
+Several policies are available. Please note that the order of policies
 is important.
 
 #### Throttling
@@ -180,7 +180,7 @@ with the following keys:
 
 - `privateEndpoint`: the name of the private endpoint to forward to.
 
-This processor type should generally be placed last in the list.
+This policy type should generally be placed last in the list.
 
 #### JWT authentication
 
@@ -220,7 +220,7 @@ Example:
 
 ```json
 ...
-"processors": [
+"policies": [
   {
     "condition": ["always"],
     "action": "cors",
@@ -242,7 +242,7 @@ Example:
 
 ```json
 ...
-"processors": [
+"policies": [
   {
     "condition": ["always"],
     "action": "log",
@@ -264,12 +264,12 @@ request. Takes the following parameters:
    references to the captured groups.
 - `flags`: flags for the regular expression engine, described
   [here](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp#Parameters)
-- `redirect`: if this is not specified then all following processors, including
+- `redirect`: if this is not specified then all following policies, including
   the proxy, will treat the request as if it had been made to the rewritten
   URL. This parameter changes the operation into a redirection instead. The
   value of the parameter should be the HTTP status code to return (must be in
   the 300-range). Note that this will terminate the flow and no subsequent
-  processors will be executed.
+  policies will be executed.
 
 ### Full config example
 
@@ -292,7 +292,7 @@ request. Takes the following parameters:
         {"path": "/example"},
         {"path": "/google"}
       ],
-      "processors": [
+      "policies": [
         {
           "condition": ["pathMatch", "/example"],
           "action": "proxy",
