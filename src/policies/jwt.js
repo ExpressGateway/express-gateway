@@ -3,7 +3,7 @@
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const debug = require('debug')('gateway:oauth2');
+const debug = require('debug')('EG:oauth2');
 
 function createJwtMiddleware(params) {
   let jwtOptions = {

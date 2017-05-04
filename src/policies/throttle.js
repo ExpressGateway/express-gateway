@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('gateway:throttle');
+const debug = require('debug')('EG:throttle');
 const RateLimiter = require('limiter').RateLimiter;
 
 function createThrottleGroupMiddleware(params) {

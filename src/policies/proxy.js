@@ -2,13 +2,14 @@
 
 const httpProxy = require('http-proxy');
 const lodash = require('lodash');
-const debug = require('debug')('gateway:proxy');
+const debug = require('debug')('EG:proxy');
 
 const MisconfigurationError = require('../errors').MisconfigurationError;
 
 function createMiddleware(params, config) {
   let privateEndpoint = lodash.get(config, ['privateEndpoints',
-                                            params.privateEndpoint, 'url']);
+    params.privateEndpoint, 'url'
+  ]);
   if (!privateEndpoint) {
     throw new MisconfigurationError(
       `Private endpoint ${params.privateEndpoint} (referenced in 'proxy' ` +
@@ -20,7 +21,7 @@ function createMiddleware(params, config) {
     changeOrigin: params.changeOrigin || false
   });
   proxy.on('error', (err, _req, res) => {
-    console.warn('Error', err);
+    debug('Error %O', err);
 
     if (!res.headersSent) {
       res.status(502).send('Bad gateway.');
@@ -33,7 +34,7 @@ function createMiddleware(params, config) {
     debug(`proxying to ${privateEndpoint}`);
     proxy.web(req, res);
   };
-};
+}
 
 module.exports = {
   proxy: createMiddleware

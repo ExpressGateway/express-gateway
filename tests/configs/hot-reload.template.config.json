@@ -1,0 +1,24 @@
+{
+  "privateEndpoints": {
+    "backend": {
+      "url": "http://localhost"
+    }
+  },
+  "publicEndpoints": {
+    "api": {
+      "host": "*",
+      "path": "/",
+      "pipeline": "api"
+    }
+  },
+  "pipelines": {
+    "api": {
+      "policies": [{
+        "action": {
+          "name": "proxy",
+          "privateEndpoint": "backend"
+        }
+      }]
+    }
+  }
+}

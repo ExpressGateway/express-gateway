@@ -21,7 +21,7 @@ top level, with the following keys:
      handled. Represented as a list of objects with the following keys:
       - `path`: the URL path, e.g. "/products" or "/orders". The gateway will
         listen for requests for any URL that starts with the given string.
-  - `processors`: the set of actions that should take place when a request is
+  - `Policies`: the set of actions that should take place when a request is
     received on one of the public endpoints. Represented as a list of objects
     with the following keys (see below for more information):
     - `condition`. This condition must be satisfied to trigger the action.
@@ -31,7 +31,7 @@ top level, with the following keys:
 ### TLS
 
 The gateway supports TLS, including SNI (domain-specific TLS certificates). To
-configure, use the `tls` option. This option should be an object. Each key
+configure, use the `https` option. This option should be an object. Each key
 should be a wildcard pattern for matching the domain, and the value should be
 an object with `key` and `cert` as keys and paths to the files containing the
 data in PEM format.
@@ -99,18 +99,23 @@ conditional statements:
 Example:
 
 ```json
-["allOf",
-  ["pathExact", "/foo/bar"],
-  ["not"
-    ["method", ["POST", "HEAD"]]]]
+{
+  "name" :"allOf",
+    "conditions": [
+      {"name":"pathExact", "path": "/foo/bar"},
+      { "name":"not",
+        "condition":{ "name":"method", "methods": ["POST", "HEAD"]}
+      }
+    ]
+}
 ```
 
 The above will match only if the exact request path is "/foo/bar" and the
 request is *not* a POST or HEAD.
 
-### Processors
+### Policies
 
-Several processors are available. Please note that the order of processors
+Several Policies are available. Please note that the order of Policies
 is important.
 
 #### Throttling
@@ -139,23 +144,24 @@ Example:
 
 ```json
 {
-  "condition": ["pathExact", "/foo"],
-  "action": "throttleGroup",
-  "params": {
+  "condition": {
+    "name": "pathExact",
+     "path" :"/foo"
+  },
+  "action": {
+    "name":"throttleGroup",
     "key": "foo"
   }
 },
 {
-  "condition": ["always"],
-  "action": "throttleGroup",
-  "params": {
+  "action": {
+    "name":"throttleGroup",
     "key": "all"
   }
 },
 {
-  "condition": ["always"],
-  "action": "throttle",
-  "params": {
+  "action":{
+    "name": "throttle",
     "all": {
       "rate": 1000,
       "period": "minute"
@@ -200,7 +206,8 @@ Example:
 
 ```json
 {
-  "params": {
+  "action": {
+    "name": "jwt",
     "issuer": "https://www.lunchbadger.com",
     "audience": "4kzhU5LqlUpQJmjbMevWkWyt9adeKK",
     "algorithms": ["RS256"],
@@ -220,13 +227,12 @@ Example:
 
 ```json
 ...
-"processors": [
+"Policies": [
   {
-    "condition": ["always"],
-    "action": "cors",
-    "params": {
-      "origin": ["http://www.example.com"],
-      "credentials": true
+    "condition": {"name":"always"},
+    "action": { "name":"cors",
+                "origin": ["http://www.example.com"],
+                "credentials": true
     }
   }
 ]
@@ -242,11 +248,10 @@ Example:
 
 ```json
 ...
-"processors": [
+"Policies": [
   {
-    "condition": ["always"],
-    "action": "log",
-    "params": {
+    "action": {
+      "name":"log",
       "message": "${req.method} ${req.originalUrl}"
     }
   }
@@ -264,53 +269,52 @@ request. Takes the following parameters:
    references to the captured groups.
 - `flags`: flags for the regular expression engine, described
   [here](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp#Parameters)
-- `redirect`: if this is not specified then all following processors, including
+- `redirect`: if this is not specified then all following Policies, including
   the proxy, will treat the request as if it had been made to the rewritten
   URL. This parameter changes the operation into a redirection instead. The
   value of the parameter should be the HTTP status code to return (must be in
   the 300-range). Note that this will terminate the flow and no subsequent
-  processors will be executed.
+  Policies will be executed.
 
 ### Full config example
 
-```json
-{
-  "bindPort": 3000,
-  "bindHost": "127.0.0.1",
-  "privateEndpoints": {
-    "example": {
-      "url": "http://www.example.com"
-    },
-    "google": {
-      "url": "http://www.google.com"
-    }
-  },
-  "pipelines": [
-    {
-      "name": "main_pipeline",
-      "publicEndpoints": [
-        {"path": "/example"},
-        {"path": "/google"}
-      ],
-      "processors": [
-        {
-          "condition": ["pathMatch", "/example"],
-          "action": "proxy",
-          "params": {
-            "privateEndpoint": "example"
-          }
-        },
-        {
-          "condition": ["pathMatch", "/google"],
-          "action": "proxy",
-          "params": {
-            "privateEndpoint": "google"
-          }
-        }
-      ]
-    }
-  ]
-}
+```yaml
+http:
+  port: 3000
+privateEndpoints:
+  google: # will be referenced in proxy policy
+    url: 'http://google.com'
+  example: # will be referenced in proxy policy
+    url: 'http://example.com'
+
+publicEndpoints:
+  api:
+    host: '*'
+    path: /
+    pipeline: api
+pipelines:
+  api:
+    policies:
+      -
+
+        action:
+          name: log
+          message: "${req.method} ${req.originalUrl}"
+      -
+        condition:
+          name: pathExact
+          path: /google
+        action:
+          name: proxy
+          privateEndpoint: google # see declaration above
+      -
+        condition:
+          name: pathExact
+          path: /example
+        action:
+          name: proxy
+          privateEndpoint: example # see declaration above
+
 ```
 
 In the above example, a request to `http://127.0.0.1:3000/example` will be
