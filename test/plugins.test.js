@@ -1,7 +1,7 @@
 const path = require('path');
 const request = require('supertest');
 const assert = require('chai').assert;
-const debug = require('debug')('EG:test:plugin')
+const logger = require('../src/log').test;
 let app;
 let gateway = require('../src/gateway');
 describe('Should load plugins', () => {
@@ -18,7 +18,7 @@ describe('Should load plugins', () => {
       .expect((res) => {
         assert.ok(res.body.plugin);
       }).end(function(err, res) {
-        if (err) { debug(res.body) }
+        if (err) { logger.error(res.body) }
         err ? done(err) : done();
       });
   })
@@ -31,7 +31,7 @@ describe('Should load plugins', () => {
         assert.equal(res.body.conditional, true);
         assert.equal(res.body.result, 'plugin-policy');
       }).end(function(err, res) {
-        if (err) { debug(res.body) }
+        if (err) { logger.error(res.body) }
         err ? done(err) : done();
       });
   })

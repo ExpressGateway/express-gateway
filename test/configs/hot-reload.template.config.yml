@@ -1,15 +1,15 @@
-APIEndpoints:
+apiEndpoints:
   api:
       host: '*.com'
       path: /
 
 serviceEndpoints:
   backend:
-      url: 'http://localhost'
+      url: 'http://localhost:5998'
 
 pipelines:
-  api-pipeline:
-    APIEndpoints:
+  apiPipeline:
+    apiEndpoints:
       - api
     policies:
       -

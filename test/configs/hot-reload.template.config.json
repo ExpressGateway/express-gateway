@@ -1,5 +1,5 @@
 {
-  "APIEndpoints": {
+  "apiEndpoints": {
     "api": {
       "host": "*.com",
       "path": "/"
@@ -11,8 +11,8 @@
     }
   },
   "pipelines": {
-    "api-pipeline": {
-      "APIEndpoints": [
+    "apiPipeline": {
+      "apiEndpoints": [
         "api"
       ],
       "policies": [{

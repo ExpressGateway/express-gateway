@@ -1,7 +1,7 @@
 const path = require('path');
 const request = require('supertest');
 const assert = require('chai').assert;
-const debug = require('debug')('EG:test:hostnames')
+const logger = require('../src/log').test
 let app;
 let gateway = require('../src/gateway');
 
@@ -40,7 +40,7 @@ describe('Should process host names', function() {
           assert.equal(res.body.hostname, 'zu.io')
         })
         .end(function(err, res) {
-          if (err) { debug(res.body) }
+          if (err) { logger.error(res.body) }
           err ? done(err) : done();
         });
     })
@@ -56,7 +56,7 @@ describe('Should process host names', function() {
           assert.equal(res.body.hostname, '127.0.0.1')
         })
         .end(function(err, res) {
-          if (err) { debug(res.body) }
+          if (err) { logger.error(res.body) }
           err ? done(err) : done();
         });
     })
@@ -318,7 +318,7 @@ describe('Should process host names', function() {
           assert.equal(res.body.hostname, testCase.test.host)
         })
         .end(function(err, res) {
-          if (err) { debug(res.body) }
+          if (err) { logger.error(res.body) }
           err ? done(err) : done();
         });
     }
@@ -333,7 +333,7 @@ describe('Should process host names', function() {
         .expect('Content-Type', /text\/html/)
         .expect(404)
         .end(function(err, res) {
-          if (err) { debug(res.body) }
+          if (err) { logger.error(res.body) }
           err ? done(err) : done();
         });
     }

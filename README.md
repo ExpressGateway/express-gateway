@@ -10,8 +10,8 @@ The configuration file is a YAML(or JSON) document.
 It consists of the following sections:
 * http
 * https
-* APIEndpoints
-* ServiceEndpoints
+* apiEndpoints
+* serviceEndpoints
 * policies
 * pipelines
 
@@ -20,7 +20,7 @@ The section defines how to setup EG HTTP server.
 If http section is not provided EG will not listen to HTTP protocol
 - `port`: the port to listen to
 ```yaml
-https:
+http:
   port: 9080
 ```
 
@@ -56,27 +56,33 @@ https:
         cert: example/keys/lunchbadger.io.cert.pem
 
 ```
-### APIEndpoints:
+### apiEndpoints:
 A list of domain + path combinations that your EG will listen to
 
 #### Standard usage
 ```yaml
-APIEndpoints:
+apiEndpoints:
   api: # name, used as reference in pipeline
-    host: '*' # wildcard support, by default accepts all hosts
+    host: '*.com' # wildcard pattern support
     path: /v1   # optional default /
+  help: # name, used as reference in pipeline
+    host: '*' # by default accepts all hosts, same as '*'
+    path: /help   # optional default /
 ```
+Note: If not possible to avoid overlapping wildcard patterns, ~~try again~~ be aware that order of registration is important, put more specific patterns higher.
 
-#### Regex usage
+#### Overlapping api endpoints usage
 ```yaml
-APIEndpoints:
-  api: # name, used as reference in pipeline
-    host_regex: '[a-z]{3}.parrots.com' # use instead of host
-    path_regex: '/cats-id-[0-9]{3}'  # use instead of path
+apiEndpoints:
+  ci:
+    host: '*.ci.zu.com'
+    path: /    # optional default /
+  zu:
+    host: '*.zu.com'
+  com:
+    host: '*.com'
 ```
 
-`host` has higger priority over `host_regex` if none of them is provided will ignore HOST header and process all requests
-`path` has higger priority over `path_regex` if none is provided will use `/`
 
 serviceEndpoints
 ----------------
@@ -141,13 +147,13 @@ http:
 serviceEndpoints:
   example: # will be referenced in proxy policy
     url: 'http://example.com'
-APIEndpoints:
+apiEndpoints:
   api:
     host: '*'
     path: /
 pipelines:
   api:
-    APIEndpoints:
+    apiEndpoints:
       - api
     policies:
       -
@@ -287,10 +293,10 @@ count against the overall limit.
 
 #### Proxying (TODO:Update doc, non relevant)
 
-Forwards the request to a private endpoint. The params format is an object
+Forwards the request to a service endpoint. The params format is an object
 with the following keys:
 
-- `serviceEndpoint`: the name of the private endpoint to forward to.
+- `serviceEndpoint`: the name of the service endpoint to forward to.
 
 This Policy type should generally be placed last in the list.
 
@@ -393,13 +399,13 @@ serviceEndpoints:
   example: # will be referenced in proxy policy
     url: 'http://example.com'
 
-APIEndpoints:
+apiEndpoints:
   api:
     host: '*'
     path: /
 pipelines:
   api:
-    APIEndpoints:
+    apiEndpoints:
       - api
     policies:
       -

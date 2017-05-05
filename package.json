@@ -6,12 +6,12 @@
   "scripts": {
     "dist": "npm run clean && babel -d dist src",
     "dist-test": "babel -d dist-test test",
-    "start": "DEBUG=EG:* babel-watch .",
+    "start": "LOG_LEVEL=debug babel-watch .",
     "start:dist": "node dist/main.js",
     "pretest": "eslint .",
     "clean": "rimraf dist/",
     "test": "mocha --recursive --compilers js:babel-register test",
-    "dev-test": "DEBUG=EG:* node --harmony node_modules/mocha/bin/_mocha --recursive  test"
+    "dev-test": "LOG_LEVEL=error node --harmony node_modules/mocha/bin/_mocha --recursive  test"
   },
   "author": "Roman Lisagor <roman@lunchbadger.com>",
   "license": "UNLICENSED",
@@ -44,6 +44,7 @@
     "passport": "^0.3.2",
     "passport-jwt": "^2.2.1",
     "plugin-test": "file:test/common/plugin-test",
-    "vhost": "^3.0.2"
+    "vhost": "^3.0.2",
+    "winston": "^2.3.1"
   }
 }

@@ -1,6 +1,6 @@
-APIEndpoints: # specify pipeline per domain and path
+apiEndpoints: # specify pipeline per domain and path
   cats:
-    host: "*.cats.com"  # regexp support
+    host: "*.cats.com"  # wildcard pattern support
     path: /             # optional defaults to /
   mycats:
     host: "*.mycats.com"
@@ -32,17 +32,17 @@ https:                # if not specified EG will not start https server
         cert: "example/keys/lunchbadger.io.cert.pem"
 
 serviceEndpoints: # urls to downstream services
-  cats_service:
+  catsService:
     url: "http://localhost"
     port: 3000
     path: /             # optional defaults to /
-  dogs_service:
+  dogsService:
     url: http://localhost
     port: 4000
 
 pipelines:
   cats_pipeline:
-    APIEndpoints:
+    apiEndpoints:
       - cats
       - mycats
       - animals-cats
@@ -51,10 +51,10 @@ pipelines:
     policies:
       - action:
           name: proxy # proxy to cats_service downstream service
-          serviceEndpoint: cats_service
+          serviceEndpoint: catsService
 
   dogs_pipeline:
-    APIEndpoints:
+    apiEndpoints:
       - big-dogs
       - animals-dogs
     title: dogs Pipeline
@@ -73,19 +73,4 @@ pipelines:
       #       - '/dogs'
         action:
           name: proxy # proxy to dogs_service downstream service
-          serviceEndpoint: dogs_service
-
-apis:
-  animals:
-    name: animals
-    plan: free
-    public_endpoints:
-    - cats
-    - mycats
-    - dogs
-
-
-
-
-
-
+          serviceEndpoint: dogsService

@@ -82,10 +82,10 @@ data:
       "pipelines": [
         {
           "name": "lunchbadger-api",
-          "APIEndpoints": [
+          "apiEndpoints": [
             { "path": "/" }
           ],
-          "processors": [
+          "policies": [
             {
               "condition": ["always"],
               "action": "cors",

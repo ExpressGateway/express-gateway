@@ -1,15 +1,15 @@
 'use strict';
 
-const MisconfigurationError = require('../errors').MisconfigurationError;
+const ConfigurationError = require('../errors').ConfigurationError;
 
 function createRewriteMiddleware(params) {
   if (!params || !params.match || !params.replace) {
-    throw new MisconfigurationError(
+    throw new ConfigurationError(
       'Rewrite middleware requires "match" and "replace" params');
   }
 
   if (params.redirect && Math.floor(params.redirect / 100) !== 3) {
-    throw new MisconfigurationError(
+    throw new ConfigurationError(
       'Rewrite middleware "redirect" param should be 300 <= value < 400');
   }
 

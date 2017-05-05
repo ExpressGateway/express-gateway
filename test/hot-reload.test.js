@@ -43,7 +43,6 @@ let app1, app2, appTarget, tmpConfigFile;
     it('should proxy to server on ' + port2, (done) => {
       configTemplate.serviceEndpoints.backend.url = 'http://localhost:' + port2;
       helper.saveTempFile(configTemplate, tmpConfigFile.name)
-
       request(appTarget).get('/')
         .set('Host', 'test.com')
         .expect(200)

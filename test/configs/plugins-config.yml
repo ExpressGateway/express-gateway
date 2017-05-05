@@ -1,7 +1,7 @@
-APIEndpoints: # specify pipeline per domain and path
+apiEndpoints:         # specify pipeline per domain and path
   cats:
-    host: "cats.com"  # regexp support
-    path: /             # optional defaults to /
+    host: "cats.com"  # wildcard pattern support
+    path: /           # optional defaults to /
 
 
 http:                 # if not specified EG will not start http server
@@ -12,8 +12,8 @@ serviceEndpoints:
         url: 'http://localhost'
 
 pipelines:
-  plugins_pipeline:
-    APIEndpoints:
+  pluginsPipeline:
+    apiEndpoints:
       - cats
     title: Plugin Pipeline
     policies:

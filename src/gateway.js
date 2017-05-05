@@ -1,5 +1,5 @@
 'use strict';
-const debug = require('debug')('EG:gateway')
+const logger = require('./log').gateway
 let configParser = require('./config');
 
 async function start(startupConfig) {
@@ -8,8 +8,9 @@ async function start(startupConfig) {
   try {
     [server, config] = await configParser.loadConfig(startupConfig.configPath);
   } catch (err) {
-    debug("FATAL:" + err.message);
-    if (err instanceof configParser.MisconfigurationError) {
+    logger.error(err.message);
+    if (err instanceof configParser.ConfigurationError) {
+      logger.error('system is misconfigured, shutdown initiated %j', err)
       process.exit(1);
     }
     throw err;
@@ -20,7 +21,7 @@ async function start(startupConfig) {
   const bindHost = config.bindHost || startupConfig.defaultBindHost;
   return new Promise((resolve) => {
     let runningApp = server.listen(bindPort, bindHost, () => {
-      debug(`Listening on ${bindHost}:${bindPort}`);
+      logger.info(`Listening on ${bindHost}:${bindPort}`);
       resolve({
         app: runningApp
       });
