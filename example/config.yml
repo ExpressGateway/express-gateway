@@ -41,7 +41,7 @@ serviceEndpoints: # urls to downstream services
     port: 4000
 
 pipelines:
-  cats_pipeline:
+  catsPipeline:
     apiEndpoints:
       - cats
       - mycats
@@ -53,7 +53,7 @@ pipelines:
           name: proxy # proxy to cats_service downstream service
           serviceEndpoint: catsService
 
-  dogs_pipeline:
+  dogsPipeline:
     apiEndpoints:
       - big-dogs
       - animals-dogs

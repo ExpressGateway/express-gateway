@@ -11,7 +11,7 @@
     "pretest": "eslint .",
     "clean": "rimraf dist/",
     "test": "mocha --recursive --compilers js:babel-register test",
-    "dev-test": "LOG_LEVEL=error node --harmony node_modules/mocha/bin/_mocha --recursive  test"
+    "dev-test": "LOG_LEVEL=debug node --harmony node_modules/mocha/bin/_mocha  --recursive  test"
   },
   "author": "Roman Lisagor <roman@lunchbadger.com>",
   "license": "UNLICENSED",

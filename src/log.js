@@ -3,28 +3,28 @@ winston.loggers.add('EG:gateway', {
   console: {
     level: process.env.LOG_LEVEL || 'error',
     colorize: true,
-    label: 'category one'
+    label: 'EG:gateway'
   }
 });
 winston.loggers.add('EG:policy', {
   console: {
     level: process.env.LOG_LEVEL || 'error',
     colorize: true,
-    label: 'category one'
+    label: 'EG:policy'
   }
 });
 winston.loggers.add('EG:test', {
   console: {
     level: process.env.LOG_LEVEL || 'error',
     colorize: true,
-    label: 'category one'
+    label: 'EG:test'
   }
 });
 winston.loggers.add('EG:config', {
   console: {
     level: process.env.LOG_LEVEL || 'error',
     colorize: true,
-    label: 'category one'
+    label: 'EG:config'
   }
 });
 winston.level = process.env.LOG_LEVEL || 'error';

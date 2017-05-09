@@ -54,8 +54,39 @@ let app1, app2, appTarget, tmpConfigFile;
           assert.ok(res.text.indexOf(port2) >= 0);
           done();
         });
-
     });
+
+    it('should not have plugin enabled', (done) => {
+      request(appTarget).get('/testing')
+        .expect(404).end(done);
+    })
+
+    describe('enable a plugin', () => {
+      before(function(done) {
+        configTemplate.serviceEndpoints.backend.url = 'http://localhost:' + port2;
+        configTemplate.policies = [{
+          package: 'plugin-test'
+        }]
+        helper.saveTempFile(configTemplate, tmpConfigFile.name)
+        setTimeout(done, 10000); // time needed to install plugin
+      });
+      it('should enable plugin on hot reload', (done) => {
+        request(appTarget).get('/testing')
+          .expect(200).end(done);
+      })
+    })
+
+    describe('disable a plugin', () => {
+      before(function() {
+        configTemplate.serviceEndpoints.backend.url = 'http://localhost:' + port2;
+        delete configTemplate.policies;
+        helper.saveTempFile(configTemplate, tmpConfigFile.name)
+      });
+      it('should disable plugin on hot reload', (done) => {
+        request(appTarget).get('/testing')
+          .expect(404).end(done);
+      })
+    })
 
     after(() => {
       app1.close();
