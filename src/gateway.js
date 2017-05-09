@@ -8,12 +8,11 @@ async function start(startupConfig) {
   try {
     [server, config] = await configParser.loadConfig(startupConfig.configPath);
   } catch (err) {
-    logger.error(err.message);
+    logger.error(err);
     if (err instanceof configParser.ConfigurationError) {
       logger.error('system is misconfigured, shutdown initiated %j', err)
-      process.exit(1);
     }
-    throw err;
+    process.exit(1);
   }
 
   const bindPort = config.bindPort || startupConfig.defaultBindPort;
