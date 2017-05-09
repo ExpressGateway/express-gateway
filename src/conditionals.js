@@ -2,18 +2,22 @@
 
 const minimatch = require('minimatch');
 
-function run(context, [functionName, ...args]) {
-  const func = CONDITIONALS[functionName];
+function run(context, conditionConfig) {
+
+  const func = CONDITIONALS[conditionConfig.name];
   if (!func) {
     return null;
   } else {
-    return func(context, ...args);
+
+    return func(context, conditionConfig);
   }
-};
+}
 
 const CONDITIONALS = module.exports = {
   run,
-
+  register: function({ name, handler }) {
+    CONDITIONALS[name] = handler
+  },
   always: function(_req) {
     return true;
   },
@@ -24,37 +28,37 @@ const CONDITIONALS = module.exports = {
     return false;
   },
 
-  allOf: function(req, ...subItems) {
-    return subItems.every(subItem => run(req, subItem));
+  allOf: function(req, actionConfig) {
+    return actionConfig.conditions.every(subItem => run(req, subItem));
   },
 
-  oneOf: function(req, ...subItems) {
-    return subItems.some(subItem => run(req, subItem));
+  oneOf: function(req, actionConfig) {
+    return actionConfig.conditions.some(subItem => run(req, subItem));
   },
 
-  not: function(req, subItem) {
-    return !run(req, subItem);
+  not: function(req, actionConfig) {
+    return !run(req, actionConfig.condition);
   },
 
-  pathMatch: function(req, pattern) {
-    return req.url.match(new RegExp(pattern)) != null;
+  pathMatch: function(req, actionConfig) {
+    return req.url.match(new RegExp(actionConfig.pattern)) != null;
   },
 
-  pathExact: function(req, path) {
-    return req.url === path;
+  pathExact: function(req, actionConfig) {
+    return req.url === actionConfig.path;
   },
 
-  method: function(req, method) {
-    if (Array.isArray(method)) {
-      return method.includes(req.method);
+  method: function(req, actionConfig) {
+    if (Array.isArray(actionConfig.methods)) {
+      return actionConfig.methods.includes(req.method);
     } else {
-      return req.method === method;
+      return req.method === actionConfig.methods;
     }
   },
 
-  hostMatch: function(req, pattern) {
+  hostMatch: function(req, actionConfig) {
     if (req.headers.host) {
-      return minimatch(req.headers.host, pattern);
+      return minimatch(req.headers.host, actionConfig.pattern);
     }
     return false;
   }
