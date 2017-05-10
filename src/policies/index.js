@@ -1,16 +1,19 @@
 'use strict';
 
-const MODULES = [
+const MODULES = [ // TODO: decide what is part of the core what is a plugin
   './throttle',
   './proxy',
   './jwt',
   './cors',
   './log',
-  './rewrite'
+  './rewrite',
 ];
 
-const PROCESSORS = MODULES.reduce((pre, modName) => {
+const POLICIES = MODULES.reduce((pre, modName) => {
   return Object.assign({}, pre, require(modName));
 }, {});
 
-module.exports = name => PROCESSORS[name];
+module.exports.resolve = name => POLICIES[name];
+module.exports.register = (name, policy) => {
+  POLICIES[name] = policy
+}
