@@ -28,6 +28,13 @@ async function loadConfig(fileName) {
     rootRouter(req, res, next);
   });
 
+  //hot swap router
+  fs.watch(fileName, async(evt, name) => {
+    logger.info(`watch file triggered ${evt} file ${name}
+      note: loading file ${fileName}`);
+    let config = readConfigFile(fileName);
+    rootRouter = await parseConfig(config);
+  });
 
   let server = undefined;
   if (config.https && config.https.tls) {
