@@ -11,6 +11,7 @@ const path = require('path')
 const tls = require('tls');
 const vhost = require('vhost');
 const yaml = require('js-yaml');
+const pluginLoader = require('./plugin-loader');
 
 const ConfigurationError = require('../errors').ConfigurationError;
 const policies = require('../policies');
@@ -27,13 +28,6 @@ async function loadConfig(fileName) {
     rootRouter(req, res, next);
   });
 
-  //hot swap router
-  fs.watch(fileName, async(evt, name) => {
-    logger.info(`watch file triggered ${evt} file ${name}
-      note: loading file ${fileName}`);
-    let config = readConfigFile(fileName);
-    rootRouter = await parseConfig(config);
-  });
 
   let server = undefined;
   if (config.https && config.https.tls) {
@@ -95,6 +89,8 @@ function createTlsServer(tlsConfig, app) {
 async function parseConfig(config) {
   let app = express.Router()
 
+  // No error handling, fail if misconfigured
+  await pluginLoader.loadPlugins(app, config)
 
   let apiPipelines = parsePipelines(config)
   app.use((req, res, next) => {
