@@ -1,0 +1,18 @@
+apiEndpoints:
+  api:
+      host: '*.com'
+      path: /
+
+serviceEndpoints:
+  backend:
+      url: 'http://localhost:5998'
+
+pipelines:
+  apiPipeline:
+    apiEndpoints:
+      - api
+    policies:
+      -
+        action:
+            name: proxy
+            serviceEndpoint: backend

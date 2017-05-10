@@ -1,0 +1,76 @@
+apiEndpoints: # specify pipeline per domain and path
+  cats:
+    host: "*.cats.com"  # wildcard pattern support
+    path: /             # optional defaults to /
+  mycats:
+    host: "*.mycats.com"
+    path: /cats
+  big-dogs:
+    host: big-dogs.com
+  animals-cats:
+    host: "animals.com"
+    path: /cats
+  animals-dogs:
+    host: "animals.com"
+    path: /dogs
+
+
+http:                 # if not specified EG will not start http server
+  port: 9080
+
+https:                # if not specified EG will not start https server
+  port: 9443
+  certificates: # will use SNI callback to provide proper certificate for domain
+      "*.lunchbadger.io":
+        key: "example/keys/lunchbadger.io.key.pem"
+        cert: "example/keys/lunchbadger.io.cert.pem"
+      "api.lunchbadger.com":
+        key: "example/keys/lunchbadger.com.key.pem"
+        cert: "example/keys/lunchbadger.com.cert.pem"
+      "default":
+        key: "example/keys/lunchbadger.io.key.pem"
+        cert: "example/keys/lunchbadger.io.cert.pem"
+
+serviceEndpoints: # urls to downstream services
+  catsService:
+    url: "http://localhost"
+    port: 3000
+    path: /             # optional defaults to /
+  dogsService:
+    url: http://localhost
+    port: 4000
+
+pipelines:
+  catsPipeline:
+    apiEndpoints:
+      - cats
+      - mycats
+      - animals-cats
+
+    title: Cats Pipeline
+    policies:
+      - action:
+          name: proxy # proxy to cats_service downstream service
+          serviceEndpoint: catsService
+
+  dogsPipeline:
+    apiEndpoints:
+      - big-dogs
+      - animals-dogs
+    title: dogs Pipeline
+    policies:
+      - condition:
+          name: always
+      #   action:
+      #     name: oauth2-basic
+      # - action:
+      #     name: oauth2-bearer
+      # - action:
+      #     name: ensure-autenticated # ensure user has logged in, 403 otherwise
+      # - action:
+      #     name: oauth2-scope
+      #     allow-scopes:
+      #       - '/dogs'
+        action:
+          name: proxy # proxy to dogs_service downstream service
+          serviceEndpoint: dogsService
