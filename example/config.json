@@ -12,7 +12,7 @@
         { "path": "/orders" },
         { "path": "/users" }
       ],
-      "processors": [
+      "policies": [
         {
           "condition": ["always"],
           "action": "oauth2",

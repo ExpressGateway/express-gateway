@@ -12,7 +12,7 @@ function createMiddleware(params, config) {
   if (!privateEndpoint) {
     throw new MisconfigurationError(
       `Private endpoint ${params.privateEndpoint} (referenced in 'proxy' ` +
-      'processor configuration) does not exist');
+      'policy configuration) does not exist');
   }
 
   let proxy = httpProxy.createProxyServer({
