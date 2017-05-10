@@ -8,7 +8,8 @@ const MisconfigurationError = require('../errors').MisconfigurationError;
 
 function createMiddleware(params, config) {
   let privateEndpoint = lodash.get(config, ['privateEndpoints',
-                                            params.privateEndpoint, 'url']);
+    params.privateEndpoint, 'url'
+  ]);
   if (!privateEndpoint) {
     throw new MisconfigurationError(
       `Private endpoint ${params.privateEndpoint} (referenced in 'proxy' ` +

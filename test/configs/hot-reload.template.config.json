@@ -1,0 +1,26 @@
+{
+  "apiEndpoints": {
+    "api": {
+      "host": "*.com",
+      "path": "/"
+    }
+  },
+  "serviceEndpoints": {
+    "backend": {
+      "url": "http://localhost"
+    }
+  },
+  "pipelines": {
+    "apiPipeline": {
+      "apiEndpoints": [
+        "api"
+      ],
+      "policies": [{
+        "action": {
+          "name": "proxy",
+          "serviceEndpoint": "backend"
+        }
+      }]
+    }
+  }
+}
