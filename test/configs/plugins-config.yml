@@ -1,0 +1,30 @@
+apiEndpoints:         # specify pipeline per domain and path
+  cats:
+    host: "cats.com"  # wildcard pattern support
+    path: /           # optional defaults to /
+
+
+http:                 # if not specified EG will not start http server
+  port: 9017
+
+serviceEndpoints:
+    backend:
+        url: 'http://localhost'
+
+pipelines:
+  pluginsPipeline:
+    apiEndpoints:
+      - cats
+    title: Plugin Pipeline
+    policies:
+      -
+        condition:
+          name: plugin-conditional
+        action:
+          name: plugin-policy
+
+policies:
+  # - name: 'name-test' # will be looking for npm package "express-gateway-policy-" + name
+  #   someParamRequiredToSetup:  hello
+  - package: 'plugin-test' # any variant supported by npm install, e.g. git url, github, tarball etc.
+    someParam: plugin test param

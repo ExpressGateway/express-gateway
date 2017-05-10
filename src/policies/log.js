@@ -1,10 +1,10 @@
 'use strict';
 
-const MisconfigurationError = require('../errors').MisconfigurationError;
+const ConfigurationError = require('../errors').ConfigurationError;
 
 function createLogMiddleware(params) {
   if (!params || !params.message) {
-    throw new MisconfigurationError('Log middleware requires "message" param');
+    throw new ConfigurationError('Log middleware requires "message" param');
   }
 
   // eslint-disable-next-line no-unused-vars
