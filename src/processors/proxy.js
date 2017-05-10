@@ -33,7 +33,7 @@ function createMiddleware(params, config) {
     debug(`proxying to ${privateEndpoint}`);
     proxy.web(req, res);
   };
-};
+}
 
 module.exports = {
   proxy: createMiddleware

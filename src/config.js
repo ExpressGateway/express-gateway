@@ -28,7 +28,7 @@ function loadConfig(fileName) {
   }
 
   return [server, config];
-};
+}
 
 function createTlsServer(tlsConfig, app) {
   let defaultCert = null;
@@ -83,7 +83,7 @@ function parseConfig(app, config) {
     let router = loadProcessors(pipeline.processors || [], config);
     attachToApp(app, router, pipeline.publicEndpoints || {});
   }
-};
+}
 
 function readJsonFile(fileName) {
   if (fs.existsSync(fileName)) {

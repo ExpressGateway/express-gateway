@@ -9,7 +9,7 @@ function run(context, [functionName, ...args]) {
   } else {
     return func(context, ...args);
   }
-};
+}
 
 const CONDITIONALS = module.exports = {
   run,
