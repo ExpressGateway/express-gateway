@@ -1,0 +1,64 @@
+http:                 # if not specified EG will not start http server
+  port: 9080
+
+
+apiEndpoints: # specify pipeline per domain and path
+  cats:
+    host: "*.cats.com"  # wildcard support, matches foo.cats.com; does NOT match cats.com
+    path: /
+  kitten.com:
+    host: "kitten.com"  # path defaults to /
+  parrots.com:
+    hostRegex: '[a-z]{3}.parrots.com' #regex support, use hostRegex instead of host
+    path: /
+  animals-dogs:
+    host: "animals.com"
+    path: /dogs         # only pathes under /dogs will be served by pipeline
+  animals-cats:
+    host: "animals.com"
+    pathRegex: '/cats-id-[0-9]{3}'
+  wild-cats:
+    host: "*"           # any host will be accepted, alternative syntax host:'' or no host property at all
+    pathRegex: '/wild-cats'
+
+pipelines:
+  catsPipeline:
+    apiEndpoints:
+      - cats
+      - animals-cats
+    title: Cats Pipeline
+    policies:
+      - action:
+          name: cats_policy
+
+  wildCatsPipeline:
+    apiEndpoints:
+      - wild-cats
+    title: Wild Cats Pipeline
+    policies:
+      - action:
+          name: wild_cats_policy
+
+  kittensPipeline:
+    apiEndpoints:
+      - kitten.com
+    title: Kittens Pipeline
+    policies:
+      - action:
+          name: kittens_policy
+
+  parrotsPipeline:
+    apiEndpoints:
+      - parrots.com
+    title: Parrots Pipeline
+    policies:
+      - action:
+          name: parrot_policy
+
+  animals_dogsPipeline:
+      apiEndpoints:
+        - animals-dogs
+      title: Animals dogs Pipeline
+      policies:
+        - action:
+            name: animals_dogs_policy
