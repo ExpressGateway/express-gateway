@@ -1,6 +1,6 @@
 'use strict';
 
-let configParser = require('./config');
+let configParser = require('./config-loader');
 
 if (require.main === module) {
   let server = undefined;

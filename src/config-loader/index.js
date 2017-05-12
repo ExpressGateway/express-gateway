@@ -9,9 +9,9 @@ const morgan = require('morgan');
 const minimatch = require('minimatch');
 const tls = require('tls');
 
-const ConfigurationError = require('./errors').ConfigurationError;
-const actions = require('./actions');
-const runcondition = require('./conditions').run;
+const ConfigurationError = require('../errors').ConfigurationError;
+const actions = require('../actions');
+const runcondition = require('../conditions').run;
 
 function loadConfig(fileName) {
   let config = readJsonFile(fileName);

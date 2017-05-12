@@ -3,7 +3,7 @@
 const assert = require('chai').assert;
 const sinon = require('sinon');
 
-const parseConfig = require('../src/config').parseConfig;
+const parseConfig = require('../src/config-loader').parseConfig;
 
 describe('config parser', function() {
   let app = undefined;
