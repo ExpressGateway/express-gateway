@@ -9,9 +9,9 @@ const morgan = require('morgan');
 const minimatch = require('minimatch');
 const tls = require('tls');
 
-const MisconfigurationError = require('./errors').MisconfigurationError;
-const processors = require('./processors');
-const runConditional = require('./conditionals').run;
+const ConfigurationError = require('./errors').ConfigurationError;
+const actions = require('./actions');
+const runcondition = require('./conditions').run;
 
 function loadConfig(fileName) {
   let config = readJsonFile(fileName);
@@ -80,8 +80,8 @@ function parseConfig(app, config) {
   for (const pipeline of config.pipelines) {
     debug(`processing pipeline ${pipeline.name}`);
 
-    let router = loadProcessors(pipeline.processors || [], config);
-    attachToApp(app, router, pipeline.publicEndpoints || {});
+    let router = loadPolicies(pipeline.policies || [], config);
+    attachToApp(app, router, pipeline.apiEndpoints || {});
   }
 }
 
@@ -91,14 +91,14 @@ function readJsonFile(fileName) {
       return JSON.parse(fs.readFileSync(fileName));
     } catch (err) {
       if (err instanceof SyntaxError) {
-        throw new MisconfigurationError(`Bad config file format: ${err}`);
+        throw new ConfigurationError(`Bad config file format: ${err}`);
       } else if ('errno' in err) {
-        throw new MisconfigurationError(`Could not read config file: ${err}`);
+        throw new ConfigurationError(`Could not read config file: ${err}`);
       }
       throw err;
     }
   } else {
-    throw new MisconfigurationError(`Could not find config file ${fileName}`);
+    throw new ConfigurationError(`Could not find config file ${fileName}`);
   }
 }
 
@@ -108,25 +108,25 @@ function attachStandardMiddleware(app) {
     ':method (:target) :url :status :response-time ms - :res[content-length]'));
 }
 
-function loadProcessors(spec, config) {
+function loadPolicies(spec, config) {
   let router = express.Router();
 
-  for (const procSpec of spec) {
+  for (const policySpec of spec) {
     // TODO: compile all nested s-expressions in advance. This will allow
     // for better validation of the condition spec
-    const condition = procSpec.condition || ['always'];
-    const predicate = (req => runConditional(req, condition));
-    const actionCtr = processors(procSpec.action);
+    const condition = policySpec.condition || ['always'];
+    const predicate = (req => runcondition(req, condition));
+    const actionCtr = actions(policySpec.action);
     if (!actionCtr) {
-      throw new MisconfigurationError(
-        `Could not find action "${procSpec.action}"`);
+      throw new ConfigurationError(
+        `Could not find action "${policySpec.action}"`);
     }
-    const action = actionCtr(procSpec.params, config);
+    const action = actionCtr(policySpec.params, config);
 
     router.use((req, res, next) => {
-      debug(`checking predicate for ${procSpec.action}`);
+      debug(`checking predicate for ${policySpec.action}`);
       if (predicate(req)) {
-        debug(`request matched predicate for ${procSpec.action}`);
+        debug(`request matched predicate for ${policySpec.action}`);
         action(req, res, next);
       } else {
         next();
@@ -137,8 +137,8 @@ function loadProcessors(spec, config) {
   return router;
 }
 
-function attachToApp(app, router, publicEndpoints) {
-  for (const ep of publicEndpoints) {
+function attachToApp(app, router, apiEndpoints) {
+  for (const ep of apiEndpoints) {
     app.use(ep.path, router);
   }
 }
@@ -146,5 +146,5 @@ function attachToApp(app, router, publicEndpoints) {
 module.exports = {
   loadConfig,
   parseConfig,
-  MisconfigurationError
+  ConfigurationError
 };

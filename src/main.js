@@ -7,9 +7,9 @@ if (require.main === module) {
   let config = undefined;
   try {
     [server, config] = configParser.loadConfig(process.argv[2] ||
-                                               '/etc/lunchbadger/gateway.conf');
+      '/etc/lunchbadger/gateway.conf');
   } catch (err) {
-    if (err instanceof configParser.MisconfigurationError) {
+    if (err instanceof configParser.ConfigurationError) {
       console.error(err.message);
       process.exit(1);
     }

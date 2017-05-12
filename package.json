@@ -25,7 +25,6 @@
     "chai": "^3.5.0",
     "eslint": "^3.19.0",
     "eslint-config-defaults": "^9.0.0",
-    "eslint-config-loopback": "^8.0.0",
     "mocha": "^3.3.0",
     "pre-commit": "^1.2.2",
     "request": "^2.81.0",
@@ -44,7 +43,6 @@
     "npm": "^4.5.0",
     "passport": "^0.3.2",
     "passport-jwt": "^2.2.1",
-    "plugin-test": "file:test/common/plugin-test",
     "vhost": "^3.0.2",
     "winston": "^2.3.1"
   }
