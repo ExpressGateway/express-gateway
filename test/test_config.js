@@ -13,34 +13,31 @@ describe('config parser', function() {
       use: sinon.spy()
     };
     parseConfig(app, {
-      privateEndpoints: {
+      serviceEndpoints: {
         backend: {
           url: 'http://www.example.com'
         }
       },
-      pipelines: [
-        {
-          name: 'pipeline1',
-          publicEndpoints: [
-            {path: '/foo'},
-            {path: '/bar'}
-          ],
-          processors: [
-            {
-              condition: ['always'],
-              action: 'throttle',
-              params: {}
-            },
-            {
-              condition: ['always'],
-              action: 'proxy',
-              params: {
-                privateEndpoint: 'backend'
-              }
+      pipelines: [{
+        name: 'pipeline1',
+        apiEndpoints: [
+          { path: '/foo' },
+          { path: '/bar' }
+        ],
+        policies: [{
+            condition: ['always'],
+            action: 'throttle',
+            params: {}
+          },
+          {
+            condition: ['always'],
+            action: 'proxy',
+            params: {
+              serviceEndpoint: 'backend'
             }
-          ]
-        }
-      ]
+          }
+        ]
+      }]
     });
   });
 
@@ -49,7 +46,7 @@ describe('config parser', function() {
     assert(app.use.calledWithMatch('/bar', sinon.match.func));
   });
 
-  it('sets up processors correctly', function() {
+  it('sets up actions correctly', function() {
     let router = app.use.getCall(0).args[1];
     assert.property(router, 'stack');
     assert.isArray(router.stack);

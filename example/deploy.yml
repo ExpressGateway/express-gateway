@@ -60,7 +60,7 @@ data:
     {
       "bindPort": 443,
       "bindHost": "0.0.0.0",
-      "privateEndpoints": {
+      "serviceEndpoints": {
         "backend": {
           "url": "http://10.3.0.11"
         }
@@ -82,10 +82,10 @@ data:
       "pipelines": [
         {
           "name": "lunchbadger-api",
-          "publicEndpoints": [
+          "apiEndpoints": [
             { "path": "/" }
           ],
-          "processors": [
+          "policies": [
             {
               "condition": ["always"],
               "action": "cors",
@@ -128,7 +128,7 @@ data:
               "condition": ["always"],
               "action": "proxy",
               "params": {
-                "privateEndpoint": "backend"
+                "serviceEndpoint": "backend"
               }
             }
           ]

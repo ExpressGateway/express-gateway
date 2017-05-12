@@ -9,9 +9,9 @@ function CustomError(message) {
 }
 util.inherits(CustomError, Error);
 
-class MisconfigurationError extends CustomError {}
+class ConfigurationError extends CustomError {}
 
 module.exports = {
   CustomError,
-  MisconfigurationError
+  ConfigurationError
 };
