@@ -13,7 +13,6 @@ module.exports.bootstrap = function(app, config) {
   }
 }
 
-
 function loadPolicies(spec, config) {
   let router = express.Router();
 
