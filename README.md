@@ -180,9 +180,9 @@ condition specification is in the format:
 [name, ...params]
 ```
 
-The name specifies a conditional function. This can be one of the following:
+The name specifies a condition function. This can be one of the following:
 
-  - `always`: Always matches. If the conditional is missing, it will default to
+  - `always`: Always matches. If the condition is missing, it will default to
     this.
   - `never`: Never matches.
   - `pathExact`: Matches if the request's path is an exact match for the
@@ -202,7 +202,7 @@ The name specifies a conditional function. This can be one of the following:
 
 In addition, several functions are provided that allow you to create logical
 combinations of conditions. The parameters to these functions should be other
-conditional statements:
+condition statements:
 
   - `allOf`: Matches only if all of its parameters match.
   - `oneOf`: Matches if at least one of its parameters matches.

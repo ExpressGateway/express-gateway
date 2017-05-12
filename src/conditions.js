@@ -3,7 +3,7 @@
 const minimatch = require('minimatch');
 
 function run(context, [functionName, ...args]) {
-  const func = CONDITIONALS[functionName];
+  const func = conditions[functionName];
   if (!func) {
     return null;
   } else {
@@ -11,7 +11,7 @@ function run(context, [functionName, ...args]) {
   }
 }
 
-const CONDITIONALS = module.exports = {
+const conditions = module.exports = {
   run,
 
   always: function(_req) {
@@ -20,7 +20,7 @@ const CONDITIONALS = module.exports = {
 
   never: function(_req) {
     // Not sure if anyone would ever use this in real life, but it is a
-    // "legitimate" conditional, and is useful during tests.
+    // "legitimate" condition, and is useful during tests.
     return false;
   },
 

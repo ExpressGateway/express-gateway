@@ -46,7 +46,7 @@ describe('config parser', function() {
     assert(app.use.calledWithMatch('/bar', sinon.match.func));
   });
 
-  it('sets up actions correctly', function() {
+  it('sets up policies correctly', function() {
     let router = app.use.getCall(0).args[1];
     assert.property(router, 'stack');
     assert.isArray(router.stack);

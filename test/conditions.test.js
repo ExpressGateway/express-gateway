@@ -1,6 +1,6 @@
 'use strict';
 
-const run = require('../src/conditionals').run;
+const run = require('../src/conditions').run;
 const assert = require('chai').assert;
 
 describe('always', function() {
@@ -17,29 +17,49 @@ describe('never', function() {
 
 describe('allOf', function() {
   it('should return true if all of the arguments is true', function() {
-    assert.isTrue(run({}, ['allOf', ['always'], ['always'], ['always']]));
+    assert.isTrue(run({}, ['allOf', ['always'],
+      ['always'],
+      ['always']
+    ]));
     assert.isTrue(run({}, ['allOf', ['always']]));
   });
   it('should return false if one of the arguments is false', function() {
-    assert.isFalse(run({}, ['allOf', ['always'], ['always'], ['never']]));
-    assert.isFalse(run({}, ['allOf', ['always'], ['never'], ['always']]));
+    assert.isFalse(run({}, ['allOf', ['always'],
+      ['always'],
+      ['never']
+    ]));
+    assert.isFalse(run({}, ['allOf', ['always'],
+      ['never'],
+      ['always']
+    ]));
     assert.isFalse(run({}, ['allOf', ['never']]));
   });
 });
 
 describe('oneOf', function() {
   it('should return true if one of the arguments is true', function() {
-    assert.isTrue(run({}, ['oneOf', ['never'], ['always'], ['never']]));
+    assert.isTrue(run({}, ['oneOf', ['never'],
+      ['always'],
+      ['never']
+    ]));
     assert.isTrue(run({}, ['oneOf', ['always']]));
   });
   it('should return true if more than one of the arguments is true',
     function() {
-      assert.isTrue(run({}, ['oneOf', ['always'], ['always'], ['always']]));
-      assert.isTrue(run({}, ['oneOf', ['always'], ['always']]));
+      assert.isTrue(run({}, ['oneOf', ['always'],
+        ['always'],
+        ['always']
+      ]));
+      assert.isTrue(run({}, ['oneOf', ['always'],
+        ['always']
+      ]));
     });
   it('should return false if none of the arguments are true', function() {
     assert.isFalse(run({}, ['oneOf', ['never']]));
-    assert.isFalse(run({}, ['oneOf', ['never'], ['never'], ['never']]));
+    assert.isFalse(run({}, ['oneOf', ['never'],
+      ['never'],
+      ['never']
+    ]));
   });
 });
 
@@ -95,43 +115,41 @@ describe('pathMatch', function() {
 
 describe('method', function() {
   it('should return true if param is string and matches', function() {
-    assert.isTrue(run({method: 'GET'}, ['method', 'GET']));
-    assert.isTrue(run({method: 'POST'}, ['method', 'POST']));
+    assert.isTrue(run({ method: 'GET' }, ['method', 'GET']));
+    assert.isTrue(run({ method: 'POST' }, ['method', 'POST']));
   });
 
   it('should return true if param is list and method is member', function() {
-    assert.isTrue(run({method: 'GET'}, ['method', ['GET', 'POST', 'PUT']]));
-    assert.isTrue(run({method: 'POST'}, ['method', ['GET', 'POST', 'PUT']]));
+    assert.isTrue(run({ method: 'GET' }, ['method', ['GET', 'POST', 'PUT']]));
+    assert.isTrue(run({ method: 'POST' }, ['method', ['GET', 'POST', 'PUT']]));
   });
 
   it('should return false if param is string and does not match', function() {
-    assert.isFalse(run({method: 'HEAD'}, ['method', 'GET']));
-    assert.isFalse(run({method: 'POST'}, ['method', 'PUT']));
+    assert.isFalse(run({ method: 'HEAD' }, ['method', 'GET']));
+    assert.isFalse(run({ method: 'POST' }, ['method', 'PUT']));
   });
 
   it('should return false if param is list and method is not member',
     function() {
-      assert.isFalse(run({method: 'HEAD'}, ['method', ['GET', 'POST', 'PUT']]));
+      assert.isFalse(run({ method: 'HEAD' }, ['method', ['GET', 'POST', 'PUT']]));
     });
 });
 
 describe('run', function() {
-  it('correctly handles complex conditional rule', function() {
+  it('correctly handles complex condition rule', function() {
     let control = ['never'];
-    let rule = ['allOf',
-      ['oneOf',
-        'never',
-        ['pathExact', '/foo/bar'],
-        ['not', ['always']]],
-      ['not',
-        ['oneOf',
-          control,
-          ['pathExact', '/path/path/path']]],
+    let rule = ['allOf', ['oneOf',
+        'never', ['pathExact', '/foo/bar'],
+        ['not', ['always']]
+      ],
+      ['not', ['oneOf',
+        control, ['pathExact', '/path/path/path']
+      ]],
       ['pathMatch', '/foo(/baz)?(/bar)?']
     ];
 
-    assert.isTrue(run({url: '/foo/bar'}, rule));
+    assert.isTrue(run({ url: '/foo/bar' }, rule));
     control[0] = 'always';
-    assert.isFalse(run({url: '/foo/bar'}, rule));
+    assert.isFalse(run({ url: '/foo/bar' }, rule));
   });
 });

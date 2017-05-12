@@ -11,7 +11,7 @@ const tls = require('tls');
 
 const ConfigurationError = require('./errors').ConfigurationError;
 const actions = require('./actions');
-const runConditional = require('./conditionals').run;
+const runcondition = require('./conditions').run;
 
 function loadConfig(fileName) {
   let config = readJsonFile(fileName);
@@ -115,7 +115,7 @@ function loadPolicies(spec, config) {
     // TODO: compile all nested s-expressions in advance. This will allow
     // for better validation of the condition spec
     const condition = policySpec.condition || ['always'];
-    const predicate = (req => runConditional(req, condition));
+    const predicate = (req => runcondition(req, condition));
     const actionCtr = actions(policySpec.action);
     if (!actionCtr) {
       throw new ConfigurationError(
