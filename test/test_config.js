@@ -3,7 +3,7 @@
 const assert = require('chai').assert;
 const sinon = require('sinon');
 
-const parseConfig = require('../src/config-loader').parseConfig;
+const pipelinesLoader = require('../src/config-loader/pipelines-loader');
 
 describe('config parser', function() {
   let app = undefined;
@@ -12,7 +12,7 @@ describe('config parser', function() {
     app = {
       use: sinon.spy()
     };
-    parseConfig(app, {
+    pipelinesLoader.bootstrap(app, {
       serviceEndpoints: {
         backend: {
           url: 'http://www.example.com'
