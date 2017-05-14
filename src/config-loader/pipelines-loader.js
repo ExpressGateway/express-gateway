@@ -1,6 +1,6 @@
 const debug = require('debug')('gateway:config');
-const actions = require('../actions');
-const runcondition = require('../conditions').run;
+const actions = require('../actions').init();
+const conditions = require('../conditions');
 const express = require('express');
 const ConfigurationError = require('../errors').ConfigurationError;
 
@@ -15,23 +15,20 @@ module.exports.bootstrap = function(app, config) {
 
 function loadPolicies(spec, config) {
   let router = express.Router();
-
+  conditions.init()
   for (const policySpec of spec) {
-    // TODO: compile all nested s-expressions in advance. This will allow
-    // for better validation of the condition spec
-    const condition = policySpec.condition || ['always'];
-    const predicate = (req => runcondition(req, condition));
-    const actionCtr = actions(policySpec.action);
+    const condition = policySpec.condition || { name: 'always' };
+    const actionCtr = actions.resolve(policySpec.action.name);
     if (!actionCtr) {
       throw new ConfigurationError(
-        `Could not find action "${policySpec.action}"`);
+        `Could not find action "${policySpec.action.name}"`);
     }
-    const action = actionCtr(policySpec.params, config);
+    const action = actionCtr(policySpec.action, config);
 
     router.use((req, res, next) => {
-      debug(`checking predicate for ${policySpec.action}`);
-      if (predicate(req)) {
-        debug(`request matched predicate for ${policySpec.action}`);
+      debug(`checking predicate for %j`, policySpec.action);
+      if (req.matchEGCondition(condition)) {
+        debug('request matched predicate for %j', policySpec.action);
         action(req, res, next);
       } else {
         next();
