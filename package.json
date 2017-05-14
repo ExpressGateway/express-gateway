@@ -39,7 +39,6 @@
     "js-yaml": "^3.8.3",
     "limiter": "^1.1.0",
     "minimatch": "^3.0.3",
-    "morgan": "^1.8.1",
     "npm": "^4.5.0",
     "passport": "^0.3.2",
     "passport-jwt": "^2.2.1",
