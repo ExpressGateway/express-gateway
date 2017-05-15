@@ -1,6 +1,6 @@
 'use strict';
 
-const MODULES = [
+const MODULES = [ // TODO: what is core what is plugin;
   './throttle',
   './proxy',
   './jwt',
@@ -8,9 +8,17 @@ const MODULES = [
   './log',
   './rewrite'
 ];
+const coreNamespace = 'EGCore';
 
-const actions = MODULES.reduce((pre, modName) => {
-  return Object.assign(pre, require(modName));
-}, {});
+module.exports.init = function() {
+  const actions = MODULES.reduce((pre, modName) => {
+    return Object.assign(pre, require(modName));
+  }, {});
 
-module.exports = name => actions[name];
+  return {
+    resolve: name => actions[name] || actions[`${coreNamespace}:${name}`],
+    register: (name, action, namespace = coreNamespace) => {
+      actions[`${namespace}:${name}`] = action
+    }
+  }
+}

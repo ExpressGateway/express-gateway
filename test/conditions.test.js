@@ -1,155 +1,158 @@
-'use strict';
-
-const run = require('../src/conditions').run;
+require('../src/conditions').init();
+const express = require('express');
 const assert = require('chai').assert;
 
 describe('always', function() {
+  let req = Object.create(express.request);
   it('should always return true', function() {
-    assert.isTrue(run({}, ['always']));
+    assert.isTrue(req.matchEGCondition({ name: 'always' }));
   });
 });
 
 describe('never', function() {
+  let req = Object.create(express.request);
   it('should always return false', function() {
-    assert.isFalse(run({}, ['never']));
+    assert.isFalse(req.matchEGCondition({ name: 'never' }));
   });
 });
 
 describe('allOf', function() {
+  let req = Object.create(express.request);
   it('should return true if all of the arguments is true', function() {
-    assert.isTrue(run({}, ['allOf', ['always'],
-      ['always'],
-      ['always']
-    ]));
-    assert.isTrue(run({}, ['allOf', ['always']]));
+    assert.isTrue(req.matchEGCondition({
+      name: 'allOf',
+      conditions: [{ name: 'always' }, { name: 'always' }]
+    }));
   });
   it('should return false if one of the arguments is false', function() {
-    assert.isFalse(run({}, ['allOf', ['always'],
-      ['always'],
-      ['never']
-    ]));
-    assert.isFalse(run({}, ['allOf', ['always'],
-      ['never'],
-      ['always']
-    ]));
-    assert.isFalse(run({}, ['allOf', ['never']]));
+    assert.isFalse(req.matchEGCondition({
+      name: 'allOf',
+      conditions: [{ name: 'always' }, { name: 'never' }]
+    }));
   });
 });
 
 describe('oneOf', function() {
+  let req = Object.create(express.request);
   it('should return true if one of the arguments is true', function() {
-    assert.isTrue(run({}, ['oneOf', ['never'],
-      ['always'],
-      ['never']
-    ]));
-    assert.isTrue(run({}, ['oneOf', ['always']]));
+    assert.isTrue(req.matchEGCondition({
+      name: 'oneOf',
+      conditions: [{ name: 'never' }, { name: 'always' }]
+    }));
   });
   it('should return true if more than one of the arguments is true',
     function() {
-      assert.isTrue(run({}, ['oneOf', ['always'],
-        ['always'],
-        ['always']
-      ]));
-      assert.isTrue(run({}, ['oneOf', ['always'],
-        ['always']
-      ]));
+      assert.isTrue(req.matchEGCondition({
+        name: 'oneOf',
+        conditions: [{ name: 'always' }, { name: 'always' }]
+      }));
     });
   it('should return false if none of the arguments are true', function() {
-    assert.isFalse(run({}, ['oneOf', ['never']]));
-    assert.isFalse(run({}, ['oneOf', ['never'],
-      ['never'],
-      ['never']
-    ]));
+    assert.isFalse(req.matchEGCondition({
+      name: 'oneOf',
+      conditions: [{ name: 'never' }, { name: 'never' }]
+    }));
   });
 });
 
 describe('not', function() {
+  let req = Object.create(express.request);
   it('should return true if the argument is false', function() {
-    assert.isTrue(run({}, ['not', ['never']]));
+    assert.isTrue(req.matchEGCondition({ name: 'not', condition: { name: 'never' } }));
   });
   it('should return false if the argument is true', function() {
-    assert.isFalse(run({}, ['not', ['always']]));
+    assert.isFalse(req.matchEGCondition({ name: 'not', condition: { name: 'always' } }));
   });
 });
 
 describe('pathExact', function() {
+  let req = Object.create(express.request);
   it('should return true if request url is the same', function() {
-    assert.isTrue(run({
-      url: '/foo/bar/baz'
-    }, ['pathExact', '/foo/bar/baz']));
+    req.url = '/foo/bar/baz'
+    assert.isTrue(req.matchEGCondition({ name: 'pathExact', path: '/foo/bar/baz' }));
   });
   it('should return false if request url is not the same', function() {
-    assert.isFalse(run({
-      url: '/foo/bar'
-    }, ['pathExact', '/foo/bar/baz']));
-    assert.isFalse(run({
-      url: '/foo/bar'
-    }, ['pathExact', '/flippyflip']));
-    assert.isFalse(run({
-      url: '/foo/bar'
-    }, ['pathExact', 'is this even a url?']));
+    req.url = '/foo/bar'
+    assert.isFalse(req.matchEGCondition({ name: 'pathExact', path: '/foo/bar/baz' }));
   });
 });
 
 describe('pathMatch', function() {
+  let req = Object.create(express.request);
   it('should return true if request url matches', function() {
-    assert.isTrue(run({
-      url: '/foo/bar'
-    }, ['pathMatch', '(/(foo|bar|baz))+/?']));
-    assert.isTrue(run({
-      url: '/foo/bar/baz'
-    }, ['pathMatch', '(/(foo|bar|baz))+/?']));
-    assert.isTrue(run({
-      url: '/foo/bar/baz/blahblah'
-    }, ['pathMatch', '(/(foo|bar|baz))+/?']));
+    req.url = '/foo/bar'
+    assert.isTrue(req.matchEGCondition({ name: 'pathMatch', pattern: '(/(foo|bar|baz))+/?' }))
   });
   it('should return false if request url does not match', function() {
-    assert.isTrue(run({
-      url: '/foo/bar/baz/blahblah'
-    }, ['pathMatch', '(/(foo|bar|baz))+/?']));
-    assert.isFalse(run({
-      url: '/froo/brar'
-    }, ['pathMatch', '(/(foo|bar|baz))/?']));
+    req.url = '/froo/brar'
+    assert.isFalse(req.matchEGCondition({ name: 'pathMatch', pattern: '(/(foo|bar|baz))/?' }));
   });
 });
 
 describe('method', function() {
-  it('should return true if param is string and matches', function() {
-    assert.isTrue(run({ method: 'GET' }, ['method', 'GET']));
-    assert.isTrue(run({ method: 'POST' }, ['method', 'POST']));
+  let req = Object.create(express.request);
+  it('should return true if methods param is string and matches', function() {
+    req.method = 'GET'
+    assert.isTrue(req.matchEGCondition({
+      name: 'method',
+      methods: 'GET'
+    }));
   });
 
-  it('should return true if param is list and method is member', function() {
-    assert.isTrue(run({ method: 'GET' }, ['method', ['GET', 'POST', 'PUT']]));
-    assert.isTrue(run({ method: 'POST' }, ['method', ['GET', 'POST', 'PUT']]));
+  it('should return true if methods param is list and method is member', function() {
+    req.method = 'POST'
+    assert.isTrue(req.matchEGCondition({
+      name: 'method',
+      methods: ['GET', 'POST', 'PUT']
+    }));
   });
 
-  it('should return false if param is string and does not match', function() {
-    assert.isFalse(run({ method: 'HEAD' }, ['method', 'GET']));
-    assert.isFalse(run({ method: 'POST' }, ['method', 'PUT']));
+  it('should return false if methods param is string and does not match', function() {
+    req.method = 'POST'
+    assert.isFalse(req.matchEGCondition({
+      name: 'method',
+      methods: 'GET'
+    }));
   });
 
   it('should return false if param is list and method is not member',
     function() {
-      assert.isFalse(run({ method: 'HEAD' }, ['method', ['GET', 'POST', 'PUT']]));
+      req.method = 'HEAD'
+      assert.isFalse(req.matchEGCondition({
+        name: 'method',
+        methods: ['GET', 'POST', 'PUT']
+      }));
     });
 });
 
-describe('run', function() {
-  it('correctly handles complex condition rule', function() {
-    let control = ['never'];
-    let rule = ['allOf', ['oneOf',
-        'never', ['pathExact', '/foo/bar'],
-        ['not', ['always']]
-      ],
-      ['not', ['oneOf',
-        control, ['pathExact', '/path/path/path']
-      ]],
-      ['pathMatch', '/foo(/baz)?(/bar)?']
-    ];
-
-    assert.isTrue(run({ url: '/foo/bar' }, rule));
-    control[0] = 'always';
-    assert.isFalse(run({ url: '/foo/bar' }, rule));
+describe('req.matchEGCondition', function() {
+  let req = Object.create(express.request);
+  it('correctly handles complex conditional rule', function() {
+    let control = { name: 'never' };
+    let rule = {
+      name: 'allOf',
+      conditions: [{
+          name: 'oneOf',
+          conditions: [
+            { name: 'pathExact', path: '/foo/bar' },
+            { name: 'not', condition: { name: 'always' } }
+          ]
+        },
+        {
+          name: 'not',
+          condition: {
+            name: 'oneOf',
+            conditions: [
+              control,
+              { name: 'pathExact', path: '/path/path/path' },
+            ]
+          }
+        }
+      ]
+    }
+    req.url = '/foo/bar'
+    assert.isTrue(req.matchEGCondition(rule));
+    control.name = 'always';
+    assert.isFalse(req.matchEGCondition(rule));
   });
 });

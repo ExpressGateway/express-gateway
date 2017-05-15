@@ -1,0 +1,14 @@
+serviceEndpoints:
+  backend:
+    url: 'http://www.example.com'
+pipelines:
+  -
+    name: ecommerce
+    apiEndpoints:
+        - path: /users
+    policies:
+        - condition:
+              name: always
+          action:
+              name: proxy
+              serviceEndpoint: backend

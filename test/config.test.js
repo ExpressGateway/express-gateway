@@ -26,13 +26,12 @@ describe('config parser', function() {
         ],
         policies: [{
             condition: ['always'],
-            action: 'throttle',
-            params: {}
+            action: { name: 'throttle' },
           },
           {
-            condition: ['always'],
-            action: 'proxy',
-            params: {
+            condition: { name: 'always' },
+            action: {
+              name: 'proxy',
               serviceEndpoint: 'backend'
             }
           }

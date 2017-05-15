@@ -1,19 +1,8 @@
-'use strict';
+const minimatch = require('minimatch')
+const express = require('express')
+const debug = require('debug')("gateway");
 
-const minimatch = require('minimatch');
-
-function run(context, [functionName, ...args]) {
-  const func = conditions[functionName];
-  if (!func) {
-    return null;
-  } else {
-    return func(context, ...args);
-  }
-}
-
-const conditions = module.exports = {
-  run,
-
+const predefinedConditions = {
   always: function(_req) {
     return true;
   },
@@ -24,38 +13,59 @@ const conditions = module.exports = {
     return false;
   },
 
-  allOf: function(req, ...subItems) {
-    return subItems.every(subItem => run(req, subItem));
+  allOf: function(req, actionConfig) {
+    return actionConfig.conditions.every(subItem => req.matchEGCondition(subItem));
   },
 
-  oneOf: function(req, ...subItems) {
-    return subItems.some(subItem => run(req, subItem));
+  oneOf: function(req, actionConfig) {
+    return actionConfig.conditions.some(subItem => req.matchEGCondition(subItem));
   },
 
-  not: function(req, subItem) {
-    return !run(req, subItem);
+  not: function(req, actionConfig) {
+    return !req.matchEGCondition(actionConfig.condition);
   },
 
-  pathMatch: function(req, pattern) {
-    return req.url.match(new RegExp(pattern)) != null;
+  pathMatch: function(req, actionConfig) {
+    return req.url.match(new RegExp(actionConfig.pattern)) != null;
   },
 
-  pathExact: function(req, path) {
-    return req.url === path;
+  pathExact: function(req, actionConfig) {
+    return req.url === actionConfig.path;
   },
 
-  method: function(req, method) {
-    if (Array.isArray(method)) {
-      return method.includes(req.method);
+  method: function(req, actionConfig) {
+    if (Array.isArray(actionConfig.methods)) {
+      return actionConfig.methods.includes(req.method);
     } else {
-      return req.method === method;
+      return req.method === actionConfig.methods;
     }
   },
 
-  hostMatch: function(req, pattern) {
+  hostMatch: function(req, actionConfig) {
     if (req.headers.host) {
-      return minimatch(req.headers.host, pattern);
+      return minimatch(req.headers.host, actionConfig.pattern);
     }
     return false;
   }
 };
+
+module.exports.init = function() {
+  const conditions = Object.assign({}, predefinedConditions);
+
+  //extending express.request
+  express.request.matchEGCondition = function(conditionConfig) {
+    debug('matchEGCondition for %j', conditionConfig);
+    const func = conditions[conditionConfig.name];
+    if (!func) {
+      debug(`warning: condition not found for ${conditionConfig.name}`);
+      return null;
+    } else {
+      return func(this, conditionConfig);
+    }
+  }
+  return {
+    register: function({ name, handler }) {
+      conditions[name] = handler
+    },
+  }
+}
