@@ -1,3 +1,6 @@
+apiEndpoints:
+  users:
+    path: /users
 serviceEndpoints:
   backend:
     url: 'http://www.example.com'
@@ -5,7 +8,7 @@ pipelines:
   -
     name: ecommerce
     apiEndpoints:
-        - path: /users
+       - users
     policies:
         - condition:
               name: always

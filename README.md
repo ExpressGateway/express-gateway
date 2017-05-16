@@ -436,7 +436,7 @@ forwarded to `http://www.example.com`, while a request to
 
 API Consumer Management
 -------------
-Consumer management consists of managing users. 
+Consumer management consists of managing users.
 A user, in its base form, consisits of an ID and a username. You define additional user properties in the configuration like below:
 
 ```
@@ -452,7 +452,7 @@ Config: {
     }
   }
 ...
-} 
+}
 ```
 
 ### Applications
@@ -471,7 +471,7 @@ Config: {
     }
   }
 ...
-} 
+}
 ```
 
 API Credential Management
@@ -479,12 +479,19 @@ API Credential Management
 Credential management consists of managing credentials associated with users and applications.
 Types of credentials may include username/password, id/secret and API-Key.
 
-Any type of credential can be associated with a user or application. 
+Any type of credential can be associated with a user or application.
 
 ### Scope
 Scope is a pre-defined string that is used to associate a user's or application's permission to use an api endpoint.
 
 Scopes are assigned to credentials and need to be pre-defined before assignment.
+
+Hot Reload
+-------------
+Express gateway automatically monitors changes of the config file provided at start.
+Once the change is detected the system automatically reconfigures without shutdown and dropping requests.
+
+TBD: how to disable
 
 
 Troubleshooting
