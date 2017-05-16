@@ -433,6 +433,60 @@ In the above example, a request to `http://127.0.0.1:3000/example` will be
 forwarded to `http://www.example.com`, while a request to
 `http://127.0.0.1:3000/google` will be forwarded to `http://www.google.com`.
 
+
+API Consumer Management
+-------------
+Consumer management consists of managing users. 
+A user, in its base form, consisits of an ID and a username. You define additional user properties in the configuration like below:
+
+```
+Config: {
+...
+  User: {
+  ...
+    properties: {
+      username:   { type: 'string', isMutable: false, isRequired: true}, #default, can be overridden
+      firstName:  { type: 'string', isMutable: true, isRequired: true},
+      lastName:   { type: 'string', isMutable: true, isRequired: true}
+      ...
+    }
+  }
+...
+} 
+```
+
+### Applications
+An Application is another type of API consumer. It is tied to a user and only exists by using the `oAuth 2.0` plugin.
+In its base form, an application consists of an Id and userId. You can define additional application perperties in configuration like below:
+
+```
+Config: {
+...
+  Application: {
+  ...
+    properties: {
+      name:   { type: 'string', isMutable: false, isRequired: true},
+      group:  { type: 'string', isMutable: true, isRequired: false},
+      ...
+    }
+  }
+...
+} 
+```
+
+API Credential Management
+-------------
+Credential management consists of managing credentials associated with users and applications.
+Types of credentials may include username/password, id/secret and API-Key.
+
+Any type of credential can be associated with a user or application. 
+
+### Scope
+Scope is a pre-defined string that is used to associate a user's or application's permission to use an api endpoint.
+
+Scopes are assigned to credentials and need to be pre-defined before assignment.
+
+
 Troubleshooting
 ---------------
 EG uses [debug](https://www.npmjs.com/package/debug) module
