@@ -15,7 +15,6 @@
       "argsIgnorePattern": "^_.*",
       "args": "after-used"
     }],
-    "prefer-arrow-callback": "warn",
     "no-console": "warn"
   },
   "root": true
