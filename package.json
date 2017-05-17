@@ -7,7 +7,7 @@
     "dist": "npm run clean && babel -d dist src",
     "dist-test": "babel -d dist-test test",
     "start": "LOG_LEVEL=debug babel-watch .",
-    "start:dist": "node dist/main.js",
+    "start:dist": "node dist/index.js",
     "pretest": "eslint .",
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
