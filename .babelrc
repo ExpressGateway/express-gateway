@@ -1,5 +1,7 @@
 {
   "plugins": [
-    "transform-async-to-generator"
-  ]
+    "transform-async-to-generator",
+    "transform-object-entries"
+  ],
+  "presets": ["es2015-node6"]
 }
