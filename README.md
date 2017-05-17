@@ -64,24 +64,62 @@ A list of domain + path combinations that your EG will listen to
 apiEndpoints:
   api: # name, used as reference in pipeline
     host: '*.com' # wildcard pattern support
-    path: /v1   # optional default /
+    path: /v1/**
+    verbs: ['GET', 'POST'] # optional, defaults to match any verb
   help: # name, used as reference in pipeline
     host: '*' # by default accepts all hosts, same as '*'
-    path: /help   # optional default /
+    path: /help #by default will serve all requests - same as **
+    verbs:
+      - GET
+      - PUT
 ```
-Note: If not possible to avoid overlapping wildcard patterns, ~~try again~~ be aware that order of registration is important, put more specific patterns higher.
+
+#### Path examples
+* /admin - exact string match
+  + match: /admin
+  + 404: /admin/ /admin/new /admin/new/1
+
+* /admin/* - 1 level child matching (does not match to parent dir)
+  + match: /admin/new
+  + 404: /admin  /admin/new/1 /admin/
+
+* /admin/** - deep level child matching (does not match to parent dir)
+  + match: /admin/new /admin/new/1 /admin/
+  + 404: /admin
+
+* /{admin,admin/**} - deep level child matching and directory itself
+  + match: /admin/new /admin/new/1 /admin /admin/
+
+#### Host examples
++ example.com - one domain match, will not match subdomains
++ *.example.com -
+  - any subdomain will match. test.example.com
+  - example.com will not match
+  - deeper levels will not match abc.test.example.com
++ **.example.com
+  - will match any level subdomain
+  - will not match host
+
+#### Verb filtration
+If verbs property of apiEndpoint is not provided system will allow any HTTP method.
+If provided, EG will use it as a white-list and return 404 for those not in list
+
 
 #### Overlapping api endpoints usage
+Note: If not possible to avoid overlapping wildcard patterns, ~~try again~~ be aware that order of registration is important, put more specific patterns higher.
+
 ```yaml
 apiEndpoints:
   ci:
     host: '*.ci.zu.com'
-    path: /    # optional default /
+    path: '**'    # optional default **
   zu:
     host: '*.zu.com'
   com:
     host: '*.com'
 ```
+
+
 
 
 serviceEndpoints

@@ -1,6 +1,8 @@
 apiEndpoints:
   users:
+    host: '*'
     path: /users
+    verbs: ['GET', 'POST']
 serviceEndpoints:
   backend:
     url: 'http://www.example.com'
