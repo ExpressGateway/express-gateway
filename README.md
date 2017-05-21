@@ -436,7 +436,9 @@ forwarded to `http://www.example.com`, while a request to
 
 API Consumer Management
 -------------
-Consumer management consists of managing users.
+Consumer management consists of managing users and applications.
+
+### Users
 A user, in its base form, consisits of an ID and a username. You define additional user properties in the configuration like below:
 
 ```
@@ -456,7 +458,7 @@ Config: {
 ```
 
 ### Applications
-An Application is another type of API consumer. It is tied to a user and only exists by using the `oAuth 2.0` plugin.
+An Application is another type of API consumer and is tied to a user.
 In its base form, an application consists of an Id and userId. You can define additional application perperties in configuration like below:
 
 ```
@@ -485,6 +487,7 @@ Any type of credential can be associated with a user or application.
 Scope is a pre-defined string that is used to associate a user's or application's permission to use an api endpoint.
 
 Scopes are assigned to credentials and need to be pre-defined before assignment.
+
 
 Hot Reload
 -------------
