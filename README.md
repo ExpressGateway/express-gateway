@@ -486,7 +486,7 @@ Scope is a pre-defined string that is used to associate a user's or application'
 
 Scopes are assigned to credentials and need to be pre-defined before assignment.
 
-Hot Reload vs Restart
+Hot Reload vs Manual Restart
 -------------
 Express gateway automatically monitors changes of the config file provided at start.
 Once the change is detected the system automatically reconfigures without shutdown and dropping requests.
@@ -502,7 +502,7 @@ Hot Reload will work for:
   + Plugin Configuration changes
   + Enable/Disable
 
-Restart is required for changes in:
+Manual Restart is required for changes in:
 * http section (port)
 * https section (port and certificates)
 * consumer management configuration (schema, connection string details)
