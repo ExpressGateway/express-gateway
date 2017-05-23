@@ -21,11 +21,13 @@ module.exports.bootstrap = function(app, config) {
   for (let [host, hostConfig] of Object.entries(apiEndpoints)) {
     let router = express.Router()
     router.use((req, res, next) => {
+      req.egContext = req.egContext || {}
       logger.debug("processing vhost %s %j", host, hostConfig.routes)
       for (let route of hostConfig.routes) {
         if (route.pathRegex) {
           if (req.url.match(RegExp(route.pathRegex))) {
             logger.debug("regex path matched for apiEndpointName %s", route.apiEndpointName)
+            req.egContext.apiEndpoint = route
             return apiEndpointToPipelineMap[route.apiEndpointName](req, res, next);
           }
           continue;
@@ -36,6 +38,7 @@ module.exports.bootstrap = function(app, config) {
         for (let path of paths) {
           if (mm.isMatch(req.url, path)) {
             logger.debug("path matched for apiEndpointName %s", route.apiEndpointName)
+            req.egContext.apiEndpoint = route;
             return apiEndpointToPipelineMap[route.apiEndpointName](req, res, next);
           }
         }
