@@ -1,7 +1,6 @@
 apiEndpoints:
   api:
       host: '*.com'
-      path: /
 
 serviceEndpoints:
   backend:
