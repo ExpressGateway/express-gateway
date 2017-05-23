@@ -1,6 +1,6 @@
 'use strict';
 
-let getDb = require('./db');
+let getDb = require('../db');
 let Promise = require('bluebird');
 let uuid = require('node-uuid');
 let utils = require('./utils');

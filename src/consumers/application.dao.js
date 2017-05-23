@@ -1,7 +1,7 @@
 'use strict';
 
 let _ = require('lodash');
-let getDb = require('./db');
+let getDb = require('../db');
 let Promise = require('bluebird');
 let utils = require('./utils');
 let applicationDao, db;
