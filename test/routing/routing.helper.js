@@ -3,6 +3,7 @@ const request = require('supertest');
 const assert = require('chai').assert;
 const logger = require('../../src/log').test
 let gateway = require('../../src/gateway');
+const _ = require('lodash')
 
 
 module.exports = function() {
@@ -13,7 +14,7 @@ module.exports = function() {
       testSuite.fakeActions.forEach((key) => {
         actions.register(key, (params) => {
           return (req, res) => {
-            res.json({ result: key, params, hostname: req.hostname, url: req.url })
+            res.json({ result: key, params, hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint })
           }
         })
       })
@@ -70,10 +71,15 @@ module.exports = function() {
           .expect(200)
           .expect('Content-Type', /json/)
           .expect((res) => {
-            assert.equal(res.body.result, testCase.test.result)
+            if (testCase.test.result) {
+              assert.equal(res.body.result, testCase.test.result)
+            }
             assert.equal(res.body.url, testCase.test.url)
             if (testCase.test.host) {
               assert.equal(res.body.hostname, testCase.test.host)
+            }
+            if (testCase.test.scopes) {
+              assert.ok(_.isEqual(res.body.apiEndpoint.scopes, testCase.test.scopes))
             }
           })
           .end(function(err, res) {
