@@ -13,6 +13,11 @@ module.exports = {
 		},
     usernameMaxLength: 15,
     usernameMinLength: 3,
+    properties: {
+      firstname: { isRequired: true, isMutable: true },
+      lastname: { isRequired: true, isMutable: true },
+      email: { isRequired: false, isMutable: true }
+    }
 	},
   bcrypt: {
     saltRounds: 10
@@ -21,6 +26,9 @@ module.exports = {
     redis: {
       appHashPrefix: 'TEST-ENV-APP',
       userAppsHashPrefix: 'TEST-ENV-USER-APPS'
+    },
+    properties: {
+      name: { isRequired: true, isMutable: true }
     }
   },
   credentials: {

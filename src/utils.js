@@ -1,7 +1,5 @@
 'user strict';
 
-// let Promise = require('bluebird');
-
 module.exports = {
   appendCreatedAt: appendCreatedAt,
   appendUpdatedAt: appendUpdatedAt
