@@ -3,7 +3,7 @@ let appConfig = {
   http: { port: 9081 },
   apiEndpoints: {
     test_regex: { pathRegex: "/wild-cats$" },
-    test_path: { path: "/admin" }
+    test_path: { paths: "/admin" }
   },
   pipelines: {
     pipeline1: {

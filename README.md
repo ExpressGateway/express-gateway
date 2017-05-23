@@ -57,52 +57,75 @@ https:
 
 ```
 ### apiEndpoints:
-A list of domain + path combinations that your EG will listen to
+A list of host + paths combinations that your EG will listen to
+
+#### minimalistic usage
+```yaml
+apiEndpoints:
+  api:
+```
+This declaration fallbacks to defaults for host and paths properties
+It will serve all host names and all possible urls
 
 #### Standard usage
 ```yaml
 apiEndpoints:
   api: # name, used as reference in pipeline
     host: '*.com' # wildcard pattern support
-    path: /v1/**
-    verbs: ['GET', 'POST'] # optional, defaults to match any verb
+    paths: ['/v1/**'] # string or array of string
+  example: # name, used as reference in pipeline
+    host: 'example.com' # wildcard pattern support
+    paths:
+      - /v2/** # string or array of string
   help: # name, used as reference in pipeline
     host: '*' # by default accepts all hosts, same as '*'
-    path: /help #by default will serve all requests - same as **
-    verbs:
-      - GET
-      - PUT
+    paths: /help #by default will serve all requests - same as **
 ```
 
-#### Path examples
-* /admin - exact string match
-  + match: /admin
-  + 404: /admin/ /admin/new /admin/new/1
+#### Host
+host - string that will be matched against 'HOST' header of request
 
-* /admin/* - 1 level child matching (does not match to parent dir)
-  + match: /admin/new
-  + 404: /admin  /admin/new/1 /admin/
-
-* /admin/** - deep level child matching (does not match to parent dir)
-  + match: /admin/new /admin/new/1 /admin/
-  + 404: /admin
-
-* /{admin,admin/**} - deep level child matching and directory itself
-  + match: /admin/new /admin/new/1 /admin /admin/
-
-#### Host examples
+##### Host examples
 + example.com - one domain match, will not match subdomains
 + *.example.com -
   - any subdomain will match. test.example.com
   - example.com will not match
-  - deeper levels will not match abc.test.example.com
+  - deeper levels will not match cdn.test.example.com
 + **.example.com
   - will match any level subdomain
-  - will not match host
+  - will not match example.com host
 
-#### Verb filtration
-If verbs property of apiEndpoint is not provided system will allow any HTTP method.
-If provided, EG will use it as a white-list and return 404 for those not in list
+See more examples here https://www.npmjs.com/package/vhost
+
+#### Path examples
+Paths can be either string or array of strings. It supports wildcard patterns
+
+##### Examples
+* paths: /admin - exact string match
+  + match: /admin
+  + 404: /admin/ /admin/new /admin/new/1
+
+* paths: /admin/* - 1 level child matching (does not match to parent dir)
+  + match: /admin/new
+  + 404: /admin  /admin/new/1 /admin/
+
+* paths: /admin/\*\* - deep level child matching (does not match to parent dir)
+  + match: /admin/new /admin/new/1 /admin/
+  + 404: /admin
+
+* paths: ['/admin', '/admin/\*\*']  - deep level child matching and directory itself
+  alternative syntax  paths: /{admin,admin/\*\*}
+  + match: /admin/new /admin/new/1 /admin /admin/
+
+* paths: ['/student/\*\*', '/teacher/\*\*','/admin/\*\*']
+  + match:
+      - /admin/... multi-level
+      - /student/... multi-level
+      - /teacher/... multi-level
+  + 404:
+      - /
+      - /admin; /teacher; /student
+      - /random etc.
 
 
 #### Overlapping api endpoints usage
@@ -112,15 +135,12 @@ Note: If not possible to avoid overlapping wildcard patterns, ~~try again~~ be a
 apiEndpoints:
   ci:
     host: '*.ci.zu.com'
-    path: '**'    # optional default **
+    paths: '**'    # optional default **
   zu:
     host: '*.zu.com'
   com:
     host: '*.com'
 ```
-
-
-
 
 serviceEndpoints
 ----------------
@@ -131,7 +151,7 @@ serviceEndpoints: # urls to downstream services
   cats_service:
     url: "http://localhost"
     port: 3000
-    path: /             # optional defaults to /
+    paths: /             # optional defaults to /
   dogs_service:
     url: http://localhost
     port: 4000
@@ -188,7 +208,7 @@ serviceEndpoints:
 apiEndpoints:
   api:
     host: '*'
-    path: /
+    paths: /
 pipelines:
   api:
     apiEndpoints:
@@ -197,7 +217,7 @@ pipelines:
       -
         condition:
           name: pathExact
-          path: /v1
+          paths: /v1
         action:
           name: log
           message: "${req.method} ${req.originalUrl}"
@@ -440,7 +460,7 @@ serviceEndpoints:
 apiEndpoints:
   api:
     host: '*'
-    path: /
+    paths: /
 pipelines:
   api:
     apiEndpoints:
@@ -453,14 +473,14 @@ pipelines:
       -
         condition:
           name: pathExact
-          path: /google
+          paths: /google
         action:
           name: proxy
           serviceEndpoint: google # see declaration above
       -
         condition:
           name: pathExact
-          path: /example
+          paths: /example
         action:
           name: proxy
           serviceEndpoint: example # see declaration above

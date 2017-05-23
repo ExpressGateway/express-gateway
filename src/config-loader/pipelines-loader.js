@@ -23,11 +23,6 @@ module.exports.bootstrap = function(app, config) {
     router.use((req, res, next) => {
       logger.debug("processing vhost %s %j", host, hostConfig.routes)
       for (let route of hostConfig.routes) {
-        if (route.verbs && !mm.any(req.method, route.verbs)) {
-          logger.debug("verb is not matched for apiEndpointName %s verbs %j method:", route.apiEndpointName, route.verbs, req.method);
-          continue
-        }
-
         if (route.pathRegex) {
           if (req.url.match(RegExp(route.pathRegex))) {
             logger.debug("regex path matched for apiEndpointName %s", route.apiEndpointName)
@@ -36,10 +31,13 @@ module.exports.bootstrap = function(app, config) {
           continue;
         }
 
-        let path = route.path || '**' // defaults to serve all requests
-        if (mm.isMatch(req.url, path)) {
-          logger.debug("path matched for apiEndpointName %s", route.apiEndpointName)
-          return apiEndpointToPipelineMap[route.apiEndpointName](req, res, next);
+        let paths = route.paths ? (Array.isArray(route.paths) ? route.paths : [route.paths]) : ['**']
+          // defaults to serve all requests
+        for (let path of paths) {
+          if (mm.isMatch(req.url, path)) {
+            logger.debug("path matched for apiEndpointName %s", route.apiEndpointName)
+            return apiEndpointToPipelineMap[route.apiEndpointName](req, res, next);
+          }
         }
       }
       return next()
@@ -67,7 +65,7 @@ function processApiEndpoints(apiEndpoints) {
 
     cfg[host] = cfg[host] || { isRegex, routes: [] };
     logger.debug('processing host: %s, isRegex: %s', host, cfg[host].isRegex)
-    let route = Object.assign({}, endpointConfig, { apiEndpointName })
+    let route = Object.assign({ apiEndpointName }, endpointConfig)
     logger.debug('adding route to host: %s, %j', host, route)
     cfg[host].routes.push(route)
   }

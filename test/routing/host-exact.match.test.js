@@ -11,7 +11,7 @@
      }
    }
  };
- describe('exact host name configuration host:acme.com path:**', () => {
+ describe('exact host name configuration host:acme.com paths:**', () => {
    let helper = testHelper();
    before('setup', helper.setup({
      fakeActions: ['test_policy'],

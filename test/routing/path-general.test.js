@@ -6,7 +6,7 @@ describe('path resolution for specific and general domains', () => {
     let configTemplate = {
       http: { port: 9085 },
       apiEndpoints: {
-        test: { path: '', host }
+        test: { paths: '', host }
       },
       pipelines: {
         pipeline1: {
@@ -15,10 +15,10 @@ describe('path resolution for specific and general domains', () => {
         }
       }
     };
-    describe('path configuration without wildcards path:/admin host:' + host, () => {
+    describe('paths configuration without wildcards paths:/admin host:' + host, () => {
       let helper = testHelper();
       let appConfig = _.cloneDeep(configTemplate);
-      appConfig.apiEndpoints.test.path = '/admin'
+      appConfig.apiEndpoints.test.paths = '/admin'
 
       before('setup', helper.setup({
         fakeActions: ['test_policy'],
@@ -47,15 +47,15 @@ describe('path resolution for specific and general domains', () => {
       });
     })
 
-    describe('path configuration with single wildcard after slash (1 level nesting) path:/admin/* host:' + host, () => {
-      // path: /admin/*
+    describe('paths configuration with single wildcard after slash (1 level nesting) paths:/admin/* host:' + host, () => {
+      // paths: /admin/*
       // will serve any requests in folder /admin/new etc.
       // will not serve folder itself /admin
       // will not serve deep levels /admin/new/1 /admin/new/1/test
 
       let helper = testHelper();
       let appConfig = _.cloneDeep(configTemplate);
-      appConfig.apiEndpoints.test.path = '/admin/*'
+      appConfig.apiEndpoints.test.paths = '/admin/*'
       before('setup', helper.setup({
         fakeActions: ['test_policy'],
         appConfig
@@ -86,10 +86,10 @@ describe('path resolution for specific and general domains', () => {
       });
     })
 
-    describe('path configuration with double wildcards after slash (multi level nesting) path:/admin/**', () => {
+    describe('paths configuration with double wildcards after slash (multi level nesting) paths:/admin/**', () => {
       let helper = testHelper();
       let appConfig = _.cloneDeep(configTemplate);
-      appConfig.apiEndpoints.test.path = '/admin/**'
+      appConfig.apiEndpoints.test.paths = '/admin/**'
       before('setup', helper.setup({
         fakeActions: ['test_policy'],
         appConfig
@@ -120,10 +120,44 @@ describe('path resolution for specific and general domains', () => {
       });
     })
 
-    describe('path configuration with double wildcards after slash or slash /{admin,admin/**}', () => {
+    describe('paths configuration with double wildcards after slash or slash /{admin,admin/**}', () => {
       let helper = testHelper();
       let appConfig = _.cloneDeep(configTemplate);
-      appConfig.apiEndpoints.test.path = '/{admin,admin/**}'
+      appConfig.apiEndpoints.test.paths = '/{admin,admin/**}'
+      before('setup', helper.setup({
+        fakeActions: ['test_policy'],
+        appConfig
+      }))
+      after('cleanup', helper.cleanup());
+
+      ['/admin', '/admin/new', '/admin/', '/admin/new/1', '/admin/new/1/test'].forEach(function(url) {
+        it('should serve matched url: ' + url, helper.validateSuccess({
+          setup: {
+            host,
+            url
+          },
+          test: {
+            host,
+            url,
+            result: 'test_policy'
+          }
+        }));
+      });
+
+      ['/student', '/adm'].forEach(function(url) {
+        it('should not serve  url: ' + url, helper.validate404({
+          setup: {
+            host,
+            url
+          }
+        }))
+      });
+    })
+
+    describe('paths configuration with double wildcards after slash or slash ["/admin","/admin/**"]', () => {
+      let helper = testHelper();
+      let appConfig = _.cloneDeep(configTemplate);
+      appConfig.apiEndpoints.test.paths = ['/admin', '/admin/**']
       before('setup', helper.setup({
         fakeActions: ['test_policy'],
         appConfig
