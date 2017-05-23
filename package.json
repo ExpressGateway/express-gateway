@@ -45,6 +45,7 @@
     "npm": "4.5.0",
     "passport": "0.3.2",
     "passport-jwt": "2.2.1",
+    "passport-localapikey": "0.0.3",
     "vhost": "3.0.2",
     "winston": "2.3.1",
     "bcrypt": "1.0.0",

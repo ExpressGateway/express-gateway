@@ -6,7 +6,8 @@ const MODULES = [ // TODO: what is core what is plugin;
   './jwt',
   './cors',
   './log',
-  './rewrite'
+  './rewrite',
+  './keyauth',
 ];
 const coreNamespace = 'EGCore';
 
