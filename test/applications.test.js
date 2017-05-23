@@ -4,7 +4,7 @@ let uuid = require('node-uuid');
 let services = require('../src/consumers')(config);
 let applicationService = services.applicationService;
 let userService = services.userService;
-let db = require('../src/consumers/db')(config.redis.host, config.redis.port);
+let db = require('../src/db')(config.redis.host, config.redis.port);
 
 describe('Application service tests', function () {
 
