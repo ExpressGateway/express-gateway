@@ -3,10 +3,9 @@ let config = require('./config.models.js');
 let uuid = require('node-uuid');
 let services = require('../src/consumers')(config);
 let userService = services.userService;
-let utils = require('../src/consumers/utils');
 let db = require('../src/db')(config.redis.host, config.redis.port);
 
-describe('User service tests', function () {
+describe.only('User service tests', function () {
 
   describe('Insert tests', function () {
     before(function(done) {
@@ -26,7 +25,6 @@ describe('User service tests', function () {
     it('should insert a user', function (done) {
       let user = {
         username: 'irfanbaqui',
-        password: 'abc123',
         firstname: 'irfan',
         lastname: 'baqui',
         email: 'irfan@eg.com'
@@ -44,7 +42,6 @@ describe('User service tests', function () {
           should.exist(userObj);
           should.exist(userObj.username);
           userObj.username.should.eql(user.username);
-          should.exist(userObj.password);
           should.exist(userObj.email);
           userObj.email.should.eql(user.email);
           should.exist(userObj.firstname);
@@ -56,17 +53,17 @@ describe('User service tests', function () {
           should.exist(userObj.updatedAt);
           done();
         })
-        .catch(function(err) {
-          should.not.exist(err);
-          done();
-        })
+      })
+      .catch(function(err) {
+        console.log(err)
+        should.not.exist(err);
+        done();
       })
     });
 
     it('should throw an error when inserting a user with missing properties', function (done) {
       let user = {
         username: 'irfanbaqui-1',
-        password: 'abc123',
         lastname: 'baqui',
         email: 'irfan@eg.com'
       };
@@ -78,7 +75,7 @@ describe('User service tests', function () {
       })
       .catch(function(err) {
         should.exist(err);
-        err.message.should.eql('invalid user object');
+        err.message.should.eql('firstname is required');
         done();
       });
     });
@@ -86,7 +83,6 @@ describe('User service tests', function () {
     it('should throw an error when inserting a user with existing username', function (done) {
       let user = {
         username: 'irfanbaqui',
-        password: 'abc12333',
         firstname: 'irfan',
         lastname: 'baqui',
         email: 'irfan@eg.com'
@@ -102,61 +98,6 @@ describe('User service tests', function () {
         err.message.should.eql('username already exists');
         done();
       });
-    });
-
-
-    it('should hash user password', function (done) {
-      utils.saltAndHash('irfan', config.bcrypt.saltRounds)
-      .then(function(hash) {
-        should.exist(hash);
-        hash.should.not.eql('irfan');
-        hash.length.should.be.greaterThan(12);
-        done();
-        })
-      .catch(function(err) {
-        should.not.exist(err);
-        done();
-      });
-    });
-  });
-
-  describe('Authentication tests', function () { 
-    let user;
-    before(function(done) {
-      db.flushdbAsync()
-      .then(function(didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
-        user = createRandomUserObject();
-        userService
-        .insert(user)
-        .then(function(newUser) {
-          should.exist(newUser);
-          done();
-        });
-      })
-      .catch(function(err) {
-        should.not.exist(err);
-        done();
-      });
-    });
-
-    it('should authenticate user', function (done) {
-      userService.authenticate(user.username, user.password)
-        .then(function(user) {
-          should.exist(user);
-          user.id.length.should.be.greaterThan(10);
-          done();
-        });
-    });
-
-    it('should not authenticate user with invalid credentials', function (done) {
-      userService.authenticate(user.username, 'incorrect_password')
-        .then(function(id) {
-          should(id).not.be.ok;
-          done();
-        });
     });
   });
 
@@ -235,33 +176,6 @@ describe('User service tests', function () {
           done();
         })
     });
-
-    it('should find user by email', function (done) {
-      userService.findUserByEmail(user.email)
-        .then(function(_user) {
-          should.exist(_user);
-          _user.email.should.eql(user.email)
-          _user.id.length.should.be.greaterThan(10);
-          done();
-        })
-        .catch(function(err) {
-          should.not.exist(err);
-          done();
-        })
-    });
-
-    it('should not find user by invalid email', function (done) {
-      userService.findUserByEmail('invalid_email')
-        .then(function(user) {
-          should.not.exist(user);
-          done();
-        })
-        .catch(function(err) {
-          should.exist(err);
-          err.message.should.eql('email not found');
-          done();
-        })
-    });
   });
 
   describe('Update user tests', function() {
@@ -318,7 +232,7 @@ describe('User service tests', function () {
 
     it('should allow update of any single user property user', function(done) {
       let anotherUpdatedUser = {
-        password: 'xyz111'
+        email: 'baq@eg.com'
       };
       userService.update(user.id, anotherUpdatedUser)
       .then(function(res) {
@@ -329,7 +243,7 @@ describe('User service tests', function () {
           should.exist(_user.username);
           _user.username.should.eql(updatedUser.username);
           should.exist(_user.email);
-          _user.email.should.eql(updatedUser.email);
+          _user.email.should.eql(anotherUpdatedUser.email);
           should.exist(_user.firstname);
           _user.firstname.should.eql(updatedUser.firstname);
           should.exist(_user.lastname);
@@ -337,12 +251,7 @@ describe('User service tests', function () {
           should.exist(_user.createdAt);
           _user.createdAt.should.eql(user.createdAt);
           should.exist(_user.updatedAt);
-          return userService.authenticate(updatedUser.username, anotherUpdatedUser.password)
-          .then(function(user) {
-            should.exist(user);
-            user.id.length.should.be.greaterThan(10);
-            done();
-          });
+          done();
         });
       })
       .catch(function(err) {
@@ -354,7 +263,6 @@ describe('User service tests', function () {
     it('should not update user with unvalid id', function(done) {
       let updatedUser = {
         username: 'joecamper', 
-        password: 'xyz111', 
         firstname: 'Joe', 
         lastname: 'Camper',
         email: 'joecamper@eg.com'
@@ -371,7 +279,7 @@ describe('User service tests', function () {
       });
     });
 
-    it('should not update user with unvalid properties', function(done) {
+    it('should not update user with invalid properties', function(done) {
       let updatedUser = {
         username: 'joecamper', 
         invalid_prop: 'xyz111', 
@@ -383,7 +291,7 @@ describe('User service tests', function () {
       })
       .catch(function(err) {
         should.exist(err);
-        err.message.should.eql('invalid user property invalid_prop');
+        err.message.should.eql('one or more properties is invalid');
         done();
       });
     });
@@ -442,7 +350,6 @@ describe('User service tests', function () {
 function createRandomUserObject() {
   return {
     username: uuid.v4(),
-    password: uuid.v4(),
     firstname: uuid.v4(),
     lastname: uuid.v4(),
     email: uuid.v4()

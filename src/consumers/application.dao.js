@@ -3,7 +3,7 @@
 let _ = require('lodash');
 let getDb = require('../db');
 let Promise = require('bluebird');
-let utils = require('./utils');
+let utils = require('../utils');
 let applicationDao, db;
 
 module.exports = function(config) {

@@ -3,7 +3,7 @@
 let getApplicationDao = require('./application.dao.js');
 let _ = require('lodash');
 let Promise = require('bluebird');
-let utils = require('./utils');
+let utils = require('../utils');
 let uuid = require('node-uuid');
 let applicationService, applicationDao;
 
