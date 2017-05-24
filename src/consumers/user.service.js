@@ -4,21 +4,16 @@ let getUserDao = require('./user.dao.js');
 let getApplicationService = require('./application.service.js');
 let _ = require('lodash');
 let Promise = require('bluebird');
-let utils = require('./utils');
+let utils = require('../utils');
+let uuid = require('node-uuid');
 let userService, userDao, applicationService;
 
 module.exports = function(config) {
+  const userPropsDefinitions = config.users.properties;
+
   if (userService) {
     return userService;
   }
-
-  const userPropsDefinitions = {
-    username:   { type: 'string', isMutable: true },
-    password:   { type: 'string', isMutable: true },
-    email:      { type: 'string', isMutable: true },
-    firstname:  { type: 'string', isMutable: true },
-    lastname:   { type: 'string', isMutable: true }
-  };
 
   userDao = getUserDao(config);
   applicationService = getApplicationService(config);
@@ -27,12 +22,14 @@ module.exports = function(config) {
     return validateAndCreateUser(user)
     .then(function(newUser) {
       return userDao.insert(newUser)
-      .then(function(id) {
-        return {
-          username: newUser.username,
-          id: id,
-          createdAt: newUser.createdAt
-        }
+      .then(function(success) {
+        if (success) {
+          return {
+            username: newUser.username,
+            id: newUser.id,
+            createdAt: newUser.createdAt
+          }
+        } else return Promise.reject(new Error('insert user failed'));
       });
     });
   }
@@ -96,7 +93,7 @@ module.exports = function(config) {
 
     return get(userId) // validate user exists
     .then(function() {
-      return validateUserProperties(_props);
+      return validateUpdateToUserProperties(_.omit(_props, ['username']));
     })
     .then(function(){
       props = _.cloneDeep(_props);
@@ -138,12 +135,16 @@ module.exports = function(config) {
       return Promise.reject(new Error('invalid user object'));
     }
 
-    user = _.cloneDeep(_user);
-    return exists(user.username) // Ensure username is unique
+    return exists(_user.username) // Ensure username is unique
     .then(function(exists) {
-      return !exists ? validateUserProperties(user, 'create') : Promise.reject(new Error('username already exists'));
+      return !exists ? validateNewUserProperties(_.omit(_user, ['username'])) : Promise.reject(new Error('username already exists'));
     })
-    .then(function() {
+    .then(function(newUser) {
+      let baseUserProps = { username: _user.username, id: uuid.v4() };
+      if (newUser) {
+        user = Object.assign(newUser, baseUserProps);
+      } else user = baseUserProps;
+
       utils.appendCreatedAt(user);
       utils.appendUpdatedAt(user);
 
@@ -151,22 +152,43 @@ module.exports = function(config) {
     });
   }
 
-  function validateUserProperties(user, operationType) {
-    for (let key in user) {
-        if (!(userPropsDefinitions.hasOwnProperty(key) &&
-              userPropsDefinitions[key].isMutable &&
-              typeof user[key] === userPropsDefinitions[key]['type'])) {
-          return Promise.reject(new Error('invalid user property ' + key));
-        }
+  function validateUpdateToUserProperties(userProperties) {
+    let updatedUserProperties = {};
+
+    if (!Object.keys(userProperties).every(key => typeof key === 'string' && userPropsDefinitions[key])) {
+      return Promise.reject(new Error('one or more properties is invalid'));
     }
 
-    // Ensure new user doesn't have properties outside of the user schema
-    if (operationType === 'create' && Object.keys(user).length !== Object.keys(userPropsDefinitions).length) {
-      return Promise.reject(new Error('invalid user object'));
+    for (let prop in userProperties) {
+      if (userPropsDefinitions[prop].isMutable !== false) {
+        updatedUserProperties = userProperties[prop];
+      } else return Promise.reject(new Error('invalid property ' + prop));
     }
-    return Promise.resolve(true);
+
+    return Object.keys(updatedUserProperties).length > 0 ? Promise.resolve(updatedUserProperties) : Promise.resolve(null);
   }
 
+  function validateNewUserProperties(userProperties) {
+    let newUserProperties = {};
+
+    if (!Object.keys(userProperties).every(key => (typeof key === 'string' && !!userPropsDefinitions[key]))) {
+      return Promise.reject(new Error('one or more property is invalid'));
+    }
+
+    for (let prop in userPropsDefinitions) {
+      let descriptor = userPropsDefinitions[prop];
+      if (!userProperties[prop]) {
+        if (descriptor.isRequired) {
+          return Promise.reject(new Error(`${prop} is required`));
+        }
+        if (descriptor.defaultValue) {
+          newUserProperties[prop] = descriptor.defaultValue;
+        }
+      } else newUserProperties[prop] = userProperties[prop];
+    }
+
+    return Object.keys(newUserProperties).length > 0 ? Promise.resolve(newUserProperties) : Promise.resolve(null);
+  }
 
   userService = {
     insert: insert,
