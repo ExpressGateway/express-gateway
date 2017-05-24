@@ -1,6 +1,14 @@
 apiEndpoints:
   users:
-    path: /users
+    host: '*'
+    paths: ['/users']
+    scopes: #by defyning this attribute you can assigne scopes to endpoints
+      - scope: Admin # assumes verbs *
+      - scope: User
+        verbs: GET
+      - scope: Manager
+        verbs: [GET, POST, PUT]
+
 serviceEndpoints:
   backend:
     url: 'http://www.example.com'

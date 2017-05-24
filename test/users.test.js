@@ -55,7 +55,6 @@ describe('User service tests', function () {
         })
       })
       .catch(function(err) {
-        console.log(err)
         should.not.exist(err);
         done();
       })

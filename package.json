@@ -12,7 +12,7 @@
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "test": "mocha --recursive --compilers js:babel-register test/*",
-    "dev-test": "LOG_LEVEL=debug node --harmony node_modules/mocha/bin/_mocha  --recursive  test"
+    "dev-test": "LOG_LEVEL=error node --harmony node_modules/mocha/bin/_mocha --recursive  test"
   },
   "author": "Roman Lisagor <roman@lunchbadger.com>",
   "license": "UNLICENSED",
@@ -36,22 +36,23 @@
     "tmp": "0.0.31"
   },
   "dependencies": {
+    "bcrypt": "1.0.0",
+    "bluebird": "3.5.0",
+    "body-parser": "1.17.1",
     "cors": "2.8.3",
     "express": "4.15.2",
     "http-proxy": "1.16.2",
     "js-yaml": "3.8.3",
     "limiter": "1.1.0",
+    "lodash": "4.17.4",
+    "micromatch": "^2.3.11",
     "minimatch": "3.0.3",
+    "node-uuid": "1.4.8",
     "npm": "4.5.0",
     "passport": "0.3.2",
     "passport-jwt": "2.2.1",
+    "redis": "2.7.1",
     "vhost": "3.0.2",
-    "winston": "2.3.1",
-    "bcrypt": "1.0.0",
-    "bluebird": "3.5.0",
-    "body-parser": "1.17.1",
-    "lodash": "4.17.4",
-    "node-uuid": "1.4.8",
-    "redis": "2.7.1"
+    "winston": "2.3.1"
   }
 }
