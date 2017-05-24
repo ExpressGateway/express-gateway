@@ -101,6 +101,14 @@ module.exports = function(config) {
     });
   }
 
+  function activate(id) {
+    return db.hsetAsync(config.users.redis.userHashPrefix.concat(':', id), 'isActive', 'true');
+  }
+
+  function deactivate(id) {
+    return db.hsetAsync(config.users.redis.userHashPrefix.concat(':', id), 'isActive', 'false');
+  }
+
   function remove(userId) {
     return getUserById(userId)
     .then(function(user) {
@@ -124,6 +132,8 @@ module.exports = function(config) {
     getUserIdByUsername,
     getUserById,
     update,
+    activate,
+    deactivate,
     remove
   };
 
