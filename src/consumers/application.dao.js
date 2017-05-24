@@ -15,7 +15,7 @@ module.exports = function(config) {
 
   /**
    * Insert application to the database. Application should be searchable by its ID.
-   * @param  {Object}  user
+   * @param  {Object}  app
    * @return {bool}    success
    */
   function insert(app) {
@@ -34,6 +34,20 @@ module.exports = function(config) {
       let success = res.every(function(val) {return val;});
       if (!success) {
         return Promise.reject(new Error('Failed to create app'))
+      }
+      return true;
+    });
+  }
+
+  function update(id, props) {
+    // key for the app hash table
+    let appHashKey = applicationDbConfig.appHashPrefix.concat(':', id);
+
+    return db
+    .hmsetAsync(appHashKey, props)
+    .then(function(res) {
+      if (!res) {
+        return Promise.reject(new Error('Failed to update app'))
       }
       return true;
     });
@@ -87,6 +101,7 @@ module.exports = function(config) {
 
   applicationDao = {
     insert,
+    update,
     get,
     getAll,
     getAllAppIdsByUser,

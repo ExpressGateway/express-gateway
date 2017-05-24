@@ -4,13 +4,9 @@ let getApplicationDao = require('./application.dao.js');
 let Promise = require('bluebird');
 let utils = require('../utils');
 let uuid = require('node-uuid');
-let applicationService, applicationDao;
+let applicationDao;
 
 module.exports = function(config) {
-  if (applicationService) {
-    return applicationService;
-  }
-
   const applicationPropsDefinitions = config.applications.properties;
   applicationDao = getApplicationDao(config);
 
@@ -64,6 +60,33 @@ module.exports = function(config) {
     });
   }
 
+  function update(id, applicationProperties) {
+    let updatedAppProperties = {};
+
+    if (!applicationProperties || !id) {
+      return Promise.reject(new Error('invalid properties'));
+    }
+
+    return get(id) // validate app exists
+    .then(function() {
+      if (!Object.keys(applicationProperties).every(key => typeof key === 'string' && applicationPropsDefinitions[key])) {
+        return Promise.reject(new Error('one or more properties is invalid'));
+      }
+
+      for (let prop in applicationProperties) {
+        if (applicationPropsDefinitions[prop].isMutable !== false) {
+          updatedAppProperties[prop] = applicationProperties[prop];
+        } else return Promise.reject(new Error('invalid property ' + prop));
+      }
+
+      utils.appendUpdatedAt(updatedAppProperties);
+      return applicationDao.update(id, updatedAppProperties);
+    })
+    .then(function(updated) {
+      return updated ? true : Promise.reject(new Error('app update failed'));
+    });
+  }
+
   function validateAndCreateApp(appProperties, userId) {
     let app = {};
     let baseAppProps;
@@ -98,13 +121,12 @@ module.exports = function(config) {
     return app;
   }
 
-  applicationService = {
+  return {
     insert,
+    update,
     get,
     getAll,
     remove,
     removeAll
   };
-
-  return applicationService;
 }
