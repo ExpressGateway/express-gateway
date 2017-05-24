@@ -8,8 +8,7 @@ module.exports = {
 	users: {
 		redis: {
 			userHashPrefix: 'TEST-ENV-USER',
-      usernameSetPrefix: 'TEST-ENV-USERNAME',
-      emailSetPrefix: 'TEST-ENV-EMAIL'
+      usernameSetPrefix: 'TEST-ENV-USERNAME'
 		},
     usernameMaxLength: 15,
     usernameMinLength: 3,
