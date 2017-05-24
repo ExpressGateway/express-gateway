@@ -5,7 +5,7 @@ let services = require('../src/consumers')(config);
 let userService = services.userService;
 let db = require('../src/db')(config.redis.host, config.redis.port);
 
-describe.only('User service tests', function () {
+describe('User service tests', function () {
 
   describe('Insert tests', function () {
     before(function(done) {
