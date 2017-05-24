@@ -6,14 +6,10 @@ let _ = require('lodash');
 let Promise = require('bluebird');
 let utils = require('../utils');
 let uuid = require('node-uuid');
-let userService, userDao, applicationService;
+let userDao, applicationService;
 
 module.exports = function(config) {
   const userPropsDefinitions = config.users.properties;
-
-  if (userService) {
-    return userService;
-  }
 
   userDao = getUserDao(config);
   applicationService = getApplicationService(config);
@@ -190,7 +186,7 @@ module.exports = function(config) {
     return Object.keys(newUserProperties).length > 0 ? Promise.resolve(newUserProperties) : Promise.resolve(null);
   }
 
-  userService = {
+  return {
     insert: insert,
     authenticate: authenticate,
     get: get,
@@ -200,6 +196,4 @@ module.exports = function(config) {
     update: update,
     remove: remove
   };
-
-  return userService;
 }
