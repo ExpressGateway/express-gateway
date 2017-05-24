@@ -34,21 +34,19 @@ describe('Application service tests', function () {
         user = newUser;
         should.exist(user.id);
         app = {
-          name: 'test-app-1',
-          userId: user.id
+          name: 'test-app-1'
         };
 
         applicationService
-        .insert(app)
+        .insert(app, user.id)
         .then(function(newApp) {
           should.exist(newApp);
           should.exist(newApp.id);
           should.exist(newApp.name);
           newApp.name.should.eql(app.name);
-          should.exist(newApp.secret);
           should.exist(newApp.createdAt);
           should.exist(newApp.userId);
-          newApp.userId.should.eql(app.userId);
+          newApp.userId.should.eql(user.id);
           done();
         })
         .catch(function(err) {
@@ -60,97 +58,41 @@ describe('Application service tests', function () {
     });
 
     it('should throw an error when inserting an app with missing properties', function (done) {
-      let app = { userId: user.id };
+      let app = {};
 
       applicationService
-      .insert(app)
+      .insert(app, user.id)
       .then(function(newApp) {
         should.not.exist(newApp);
       })
       .catch(function(err) {
         should.exist(err);
-        err.message.should.eql('invalid app object');
+        err.message.should.eql('Failed to insert application: name is required');
         done();
       });
     });
 
     it('should allow inserting multiple applications per user', function (done) {
       let app = {
-          name: 'test-app-2',
-          userId: user.id
+          name: 'test-app-2'
         };
 
       applicationService
-      .insert(app)
+      .insert(app, user.id)
       .then(function(newApp) {
         should.exist(newApp);
         should.exist(newApp.id);
         should.exist(newApp.name);
         newApp.name.should.eql(app.name);
-        should.exist(newApp.secret);
         should.exist(newApp.createdAt);
         should.exist(newApp.userId);
-        newApp.userId.should.eql(app.userId);
+        newApp.userId.should.eql(user.id);
         done();
       })
       .catch(function(err) {
         should.not.exist(err);
         done();
       })
-    });
-  });
-
-  describe('Authentication tests', function () { 
-    let user, app;
-
-    before(function(done) {
-      db.flushdbAsync()
-      .then(function(didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
-        let _user = createRandomUserObject();
-        userService
-        .insert(_user)
-        .then(function(newUser) {
-          should.exist(newUser);
-          user = newUser
-          app = {
-            name: 'test-app',
-            userId: user.id
-          }
-          applicationService
-          .insert(app)
-          .then(function(newApp) {
-            should.exist(newApp);
-            app = newApp;
-            done();
-          });
-        });
-      })
-      .catch(function(err) {
-        should.not.exist(err);
-        done();
-      });
-    });
-
-    it('should authenticate application', function (done) {
-      applicationService
-      .authenticate(app.id, app.secret)
-      .then(function(authenticated) {
-        should.exist(authenticated);
-        authenticated.should.eql(true);
-        done();
-      });
-    });
-
-    it('should not authenticate app with invalid credentials', function (done) {
-      applicationService
-      .authenticate(app.id, 'incorrect_secret')
-      .then(function(authenticated) {
-        authenticated.should.eql(false);
-        done();
-      });
     });
   });
 
@@ -170,11 +112,10 @@ describe('Application service tests', function () {
           should.exist(newUser);
           user = newUser
           app = {
-            name: 'test-app',
-            userId: user.id
+            name: 'test-app'
           }
           applicationService
-          .insert(app)
+          .insert(app, user.id)
           .then(function(newApp) {
             should.exist(newApp);
             app = newApp;
@@ -195,7 +136,6 @@ describe('Application service tests', function () {
         should.exist(_app);
         should.exist(_app.id);
         _app.id.should.eql(app.id);
-        should.not.exist(_app.secret);
         should.exist(_app.name);
         _app.name.should.eql(app.name);
         should.exist(_app.createdAt);
@@ -230,11 +170,10 @@ describe('Application service tests', function () {
         should.exist(newUser);
         user1 = newUser;
         app1 = {
-          name: 'test-app-1',
-          userId: user1.id
+          name: 'test-app-1'
         }
         return applicationService
-        .insert(app1)
+        .insert(app1, user1.id)
         .then(function(newApp) {
           should.exist(newApp);
           app1 = newApp;
@@ -243,11 +182,10 @@ describe('Application service tests', function () {
       })
       .then(function() {
         app2 = {
-          name: 'test-app-2',
-          userId: user1.id
+          name: 'test-app-2'
         }
         return applicationService
-        .insert(app2)
+        .insert(app2, user1.id)
         .then(function(newApp) {
           should.exist(newApp);
           app2 = newApp;
@@ -272,84 +210,6 @@ describe('Application service tests', function () {
     });
   });
 
-  describe('Rotate Secret', function() {
-    let user, app, newSecret;
-
-    before(function(done) {
-      db.flushdbAsync()
-      .then(function(didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
-        let _user = createRandomUserObject();
-        userService
-        .insert(_user)
-        .then(function(newUser) {
-          should.exist(newUser);
-          user = newUser
-          app = {
-            name: 'test-app',
-            userId: user.id
-          }
-          applicationService
-          .insert(app)
-          .then(function(newApp) {
-            should.exist(newApp);
-            app = newApp;
-            done();
-          });
-        });
-      })
-      .catch(function(err) {
-        should.not.exist(err);
-        done();
-      });
-    });
-
-    it('should rotate secret', function(done) {
-      applicationService
-      .rotateSecret(app.id)
-      .then(function(_newSecret) {
-        newSecret = _newSecret;
-        should.exist(newSecret);
-        newSecret.should.not.eql(app.secret);
-        done()
-      })
-      .catch(function(err) {
-        should.not.exist(err);
-        done();
-      })
-    });
-
-    it('should authenticate with new secret', function(done) {
-      applicationService
-      .authenticate(app.id, newSecret)
-      .then(function(authenticated) {
-        should.exist(authenticated);
-        authenticated.should.eql(true);
-        done();
-      })
-      .catch(function(err) {
-        should.not.exist(err);
-        done();
-      })
-    });
-
-    it('should not authenticate with old secret', function(done) {
-      applicationService
-      .authenticate(app.id, app.secret)
-      .then(function(authenticated) {
-        should.exist(authenticated);
-        authenticated.should.eql(false);
-        done();
-      })
-      .catch(function(err) {
-        should.not.exist(err);
-        done();
-      })
-    });
-  });
-
   describe('Delete app tests', function() {
     let user, app;
 
@@ -366,11 +226,10 @@ describe('Application service tests', function () {
           should.exist(newUser);
           user = newUser
           app = {
-            name: 'test-app',
-            userId: user.id
+            name: 'test-app'
           }
           applicationService
-          .insert(app)
+          .insert(app, user.id)
           .then(function(newApp) {
             should.exist(newApp);
             app = newApp;
@@ -432,11 +291,10 @@ describe('Application service tests', function () {
         should.exist(newUser);
         user1 = newUser;
         app1 = {
-          name: 'test-app-1',
-          userId: user1.id
+          name: 'test-app-1'
         }
         return applicationService
-        .insert(app1)
+        .insert(app1, user1.id)
         .then(function(newApp) {
           should.exist(newApp);
           app1 = newApp;
@@ -445,11 +303,10 @@ describe('Application service tests', function () {
       })
       .then(function() {
         app2 = {
-          name: 'test-app-2',
-          userId: user1.id
+          name: 'test-app-2'
         }
         return applicationService
-        .insert(app2)
+        .insert(app2, user1.id)
         .then(function(newApp) {
           should.exist(newApp);
           app2 = newApp;
@@ -502,11 +359,10 @@ describe('Application service tests', function () {
         should.exist(newUser);
         user1 = newUser;
         app1 = {
-          name: 'test-app-1',
-          userId: user1.id
+          name: 'test-app-1'
         }
         return applicationService
-        .insert(app1)
+        .insert(app1, user1.id)
         .then(function(newApp) {
           should.exist(newApp);
           app1 = newApp;
@@ -541,7 +397,6 @@ describe('Application service tests', function () {
 function createRandomUserObject() {
   return {
     username: uuid.v4(),
-    password: uuid.v4(),
     firstname: uuid.v4(),
     lastname: uuid.v4(),
     email: uuid.v4()

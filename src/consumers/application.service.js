@@ -1,7 +1,6 @@
 'use strict';
 
 let getApplicationDao = require('./application.dao.js');
-let _ = require('lodash');
 let Promise = require('bluebird');
 let utils = require('../utils');
 let uuid = require('node-uuid');
@@ -12,43 +11,25 @@ module.exports = function(config) {
     return applicationService;
   }
 
-  const applicationPropsDefinitions = {
-    name:   { type: 'string', isMutable: true, userDefined: true  },
-    id:     { type: 'string', isMutable: false, userDefined: false },
-    secret: { type: 'string', isMutable: true, userDefined: false  },
-    userId: { type: 'string', isMutable: false, userDefined: true }
-  };
-
+  const applicationPropsDefinitions = config.applications.properties;
   applicationDao = getApplicationDao(config);
 
-  function insert(_app) {
-    let app;
-    return validateAndCreateApp(_app)
-    .then(function(newApp) {
-      app = newApp;
+  function insert(_app, userId) {
+    return new Promise((resolve) => {
+      let app = validateAndCreateApp(_app, userId);
       return applicationDao.insert(app)
       .then(function() {
-        return app;
+        return resolve(app);
       });
-    });
-  }
-
-  function authenticate(id, secret) {
-    if (!id || !secret) {
-      return Promise.reject(new Error('invalid credentials'));
-    }
-
-    return applicationDao.authenticate(id, secret)
-    .then(function(authenticated) {
-      return authenticated ? true : false;
-    });
+    })
+    .catch(err => Promise.reject(new Error('Failed to insert application: ' + err.message)));
   }
 
   function get(id) {
     return applicationDao
     .get(id)
     .then(function(app) {
-      return app ? _.omit(app, ['secret']) : Promise.reject(new Error('app not found'));
+      return app ? app : Promise.reject(new Error('app not found'));
     });
   }
 
@@ -56,17 +37,6 @@ module.exports = function(config) {
     return applicationDao.getAll(userId)
     .catch(function() {
       return Promise.reject(new Error('failed to get all apps'));
-    });
-  }
-
-  function rotateSecret(id) {
-    let newSecret = uuid.v4();
-    return get(id) // make sure app exists
-    .then(function() {
-      return applicationDao.rotateSecret(id, newSecret);
-    })
-    .then(function(rotated) {
-      return rotated ? newSecret : Promise.reject(new Error('rotate secret operation failed'));
     });
   }
 
@@ -94,53 +64,46 @@ module.exports = function(config) {
     });
   }
 
-  /**
-   * Helper function to insert. 
-   * Creates an app object with the correct schema.
-   * @param  {Object}
-   * @return {Object}
-   */
-  function validateAndCreateApp(_app) {
-    let app;
+  function validateAndCreateApp(appProperties, userId) {
+    let app = {};
+    let baseAppProps;
 
-    return Promise.resolve()
-    .then(function() {
-      if (!_app || !_app.name || !_app.userId) {
-        return Promise.reject(new Error('invalid app object'));
-      }
+    if (!appProperties || !userId) {
+      throw new Error('invalid application properties');
+    }
 
-      // validate application properties
-      for (let key in _app) {
-        if (!(applicationPropsDefinitions.hasOwnProperty(key) && 
-              applicationPropsDefinitions[key].userDefined && 
-              typeof _app[key] === applicationPropsDefinitions[key]['type'])) {
-          return Promise.reject(new Error('invalid application property'));
+    if (!Object.keys(appProperties).every(key => (typeof key === 'string' && !!applicationPropsDefinitions[key]))) {
+      throw new Error('one or more property is invalid');
+    }
+
+    baseAppProps = { id: uuid.v4(), userId };
+
+    for (let prop in applicationPropsDefinitions) {
+      let descriptor = applicationPropsDefinitions[prop];
+      if (!appProperties[prop]) {
+        if (descriptor.isRequired) {
+          throw new Error(`${prop} is required`);
         }
-      }
+        if (descriptor.defaultValue) {
+          app[prop] = descriptor.defaultValue;
+        }
+      } else app[prop] = appProperties[prop];
+    }
 
-      app = {
-        name: _app.name,
-        id: uuid.v4(),
-        secret: uuid.v4(),
-        userId: _app.userId
-      };
+    app = Object.assign(app, baseAppProps);
 
-      utils.appendCreatedAt(app);
-      utils.appendUpdatedAt(app);
+    utils.appendCreatedAt(app);
+    utils.appendUpdatedAt(app);
 
-      return app;
-    });
+    return app;
   }
 
-
   applicationService = {
-    insert: insert,
-    authenticate: authenticate,
-    get: get,
-    getAll: getAll,
-    rotateSecret: rotateSecret,
-    remove: remove,
-    removeAll: removeAll
+    insert,
+    get,
+    getAll,
+    remove,
+    removeAll
   };
 
   return applicationService;

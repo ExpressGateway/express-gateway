@@ -22,7 +22,7 @@ module.exports = {
   bcrypt: {
     saltRounds: 10
   },
-  apps: {
+  applications: {
     redis: {
       appHashPrefix: 'TEST-ENV-APP',
       userAppsHashPrefix: 'TEST-ENV-USER-APPS'
