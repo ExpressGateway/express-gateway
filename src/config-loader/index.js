@@ -5,8 +5,19 @@ const pipelineLoader = require('./pipelines-loader');
 const fs = require('fs');
 let logger = require('../log').config;
 
-function loadConfig(fileName) {
-  let config = fileLoader.readConfigFile(fileName);
+/// expecting configPath if loading from file
+/// if config was provided as code or env var use appConfig
+function loadConfig(startupConfig) {
+  let fileName = startupConfig.configPath
+  let config
+  if (fileName) {
+    config = fileLoader.readConfigFile(fileName)
+    logger.debug('loaded config from file %s %j', fileName, config)
+  } else {
+    config = startupConfig.appConfig
+    logger.debug('loaded config from code %j', config)
+  }
+
   let app = express();
   let rootRouter = pipelineLoader.bootstrap(express.Router(), config);
 
@@ -17,15 +28,15 @@ function loadConfig(fileName) {
     // once all old requests are served old instance is target for GC
     rootRouter(req, res, next);
   });
-
-  fs.watch(fileName, (evt, name) => {
-    logger.info(`watch file triggered ${evt} file ${name}
+  if (fileName) { //hot reload only if config provided by file
+    fs.watch(fileName, (evt, name) => {
+      logger.info(`watch file triggered ${evt} file ${name}
       note: loading file ${fileName}`);
-    let config = fileLoader.readConfigFile(fileName);
-    //hot swap router
-    rootRouter = pipelineLoader.bootstrap(express.Router(), config);
-  });
-
+      let config = fileLoader.readConfigFile(fileName);
+      //hot swap router
+      rootRouter = pipelineLoader.bootstrap(express.Router(), config);
+    });
+  }
   let servers = serverLoader.bootstrap(app, config)
 
   //TODO: as part of #13 refactor to return both server and run at the same time
