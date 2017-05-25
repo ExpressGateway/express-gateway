@@ -79,7 +79,7 @@ const testCases = [{
   }
 }, {
   clientOptions: {
-    testTitle: 'should failed to connect to c.another.com (not defined in EG config)',
+    testTitle: 'should fail to connect to c.another.com (not defined in EG config)',
     key: loadPEM('agent3-key'),
     cert: loadPEM('agent3-cert'), // NOTE: issued by ca2
     ca: [loadPEM('ca1-cert')],
