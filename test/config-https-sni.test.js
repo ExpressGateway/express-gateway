@@ -34,7 +34,7 @@ let appConfig = {
 
 const testCases = [{
   clientOptions: {
-    testTitle: 'should connect to a.example.com but fail to verify client chain (ca1 issues is not known to server)',
+    testTitle: 'should connect to a.example.com but fail to verify client chain (ca1 issuer is not known to server)',
     key: loadPEM('agent1-key'),
     cert: loadPEM('agent1-cert'), // NOTE: agent1 cert issued by ca1
     ca: [loadPEM('ca1-cert')], // this is to bypass chain validation for self signed certs
@@ -49,7 +49,7 @@ const testCases = [{
   }
 }, {
   clientOptions: {
-    testTitle: 'should connect to a.example.com and authorize client because agent4 is issued ca2, allowed by server',
+    testTitle: 'should connect to a.example.com and authorize client because agent4 is issued by ca2, allowed by server',
     key: loadPEM('agent4-key'), // NOTE: issued by ca2
     cert: loadPEM('agent4-cert'),
     ca: [loadPEM('ca1-cert')],
@@ -79,7 +79,7 @@ const testCases = [{
   }
 }, {
   clientOptions: {
-    testTitle: 'should failed to connect to c.example.com (not defined in EG config)',
+    testTitle: 'should failed to connect to c.another.com (not defined in EG config)',
     key: loadPEM('agent3-key'),
     cert: loadPEM('agent3-cert'), // NOTE: issued by ca2
     ca: [loadPEM('ca1-cert')],
