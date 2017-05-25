@@ -220,7 +220,7 @@ pipelines:
           paths: /v1
         action:
           name: log
-          message: "${req.method} ${req.originalUrl}"
+          message: "${method} ${originalUrl}"
       -
         action:
           name: proxy
@@ -408,24 +408,29 @@ Example:
 ]
 ```
 
-#### Logging (TODO:Update doc, non relevant)
+#### Logging
 
 Provides capability for simple logging. The only parameter is `message`, with
 a string specifying the message to log. This can include placeholders using
 the JavaScript [ES6 template literal syntax](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Template_literals).
 
-Example:
+It will allow dumping all parameters of express Request object
+[ExpressJS Request](https://expressjs.com/en/api.html#req)
 
-```json
-...
-"Policies": [
-  {
-    "action": {
-      "name":"log",
-      "message": "${req.method} ${req.originalUrl}"
-    }
-  }
-]
+Example:
+```yml
+pipelines:
+  api:
+    policies:
+      - action:
+          name: log
+          message: ${method} ${originalUrl}
+
+```
+```js
+// let say we have incomming request
+req = { method:'GET', originalUrl:'/v1' }
+// will log record "[EG:log-policy] GET /v1" will appear
 ```
 
 #### URL Rewriting (TODO:Update doc, non relevant)
@@ -469,7 +474,7 @@ pipelines:
       -
         action:
           name: log
-          message: "${req.method} ${req.originalUrl}"
+          message: "${method} ${originalUrl}"
       -
         condition:
           name: pathExact

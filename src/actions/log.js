@@ -1,15 +1,16 @@
 'use strict';
-
+const logger = require('../log').logPolicy;
 const ConfigurationError = require('../errors').ConfigurationError;
+const vm = require('vm');
 
 function createLogMiddleware(params) {
   if (!params || !params.message) {
     throw new ConfigurationError('Log middleware requires "message" param');
   }
+  let script = new vm.Script('`' + params.message + '`')
 
-  // eslint-disable-next-line no-unused-vars
   return function(req, res, next) {
-    //const message = eval('`' + params.message + '`');
+    logger.info(script.runInNewContext(req))
     next();
   };
 }
