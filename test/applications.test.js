@@ -56,7 +56,9 @@ describe('Application service tests', function () {
           should.exist(newApp);
           should.exist(newApp.id);
           should.exist(newApp.name);
+          should.exist(newApp.isActive);
           should.exist(newApp.group);
+          newApp.isActive.should.eql('true');
           newApp.name.should.eql(app.name);
           newApp.group.should.eql('someGroup');
           should.not.exist(newApp.irrelevantProp);
@@ -66,7 +68,6 @@ describe('Application service tests', function () {
           done();
         })
         .catch(function(err) {
-          console.log(err)
           should.not.exist(err);
           done();
         })
@@ -319,7 +320,6 @@ describe('Application service tests', function () {
           })
         })
         .catch(function(err) {
-          console.log(err)
           should.not.exist(err);
           done();
         })
@@ -354,6 +354,117 @@ describe('Application service tests', function () {
         err.message.should.eql('invalid property group');
         done();
       });
+    });
+  });
+
+  describe('activate/deactivate application tests', function () {
+    let user, app, _applicationService, originalAppConfig;
+
+    before(function(done) {
+      originalAppConfig = config.applications;
+      config.applications.properties = {
+        name: { isRequired: true, isMutable: true },
+        group: { defaultValue: 'admin', isMutable: false }
+      };
+
+      _applicationService = getApplicationService(config);
+
+      db.flushdbAsync()
+      .then(function(didSucceed) {
+        if (!didSucceed) {
+          console.log('Failed to flush the database');
+        }
+        done();
+      })
+      .catch(function(err) {
+        should.not.exist(err);
+        done();
+      });
+    });
+
+    after(function(done) {
+      config.applications = originalAppConfig;
+      done();
+    });
+
+    it('should deactivate an application', function (done) {
+      let _user = createRandomUserObject();
+
+      userService
+      .insert(_user)
+      .then(function(newUser) {
+        user = newUser;
+        should.exist(user.id);
+        app = {
+          name: 'test-app-1'
+        };
+
+        _applicationService
+        .insert(app, user.id)
+        .then(function(newApp) {
+          app = newApp;
+          should.exist(newApp);
+          should.exist(newApp.id);
+          should.exist(newApp.name);
+          newApp.name.should.eql(app.name);
+          should.exist(newApp.createdAt);
+          should.exist(newApp.userId);
+          newApp.userId.should.eql(user.id);
+
+          return;
+        })
+        .then(() => {
+          _applicationService.deactivate(app.id)
+          .then((res) => {
+            res.should.eql(true);
+            _applicationService
+            .get(app.id)
+            .then(function(_app) {
+              should.exist(_app);
+              should.exist(_app.id);
+              _app.id.should.eql(app.id);
+              should.exist(_app.isActive);
+              _app.isActive.should.eql('false');
+              should.exist(_app.name);
+              _app.name.should.eql(app.name);
+              should.exist(_app.createdAt);
+              _app.createdAt.should.eql(app.createdAt);
+              should.exist(_app.updatedAt);
+              done();
+            })
+          })
+        })
+        .catch(function(err) {
+          should.not.exist(err);
+          done();
+        })
+      })
+    });
+
+    it('should reactivate an application', function (done) {
+      _applicationService.activate(app.id)
+      .then((res) => {
+        res.should.eql(true);
+        _applicationService
+        .get(app.id)
+        .then(function(_app) {
+          should.exist(_app);
+          should.exist(_app.id);
+          _app.id.should.eql(app.id);
+          should.exist(_app.isActive);
+          _app.isActive.should.eql('true');
+          should.exist(_app.name);
+          _app.name.should.eql(app.name);
+          should.exist(_app.createdAt);
+          _app.createdAt.should.eql(app.createdAt);
+          should.exist(_app.updatedAt);
+          done();
+        })
+      })
+      .catch(function(err) {
+        should.not.exist(err);
+        done();
+      })
     });
   });
 

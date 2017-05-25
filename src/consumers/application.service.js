@@ -46,6 +46,24 @@ module.exports = function(config) {
     });
   }
 
+  function deactivate(id) {
+    return get(id) // make sure app exists
+    .then(function() {
+      return applicationDao.deactivate(id);
+    })
+    .return(true)
+    .catch(() => Promise.reject(new Error('failed to deactivate application')));
+  }
+
+  function activate(id) {
+    return get(id) // make sure app exists
+    .then(function() {
+      return applicationDao.activate(id);
+    })
+    .return(true)
+    .catch(() => Promise.reject(new Error('failed to activate user')));
+  }
+
   function removeAll(userId) {
     return applicationDao.removeAll(userId)
     .then(function(responses) {
@@ -99,7 +117,7 @@ module.exports = function(config) {
       throw new Error('one or more property is invalid');
     }
 
-    baseAppProps = { id: uuid.v4(), userId };
+    baseAppProps = { isActive: 'true', id: uuid.v4(), userId };
 
     for (let prop in applicationPropsDefinitions) {
       let descriptor = applicationPropsDefinitions[prop];
@@ -126,6 +144,8 @@ module.exports = function(config) {
     update,
     get,
     getAll,
+    activate,
+    deactivate,
     remove,
     removeAll
   };
