@@ -15,3 +15,5 @@ pipelines:
         action:
             name: proxy
             serviceEndpoint: backend
+http:
+  port: 5997

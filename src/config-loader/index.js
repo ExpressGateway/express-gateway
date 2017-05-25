@@ -39,8 +39,7 @@ function loadConfig(startupConfig) {
   }
   let servers = serverLoader.bootstrap(app, config)
 
-  //TODO: as part of #13 refactor to return both server and run at the same time
-  return [servers.httpsServer || servers.httpServer, config];
+  return { httpsServer: servers.httpsServer, httpServer: servers.httpServer, config };
 }
 
 module.exports = {

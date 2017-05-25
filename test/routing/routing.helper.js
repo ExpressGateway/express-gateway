@@ -7,9 +7,9 @@ const _ = require('lodash')
 
 
 module.exports = function() {
-  let app;
+  let app, httpsApp;
   return {
-    setup: testSuite => done => {
+    setup: testSuite => () => {
       let actions = require('../../src/actions').init();
       testSuite.fakeActions.forEach((key) => {
         actions.register(key, (params) => {
@@ -24,14 +24,16 @@ module.exports = function() {
       } else {
         options.appConfig = testSuite.appConfig
       }
-      gateway.start(options)
+      return gateway.start(options)
         .then(result => {
-          app = result.app
-          done()
-        }).catch(done);
+          app = result.app;
+          httpsApp = result.httpsApp;
+          return result
+        });
     },
     cleanup: () => done => {
-      app.close();
+      app && app.close()
+      httpsApp && httpsApp.close()
       done()
     },
     validate404: testCase => {
