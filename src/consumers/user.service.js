@@ -25,96 +25,73 @@ module.exports = function(config) {
             id: newUser.id,
             createdAt: newUser.createdAt
           }
-        } else return Promise.reject(new Error('insert user failed'));
+        } else return Promise.reject(new Error('insert user failed')); // TODO: replace with server error
       });
     });
   }
 
-  function exists(username) {
-    return userDao.usernameExists(username);
-  }
-
-  function authenticate(username, password) {
-    if (!username || !password) {
-      return Promise.reject(new Error('invalid user'));
-    }
-
-    return userDao.authenticate(username, password)
-    .then(function(id) {
-      return id ? { id: id } : null;
-    });
-  }
-
-  function get(userId) {
+  function get(userId, options) {
     if (!userId || !typeof userId === 'string') {
-      return Promise.reject(new Error('invalid user id'));
+      return false;
     }
 
     return userDao
     .getUserById(userId)
     .then(function(user) {
-      return user ? _.omit(user, ['password']) : Promise.reject(new Error('user not found'));
+      if (!user) {
+        return false;
+      }
+      return (options && options.includePassword) ? user : _.omit(user, ['password']);
     });
   }
 
-  function findUserByUsername(username) {
+  function find(username, options) {
     if (!username || !typeof username === 'string') {
-      return Promise.reject(new Error('invalid username'));
+      return Promise.reject(new Error('invalid username')); // TODO: replace with validation error
     }
 
     return userDao
-    .getUserIdByUsername(username)
+    .find(username)
     .then(function(userId) {
-      return userId ? get(userId) : Promise.reject(new Error('username not found'));
-    });
-  }
-
-  function findUserByEmail(email) {
-    if (!email || !typeof email === 'string') {
-      return Promise.reject(new Error('invalid email'));
-    }
-
-    return userDao
-    .getUserIdByEmail(email)
-    .then(function(userId) {
-      return userId ? get(userId) : Promise.reject(new Error('email not found'));
+      return userId ? get(userId, options) : false;
     });
   }
 
   function update(userId, _props) {
-    let props;
     if (!_props || !userId) {
-      return Promise.reject(new Error('invalid user id'));
+      return Promise.reject(new Error('invalid user id')); // TODO: replace with validation error
     }
 
     return get(userId) // validate user exists
-    .then(function() {
-      return validateUpdateToUserProperties(_.omit(_props, ['username']));
-    })
-    .then(function(){
-      props = _.cloneDeep(_props);
-      utils.appendUpdatedAt(props);
-      return userDao.update(userId, props);
-    })
-    .then(function(updated) {
-      return updated ? true : Promise.reject(new Error('user update failed'))
+    .then(user => {
+      return !user ? false : // user does not exist
+      validateUpdateToUserProperties(_.omit(_props, ['username']))
+      .then(function(updatedUserProperties){
+        if (updatedUserProperties) {
+          utils.appendUpdatedAt(updatedUserProperties);
+          return userDao.update(userId, updatedUserProperties);
+        } else return true; // there are no properties to update
+      })
+      .then(updated =>  {
+        return updated ? true : Promise.reject(new Error('user update failed')); // TODO: replace with server error
+      });
     });
   }
 
   function remove(userId) {
     return get(userId) // validate user exists
-    .then(function() {
-      return userDao.remove(userId)
-    })
-    .then(function(userDeleted) {
-      if (!userDeleted) {
-        return Promise.reject(new Error('failed to delete user'));
-      }
-      // Cascade delete all apps associated with user
-      return applicationService.removeAll(userId);
-    })
-    .then(function(appsDeleted) {
-      return appsDeleted ? true : Promise.reject(new Error('failed to delete user\'s applications'));
+    .then(function(user) {
+      return !user ? false : // user does not exist
+      userDao.remove(userId)
+      .then(function(userDeleted) {
+        if (!userDeleted) {
+          return Promise.reject(new Error('user delete failed')); // TODO: replace with server error
+        } else {
+          return applicationService.removeAll(userId) // Cascade delete all apps associated with user
+          .catch(() => Promise.reject(new Error('failed to delete user\'s applications'))) // TODO: replace with server error
+          .then(res => res);
+        }
+      });
     });
   }
 
@@ -128,12 +105,13 @@ module.exports = function(config) {
   function validateAndCreateUser(_user) {
     let user;
     if (!_user && !_user.username) {
-      return Promise.reject(new Error('invalid user object'));
+      return Promise.reject(new Error('invalid user object')); // TODO: replace with validation error
     }
 
-    return exists(_user.username) // Ensure username is unique
+    return find(_user.username) // Ensure username is unique
     .then(function(exists) {
-      return !exists ? validateNewUserProperties(_.omit(_user, ['username'])) : Promise.reject(new Error('username already exists'));
+      return !exists ? validateNewUserProperties(_.omit(_user, ['username'])) :
+        Promise.reject(new Error('username already exists')); // TODO: replace with validation error
     })
     .then(function(newUser) {
       let baseUserProps = { username: _user.username, id: uuid.v4() };
@@ -152,30 +130,30 @@ module.exports = function(config) {
     let updatedUserProperties = {};
 
     if (!Object.keys(userProperties).every(key => typeof key === 'string' && userPropsDefinitions[key])) {
-      return Promise.reject(new Error('one or more properties is invalid'));
+      return Promise.reject(new Error('one or more properties is invalid')); // TODO: replace with validation error
     }
 
     for (let prop in userProperties) {
       if (userPropsDefinitions[prop].isMutable !== false) {
-        updatedUserProperties = userProperties[prop];
-      } else return Promise.reject(new Error('invalid property ' + prop));
+        updatedUserProperties[prop] = userProperties[prop];
+      } else return Promise.reject(new Error('one or more properties is immutable')); // TODO: replace with validation error
     }
 
-    return Object.keys(updatedUserProperties).length > 0 ? Promise.resolve(updatedUserProperties) : Promise.resolve(null);
+    return Object.keys(updatedUserProperties).length > 0 ? Promise.resolve(updatedUserProperties) : Promise.resolve(false);
   }
 
   function validateNewUserProperties(userProperties) {
     let newUserProperties = {};
 
     if (!Object.keys(userProperties).every(key => (typeof key === 'string' && !!userPropsDefinitions[key]))) {
-      return Promise.reject(new Error('one or more property is invalid'));
+      return Promise.reject(new Error('one or more property is invalid')); // TODO: replace with validation error
     }
 
     for (let prop in userPropsDefinitions) {
       let descriptor = userPropsDefinitions[prop];
       if (!userProperties[prop]) {
         if (descriptor.isRequired) {
-          return Promise.reject(new Error(`${prop} is required`));
+          return Promise.reject(new Error(`${prop} is required`)); // TODO: replace with validation error
         }
         if (descriptor.defaultValue) {
           newUserProperties[prop] = descriptor.defaultValue;
@@ -187,13 +165,10 @@ module.exports = function(config) {
   }
 
   return {
-    insert: insert,
-    authenticate: authenticate,
-    get: get,
-    findUserByUsername: findUserByUsername,
-    findUserByEmail: findUserByEmail,
-    exists: exists,
-    update: update,
-    remove: remove
+    insert,
+    get,
+    find,
+    update,
+    remove
   };
 }

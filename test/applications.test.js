@@ -181,12 +181,12 @@ describe('Application service tests', function () {
     it('should not get app by invalid id', function (done) {
       applicationService.get('invalid_id')
         .then(function(_app) {
-          should.not.exist(_app);
+          should.exist(_app);
+          _app.should.eql(false);
           done();
         })
         .catch(function(err) {
-          should.exist(err);
-          err.message.should.eql('app not found');
+          should.not.exist(err);
           done();
         })
     });
@@ -421,12 +421,12 @@ describe('Application service tests', function () {
       applicationService
       .get(app.id)
       .then(function(_app) {
-        should.not.exist(_app);
+        should.exist(_app);
+        _app.should.eql(false);
         done();
       })
       .catch(function(err) {
-        should.exist(err);
-        err.message.should.eql('app not found')
+        should.not.exist(err);
         done();
       });
     });
@@ -487,12 +487,11 @@ describe('Application service tests', function () {
         applicationService
         .get(app1.id)
         .then(function(_app) {
-          should.not.exist(_app);
-          done();
+          should.exist(_app);
+          _app.should.eql(false)
         })
         .catch(function(err) {
-          should.exist(err);
-          err.message.should.eql('app not found');
+          should.not.exist(err);
           return;
         });
       })
@@ -500,12 +499,12 @@ describe('Application service tests', function () {
         applicationService
         .get(app2.id)
         .then(function(_app) {
-          should.not.exist(_app);
+          should.exist(_app);
+          _app.should.eql(false);
           done();
         })
         .catch(function(err) {
-          should.exist(err);
-          err.message.should.eql('app not found');
+          should.not.exist(err);
           done();
         });
       });
@@ -542,12 +541,12 @@ describe('Application service tests', function () {
         applicationService
         .get(app1.id)
         .then(function(_app) {
-          should.not.exist(_app);
-          return done();
+          should.exist(_app);
+          _app.should.eql(false);
+          done();
         })
         .catch(function(err) {
-          should.exist(err);
-          err.message.should.eql('app not found');
+          should.not.exist(err);
           done();
         });
       })
