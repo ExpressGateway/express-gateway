@@ -6,7 +6,6 @@ const fileHelper = require('./common/temp.config.helper')
 const request = require('supertest');
 const port1 = 5998;
 const port2 = 5999;
-const gatewayPort = 5997;
 let app1, app2, appTarget, tmpConfigFile;
 
 ['JSON', 'YAML'].forEach(function(configType) {
@@ -21,8 +20,6 @@ let app1, app2, appTarget, tmpConfigFile;
       helper.saveTempFile(configTemplate, tmpConfigFile.name)
       appTarget = (await gateway.start({
         configPath: tmpConfigFile.name,
-        defaultBindPort: gatewayPort,
-        defaultBindHost: '127.0.0.1'
       })).app;
     });
 

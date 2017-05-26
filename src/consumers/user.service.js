@@ -78,6 +78,24 @@ module.exports = function(config) {
     });
   }
 
+  function deactivate(id) {
+    return get(id) // make sure user exists
+    .then(function() {
+      return userDao.deactivate(id);
+    })
+    .return(true)
+    .catch(() => Promise.reject(new Error('failed to deactivate user')));
+  }
+
+  function activate(id) {
+    return get(id) // make sure user exists
+    .then(function() {
+      return userDao.activate(id);
+    })
+    .return(true)
+    .catch(() => Promise.reject(new Error('failed to deactivate user')));
+  }
+
   function remove(userId) {
     return get(userId) // validate user exists
     .then(function(user) {
@@ -114,7 +132,7 @@ module.exports = function(config) {
         Promise.reject(new Error('username already exists')); // TODO: replace with validation error
     })
     .then(function(newUser) {
-      let baseUserProps = { username: _user.username, id: uuid.v4() };
+      let baseUserProps = { isActive: 'true', username: _user.username, id: uuid.v4() };
       if (newUser) {
         user = Object.assign(newUser, baseUserProps);
       } else user = baseUserProps;
@@ -169,6 +187,8 @@ module.exports = function(config) {
     get,
     find,
     update,
+    activate,
+    deactivate,
     remove
   };
 }

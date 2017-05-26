@@ -9,6 +9,14 @@ apiEndpoints:
       - scope: Manager
         verbs: [GET, POST, PUT]
 
+http:
+  port: 8080
+
+https:
+  port: 9999
+  tls: {}
+
+
 serviceEndpoints:
   backend:
     url: 'http://www.example.com'

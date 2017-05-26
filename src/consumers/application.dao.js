@@ -58,6 +58,14 @@ module.exports = function(config) {
     return db.smembersAsync(applicationDbConfig.userAppsHashPrefix.concat(':', userId));
   }
 
+  function activate(id) {
+    return db.hsetAsync(config.applications.redis.appHashPrefix.concat(':', id), 'isActive', 'true');
+  }
+
+  function deactivate(id) {
+    return db.hsetAsync(config.applications.redis.appHashPrefix.concat(':', id), 'isActive', 'false');
+  }
+
   function remove(id, userId) {
     return db
     .multi()
@@ -82,6 +90,8 @@ module.exports = function(config) {
     get,
     getAll,
     getAllAppIdsByUser,
+    activate,
+    deactivate,
     remove,
     removeAll
   };

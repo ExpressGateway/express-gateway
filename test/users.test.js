@@ -48,6 +48,8 @@ describe('User service tests', function () {
           userObj.firstname.should.eql(user.firstname);
           should.exist(userObj.lastname);
           userObj.lastname.should.eql(user.lastname);
+          should.exist(userObj.isActive);
+          userObj.isActive.should.eql('true');
           should.exist(userObj.createdAt);
           userObj.createdAt.should.eql(newUser.createdAt);
           should.exist(userObj.updatedAt);
@@ -292,6 +294,89 @@ describe('User service tests', function () {
         should.exist(err);
         err.message.should.eql('one or more properties is invalid');
         done();
+      });
+    });
+  });
+
+  describe('Activate and deactivate user tests', function() {
+    let user;
+    before(function(done) {
+      db.flushdbAsync()
+      .then(function(didSucceed) {
+        if (!didSucceed) {
+          console.log('Failed to flush the database');
+        }
+        user = createRandomUserObject();
+        userService
+        .insert(user)
+        .then(function(newUser) {
+          should.exist(newUser);
+          user = Object.assign(user, newUser);
+          user.createdAt = newUser.createdAt;
+          done();
+        });
+      })
+      .catch(function(err) {
+        should.not.exist(err);
+        done();
+      });
+    });
+
+    it('should deactivate user', function(done) {
+      userService.deactivate(user.id)
+      .then(function(res) {
+        should.exist(res);
+        res.should.eql(true);
+        return userService.get(user.id)
+        .then(function(_user) {
+          should.exist(_user.username);
+          _user.username.should.eql(user.username);
+          should.exist(_user.email);
+          _user.email.should.eql(user.email);
+          should.exist(_user.firstname);
+          _user.firstname.should.eql(user.firstname);
+          should.exist(_user.lastname);
+          _user.lastname.should.eql(user.lastname);
+          should.exist(_user.isActive);
+          _user.isActive.should.eql('false');
+          should.exist(_user.createdAt);
+          _user.createdAt.should.eql(user.createdAt);
+          should.exist(_user.updatedAt);
+          done();
+        })
+        .catch(function(err) {
+          should.not.exist(err);
+          done();
+        })
+      });
+    });
+
+    it('should reactivate user', function(done) {
+      userService.activate(user.id)
+      .then(function(res) {
+        should.exist(res);
+        res.should.eql(true);
+        return userService.get(user.id)
+        .then(function(_user) {
+          should.exist(_user.username);
+          _user.username.should.eql(user.username);
+          should.exist(_user.email);
+          _user.email.should.eql(user.email);
+          should.exist(_user.firstname);
+          _user.firstname.should.eql(user.firstname);
+          should.exist(_user.lastname);
+          _user.lastname.should.eql(user.lastname);
+          should.exist(_user.isActive);
+          _user.isActive.should.eql('true');
+          should.exist(_user.createdAt);
+          _user.createdAt.should.eql(user.createdAt);
+          should.exist(_user.updatedAt);
+          done();
+        })
+        .catch(function(err) {
+          should.not.exist(err);
+          done();
+        })
       });
     });
   });
