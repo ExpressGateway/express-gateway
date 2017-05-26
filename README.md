@@ -608,3 +608,6 @@ example: EG\_CONFIG\_PATH=/some/path/config.yml npm start
 
 ##### Entire JSON serialized config env variable EG\_APP\_CONFIG
 example: EG\_APP\_CONFIG='{"apiEndpoints": ....}' npm start
+
+##### Path as command line argument
+npm start /path/here
