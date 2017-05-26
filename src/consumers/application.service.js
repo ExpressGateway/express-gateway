@@ -11,29 +11,22 @@ module.exports = function(config) {
   applicationDao = getApplicationDao(config);
 
   function insert(_app, userId) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let app = validateAndCreateApp(_app, userId);
       return applicationDao.insert(app)
-      .then(function() {
-        return resolve(app);
+      .then(function(success) {
+        return success ? resolve(app) : reject('one or more insert operations failed'); // TODO: replace with server error
       });
     })
     .catch(err => Promise.reject(new Error('Failed to insert application: ' + err.message)));
   }
 
   function get(id) {
-    return applicationDao
-    .get(id)
-    .then(function(app) {
-      return app ? app : Promise.reject(new Error('app not found'));
-    });
+    return applicationDao.get(id);
   }
 
   function getAll(userId) {
     return applicationDao.getAll(userId)
-    .catch(function() {
-      return Promise.reject(new Error('failed to get all apps'));
-    });
   }
 
   function remove(id) {
@@ -42,7 +35,7 @@ module.exports = function(config) {
       return applicationDao.remove(id, app.userId);
     })
     .then(function(removed) {
-      return removed ? true : Promise.reject(new Error('failed to remove app'));
+      return removed ? true : Promise.reject(new Error('failed to remove app')); // TODO: replace with server error
     });
   }
 
@@ -72,15 +65,8 @@ module.exports = function(config) {
 
   function removeAll(userId) {
     return applicationDao.removeAll(userId)
-    .then(function(responses) {
-      let removed = responses.every(function(res) {
-        return res;
-      });
-
-      return removed ? true : Promise.reject(new Error('failed to remove all apps'));
-    })
-    .catch(function() {
-      return Promise.reject(new Error('failed to get all apps'));
+    .then(removed => {
+      return removed ? true : Promise.reject(new Error('failed to remove all apps')); // TODO: replace with server error
     });
   }
 
@@ -88,26 +74,26 @@ module.exports = function(config) {
     let updatedAppProperties = {};
 
     if (!applicationProperties || !id) {
-      return Promise.reject(new Error('invalid properties'));
+      return Promise.reject(new Error('invalid properties')); // TODO: replace with validation error
     }
 
     return get(id) // validate app exists
     .then(function() {
       if (!Object.keys(applicationProperties).every(key => typeof key === 'string' && applicationPropsDefinitions[key])) {
-        return Promise.reject(new Error('one or more properties is invalid'));
+        return Promise.reject(new Error('one or more properties is invalid')); // TODO: replace with validation error
       }
 
       for (let prop in applicationProperties) {
         if (applicationPropsDefinitions[prop].isMutable !== false) {
           updatedAppProperties[prop] = applicationProperties[prop];
-        } else return Promise.reject(new Error('invalid property ' + prop));
+        } else return Promise.reject(new Error('invalid property ' + prop)); // TODO: replace with validation error
       }
 
       utils.appendUpdatedAt(updatedAppProperties);
       return applicationDao.update(id, updatedAppProperties);
     })
     .then(function(updated) {
-      return updated ? true : Promise.reject(new Error('app update failed'));
+      return updated ? true : Promise.reject(new Error('app update failed')); // TODO: replace with server error
     });
   }
 
@@ -116,11 +102,11 @@ module.exports = function(config) {
     let baseAppProps;
 
     if (!appProperties || !userId) {
-      throw new Error('invalid application properties');
+      throw new Error('invalid application properties'); // TODO: replace with validation error
     }
 
     if (!Object.keys(appProperties).every(key => (typeof key === 'string' && !!applicationPropsDefinitions[key]))) {
-      throw new Error('one or more property is invalid');
+      throw new Error('one or more property is invalid'); // TODO: replace with validation error
     }
 
     baseAppProps = { isActive: 'true', id: uuid.v4(), userId };

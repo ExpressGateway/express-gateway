@@ -1,8 +1,6 @@
 'use strict';
 
-// let _ = require('lodash');
 let Promise = require('bluebird');
-// let utils = require('./utils');
 let getDb = require('../db');
 let credentialDao, db;
 
@@ -29,7 +27,7 @@ module.exports = function(config) {
     associationPromises = scopes.map(scope => db.hsetAsync(config.credentials.redis.scopeCredentialPrefix.concat(':', scope), credentialId, true ));
 
     return Promise.all(associationPromises)
-    .catch(() => Promise.reject(new Error('failed to associate credential with scopes in db')));
+    .catch(() => Promise.reject(new Error('failed to associate credential with scopes in db'))); // TODO: replace with server error
   }
 
   function dissociateCredentialFromScopes(id, type, scopes) {
@@ -39,7 +37,7 @@ module.exports = function(config) {
     dissociationPromises = scopes.map(scope => db.hdelAsync(config.credentials.redis.scopeCredentialPrefix.concat(':', scope), credentialId));
 
     return Promise.all(dissociationPromises)
-    .catch(() => Promise.reject(new Error('failed to dissociate credential with scopes in db')));
+    .catch(() => Promise.reject(new Error('failed to dissociate credential with scopes in db'))); // TODO: replace with server error
   }
 
   function removeScopes(scopes) {

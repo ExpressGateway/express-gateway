@@ -15,27 +15,27 @@ module.exports = function(config) {
     return validateNewScopes(scopes)
     .then(newScopes => {
       if (!newScopes) {
-        return Promise.reject(new Error('invalid scopes. scopes should be unique strings'));
+        return true; // no scopes to insert
       }
       
       return credentialDao.insertScopes(newScopes)
       .then(res => !!res);
     })
-    .catch(() => Promise.reject(new Error('failed to insert scope')));
+    .catch(() => Promise.reject(new Error('failed to insert scope'))); // TODO: replace with server error
   }
 
   function removeScopes(scopes) {
-    return validateScopes(scopes)
-    .then(_scopes => {
-      return credentialDao.removeScopes(_scopes)
-      .then(function(removed) {
-        return removed ? true : Promise.reject(new Error('failed to remove scopes'));
-      });
+    let _scopes = validateScopes(scopes)
+    if (!_scopes) {
+      return Promise.reject(new Error('invalid scopes')); // TODO: replace with validation error
+    } else return credentialDao.removeScopes(_scopes)
+    .then(function(removed) {
+      return removed ? true : false;
     });
   }
 
   function existsScope(scope) {
-    return scope ? credentialDao.existsScope(scope) : Promise.resolve(null);
+    return scope ? credentialDao.existsScope(scope) : Promise.resolve(false);
   }
 
   function getAllScopes() {
@@ -44,11 +44,11 @@ module.exports = function(config) {
 
   function insertCredential(id, type, credentialDetails) {
     if (!id || typeof id !== 'string' || !type || !credentialDetails) {
-      return Promise.reject(new Error('invalid credentials'));
+      return Promise.reject(new Error('invalid credentials')); // TODO: replace with validation error
     }
 
     if (!config.credentials[type]) {
-      return Promise.reject(new Error('invalid credential type'));
+      return Promise.reject(new Error('invalid credential type')); // TODO: replace with validation error
     }
 
     return getCredential(id, type) // check if credential already exists
@@ -57,8 +57,8 @@ module.exports = function(config) {
 
       if (cred) {
         if (cred.isActive) {
-          return Promise.reject(new Error('credential already exists and is active'));
-        } else return Promise.reject(new Error('credential already exists but it is inactive. activate credential instead.'));
+          return Promise.reject(new Error('credential already exists and is active')); // TODO: replace with validation error
+        } else return Promise.reject(new Error('credential already exists but it is inactive. activate credential instead.')); // TODO: replace with validation error
       }
 
       credentialConfig = config.credentials[type];
@@ -92,7 +92,7 @@ module.exports = function(config) {
           }
           return credential;
         })
-        .catch((err) => Promise.reject(new Error('failed to insert credential: ' + err.message)));
+        .catch((err) => Promise.reject(new Error('failed to insert credential: ' + err.message))); // TODO: replace with server error
       });
     });
   }
@@ -109,7 +109,7 @@ module.exports = function(config) {
     }
 
     if (!credentialConfig.autoGeneratePassword) {
-      return Promise.reject(new Error(`${credentialConfig.passwordKey} is required`));
+      return Promise.reject(new Error(`${credentialConfig.passwordKey} is required`)); // TODO: replace with validation error
     }
 
     password = uuid.v4();
@@ -131,7 +131,7 @@ module.exports = function(config) {
     }
 
     if (credentialConfig.properties['scopes'].isRequired) {
-      return Promise.reject(new Error('scopes are required'));
+      return Promise.reject(new Error('scopes are required')); // TODO: replace with validation error
     }
 
     if (credentialConfig.properties['scopes'].defaultValue) {
@@ -141,9 +141,9 @@ module.exports = function(config) {
     return Promise.resolve(null);
   }
 
-  function getCredential(id, type, getPassword) {
+  function getCredential(id, type, options) {
     if (!id || !type || typeof id !== 'string' || typeof type !== 'string') {
-      return Promise.reject(new Error('invalid credential'));
+      return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
     return credentialDao.getCredential(id, type)
     .then(credential => {
@@ -155,13 +155,13 @@ module.exports = function(config) {
         credential.scopes = JSON.parse(credential.scopes);
       }
 
-      return getPassword === true ? credential : _.omit(credential, [ config.credentials[type].passwordKey ]);
+      return (options && options.includePassword === true) ? credential : _.omit(credential, [ config.credentials[type].passwordKey ]);
     });
   }
 
   function deactivateCredential(id, type) {
     if (!id || !type) {
-      return Promise.reject(new Error('invalid credential'));
+      return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
 
     return getCredential(id, type) // verify credential exists
@@ -169,13 +169,13 @@ module.exports = function(config) {
       if (credential) {
         return credentialDao.deactivateCredential(id, type)
         .then(() => true);
-      } else return Promise.reject(new Error('credential does not exist'));
+      } else return Promise.reject(new Error('credential does not exist')); // TODO: replace with validation error
     });
   }
 
   function activateCredential(id, type) {
     if (!id || !type) {
-      return Promise.reject(new Error('invalid credential'));
+      return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
 
     return getCredential(id, type) // verify credential exists
@@ -183,7 +183,7 @@ module.exports = function(config) {
       if (credential) {
         return credentialDao.activateCredential(id, type)
         .then(() => true);
-      } else return Promise.reject(new Error('credential does not exist'));
+      } else return Promise.reject(new Error('credential does not exist')); // TODO: replace with validation error
     });
   }
 
@@ -191,7 +191,7 @@ module.exports = function(config) {
     return getCredential(id, type)
     .then((credential) => {
       if (!credential) {
-        return Promise.reject(new Error('credential does not exist'));
+        return Promise.reject(new Error('credential does not exist')); // TODO: replace with validation error
       }
       return validateUpdatedCredentialproperties(type, properties);
     })
@@ -209,7 +209,7 @@ module.exports = function(config) {
                           credentialDao.associateCredentialWithScopes(id, type, _scopes)
                         ]);
     })
-    .then(() => true)
+    .return(true);
   }
 
   function removeScopesFromCredential(id, type, scopes) {
@@ -221,8 +221,7 @@ module.exports = function(config) {
                           credentialDao.dissociateCredentialFromScopes(id, type, _scopes)
                         ]);
     })
-    .then(() => true)
-    .catch(() => Promise.reject('failed to remove scopes from credential'));
+    .return(true);
   }
 
   // This function validates all user defined properties, excluding scopes
@@ -252,7 +251,7 @@ module.exports = function(config) {
     for (let prop in _.omit(credentialConfig.properties, ['scopes'])) {
       if (credentialDetails[prop]) {
         if (typeof credentialDetails[prop] !== 'string') {
-          return Promise.reject(new Error('credential property must be a string'));
+          return Promise.reject(new Error('credential property must be a string')); // TODO: replace with validation error
         }
         if (credentialConfig.properties[prop].isMutable !== false) {
           newCredentialProperties[prop] = credentialDetails[prop];
@@ -264,51 +263,44 @@ module.exports = function(config) {
   }
 
   function validateNewScopes(scopes) {
-    let _scopes;
-    return validateScopes(scopes)
-    .then(newScopes => {
-      _scopes = newScopes;
-      return Promise.all(_scopes.map(val => existsScope(val)))
-    })
-    .then(res => res.every(val => !val))
-    .then(res => {
-      return res ? _scopes : Promise.reject(new Error('one or more scopes already exist'));
-    })
-    .catch(() => Promise.reject(new Error('invalid scopes')));
+    let _scopes = validateScopes(scopes);
+    return !_scopes ? Promise.reject(new Error('invalid scopes')) : // TODO: replace with validation error
+      Promise.all(_scopes.map(val => existsScope(val)))
+      .then(res => {
+        return res.every(val => !val) ? _scopes :
+          Promise.reject(new Error('one or more scopes already exist')); // TODO: replace with validation error
+      });
   }
 
   function validateExistingScopes(scopes) {
-    let _scopes;
-    return validateScopes(scopes)
-    .then(newScopes => {
-      _scopes = newScopes;
-      return Promise.all(_scopes.map(val => existsScope(val)))
-    })
-    .then(res => res.every(val => val))
-    .then(res => {
-      return res ? _scopes : Promise.reject(new Error('invalid scopes'));
-    })
-    .catch(() => Promise.reject(new Error('invalid scopes')));
+    let _scopes = validateScopes(scopes);
+    return !_scopes ? Promise.reject(new Error('invalid scopes')) : // TODO: replace with validation error
+      Promise.all(_scopes.map(val => existsScope(val)))
+      .then(res => {
+        return res.every(val => val) ? _scopes :
+          Promise.reject(new Error('one or more scopes don\'t exist')); // TODO: replace with validation error
+      });
   }
 
   function validateScopes(scopes) {
     let _scopes = Array.isArray(scopes) ? _.uniq(scopes) : [ scopes ];
     if (!_scopes || _scopes.some(val => typeof val !== 'string')) {
-      return Promise.reject(new Error('invalid scopes'));
-    } else return Promise.resolve(_scopes);
+      return false;
+    } else return _scopes;
   }
 
   function authenticate(id, password, type) {
     let credential;
 
-    return getCredential(id, type, true)
+    return getCredential(id, type, { includePassword: true })
     .then(_credential => {
       credential = _credential;
       return credential ? compareSaltAndHashed(password, credential[config.credentials[type]['passwordKey']]) : false;
     })
     .then(authenticated => {
       return authenticated ? true : false;
-    });
+    })
+    .catch(() => false);
   }
 
   function saltAndHash(password) {
@@ -319,7 +311,7 @@ module.exports = function(config) {
     .then(function(salt) {
       return bcrypt.hashAsync(password, salt);
     })
-    .catch(() => Promise.reject(new Error('password hash failed')));
+    .catch(() => Promise.reject(new Error('password hash failed'))); // TODO: replace with server error
   }
 
   function compareSaltAndHashed(password, hash) {
