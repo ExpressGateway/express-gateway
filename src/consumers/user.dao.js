@@ -1,7 +1,6 @@
 'use strict';
 
 let getDb = require('../db');
-let Promise = require('bluebird');
 let userDao, db;
 
 module.exports = function(config) {
@@ -17,88 +16,50 @@ module.exports = function(config) {
    * @return {string}  username
    */
   function insert(user) {
-    let userHashKey, usernameSetKey;
+    let redisUserKey, redisUsernameSetKey;
 
     // key for the user hash table
-    userHashKey = config.users.redis.userHashPrefix.concat(':', user.id);
+    redisUserKey = config.users.redis.userHashPrefix.concat(':', user.id);
 
     // name for the user's username set
-    usernameSetKey = config.users.redis.usernameSetPrefix.concat(':', user.username);
+    redisUsernameSetKey = config.users.redis.usernameSetPrefix.concat(':', user.username);
 
     return db
     .multi()
-    .hmset(userHashKey, user)
-    .sadd(usernameSetKey, user.id)
+    .hmset(redisUserKey, user)
+    .sadd(redisUsernameSetKey, user.id)
     .execAsync()
-    .then(function(res) {
-      // should return true only if all responses are positive
-      return res.every(function(val) {return val;});
-    });
-  }
-
-  function usernameExists(username) {
-    return getUserIdByUsername(username)
-    .then(function(result) {
-      return !!result;
-    });
+    .then(res => res.every(val => val));
   }
 
   function getUserById(userId) {
     return db.hgetallAsync(config.users.redis.userHashPrefix.concat(':', userId))
     .then(function(user) {
       if (!user || !Object.keys(user).length) {
-        return null;
+        return false;
       }
-      user['id'] = userId;
       return user;
     });
   }
 
-  function getUserIdByUsername(username) {
+  function find(username) {
     return db.smembersAsync(config.users.redis.usernameSetPrefix.concat(':', username))
     .then(function(Ids) {
       if (Ids && Ids.length !== 0) {
         return Ids[0];
-      } else return null;
+      } else return false;
     });
   }
 
   function update(userId, props) {
-    return getUserById(userId)
-    .then(function(existingUserProperties) {
-      let updateQuery, userHashKey, usernameSetKey, existingUsernameSetKey;
+    let redisUserKey;
 
-      if(!existingUserProperties) {
-        return Promise.reject(new Error('user not found'));
-      }
+    // key for the user in redis
+    redisUserKey = config.users.redis.userHashPrefix.concat(':', userId);
 
-      // key for the user hash table
-      userHashKey = config.users.redis.userHashPrefix.concat(':', userId);
-
-      updateQuery = db
-      .multi()
-      .hmset(userHashKey, props);
-
-      if (props.username) {
-        // name for the user's new username set
-        usernameSetKey = config.users.redis.usernameSetPrefix.concat(':', props.username);
-
-        // name for the user's old username set
-        existingUsernameSetKey = config.users.redis.usernameSetPrefix.concat(':', existingUserProperties.username);
-
-        updateQuery = updateQuery
-        .sadd(usernameSetKey, userId)
-        .srem(existingUsernameSetKey, userId);
-      }
-
-      return updateQuery
-      .execAsync()
-      .then(function(res) {
-        return !res.some(function(val) { // should return true only is all responses are positive
-          return !val;
-        });
-      });
-    });
+    return db
+    .hmsetAsync(redisUserKey, props)
+    .then(res => !!res);
   }
 
   function activate(id) {
@@ -113,23 +74,20 @@ module.exports = function(config) {
     return getUserById(userId)
     .then(function(user) {
       if (!user) {
-        return null;
+        return false;
       }
       return db
       .multi()
       .del(config.users.redis.userHashPrefix.concat(':', userId))
       .srem(config.users.redis.usernameSetPrefix.concat(':', user.username), userId)
       .execAsync()
-      .then(function(replies) {
-        return replies.every((res) => res !== 0 || Number.isInteger(res));
-      });
+      .then(replies => replies.every(res => res));
     });
   }
 
   userDao = {
     insert,
-    usernameExists,
-    getUserIdByUsername,
+    find,
     getUserById,
     update,
     activate,

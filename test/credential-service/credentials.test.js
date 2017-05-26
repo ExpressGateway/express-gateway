@@ -230,7 +230,7 @@ describe('Credential service tests', function () {
       })
       .catch(function(err) {
         should.exist(err);
-        err.message.should.eql('invalid scopes');
+        err.message.should.eql('one or more scopes don\'t exist');
         done();
       })
     });
@@ -345,7 +345,7 @@ describe('Credential service tests', function () {
       })
       .catch(function(err) {
         should.exist(err);
-        err.message.should.eql('invalid scopes');
+        err.message.should.eql('one or more scopes don\'t exist');
         done();
       });
     });

@@ -1,8 +1,6 @@
 'use strict';
 
-let _ = require('lodash');
 let getDb = require('../db');
-let Promise = require('bluebird');
 let applicationDao, db, applicationDbConfig;
 
 module.exports = function(config) {
@@ -13,11 +11,6 @@ module.exports = function(config) {
   db = getDb(config.redis.host, config.redis.port);
   applicationDbConfig = config.applications.redis;
 
-  /**
-   * Insert application to the database. Application should be searchable by its ID.
-   * @param  {Object}  app
-   * @return {bool}    success
-   */
   function insert(app) {
     // key for the app hash table
     let appHashKey = applicationDbConfig.appHashPrefix.concat(':', app.id);
@@ -27,16 +20,10 @@ module.exports = function(config) {
 
     return db
     .multi()
-    .hmset(appHashKey, _.omit(app, ['id']))
+    .hmset(appHashKey, app)
     .sadd(userAppsHashKey, app.id)
     .execAsync()
-    .then(function(res) {
-      let success = res.every(function(val) {return val;});
-      if (!success) {
-        return Promise.reject(new Error('Failed to create app'))
-      }
-      return true;
-    });
+    .then(res => res.every(val => val));
   }
 
   function update(id, props) {
@@ -46,10 +33,7 @@ module.exports = function(config) {
     return db
     .hmsetAsync(appHashKey, props)
     .then(function(res) {
-      if (!res) {
-        return Promise.reject(new Error('Failed to update app'))
-      }
-      return true;
+      return !!res;
     });
   }
 
@@ -57,17 +41,16 @@ module.exports = function(config) {
     return db.hgetallAsync(applicationDbConfig.appHashPrefix.concat(':', id))
     .then(function(app) {
       if (!app || !Object.keys(app).length) {
-        return null;
-      }
-      app['id'] = id;
-      return app;
+        return false;
+      } else return app;
     });
   }
 
   function getAll(userId) {
     return getAllAppIdsByUser(userId)
     .then(function(appIds) {
-      return Promise.all(appIds.map(get));
+      return Promise.all(appIds.map(get))
+      .then(apps => apps.filter(app => app !== false));
     });
   }
 
@@ -89,21 +72,15 @@ module.exports = function(config) {
     .del(applicationDbConfig.appHashPrefix.concat(':', id))
     .srem(applicationDbConfig.userAppsHashPrefix.concat(':', userId), id)
     .execAsync()
-    .then(function(responses) {
-      // Respond with true only when all deletes are successful
-      return responses.every(function(res) {
-        return res;
-      });
-    });
+    .then(responses => responses.every(res => res));
   }
 
   function removeAll(userId) {
     return getAllAppIdsByUser(userId)
     .then(function(appIds) {
-      let removeAppPromises = appIds.map(function(appId) {
-        return remove(appId, userId);
-      });
-      return Promise.all(removeAppPromises);
+      let removeAppPromises = appIds.map(appId => remove(appId, userId));
+      return Promise.all(removeAppPromises)
+      .then(responses => responses.every(res => res));
     });
   }
 
