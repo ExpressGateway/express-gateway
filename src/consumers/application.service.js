@@ -55,6 +55,12 @@ module.exports = function(config) {
     .catch(() => Promise.reject(new Error('failed to deactivate application')));
   }
 
+  function deactivateAll(userId) {
+    return applicationDao.deactivateAll(userId)
+    .return(true)
+    .catch(() => Promise.reject(new Error('failed to deactivate all applications')));
+  }
+
   function activate(id) {
     return get(id) // make sure app exists
     .then(function() {

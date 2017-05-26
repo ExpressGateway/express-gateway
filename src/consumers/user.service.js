@@ -104,7 +104,8 @@ module.exports = function(config) {
   function deactivate(id) {
     return get(id) // make sure user exists
     .then(function() {
-      return userDao.deactivate(id);
+      return userDao.deactivate(id)
+      .then(() => applicationService.deactivateAll(id)); // Cascade deactivate all applications associated with the user
     })
     .return(true)
     .catch(() => Promise.reject(new Error('failed to deactivate user')));
