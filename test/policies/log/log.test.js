@@ -6,6 +6,7 @@ const assert = require('assert')
 describe('logging policy', () => {
   before('prepare mocks', () => {
     sinon.spy(logger, 'info');
+    sinon.spy(logger, 'error');
   })
   it('should log url', () => {
     let next = sinon.spy();
@@ -21,11 +22,20 @@ describe('logging policy', () => {
     let logMiddleware = logAction({
       message: '${process.exit(1)}'
     })
-    assert.throws(() => logMiddleware({ url: '/test', method: 'GET' }, {}, next))
+    logMiddleware({ url: '/test', method: 'GET' }, {}, next)
+    assert.ok(logger.info.notCalled)
+
+    assert.equal(logger.error.getCall(0).args[0], 'failed to build log message; process is not defined')
+    assert.ok(next.calledOnce)
   })
 
+  afterEach(function() {
+    logger.info.reset();
+    logger.error.reset();
+  });
 
-  after('restore logger', () => {
+  after(function() {
     logger.info.restore();
-  })
+    logger.error.restore();
+  });
 })
