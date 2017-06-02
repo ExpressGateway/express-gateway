@@ -1,14 +1,3 @@
-// var model = {
-//   id: {
-//     created_at: 'Date',
-//     expries_at: 'Date',
-//     userId: 'user',
-//     applicationId: 'app',
-//     scopes: '',
-//     access_token: ''
-//   }
-// }
-
 'use strict';
 
 let getTokenDao = require('./token.dao.js');
@@ -64,6 +53,7 @@ module.exports = function(config) {
 
   function get(_token) {
     let tokenId = _token.split('|')[0];
+
     return tokenDao.get(tokenId)
     .then(token => {
       if (!token) {
