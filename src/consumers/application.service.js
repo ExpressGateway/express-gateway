@@ -15,18 +15,37 @@ module.exports = function(config) {
       let app = validateAndCreateApp(_app, userId);
       return applicationDao.insert(app)
       .then(function(success) {
-        return success ? resolve(app) : reject('one or more insert operations failed'); // TODO: replace with server error
+        if (!success) {
+          return reject('one or more insert operations failed'); // TODO: replace with server error
+        }
+
+        app.isActive = app.isActive === 'true';
+        return resolve(app);
       });
     })
     .catch(err => Promise.reject(new Error('Failed to insert application: ' + err.message)));
   }
 
   function get(id) {
-    return applicationDao.get(id);
+    return applicationDao.get(id)
+    .then(app => {
+      if (!app) {
+        return false;
+      }
+
+      app.isActive = (app.isActive === 'true');
+      return app;
+    });
   }
 
   function getAll(userId) {
     return applicationDao.getAll(userId)
+    .then(apps => {
+      return apps.map(app => {
+        app.isActive = app.isActive === 'true';
+        return app;
+      });
+    })
   }
 
   function remove(id) {
@@ -138,6 +157,7 @@ module.exports = function(config) {
     getAll,
     activate,
     deactivate,
+    deactivateAll,
     remove,
     removeAll
   };

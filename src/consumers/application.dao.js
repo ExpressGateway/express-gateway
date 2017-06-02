@@ -100,6 +100,7 @@ module.exports = function(config) {
     getAllAppIdsByUser,
     activate,
     deactivate,
+    deactivateAll,
     remove,
     removeAll
   };

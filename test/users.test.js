@@ -3,6 +3,7 @@ let config = require('./config.models.js');
 let uuid = require('node-uuid');
 let services = require('../src/consumers')(config);
 let userService = services.userService;
+let _ = require('lodash');
 let db = require('../src/db')(config.redis.host, config.redis.port);
 
 describe('User service tests', function () {
@@ -33,26 +34,22 @@ describe('User service tests', function () {
       userService
       .insert(user)
       .then(function(newUser) {
-        should.exist(newUser.id);
-        should.exist(newUser.createdAt);
-        should.exist(newUser.username);
-        user.username.should.eql(newUser.username);
+        let expectedUserProps = ['firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt'];
+        /* including what's predictable. id, createdAt and updatedAt are initialized at 
+        time of creation, so they're not predictable */
+        let expectedPartialUserObj = {
+          firstname: user.firstname,
+          lastname: user.lastname,
+          username: user.username,
+          email: user.email,
+          isActive: true
+        };
+        Object.keys(newUser).should.eql(expectedUserProps);
+        should.deepEqual(_.omit(newUser, ['id', 'createdAt', 'updatedAt']), expectedPartialUserObj);
         db.hgetallAsync(config.users.redis.userHashPrefix.concat(':', newUser.id))
         .then(function(userObj) {
-          should.exist(userObj);
-          should.exist(userObj.username);
-          userObj.username.should.eql(user.username);
-          should.exist(userObj.email);
-          userObj.email.should.eql(user.email);
-          should.exist(userObj.firstname);
-          userObj.firstname.should.eql(user.firstname);
-          should.exist(userObj.lastname);
-          userObj.lastname.should.eql(user.lastname);
-          should.exist(userObj.isActive);
-          userObj.isActive.should.eql('true');
-          should.exist(userObj.createdAt);
-          userObj.createdAt.should.eql(newUser.createdAt);
-          should.exist(userObj.updatedAt);
+          userObj.isActive = userObj.isActive === 'true';
+          should.deepEqual(userObj, newUser);
           done();
         })
       })
@@ -338,7 +335,7 @@ describe('User service tests', function () {
           should.exist(_user.lastname);
           _user.lastname.should.eql(user.lastname);
           should.exist(_user.isActive);
-          _user.isActive.should.eql('false');
+          _user.isActive.should.eql(false);
           should.exist(_user.createdAt);
           _user.createdAt.should.eql(user.createdAt);
           should.exist(_user.updatedAt);
@@ -367,7 +364,7 @@ describe('User service tests', function () {
           should.exist(_user.lastname);
           _user.lastname.should.eql(user.lastname);
           should.exist(_user.isActive);
-          _user.isActive.should.eql('true');
+          _user.isActive.should.eql(true);
           should.exist(_user.createdAt);
           _user.createdAt.should.eql(user.createdAt);
           should.exist(_user.updatedAt);

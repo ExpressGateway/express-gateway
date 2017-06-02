@@ -58,7 +58,7 @@ describe('Application service tests', function () {
           should.exist(newApp.name);
           should.exist(newApp.isActive);
           should.exist(newApp.group);
-          newApp.isActive.should.eql('true');
+          newApp.isActive.should.eql(true);
           newApp.name.should.eql(app.name);
           newApp.group.should.eql('someGroup');
           should.not.exist(newApp.irrelevantProp);
@@ -229,8 +229,8 @@ describe('Application service tests', function () {
         .then(function(apps) {
           should.exist(apps);
           apps.length.should.eql(2);
-          [app1.id, app2.id].includes(apps[0]['id']).should.eql(true);
-          [app1.id, app2.id].includes(apps[1]['id']).should.eql(true);
+          app1.should.oneOf(apps);
+          app2.should.oneOf(apps);
           done();
         });
       })
@@ -424,7 +424,7 @@ describe('Application service tests', function () {
               should.exist(_app.id);
               _app.id.should.eql(app.id);
               should.exist(_app.isActive);
-              _app.isActive.should.eql('false');
+              _app.isActive.should.eql(false);
               should.exist(_app.name);
               _app.name.should.eql(app.name);
               should.exist(_app.createdAt);
@@ -452,7 +452,7 @@ describe('Application service tests', function () {
           should.exist(_app.id);
           _app.id.should.eql(app.id);
           should.exist(_app.isActive);
-          _app.isActive.should.eql('true');
+          _app.isActive.should.eql(true);
           should.exist(_app.name);
           _app.name.should.eql(app.name);
           should.exist(_app.createdAt);
