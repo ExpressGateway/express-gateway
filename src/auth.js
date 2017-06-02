@@ -5,7 +5,6 @@ let getUserService = require('./consumers/user.service.js');
 let getApplicationService = require('./consumers/user.service.js');
 let getTokenService = require('./tokens/token.service.js');
 let utils = require('./utils');
-// let _ = require('lodash');
 
 module.exports = function(config) {
   let credentials = getCredentialService(config);
