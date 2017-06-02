@@ -13,46 +13,43 @@ module.exports = function(config) {
   let tokens = getTokenService(config);
 
   function authenticateCredential(id, password, type) {
-    let consumer;
-
-    return applications.get(id)
-    .then(app => {
-      if (app) {
-        consumer = createApplicationObject(app);
-        return;
-      } 
-      else return users.find(id)
-      .then(user => {
-        if (user) {
-          consumer = createUserObject(user);
-        }
-        return;
-      });
-    })
-    .then(() => {
-      if (!consumer || !consumer.isActive) {
+    return validateConsumer(id)
+    .then((consumer) => {
+      if (!consumer) {
         return false;
       } else return credentials.getCredential(id, type, { includePassword: true })
         .then(_credential => {
-          if (_credential) {
+          if (_credential && _credential.isActive) {
             return utils.compareSaltAndHashed(password, _credential[config.credentials[type]['passwordKey']])
             .then(authenticated => {
               return authenticated ? consumer : false;
             })
-          }  else return false;
+          } else return false;
         });
     });
   }
 
   function authenticateToken(token) {
-    let [ tokenId, tokenPassword ] = token.split('|');
+    let tokenObj;
+    let tokenPassword = token.split('|')[1];
 
-    return tokens.get(tokenId)
-    .then(tokenObj => {
-      if (tokenObj && tokenObj.tokenDecrypted) {
-        return tokenObj.tokenDecrypted === tokenPassword ? tokenObj : false;
-      } else return false;
-    });
+    return tokens.get(token)
+    .then(_tokenObj => {
+      tokenObj = _tokenObj;
+
+      if (!tokenObj) {
+        return null;
+      }
+
+      if (tokenObj.username) {
+        return users.find(tokenObj.username);
+      } else return applications.get(tokenObj.applicationId);
+    })
+    .then(consumer => {
+      if (!consumer || !consumer.isActive) {
+        return false;
+      } else return tokenObj.tokenDecrypted === tokenPassword ? tokenObj : false;
+    })
   }
 
   function authorizeToken(_token, authType, scopes) {
@@ -89,6 +86,26 @@ module.exports = function(config) {
         }
         return scopes.every(scope => _credential.scopes.indexOf(scope) !== -1);
       }
+    });
+  }
+
+  function validateConsumer(id) {
+    return applications.get(id)
+    .then(app => {
+      if (app) {
+        if (!app.isActive) {
+          return null;
+        }
+        return createApplicationObject(app);
+      } else return users.find(id)
+        .then(user => {
+          if (user) {
+            if (!user.isActive) {
+              return null;
+            }
+            return createUserObject(user);
+          } else return null;
+        });
     });
   }
 

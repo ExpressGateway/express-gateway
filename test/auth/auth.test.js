@@ -142,6 +142,35 @@ describe('Auth tests', function () {
         done();
       });
     });
+
+    it('should not authorize Credential that is inActive', function (done) {
+      credentialService
+      .deactivateCredential(user.username, 'oauth')
+      .then(function(res) {
+        should.exist(res);
+        res.should.eql(true);
+      })
+      .then(() => {
+        authService.authorizeCredential(user.username, _credential.secret, 'oauth', [ 'otherScope', 'someScope2' ])
+        .then((authResponse) => {
+          should.exist(authResponse)
+          authResponse.should.eql(false);
+
+          // reset credential back to active status
+          credentialService
+          .activateCredential(user.username, 'oauth')
+          .then(function(res) {
+            should.exist(res);
+            res.should.eql(true);
+            done();
+          })
+        })
+        .catch(function(err) {
+          should.not.exist(err);
+          done();
+        });
+      })
+    });
   });
 
   describe('Token Auth', function () {

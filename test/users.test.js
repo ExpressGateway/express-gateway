@@ -125,7 +125,18 @@ describe('User service tests', function () {
     it('should get user by userId', function (done) {
       userService.get(user.id)
         .then(function(_user) {
+          let expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
+          let expectedPartialObj = {
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            isActive: true,
+            username: user.username
+          };
+
           should.exist(_user);
+          expectedUserProps.sort().should.eql(Object.keys(_user).sort());
+          should.deepEqual(_.omit(_user, [ 'id', 'createdAt', 'updatedAt' ]), expectedPartialObj);
           _user.id.length.should.be.greaterThan(10);
           done();
         })
@@ -151,8 +162,18 @@ describe('User service tests', function () {
     it('should find user by username', function (done) {
       userService.find(user.username)
         .then(function(_user) {
+          let expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
+          let expectedPartialObj = {
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            isActive: true,
+            username: user.username
+          };
+
           should.exist(_user);
-          _user.username.should.eql(user.username)
+          expectedUserProps.sort().should.eql(Object.keys(_user).sort());
+          should.deepEqual(_.omit(_user, [ 'id', 'createdAt', 'updatedAt' ]), expectedPartialObj);
           _user.id.length.should.be.greaterThan(10);
           done();
         })
