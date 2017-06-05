@@ -27,10 +27,18 @@ winston.loggers.add('EG:config', {
     label: 'EG:config'
   }
 });
+winston.loggers.add('EG:log-policy', {
+  console: {
+    level: process.env.LOG_LEVEL_LOG_POLICY || process.env.LOG_LEVEL || 'error',
+    colorize: true,
+    label: 'EG:log-policy'
+  }
+});
 winston.level = process.env.LOG_LEVEL || 'error';
 module.exports = {
   gateway: winston.loggers.get('EG:gateway'),
   policy: winston.loggers.get('EG:policy'),
   test: winston.loggers.get('EG:test'),
-  config: winston.loggers.get('EG:config')
+  config: winston.loggers.get('EG:config'),
+  logPolicy: winston.loggers.get('EG:log-policy')
 }
