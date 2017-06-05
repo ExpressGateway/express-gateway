@@ -20,8 +20,11 @@ module.exports = function(config) {
       return userDao.insert(newUser)
       .then(function(success) {
         if (success) {
-          newUser.isActive = newUser.isActive === 'true';
-          return newUser;
+          return {
+            username: newUser.username,
+            id: newUser.id,
+            createdAt: newUser.createdAt
+          }
         } else return Promise.reject(new Error('insert user failed')); // TODO: replace with server error
       });
     });
@@ -38,8 +41,6 @@ module.exports = function(config) {
       if (!user) {
         return false;
       }
-
-      user.isActive = user.isActive === 'true';
       return (options && options.includePassword) ? user : _.omit(user, ['password']);
     });
   }
@@ -80,8 +81,7 @@ module.exports = function(config) {
   function deactivate(id) {
     return get(id) // make sure user exists
     .then(function() {
-      return userDao.deactivate(id)
-      .then(() => applicationService.deactivateAll(id)); // Cascade deactivate all applications associated with the user
+      return userDao.deactivate(id);
     })
     .return(true)
     .catch(() => Promise.reject(new Error('failed to deactivate user')));

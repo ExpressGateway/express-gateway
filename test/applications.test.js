@@ -58,7 +58,7 @@ describe('Application service tests', function () {
           should.exist(newApp.name);
           should.exist(newApp.isActive);
           should.exist(newApp.group);
-          newApp.isActive.should.eql(true);
+          newApp.isActive.should.eql('true');
           newApp.name.should.eql(app.name);
           newApp.group.should.eql('someGroup');
           should.not.exist(newApp.irrelevantProp);
@@ -229,8 +229,8 @@ describe('Application service tests', function () {
         .then(function(apps) {
           should.exist(apps);
           apps.length.should.eql(2);
-          app1.should.oneOf(apps);
-          app2.should.oneOf(apps);
+          [app1.id, app2.id].includes(apps[0]['id']).should.eql(true);
+          [app1.id, app2.id].includes(apps[1]['id']).should.eql(true);
           done();
         });
       })
@@ -424,7 +424,7 @@ describe('Application service tests', function () {
               should.exist(_app.id);
               _app.id.should.eql(app.id);
               should.exist(_app.isActive);
-              _app.isActive.should.eql(false);
+              _app.isActive.should.eql('false');
               should.exist(_app.name);
               _app.name.should.eql(app.name);
               should.exist(_app.createdAt);
@@ -452,7 +452,7 @@ describe('Application service tests', function () {
           should.exist(_app.id);
           _app.id.should.eql(app.id);
           should.exist(_app.isActive);
-          _app.isActive.should.eql(true);
+          _app.isActive.should.eql('true');
           should.exist(_app.name);
           _app.name.should.eql(app.name);
           should.exist(_app.createdAt);
@@ -465,70 +465,6 @@ describe('Application service tests', function () {
         should.not.exist(err);
         done();
       })
-    });
-
-    it('should cascade deactivate app upon deactivating user', function(done) {
-      let user1;
-      let app1 = {
-        name: 'test-app-1'
-      }
-
-      let app2 = {
-        name: 'test-app-2'
-      }
-
-      userService
-      .insert(createRandomUserObject())
-      .then(function(newUser) {
-        should.exist(newUser);
-        user1 = newUser;
-        return _applicationService
-        .insert(app1, user1.id)
-        .then(function(newApp) {
-          should.exist(newApp);
-          app1 = newApp;
-          return; 
-        });
-      })
-      .then(() => {
-        return _applicationService
-        .insert(app2, user1.id)
-        .then(function(newApp) {
-          should.exist(newApp);
-          app2 = newApp;
-          return; 
-        });
-      })
-      .then(function() {
-        return userService
-        .deactivate(user1.id)
-        .then(function(success) {
-          should.exist(success);
-          return;
-        })
-      })
-      .then(function() {
-        _applicationService
-        .get(app1.id)
-        .then(function(_app) {
-          should.exist(_app);
-          _app.isActive.should.eql(false);
-          return;
-        });
-      })
-      .then(function() {
-        _applicationService
-        .get(app2.id)
-        .then(function(_app) {
-          should.exist(_app);
-          _app.isActive.should.eql(false);
-          done();
-        });
-      })
-      .catch(function(err) {
-        should.not.exist(err);
-        done();
-      });
     });
   });
 
