@@ -66,6 +66,14 @@ module.exports = function(config) {
     return db.hsetAsync(config.applications.redis.appHashPrefix.concat(':', id), 'isActive', 'false');
   }
 
+  function deactivateAll(userId) {
+    return getAllAppIdsByUser(userId)
+    .then(function(appIds) {
+      let deactivateAppPromises = appIds.map(appId => deactivate(appId));
+      return Promise.all(deactivateAppPromises)
+    });
+  }
+
   function remove(id, userId) {
     return db
     .multi()
@@ -92,6 +100,7 @@ module.exports = function(config) {
     getAllAppIdsByUser,
     activate,
     deactivate,
+    deactivateAll,
     remove,
     removeAll
   };
