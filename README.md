@@ -597,7 +597,7 @@ YML and JSON formats are supported.
 There are several options how to do this:
 
 ##### Default
-If nothing is provided EG will try to find config in **/etc/express-gateway/config.yml**
+If nothing is provided EG will try to find config in **$HOME/.express-gateway/config.yml**
 
 You can put your config file there or somehow map it to real location
 
