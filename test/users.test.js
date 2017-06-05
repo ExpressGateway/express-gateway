@@ -229,8 +229,8 @@ describe('User service tests', function () {
         res.should.eql(true);
         return userService.get(user.id)
         .then(function(_user) {
-          // should.exist(_user.username);
-          // _user.username.should.eql(updatedUser.username);
+          should.exist(_user.username);
+          _user.username.should.eql(user.username); // Cannot update username
           should.exist(_user.email);
           _user.email.should.eql(updatedUser.email);
           should.exist(_user.firstname);
@@ -259,8 +259,6 @@ describe('User service tests', function () {
         res.should.eql(true);
         return userService.get(user.id)
         .then(function(_user) {
-          // should.exist(_user.username);
-          // _user.username.should.eql(updatedUser.username);
           should.exist(_user.email);
           _user.email.should.eql(anotherUpdatedUser.email);
           should.exist(_user.firstname);

@@ -50,24 +50,25 @@ module.exports = {
         basicAuth: 'TEST-ENV-BASIC-AUTH'
       }
     },
-   
-    basicAuth: {
-      /* passwordKey is required for all credentials. 
-       * Usually it's just 'password' or 'secret', but users can define it themselves 
-       * In the case below, passwordKey is 'password'. So, when defining a credential, 
-       * 'password' must be supplied as a parameter
-       */
-      passwordKey: 'password',
-      autoGeneratePassword: true, // If password is not supplied, it will auto-generate a uuid as password
-      properties: { // additional properties part of the credentials object
-        scopes:   { isRequired: true },
-      }
-    },
-    oauth: {
-      passwordKey: 'secret',
-      autoGeneratePassword: true,
-      properties: { 
-        scopes: { isRequired: false }
+    types: {
+      basicAuth: {
+        /* passwordKey is required for all credentials. 
+         * Usually it's just 'password' or 'secret', but users can define it themselves 
+         * In the case below, passwordKey is 'password'. So, when defining a credential, 
+         * 'password' must be supplied as a parameter
+         */
+        passwordKey: 'password',
+        autoGeneratePassword: true, // If password is not supplied, it will auto-generate a uuid as password
+        properties: { // additional properties part of the credentials object
+          scopes:   { isRequired: true },
+        }
+      },
+      oauth: {
+        passwordKey: 'secret',
+        autoGeneratePassword: true,
+        properties: { 
+          scopes: { isRequired: false }
+        }
       }
     }
   }

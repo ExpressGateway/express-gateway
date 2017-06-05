@@ -128,6 +128,21 @@ module.exports = function(config) {
     return db.hsetAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id), 'isActive', false);
   }
 
+  function removeCredential(id, type) {
+    return db.delAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id));
+  }
+
+  function removeAllCredentials(id) {
+    let dbTransaction = db.multi();
+    let credentialTypes = Object.keys(config.credentials.types);
+    
+    credentialTypes.forEach((type) => {
+      dbTransaction = dbTransaction.del(config.credentials.redis.credentialPrefixes[type].concat(':', id));
+    });
+
+    return dbTransaction.execAsync();
+  }
+
   function updateCredential(id, type, credentialObj) {
     return insertCredential(id, type, credentialObj);
   }
@@ -143,6 +158,8 @@ module.exports = function(config) {
     getCredential,
     activateCredential,
     deactivateCredential,
+    removeCredential,
+    removeAllCredentials,
     updateCredential
   };
 

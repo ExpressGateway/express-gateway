@@ -42,11 +42,13 @@ module.exports = function(config) {
   }
 
   function insertCredential(id, type, credentialDetails) {
-    if (!id || typeof id !== 'string' || !type || !credentialDetails) {
+    credentialDetails = credentialDetails || {};
+
+    if (!id || typeof id !== 'string' || !type) {
       return Promise.reject(new Error('invalid credentials')); // TODO: replace with validation error
     }
 
-    if (!config.credentials[type]) {
+    if (!config.credentials.types[type]) {
       return Promise.reject(new Error('invalid credential type')); // TODO: replace with validation error
     }
 
@@ -60,7 +62,7 @@ module.exports = function(config) {
         } else return Promise.reject(new Error('credential already exists but it is inactive. activate credential instead.')); // TODO: replace with validation error
       }
 
-      credentialConfig = config.credentials[type];
+      credentialConfig = config.credentials.types[type];
       newCredential = { isActive: true };
 
       return Promise.all([validateNewCredentialScopes(credentialConfig, credentialDetails),
@@ -154,7 +156,7 @@ module.exports = function(config) {
         credential.scopes = JSON.parse(credential.scopes);
       }
 
-      return (options && options.includePassword === true) ? credential : _.omit(credential, [ config.credentials[type].passwordKey ]);
+      return (options && options.includePassword === true) ? credential : _.omit(credential, [ config.credentials.types[type].passwordKey ]);
     });
   }
 
@@ -199,6 +201,23 @@ module.exports = function(config) {
     });
   }
 
+  function removeCredential(id, type) {
+    if (!id || !type) {
+      return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
+    }
+
+    return credentialDao.removeCredential(id, type)
+    .return(true);
+  }
+
+  function removeAllCredentials(id) {
+    if (!id) {
+      return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
+    }
+    return credentialDao.removeAllCredentials(id)
+    .then(() => true);
+  }
+
   function addScopesToCredential(id, type, scopes) {
     return Promise.all([validateExistingScopes(scopes), getCredential(id, type)])
     .then(([ _scopes, credential ]) => {
@@ -208,7 +227,7 @@ module.exports = function(config) {
                           credentialDao.associateCredentialWithScopes(id, type, _scopes)
                         ]);
     })
-    .return(true);
+    .then(() => true);
   }
 
   function removeScopesFromCredential(id, type, scopes) {
@@ -245,7 +264,7 @@ module.exports = function(config) {
   // This function validates all user defined properties, excluding scopes
   function validateUpdatedCredentialproperties(type, credentialDetails) {
     let newCredentialProperties = {};
-    let credentialConfig = config.credentials[type];
+    let credentialConfig = config.credentials.types[type];
 
     for (let prop in _.omit(credentialConfig.properties, ['scopes'])) {
       if (credentialDetails[prop]) {
@@ -287,7 +306,7 @@ module.exports = function(config) {
       return false;
     } else return _scopes;
   }
-
+  
   credentialService = {
     insertScopes,
     removeScopes,
@@ -299,7 +318,9 @@ module.exports = function(config) {
     activateCredential,
     addScopesToCredential,
     removeScopesFromCredential,
-    updateCredential
+    updateCredential,
+    removeCredential,
+    removeAllCredentials,
   };
 
   return credentialService;
