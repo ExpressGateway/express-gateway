@@ -1,6 +1,6 @@
 const minimatch = require('minimatch')
 const express = require('express')
-const debug = require('debug')("gateway");
+const logger = require('./log').policy;
 
 const predefinedConditions = {
   always: function(_req) {
@@ -54,10 +54,10 @@ module.exports.init = function() {
 
   //extending express.request
   express.request.matchEGCondition = function(conditionConfig) {
-    debug('matchEGCondition for %j', conditionConfig);
+    logger.debug('matchEGCondition for %o', conditionConfig);
     const func = conditions[conditionConfig.name];
     if (!func) {
-      debug(`warning: condition not found for ${conditionConfig.name}`);
+      logger.debug(`warning: condition not found for ${conditionConfig.name}`);
       return null;
     } else {
       return func(this, conditionConfig);

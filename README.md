@@ -465,30 +465,33 @@ serviceEndpoints:
 apiEndpoints:
   api:
     host: '*'
-    paths: /
+    paths: /*
+
 pipelines:
   api:
     apiEndpoints:
       - api
     policies:
-      -
-        action:
-          name: log
-          message: "${method} ${originalUrl}"
-      -
-        condition:
-          name: pathExact
-          paths: /google
-        action:
-          name: proxy
-          serviceEndpoint: google # see declaration above
-      -
-        condition:
-          name: pathExact
-          paths: /example
-        action:
-          name: proxy
-          serviceEndpoint: example # see declaration above
+      simple-logger:
+        - action:
+            name: log
+            message: "${method} ${originalUrl}"
+      proxy:
+        - condition:
+            name: pathExact
+            paths: /google
+          action:
+            name: proxy
+            serviceEndpoint: google # see declaration above
+            transform: "{segment['0']}/{segment['2']}?q={keys.foo}"
+        -
+          condition:
+            name: pathExact
+            paths: /example
+          action:
+            name: proxy
+            serviceEndpoint: example # see declaration above
+            transform: "{originalUrl?q={qs[0]}"
 
 ```
 
@@ -575,8 +578,7 @@ Manual Restart is required for changes in:
 
 Troubleshooting
 ---------------
-EG uses [debug](https://www.npmjs.com/package/debug) module
-set env variable ```DEBUG=EG:*``` to see full logging
+set env variable ```LOG_LEVEL=debug``` to see full logging
 
 Build and run
 -------------

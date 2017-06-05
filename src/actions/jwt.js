@@ -3,7 +3,7 @@
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const debug = require('debug')('gateway:oauth2');
+const logger = require('../log').policy;
 
 function createJwtMiddleware(params) {
   let jwtOptions = {
@@ -18,13 +18,13 @@ function createJwtMiddleware(params) {
     done(null, jwt);
   }));
   return function jwtMiddleware(req, res, next) {
-    debug('authenticating with JWT token');
+    logger.debug('authenticating with JWT token');
     passport.authenticate('jwt', (err, user, info) => {
       if (err) {
         return next(err);
       }
       if (!user) {
-        debug(`authentication failed: ${info.message}`);
+        logger.debug(`authentication failed: ${info.message}`);
         res.status(401).send({
           error: {
             name: 'Unauthorized',

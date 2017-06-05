@@ -1,7 +1,7 @@
 const fs = require('fs')
 const ConfigurationError = require('../errors').ConfigurationError
 const yaml = require('js-yaml')
-const debug = require('debug')('gateway:config');
+const logger = require('../log').config;
 
 module.exports.readConfigFile = function(fileName) {
   if (!fs.existsSync(fileName)) {
@@ -13,7 +13,7 @@ module.exports.readConfigFile = function(fileName) {
     return yaml.load(fileContent); // valid JSON or YAML format
   } catch (err) {
     if (err instanceof yaml.YAMLException) {
-      debug(`Bad config file format: ${err}`);
+      logger.error(`Bad config file format: ${err}`);
     }
     throw err;
   }
