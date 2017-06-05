@@ -575,8 +575,7 @@ Manual Restart is required for changes in:
 
 Troubleshooting
 ---------------
-EG uses [debug](https://www.npmjs.com/package/debug) module
-set env variable ```DEBUG=EG:*``` to see full logging
+set env variable ```LOG_LEVEL=debug``` to see full logging
 
 Build and run
 -------------

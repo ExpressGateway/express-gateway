@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('gateway:throttle');
+const logger = require('../log').policy;
 const RateLimiter = require('limiter').RateLimiter;
 
 function createThrottleGroupMiddleware(params) {
@@ -10,7 +10,7 @@ function createThrottleGroupMiddleware(params) {
     }
 
     let key = params.key || 'all';
-    debug(`adding request throttle group: ${key}`);
+    logger.debug(`adding request throttle group: ${key}`);
     req.throttleGroups.add(key);
     next();
   };
@@ -29,7 +29,7 @@ function createThrottleMiddleware(params) {
     });
 
     if (rejectedGroups.length > 0) {
-      debug(`request rejected by throttling (${rejectedGroups})`);
+      logger.debug(`request rejected by throttling (${rejectedGroups})`);
       res.status(429);
       res.send('Too many requests');
     } else {
