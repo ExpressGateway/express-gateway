@@ -2,7 +2,7 @@
 
 const httpProxy = require('http-proxy');
 const lodash = require('lodash');
-const debug = require('debug')('gateway:proxy');
+const logger = require('../log').gateway;
 
 const ConfigurationError = require('../errors').ConfigurationError;
 
@@ -12,8 +12,8 @@ function createMiddleware(params, config) {
   ]);
   if (!serviceEndpoint) {
     throw new ConfigurationError(
-      `Private endpoint ${params.serviceEndpoint} (referenced in 'proxy' ` +
-      'processor configuration) does not exist');
+      `Service endpoint ${params.serviceEndpoint} (referenced in 'proxy' ` +
+      'policy configuration) does not exist');
   }
 
   let proxy = httpProxy.createProxyServer({
@@ -21,7 +21,7 @@ function createMiddleware(params, config) {
     changeOrigin: params.changeOrigin || false
   });
   proxy.on('error', (err, _req, res) => {
-    console.warn('Error', err);
+    logger.warn(err);
 
     if (!res.headersSent) {
       res.status(502).send('Bad gateway.');
@@ -31,7 +31,7 @@ function createMiddleware(params, config) {
   });
 
   return function proxyHandler(req, res, _next) {
-    debug(`proxying to ${serviceEndpoint}`);
+    logger.debug(`proxying to ${serviceEndpoint}`);
     proxy.web(req, res);
   };
 }

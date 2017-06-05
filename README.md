@@ -220,7 +220,7 @@ pipelines:
           paths: /v1
         action:
           name: log
-          message: "${req.method} ${req.originalUrl}"
+          message: "${method} ${originalUrl}"
       -
         action:
           name: proxy
@@ -408,24 +408,29 @@ Example:
 ]
 ```
 
-#### Logging (TODO:Update doc, non relevant)
+#### Logging
 
 Provides capability for simple logging. The only parameter is `message`, with
 a string specifying the message to log. This can include placeholders using
 the JavaScript [ES6 template literal syntax](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Template_literals).
 
-Example:
+It will allow dumping all parameters of express Request object
+[ExpressJS Request](https://expressjs.com/en/api.html#req)
 
-```json
-...
-"Policies": [
-  {
-    "action": {
-      "name":"log",
-      "message": "${req.method} ${req.originalUrl}"
-    }
-  }
-]
+Example:
+```yml
+pipelines:
+  api:
+    policies:
+      - action:
+          name: log
+          message: ${method} ${originalUrl}
+
+```
+```js
+// let say we have incomming request
+req = { method:'GET', originalUrl:'/v1' }
+// will log record "[EG:log-policy] GET /v1" will appear
 ```
 
 #### URL Rewriting (TODO:Update doc, non relevant)
@@ -469,7 +474,7 @@ pipelines:
       -
         action:
           name: log
-          message: "${req.method} ${req.originalUrl}"
+          message: "${method} ${originalUrl}"
       -
         condition:
           name: pathExact
@@ -589,3 +594,25 @@ npm test
 # create Docker container
 docker build -t gateway .
 ```
+Providing Configuration
+-----------------
+Express-Gateway requires application configuration to be passed during start.
+YML and JSON formats are supported.
+
+There are several options how to do this:
+
+##### Default
+If nothing is provided EG will try to find config in **$HOME/.express-gateway/config.yml**
+
+You can put your config file there or somehow map it to real location
+
+Docker example: docker run -v <source_path>:<dest_path> ...
+
+##### Location to file in env variable EG\_CONFIG\_PATH
+example: EG\_CONFIG\_PATH=/some/path/config.yml npm start
+
+##### Entire JSON serialized config env variable EG\_APP\_CONFIG
+example: EG\_APP\_CONFIG='{"apiEndpoints": ....}' npm start
+
+##### Path as command line argument
+npm start /path/here
