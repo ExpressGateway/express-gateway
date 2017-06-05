@@ -2,17 +2,19 @@
 
 let getUserDao = require('./user.dao.js');
 let getApplicationService = require('./application.service.js');
+let getCredentialService = require('../credentials');
 let _ = require('lodash');
 let Promise = require('bluebird');
 let utils = require('../utils');
 let uuid = require('node-uuid');
-let userDao, applicationService;
+let userDao, applicationService, credentialService;
 
 module.exports = function(config) {
   const userPropsDefinitions = config.users.properties;
 
   userDao = getUserDao(config);
   applicationService = getApplicationService(config);
+  credentialService = getCredentialService(config);
 
   function insert(user) {
     return validateAndCreateUser(user)
@@ -105,9 +107,10 @@ module.exports = function(config) {
         if (!userDeleted) {
           return Promise.reject(new Error('user delete failed')); // TODO: replace with server error
         } else {
-          return applicationService.removeAll(userId) // Cascade delete all apps associated with user
-          .catch(() => Promise.reject(new Error('failed to delete user\'s applications'))) // TODO: replace with server error
-          .then(res => res);
+          return Promise.all([ applicationService.removeAll(userId), // Cascade delete all apps associated with user
+                               credentialService.removeAllCredentials(user.username)]) // Cascade delete all user credentials
+          .catch(() => Promise.reject(new Error('failed to delete user\'s applications or credentials'))) // TODO: replace with server error
+          .return(true);
         }
       });
     });

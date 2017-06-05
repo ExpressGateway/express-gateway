@@ -1,7 +1,9 @@
 let should = require('should');
 let config = require('../config.models.js');
 let getCredentialService = require('../../src/credentials/credential.service.js');
+let getUserService = require('../../src/consumers/user.service.js');
 let db = require('../../src/db')(config.redis.host, config.redis.port);
+let Promise = require('bluebird');
 
 describe('Credential service tests', function () {
   describe('Credential tests', function () {
@@ -10,7 +12,7 @@ describe('Credential service tests', function () {
     let username = 'someUser';
 
     before(function(done) {
-      config.credentials.oauth = {
+      config.credentials.types.oauth = {
         passwordKey: 'secret',
         autoGeneratePassword: true,
         properties: { 
@@ -18,7 +20,7 @@ describe('Credential service tests', function () {
         }
       };
 
-      config.credentials.basicAuth = {
+      config.credentials.types.basicAuth = {
         passwordKey: 'password',
         autoGeneratePassword: true,
         properties: {
@@ -180,6 +182,107 @@ describe('Credential service tests', function () {
     });
   });
 
+  describe('Credential Cascade Delete tests', function () {
+    let _credentialService, user, _userService;
+    let originalCredentialConfig = config.credentials;
+
+    before(function(done) {
+      config.credentials.types.oauth = {
+        passwordKey: 'secret',
+        autoGeneratePassword: true,
+        properties: { 
+          scopes: { isRequired: false, isMutable: true, defaultVal: null }
+        }
+      };
+
+      config.credentials.types.basicAuth = {
+        passwordKey: 'password',
+        autoGeneratePassword: true,
+        properties: {
+          scopes:   { isRequired: false, isMutable: true, userDefined: true }
+        }
+      };
+
+      _credentialService = getCredentialService(config);
+      _userService = getUserService(config);
+
+      user = {
+        username: 'irfanbaqui',
+        firstname: 'irfan',
+        lastname: 'baqui',
+        email: 'irfan@eg.com'
+      };
+
+      db.flushdbAsync()
+      .then(function(didSucceed) {
+        if (!didSucceed) {
+          console.log('Failed to flush the database');
+        }
+        _userService
+        .insert(user)
+        .then(function(newUser) {
+          should.exist(newUser);
+          user = newUser;
+          _credentialService.insertCredential(user.username, 'oauth')
+          .then((oauthCred) => {
+            should.exist(oauthCred.secret);
+            _credentialService.insertCredential(user.username, 'basicAuth')
+            .then((basicAuthCred) => {
+              should.exist(basicAuthCred.password);
+              done();
+            });
+          });
+        });
+      })
+      .catch(function(err) {
+        should.not.exist(err);
+        done();
+      });
+    });
+
+    after(function(done) {
+      config.credentials = originalCredentialConfig;
+      done();
+    });
+
+    it('should delete all credentials associated with a user when user is deleted a credential', function (done) {
+      Promise.all([ _credentialService.getCredential(user.username, 'oauth'),
+                    _credentialService.getCredential(user.username, 'basicAuth') ])
+      .spread((oauthRes, basicAuthRes) => {
+        should.exist(oauthRes); // Check to confirm the credentials exist
+        should.exist(basicAuthRes);
+        return _userService.remove(user.id)
+        .then(res => {
+          should.exist(res);
+          res.should.eql(true);
+          return Promise.all([ _credentialService.getCredential(user.username, 'oauth'),
+                               _credentialService.getCredential(user.username, 'basicAuth') ])
+          .spread((oauthResAfterDelete, basicAuthResAfterDelete) => {
+            should.not.exist(oauthResAfterDelete);
+            should.not.exist(basicAuthResAfterDelete);
+            done();
+          });
+        });
+      });
+    });
+
+    it('should delete a credential', function (done) {
+      _credentialService.insertCredential(user.username, 'oauth')
+      .then(res => {
+        should.exist(res);
+        _credentialService.removeCredential(user.username, 'oauth')
+        .then(deleted => {
+          deleted.should.eql(true);
+          _credentialService.getCredential(user.username, 'oauth')
+          .then(resAfterDelete => {
+            should.not.exist(resAfterDelete);
+            done();
+          });
+        });
+      });
+    });
+  });
+
   describe('Credential Property tests', function () {
     let _credentialService;
     let originalCredentialConfig = config.credentials;
@@ -191,7 +294,7 @@ describe('Credential service tests', function () {
     };
 
     before(function(done) {
-      config.credentials.oauth = {
+      config.credentials.types.oauth = {
         passwordKey: 'secret',
         autoGeneratePassword: true,
         properties: { 
