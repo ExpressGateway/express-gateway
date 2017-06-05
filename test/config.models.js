@@ -18,10 +18,6 @@ module.exports = {
       email: { isRequired: false, isMutable: true }
     }
 	},
-  crypto: {
-    cipherKey: 'sensitiveKey',
-    algorithm: 'aes256'
-  },
   bcrypt: {
     saltRounds: 10
   },
@@ -34,20 +30,13 @@ module.exports = {
       name: { isRequired: true, isMutable: true }
     }
   },
-  tokens: {
-    redis: {
-      tokenHashPrefix: 'TEST-ENV-TOKEN',
-      consumerTokensHashPrefix: 'TEST-ENV-CONSUMER-TOKENS'
-    },
-    timeToExpiry: 7200000 // 2 hours
-  },
   credentials: {
     redis: {
-      scopePrefix: 'TEST-ENV-SCOPE',
-      scopeCredentialPrefix: 'TEST-ENV-SCOPE-CREDENTIAL', // 'SCOPE-CREDENTIAL:someScope': { cred100: true, cred200: true }
+      scopePrefix: 'SCOPE',
+      scopeCredentialPrefix: 'SCOPE-CREDENTIAL', // 'SCOPE-CREDENTIAL:someScope': { cred100: true, cred200: true }
       credentialPrefixes: {
-        oauth: 'TEST-ENV-OAUTH',
-        basicAuth: 'TEST-ENV-BASIC-AUTH'
+        oauth: 'OAUTH',
+        basicAuth: 'BASIC-AUTH'
       }
     },
    
