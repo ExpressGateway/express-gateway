@@ -594,3 +594,25 @@ npm test
 # create Docker container
 docker build -t gateway .
 ```
+Providing Configuration
+-----------------
+Express-Gateway requires application configuration to be passed during start.
+YML and JSON formats are supported.
+
+There are several options how to do this:
+
+##### Default
+If nothing is provided EG will try to find config in **$HOME/.express-gateway/config.yml**
+
+You can put your config file there or somehow map it to real location
+
+Docker example: docker run -v <source_path>:<dest_path> ...
+
+##### Location to file in env variable EG\_CONFIG\_PATH
+example: EG\_CONFIG\_PATH=/some/path/config.yml npm start
+
+##### Entire JSON serialized config env variable EG\_APP\_CONFIG
+example: EG\_APP\_CONFIG='{"apiEndpoints": ....}' npm start
+
+##### Path as command line argument
+npm start /path/here
