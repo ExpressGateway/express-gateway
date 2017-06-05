@@ -3,9 +3,8 @@
 let getCredentialDao = require('./credential.dao.js');
 let _ = require('lodash');
 let Promise = require('bluebird');
-// let utils = require('../utils');
+let utils = require('../utils');
 let uuid = require('node-uuid');
-let bcrypt = Promise.promisifyAll(require('bcrypt'));
 let credentialService, credentialDao;
 
 module.exports = function(config) {
@@ -104,7 +103,7 @@ module.exports = function(config) {
     let password;
 
     if (credentialDetails[credentialConfig.passwordKey]) {
-      return saltAndHash(credentialDetails[credentialConfig.passwordKey])
+      return utils.saltAndHash(credentialDetails[credentialConfig.passwordKey], config.bcrypt.saltRounds)
       .then(hash => {
         return { hash };
       });
@@ -116,7 +115,7 @@ module.exports = function(config) {
 
     password = uuid.v4();
 
-    return saltAndHash(password)
+    return utils.saltAndHash(password, config.bcrypt.saltRounds)
     .then((hash) => {
       return { hash, password }
     });
@@ -307,39 +306,7 @@ module.exports = function(config) {
       return false;
     } else return _scopes;
   }
-
-  function authenticate(id, password, type) {
-    let credential;
-
-    return getCredential(id, type, { includePassword: true })
-    .then(_credential => {
-      credential = _credential;
-      return credential ? compareSaltAndHashed(password, credential[config.credentials.types[type]['passwordKey']]) : false;
-    })
-    .then(authenticated => {
-      return authenticated ? true : false;
-    })
-    .catch(() => false);
-  }
-
-  function saltAndHash(password) {
-    if (!password || typeof password !== 'string') {
-      return Promise.reject(new Error('invalid arguments'));
-    }
-    return bcrypt.genSalt(config.bcrypt.saltRounds)
-    .then(function(salt) {
-      return bcrypt.hashAsync(password, salt);
-    })
-    .catch(() => Promise.reject(new Error('password hash failed'))); // TODO: replace with server error
-  }
-
-  function compareSaltAndHashed(password, hash) {
-    if (!password || !hash) {
-      return null;
-    }
-    return bcrypt.compareAsync(password, hash);
-  }
-
+  
   credentialService = {
     insertScopes,
     removeScopes,
@@ -354,7 +321,6 @@ module.exports = function(config) {
     updateCredential,
     removeCredential,
     removeAllCredentials,
-    authenticate
   };
 
   return credentialService;
