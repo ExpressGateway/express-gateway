@@ -80,7 +80,7 @@ function configurePipeline(policies, config) {
   conditions.init()
   for (let [policyName, policySteps] of Object.entries(policies)) {
     for (let policyStep of policySteps) {
-      const condition = policyStep.condition || { name: 'always' };
+      const condition = policyStep.condition;
       const actionCtr = actions.resolve(policyStep.action.name, policyName);
       if (!actionCtr) {
         throw new ConfigurationError(
@@ -90,7 +90,7 @@ function configurePipeline(policies, config) {
 
       router.use((req, res, next) => {
         logger.debug(`checking predicate for %j`, policyStep.action);
-        if (req.matchEGCondition(condition)) {
+        if (!condition || req.matchEGCondition(condition)) {
           logger.debug('request matched predicate for %j', policyStep.action);
           action(req, res, next);
         } else {
