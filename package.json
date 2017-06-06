@@ -12,7 +12,7 @@
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "test": "mocha --recursive --compilers js:babel-register test/*",
-    "dev-test": "LOG_LEVEL=info node --harmony node_modules/mocha/bin/_mocha --grep='tests' --invert --recursive  test"
+    "dev-test": "LOG_LEVEL=debug node --harmony node_modules/mocha/bin/_mocha --grep='tests' --invert --recursive  test"
   },
   "author": "Roman Lisagor <roman@lunchbadger.com>",
   "license": "UNLICENSED",

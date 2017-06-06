@@ -89,11 +89,11 @@ function configurePipeline(policies, config) {
       const action = actionCtr(policyStep.action, config);
 
       router.use((req, res, next) => {
-        logger.debug(`checking predicate for %j`, policyStep.action);
         if (!condition || req.matchEGCondition(condition)) {
-          logger.debug('request matched predicate for %j', policyStep.action);
+          logger.debug('request matched condition for action', policyStep.action);
           action(req, res, next);
         } else {
+          logger.debug(`request did not matched condition for action`, policyStep.action);
           next();
         }
       });
