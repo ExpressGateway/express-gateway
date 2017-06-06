@@ -477,13 +477,14 @@ pipelines:
             name: log
             message: "${method} ${originalUrl}"
       proxy:
-        - condition:
+        -
+          condition:
             name: pathExact
             paths: /google
           action:
             name: proxy
             serviceEndpoint: google # see declaration above
-            transform: "{segment['0']}/{segment['2']}?q={keys.foo}"
+            transform: "{segment['0']}/{segment['2']}?q={segment.foo}"
         -
           condition:
             name: pathExact

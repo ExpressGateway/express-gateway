@@ -7,7 +7,7 @@ let appConfig = {
   pipelines: {
     pipeline1: {
       apiEndpoints: ['parrots'],
-      policies: [{ action: { name: 'parrot_policy' } }]
+      policies: { test: [{ action: { name: 'parrot_policy' } }] }
     }
   }
 };

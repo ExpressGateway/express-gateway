@@ -6,7 +6,7 @@ const path = require('path')
 let fileHelper = {
   JSON: {
     readTemplate: function() {
-      const configTemplateContent = fs.readFileSync(path.join(__dirname, '../configs/hot-reload.template.config.json'));
+      const configTemplateContent = fs.readFileSync(path.join(__dirname, '../fixtures/hot-reload.template.config.json'));
       return JSON.parse(configTemplateContent)
     },
     saveTempFile: (config, path) => {
@@ -15,7 +15,7 @@ let fileHelper = {
   },
   YAML: {
     readTemplate: function() {
-      const configTemplateContent = fs.readFileSync(path.join(__dirname, '../configs/hot-reload.template.config.yml'));
+      const configTemplateContent = fs.readFileSync(path.join(__dirname, '../fixtures/hot-reload.template.config.yml'));
       return yaml.load(configTemplateContent);
     },
     saveTempFile: function(config, path) {
