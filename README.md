@@ -192,12 +192,11 @@ Represented as a
   - `url`: the URL to forward requests to
 - `pipelines`: a list of objects with the following keys:
   - `name`: the name of the pipeline
-  - `Policies`: the set of actions that should take place when a request is
-    received on one of the public endpoints. Represented as a list of objects
+  - `Policies`: the set of policies that should take place when a request is
+    received on one of the public endpoints. Each policy is represented as a list of objects
     with the following keys (see below for more information):
     - `condition`. This condition must be satisfied to trigger the action.
     - `action`. The name of the action to carry out.
-    - `params`. The parameters for the action.
 
 ```yaml
 http:
@@ -214,17 +213,19 @@ pipelines:
     apiEndpoints:
       - api
     policies:
-      -
-        condition:
-          name: pathExact
-          paths: /v1
-        action:
-          name: log
-          message: "${method} ${originalUrl}"
-      -
-        action:
-          name: proxy
-          serviceEndpoint: example # see declaration above
+      simple-logger: # policy name
+        -   # array of objects with condition\action properties
+          condition: #optional; defaults to always execute
+            name: pathExact
+            paths: /v1
+          action:
+            name: log
+            message: "${method} ${originalUrl}"
+      proxy: # policy name
+        -    # array of objects with condition\action properties
+          action:
+            name: proxy
+            serviceEndpoint: example # see declaration above
 
 ```
 
@@ -234,8 +235,11 @@ pipelines:
 Each Policy in a pipeline can be gated with a condition specification. Each
 condition specification is in the format:
 
-```js
-[name, ...params]
+```yaml
+  condition:
+    name: condition-name # examples: proxy; log;
+    some-param-1: p1 # if condition requires parameters this is where to put them
+    some-param-2: p1 #
 ```
 
 The name specifies a condition function. This can be one of the following:
@@ -245,16 +249,21 @@ The name specifies a condition function. This can be one of the following:
   - `never`: Never matches.
   - `pathExact`: Matches if the request's path is an exact match for the
     parameter. Example:
-
-        ["pathExact", "/foo/bar"]
-
+```yaml
+  condition:
+    name: pathExact
+    path: "/foo/bar"
+```
   - `pathMatch`. Matches if the request's path matches the given regular
     expression parameter. Example:
+```yaml
+  condition:
+    name: pathMatch
+    path: "/foo(/bar)?"
+```
 
-        ["pathMatch", "/foo(/bar)?"]
-
-  - `method`. Parameter can be either a string (e.g. 'GET') or an array of such
-    strings. Matches if the request's method matches the parameter.
+  - `method`. Matches if the request's method matches the `methods` parameter.
+    Accepts can be either a string (e.g. 'GET') or an array of such strings.
   - `hostMatch`. Parameter should be a regular expression. Matches if the
     `Host` header passed with the request matches the parameter.
 
@@ -282,6 +291,80 @@ Example:
 
 The above will match only if the exact request path is "/foo/bar" and the
 request is *not* a POST or HEAD.
+
+Best Practise Note: While it is possible to build quite complicated condition tree, huge trees could greatly affect readability of your EG configuration. In such cases it could be better to have multiple api endpoints and pipelines
+
+The following two configs are equivalent, however we believe variant B is easier to read
+
+##### Condition based config (variant A)
+```yaml
+serviceEndpoints:
+  admin: # will be referenced in proxy policy
+    url: 'http://admin.com'
+  staff: # will be referenced in proxy policy
+    url: 'http://staff.com'
+
+apiEndpoints:
+  api:
+    paths: /*
+
+pipelines:
+  api:
+    apiEndpoints:
+      - api
+    policies:
+      proxy:
+        -
+          condition:
+            name: pathExact
+            paths: /admin
+          action:
+            name: proxy
+            serviceEndpoint: admin # see declaration above
+        -
+          condition:
+            name: pathExact
+            paths: /staff
+          action:
+            name: proxy
+            serviceEndpoint: staff # see declaration above
+```
+
+##### Api Endpoint based config (variant B)
+```yaml
+serviceEndpoints:
+  admin: # will be referenced in proxy policy
+    url: 'http://admin.com'
+  staff: # will be referenced in proxy policy
+    url: 'http://staff.com'
+
+apiEndpoints:
+  admin:
+    paths: /admin
+  staff:
+    paths: /staff
+
+pipelines:
+  admin:
+    apiEndpoints:
+      - admin
+    policies:
+      proxy:
+        -   # note: no condition at all
+          action:
+            name: proxy
+            serviceEndpoint: admin
+  staff:
+    apiEndpoints:
+      - staff
+    policies:
+      proxy:
+        -   # note: no condition at all
+          action:
+            name: proxy
+            serviceEndpoint: staff
+```
+
 
 ### Policies
 
@@ -397,15 +480,15 @@ Example:
 
 ```json
 ...
-"Policies": [
-  {
+"policies": {
+  "cors":[{
     "condition": {"name":"always"},
     "action": { "name":"cors",
                 "origin": ["http://www.example.com"],
                 "credentials": true
     }
-  }
-]
+  }]
+}
 ```
 
 #### Logging
@@ -422,11 +505,12 @@ Example:
 pipelines:
   api:
     policies:
-      - action:
-          name: log
-          message: ${method} ${originalUrl}
-
+      simple-logger: # policy name
+        - action:    # array of condition/actions objects
+            name: log
+            message: ${method} ${originalUrl} # parameter for log action
 ```
+
 ```js
 // let say we have incomming request
 req = { method:'GET', originalUrl:'/v1' }
