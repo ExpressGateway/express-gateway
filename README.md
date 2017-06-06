@@ -52,8 +52,8 @@ https:
         key: example/keys/acme.com.key.pem
         cert: example/keys/acme.com.cert.pem
     - "default":
-        key: example/keys/lunchbadger.io.key.pem
-        cert: example/keys/lunchbadger.io.cert.pem
+        key: example/keys/eg.io.key.pem
+        cert: example/keys/eg.io.cert.pem
 
 ```
 ### apiEndpoints:
@@ -434,39 +434,34 @@ count against the overall limit.
 
 #### Proxying (TODO:Update doc, non relevant)
 
-Forwards the request to a service endpoint. The params format is an object
-with the following keys:
+Forwards the request to a service endpoint.
+Accepts serviceEndpoint parameter that can be one of the names of serviceEndpoints section
 
 - `serviceEndpoint`: the name of the service endpoint to forward to.
 
 This Policy type should generally be placed last in the list.
+```yaml
+serviceEndpoints:
+  example: # will be referenced in proxy policy
+    url: 'http://example.com'
 
-#### JWT authentication (TODO:Update doc, non relevant)
+apiEndpoints:
+  api:
+    path: '/*'
 
-Authenticates the request via a JWT token. Requests will need to supply an
-`Authentication` header with the value formatted as `JWT <token>`.
-
-The parameters are:
-
-- `issuer`: the required issuer name. This will be matched against the value
-  in the token provided with the request.
-- `audience`: the required audience name. This will be matched against the
-  value in the token provided with the request.
-- `key`: the public key for verifying the token signature, in PEM format.
-- `algorithms`: An array of the supported encryption/signing algorithms.
-
-Example:
-
-```json
-{
-  "action": {
-    "name": "jwt",
-    "issuer": "https://www.lunchbadger.com",
-    "audience": "4kzhU5LqlUpQJmjbMevWkWyt9adeKK",
-    "algorithms": ["RS256"],
-    "key": "-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
-  }
-}
+pipelines:
+  example-pipeline:
+    apiEndpoints:   # process all request matching "api" apiEndpoint
+      - api
+    policies:
+      proxy: # name of the policy
+        -   # list of actions
+          condition:
+            name: pathExact
+            path: /admin
+          action:
+            name: proxy # proxy policy has one action - "proxy"
+            serviceEndpoint: example # reference to serviceEndpoints Section
 ```
 
 #### CORS (TODO:Update doc, non relevant)
@@ -514,26 +509,8 @@ pipelines:
 ```js
 // let say we have incomming request
 req = { method:'GET', originalUrl:'/v1' }
-// will log record "[EG:log-policy] GET /v1" will appear
+// will log "[EG:log-policy] GET /v1"
 ```
-
-#### URL Rewriting (TODO:Update doc, non relevant)
-
-Allows the URL path to be modified using regular expressions. This can be
-useful if the target URL that needs to be proxied to is different from the
-request. Takes the following parameters:
-
-- `match`: the regular expression to match. Can include capturing groups.
-- `replace`: the string to replace the matched text with. Can include
-   references to the captured groups.
-- `flags`: flags for the regular expression engine, described
-  [here](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp#Parameters)
-- `redirect`: if this is not specified then all following Policies, including
-  the proxy, will treat the request as if it had been made to the rewritten
-  URL. This parameter changes the operation into a redirection instead. The
-  value of the parameter should be the HTTP status code to return (must be in
-  the 300-range). Note that this will terminate the flow and no subsequent
-  Policies will be executed.
 
 ### Full config example
 
