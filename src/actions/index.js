@@ -12,15 +12,16 @@ const coreNamespace = 'EGCore';
 let actions;
 module.exports.init = function() {
   actions = MODULES.reduce((pre, modName) => {
+    //TODO: it should not register by just name, it should call register
     return Object.assign(pre, require(modName));
   }, {});
   logger.debug('initializing actions. loaded: %j', Object.keys(actions));
 
 
   return {
-    resolve: name => {
-      logger.debug('resolving action %s', name);
-      return actions[name] || actions[`${coreNamespace}.${name}`]
+    resolve: (name, namespace) => {
+      logger.debug('resolving action %s policy-namespace %s', name, namespace);
+      return actions[`${namespace}.${name}`] || actions[`${coreNamespace}.${name}`] || actions[name] //TODO: it should not register by just name
     },
     register: (name, action, namespace = coreNamespace) => {
       let actionFullName = `${namespace}.${name}`;

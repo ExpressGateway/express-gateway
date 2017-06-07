@@ -10,7 +10,7 @@ const testHelper = require('./routing.helper');
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test'],
-          policies: [{ action: { name: 'test_policy' } }]
+          policies: { test: [{ action: { name: 'test_policy' } }] }
         }
       }
     };

@@ -16,7 +16,7 @@ module.exports = function() {
           return (req, res) => {
             res.json({ result: key, params, hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint })
           }
-        })
+        }, 'test')
       })
       let options = {};
       if (testSuite.configPath) {

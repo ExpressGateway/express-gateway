@@ -75,29 +75,30 @@ function processApiEndpoints(apiEndpoints) {
   return cfg
 }
 
-function configurePipeline(spec, config) {
+function configurePipeline(policies, config) {
   let router = express.Router();
   conditions.init()
-  for (const policySpec of spec) {
-    const condition = policySpec.condition || { name: 'always' };
-    const actionCtr = actions.resolve(policySpec.action.name);
-    if (!actionCtr) {
-      throw new ConfigurationError(
-        `Could not find action "${policySpec.action.name}"`);
-    }
-    const action = actionCtr(policySpec.action, config);
-
-    router.use((req, res, next) => {
-      logger.debug(`checking predicate for %j`, policySpec.action);
-      if (req.matchEGCondition(condition)) {
-        logger.debug('request matched predicate for %j', policySpec.action);
-        action(req, res, next);
-      } else {
-        next();
+  for (let [policyName, policySteps] of Object.entries(policies)) {
+    for (let policyStep of policySteps) {
+      const condition = policyStep.condition;
+      const actionCtr = actions.resolve(policyStep.action.name, policyName);
+      if (!actionCtr) {
+        throw new ConfigurationError(
+          `Could not find action "${policyStep.action.name}"`);
       }
-    });
-  }
+      const action = actionCtr(policyStep.action, config);
 
+      router.use((req, res, next) => {
+        if (!condition || req.matchEGCondition(condition)) {
+          logger.debug('request matched condition for action', policyStep.action);
+          action(req, res, next);
+        } else {
+          logger.debug(`request did not matched condition for action`, policyStep.action);
+          next();
+        }
+      });
+    }
+  }
 
 
   return router;

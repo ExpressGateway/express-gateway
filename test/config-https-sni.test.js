@@ -6,6 +6,7 @@ const path = require('path');
 let testHelper = require('./routing/routing.helper')
 let appConfig = {
   https: {
+    port: 10441,
     options: {
       requestCert: true,
       rejectUnauthorized: false,
@@ -26,7 +27,7 @@ let appConfig = {
   pipelines: {
     pipeline1: {
       apiEndpoints: ['test'],
-      policies: [{ action: { name: 'test_policy' } }]
+      policies: { test: [{ action: { name: 'test_policy' } }] }
     }
   }
 };
@@ -97,7 +98,7 @@ const testCases = [{
 let serverResult;
 let serverError;
 
-describe('sni tests', () => {
+describe('sni', () => {
   let servers, helper;
   before('setup', async() => {
     helper = testHelper()

@@ -7,7 +7,7 @@ let appConfig = {
   pipelines: {
     pipeline1: {
       apiEndpoints: ['test_default'],
-      policies: [{ action: { name: 'test_policy' } }]
+      policies: { test: [{ action: { name: 'test_policy' } }] }
     }
   }
 };
