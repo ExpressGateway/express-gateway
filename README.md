@@ -70,54 +70,65 @@ It will serve all host names and all possible urls
 #### Standard usage
 ```yaml
 apiEndpoints:
+  help: # name, used as reference in pipeline
+    host: '*' # optional by default accepts all hosts, same as '*'
+    paths: /help #optional by default will serve all requests - same as /*
+
   api: # name, used as reference in pipeline
     host: '*.com' # wildcard pattern support
-    paths: ['/v1/**'] # string or array of string
-  example: # name, used as reference in pipeline
-    host: 'example.com' # wildcard pattern support
     paths:
-      - /v2/** # string or array of string
-  help: # name, used as reference in pipeline
-    host: '*' # by default accepts all hosts, same as '*'
-    paths: /help #by default will serve all requests - same as **
+      - '/v1/*' # string or array of string
+      - '/v2/*'
+
+  example: # name, used as reference in pipeline
+    host: 'example.com'
+    paths: /v2/* # string or array of string
+
 ```
 
 #### Host
 host - string that will be matched against 'HOST' header of request
 
 ##### Host examples
++ \* - any domain will match cdn.test.example.com, test.example.com, example.com, etc.
+  Will also work if no HOST header is provided
 + example.com - one domain match, will not match subdomains
 + *.example.com -
   - any subdomain will match. test.example.com
   - example.com will not match
   - deeper levels will not match cdn.test.example.com
-+ **.example.com
-  - will match any level subdomain
++ *.*.example.com
+  - will match 2nd level subdomains like cdn.test.example.com
   - will not match example.com host
+  - will not match test.example.com host
 
 See more examples here https://www.npmjs.com/package/vhost
 
 #### Path examples
-Paths can be either string or array of strings. It supports wildcard patterns
+Paths can be either string or array of strings. It supports wildcard patterns.
+It behaves as ExpressJS routes https://expressjs.com/en/4x/api.html#router
 
 ##### Examples
 * paths: /admin - exact string match
   + match: /admin
-  + 404: /admin/ /admin/new /admin/new/1
+  + 404: /admin/new; /admin/new/1; /staff; /; etc.
 
-* paths: /admin/* - 1 level child matching (does not match to parent dir)
-  + match: /admin/new
-  + 404: /admin  /admin/new/1 /admin/
-
-* paths: /admin/\*\* - deep level child matching (does not match to parent dir)
-  + match: /admin/new /admin/new/1 /admin/
+* paths: /admin/\* - deep level child matching (does not match the parent dir)
+  + match: /admin/new /admin/new/1
   + 404: /admin
 
-* paths: ['/admin', '/admin/\*\*']  - deep level child matching and directory itself
-  alternative syntax  paths: /{admin,admin/\*\*}
-  + match: /admin/new /admin/new/1 /admin /admin/
+* paths: ['/admin', '/admin/\*']  - deep level sub directory matching and directory itself
+  + match: /admin/new /admin/new/1 /admin
 
-* paths: ['/student/\*\*', '/teacher/\*\*','/admin/\*\*']
+* paths: '/admin/:id' - one level sub directory matching without directory itself
+  + match: /admin/new /admin/1 /admin/some-guid-here
+  + 404: /admin; /admin/1/test; /admin/a/b/c;
+
+* paths: '/admin/:group/:id' - two level sub directory matching without directory itself
+  + match: /admin/eg/12
+  + 404: /admin; /admin/1; /admin/a/b/c;
+
+* paths: ['/student/\*', '/teacher/\*','/admin/\*']
   + match:
       - /admin/... multi-level
       - /student/... multi-level
