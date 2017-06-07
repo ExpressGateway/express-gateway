@@ -1,14 +1,13 @@
 /**
  * Module dependencies.
  */
-var oauth2orize = require('oauth2orize')
+let oauth2orize = require('oauth2orize')
   , passport = require('passport')
-  , login = require('connect-ensure-login')
-  , db = {}; // TODO: Replace with actual db
+  , db = {} // TODO: Replace with actual db
   , uuid = require('node-uuid');
 
 // create OAuth 2.0 server
-var server = oauth2orize.createServer();
+let server = oauth2orize.createServer();
 
 // Register serialialization and deserialization functions.
 //
@@ -49,7 +48,7 @@ server.deserializeClient(function(id, done) {
 // values, and will be exchanged for an access token.
 
 server.grant(oauth2orize.grant.code(function(client, redirectURI, user, ares, done) {
-  var code = uuid.v4()
+  let code = uuid.v4()
   
   db.authorizationCodes.save(code, client.id, redirectURI, user.id, function(err) {
     if (err) { return done(err); }
@@ -64,7 +63,7 @@ server.grant(oauth2orize.grant.code(function(client, redirectURI, user, ares, do
 // values.
 
 server.grant(oauth2orize.grant.token(function(client, user, ares, done) {
-    var token = uuid.v4();
+    let token = uuid.v4();
 
     db.accessTokens.save(token, user.id, client.clientId, function(err) {
         if (err) { return done(err); }
@@ -84,7 +83,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
     if (client.id !== authCode.clientID) { return done(null, false); }
     if (redirectURI !== authCode.redirectURI) { return done(null, false); }
     
-    var token = uuid.v4()
+    let token = uuid.v4()
     db.accessTokens.save(token, authCode.userID, authCode.clientID, function(err) {
       if (err) { return done(err); }
       done(null, token);
@@ -118,7 +117,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
                 return done(null, false);
             }
             //Everything validated, return the token
-            var token = uuid.v4();
+            let token = uuid.v4();
             db.accessTokens.save(token, user.id, client.clientId, function(err) {
                 if (err) { return done(err); }
                 done(null, token);
@@ -143,7 +142,7 @@ server.exchange(oauth2orize.exchange.clientCredentials(function(client, scope, d
         if(localClient.clientSecret !== client.clientSecret) {
             return done(null, false);
         }
-        var token = uuid.v4();
+        let token = uuid.v4();
         //Pass in a null for user id since there is no user with this grant type
         db.accessTokens.save(token, null, client.clientId, function(err) {
             if (err) { return done(err); }
@@ -191,7 +190,7 @@ exports.authorization = [
     // Otherwise ask user
     done(null, false);
   }),
-  function(req, res){
+  function(){ // should have req, res as params
     // Implement custom logic... res.send(...)
   }
 ]

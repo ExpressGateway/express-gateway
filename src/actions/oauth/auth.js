@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
  */
-var passport = require('passport')
+let passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
   , BasicStrategy = require('passport-http').BasicStrategy
   , ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy
@@ -91,7 +91,7 @@ passport.use(new BearerStrategy(
               if (!user) { return done(null, false); }
               // to keep this example simple, restricted scopes are not implemented,
               // and this is just for illustrative purposes
-              var info = { scope: '*' }
+              let info = { scope: '*' }
               done(null, user, info);
           });
       } else {
@@ -102,7 +102,7 @@ passport.use(new BearerStrategy(
               if(!client) { return done(null, false); }
               // to keep this example simple, restricted scopes are not implemented,
               // and this is just for illustrative purposes
-              var info = { scope: '*' }
+              let info = { scope: '*' }
               done(null, client, info);
           });
       }

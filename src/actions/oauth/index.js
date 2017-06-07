@@ -1,8 +1,7 @@
-let express = require('express'),
-    passport = require('passport'),
+let passport = require('passport'),
     oauth2 = require('./oauth-server');
 
-module.exports = function(app, params = null) {
+module.exports = function(app) { // it'll also have a params arg
   app.use(passport.initialize());
   require('./auth');
 
