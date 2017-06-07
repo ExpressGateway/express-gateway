@@ -6,6 +6,7 @@ const path = require('path');
 let testHelper = require('./routing/routing.helper')
 let appConfig = {
   https: {
+    port: 10441,
     options: {
       requestCert: true,
       rejectUnauthorized: false,
@@ -97,7 +98,7 @@ const testCases = [{
 let serverResult;
 let serverError;
 
-describe('sni tests', () => {
+describe('sni', () => {
   let servers, helper;
   before('setup', async() => {
     helper = testHelper()
