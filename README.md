@@ -71,23 +71,23 @@ It will serve all host names and all possible urls
 ```yaml
 apiEndpoints:
   help: # name, used as reference in pipeline
-    host: '*' # optional by default accepts all hosts, same as '*'
-    paths: /help #optional by default will serve all requests - same as /*
+    host: '*' # optional, by default accepts all hosts, same as '*'
+    paths: /help #optional, by default will serve all requests - same as /*
 
   api: # name, used as reference in pipeline
     host: '*.com' # wildcard pattern support
     paths:
-      - '/v1/*' # string or array of string
+      - '/v1/*' # string or array of strings
       - '/v2/*'
 
   example: # name, used as reference in pipeline
     host: 'example.com'
-    paths: /v2/* # string or array of string
+    paths: /v2/* # string or array of strings
 
 ```
 
 #### Host
-host - string that will be matched against 'HOST' header of request
+host - string that will be matched against the 'HOST' header of request
 
 ##### Host examples
 + \* - any domain will match cdn.test.example.com, test.example.com, example.com, etc.
@@ -102,7 +102,8 @@ host - string that will be matched against 'HOST' header of request
   - will not match example.com host
   - will not match test.example.com host
 
-See more examples here https://www.npmjs.com/package/vhost
+For host resolution EG relies on "vhost" package.
+See more examples here: https://www.npmjs.com/package/vhost
 
 #### Path examples
 Paths can be either string or array of strings. It supports wildcard patterns.
@@ -113,7 +114,7 @@ It behaves as ExpressJS routes https://expressjs.com/en/4x/api.html#router
   + match: /admin
   + 404: /admin/new; /admin/new/1; /staff; /; etc.
 
-* paths: /admin/\* - deep level child matching (does not match the parent dir)
+* paths: /admin/\* - deep level sub directory matching (does not match the parent dir)
   + match: /admin/new /admin/new/1
   + 404: /admin
 
@@ -146,7 +147,7 @@ Note: If not possible to avoid overlapping wildcard patterns, ~~try again~~ be a
 apiEndpoints:
   ci:
     host: '*.ci.zu.com'
-    paths: '**'    # optional default **
+    paths: '/*'    # optional, default /*
   zu:
     host: '*.zu.com'
   com:
@@ -162,7 +163,7 @@ serviceEndpoints: # urls to downstream services
   cats_service:
     url: "http://localhost"
     port: 3000
-    paths: /             # optional defaults to /
+    paths: /             # optional, defaults to /
   dogs_service:
     url: http://localhost
     port: 4000
@@ -226,7 +227,7 @@ pipelines:
     policies:
       simple-logger: # policy name
         -   # array of objects with condition\action properties
-          condition: #optional; defaults to always execute
+          condition: #optional,; defaults to always execute
             name: pathExact
             paths: /v1
           action:

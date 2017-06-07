@@ -153,7 +153,7 @@ describe('path resolution for specific and general domains', () => {
       });
     })
 
-    describe('paths configuration with wildcard after slash or slash ["/admin","/admin/*"]', () => {
+    describe('paths configuration with wildcard after slash or directory ["/admin","/admin/*"]', () => {
       let helper = testHelper();
       let appConfig = _.cloneDeep(configTemplate);
       appConfig.apiEndpoints.test.paths = ['/admin', '/admin/*']
