@@ -97,7 +97,7 @@ host - string that will be matched against the 'HOST' header of request
   - any subdomain will match. test.example.com
   - example.com will not match
   - deeper levels will not match cdn.test.example.com
-+ *.*.example.com
++ \*.\*.example.com
   - will match 2nd level subdomains like cdn.test.example.com
   - will not match example.com host
   - will not match test.example.com host
