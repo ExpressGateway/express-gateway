@@ -27,7 +27,7 @@ module.exports.bootstrap = function(app, config) {
       } else if (route.paths && route.paths.length) {
         mountPaths = mountPaths.concat(route.paths)
       } else {
-        mountPaths.push('/*')
+        mountPaths.push('*')
       }
       for (let path of mountPaths) {
         logger.debug("mounting routes for apiEndpointName %s, mount %s", route.apiEndpointName, path)

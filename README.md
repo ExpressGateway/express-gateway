@@ -72,7 +72,7 @@ It will serve all host names and all possible urls
 apiEndpoints:
   help: # name, used as reference in pipeline
     host: '*' # optional, by default accepts all hosts, same as '*'
-    paths: /help #optional, by default will serve all requests - same as /*
+    paths: /help #optional, by default will serve all requests - same as *
 
   api: # name, used as reference in pipeline
     host: '*.com' # wildcard pattern support
@@ -147,7 +147,7 @@ Note: If not possible to avoid overlapping wildcard patterns, ~~try again~~ be a
 apiEndpoints:
   ci:
     host: '*.ci.zu.com'
-    paths: '/*'    # optional, default /*
+    paths: '*'    # optional, default *
   zu:
     host: '*.zu.com'
   com:
@@ -318,7 +318,7 @@ serviceEndpoints:
 
 apiEndpoints:
   api:
-    paths: /*
+    paths: \*
 
 pipelines:
   api:
@@ -459,7 +459,7 @@ serviceEndpoints:
 
 apiEndpoints:
   api:
-    path: '/*'
+    path: '*'
 
 pipelines:
   example-pipeline:
@@ -538,7 +538,7 @@ serviceEndpoints:
 apiEndpoints:
   api:
     host: '*'
-    paths: /*
+    paths: '*'
 
 pipelines:
   api:

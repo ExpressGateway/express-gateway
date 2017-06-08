@@ -2,7 +2,7 @@
  let appConfig = {
    http: { port: 9082 },
    apiEndpoints: {
-     "test_domain": { "host": "acme.com" } // path defaults to /*
+     "test_domain": { "host": "acme.com" } // path defaults to *
    },
    pipelines: {
      pipeline1: {
@@ -11,7 +11,7 @@
      }
    }
  };
- describe('exact host name configuration host:acme.com paths:default(/*)', () => {
+ describe('exact host name configuration host:acme.com paths:default(*)', () => {
    let helper = testHelper();
    before('setup', helper.setup({
      fakeActions: ['test_policy'],
