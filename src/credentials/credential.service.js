@@ -63,7 +63,7 @@ module.exports = function(config) {
         }
 
         credentialConfig = config.credentials.types[type];
-        newCredential = { isActive: true };
+        newCredential = { isActive: 'true' };
 
         return Promise.all([validateNewCredentialScopes(credentialConfig, credentialDetails),
             validateAndHashPassword(credentialConfig, credentialDetails),
