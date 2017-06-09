@@ -14,9 +14,8 @@ module.exports = function(config) {
   function insertScopes(_scopes) {
     let scopes = {};
     if (Array.isArray(_scopes)) {
-      _scopes.forEach(el => scopes[el] = true);
-    } else scopes[_scopes] = true;
-
+      _scopes.forEach(el => scopes[el] = 'true');
+    } else scopes[_scopes] = 'true';
     return db.hmsetAsync(config.credentials.redis.scopePrefix, scopes);
   }
 
@@ -24,7 +23,7 @@ module.exports = function(config) {
     let credentialId = config.credentials.redis.credentialPrefixes[type].concat(':', id);
     let associationPromises;
     Array.isArray(scopes) ? scopes : [ scopes ];
-    associationPromises = scopes.map(scope => db.hsetAsync(config.credentials.redis.scopeCredentialPrefix.concat(':', scope), credentialId, true ));
+    associationPromises = scopes.map(scope => db.hsetAsync(config.credentials.redis.scopeCredentialPrefix.concat(':', scope), credentialId, 'true'));
 
     return Promise.all(associationPromises)
     .catch(() => Promise.reject(new Error('failed to associate credential with scopes in db'))); // TODO: replace with server error
@@ -121,11 +120,11 @@ module.exports = function(config) {
   }
 
   function activateCredential(id, type) {
-    return db.hsetAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id), 'isActive', true);
+    return db.hsetAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id), 'isActive', 'true');
   }
 
   function deactivateCredential(id, type) {
-    return db.hsetAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id), 'isActive', false);
+    return db.hsetAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id), 'isActive', 'false');
   }
 
   function removeCredential(id, type) {
