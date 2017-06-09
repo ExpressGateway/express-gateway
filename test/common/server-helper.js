@@ -5,7 +5,7 @@ const logger = require('../../src/log').test;
 async function generateBackendServer(port) {
   let app = express();
 
-  app.get('/*', (req, res) => {
+  app.get('*', (req, res) => {
     res.send('Hello from port ' + port);
   });
   return new Promise((resolve) => {

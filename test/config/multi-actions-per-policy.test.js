@@ -8,7 +8,7 @@ let app1, app2, appTarget;
 let appConfig = {
   http: { port: 9091 },
   apiEndpoints: {
-    test: { paths: "/*" }
+    test: {}
   },
   serviceEndpoints: {
     admin: {

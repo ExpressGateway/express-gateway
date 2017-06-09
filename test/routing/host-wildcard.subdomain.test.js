@@ -2,11 +2,12 @@
  let appConfig = {
    http: { port: 9084 },
    apiEndpoints: {
-     "test_domain": { "host": "*.acme.com" } // path defaults to /**
+     "test_domain": { "host": "*.acme.com" }, // path defaults to *
+     "test_second_level_domain": { "host": "*.*.example.com" } // path defaults to *
    },
    pipelines: {
      pipeline1: {
-       apiEndpoints: ['test_domain'],
+       apiEndpoints: ['test_domain', 'test_second_level_domain'],
        policies: { test: [{ action: { name: 'test_policy' } }] }
      }
    }
@@ -39,6 +40,29 @@
        host: 'abc.acme.com',
        url: '/',
        result: 'test_policy'
+     }
+   }));
+   it('sub.abc.example.com', helper.validateSuccess({
+     setup: {
+       host: 'sub.abc.example.com',
+       url: ''
+     },
+     test: {
+       host: 'sub.abc.example.com',
+       url: '/',
+       result: 'test_policy'
+     }
+   }));
+   it('should not serve sub.abc.acme.com ', helper.validate404({
+     setup: {
+       host: 'sub.abc.acme.com',
+       url: ''
+     }
+   }));
+   it('should not serve abc.example.com ', helper.validate404({
+     setup: {
+       host: 'abc.example.com',
+       url: ''
      }
    }));
    it('abc.acme.com/pretty', helper.validateSuccess({
