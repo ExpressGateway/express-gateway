@@ -74,13 +74,12 @@ describe('Auth tests', function () {
     it('should authenticate user', function (done) {
       authService.authenticateCredential(user.username, _credential.secret, 'oauth')
       .then(authResponse => {
-        let expectedResponse =  {
+        let expectedResponse =  Object.assign({
           type: 'user',
           id: userFromDb.id,
-          user: userFromDb,
           username: user.username,
           isActive: true
-        };
+        }, userFromDb);
         should.exist(authResponse);
         should.deepEqual(authResponse, expectedResponse);
         done();
@@ -118,7 +117,7 @@ describe('Auth tests', function () {
     });
 
     it('should authorize Credential with scopes', function (done) {
-      authService.authorizeCredential(user.username, _credential.secret, 'oauth', [ 'someScope1', 'someScope2' ])
+      authService.authorizeCredential(user.username, 'oauth', [ 'someScope1', 'someScope2' ])
       .then((authResponse) => {
         should.exist(authResponse)
         authResponse.should.eql(true);
@@ -131,7 +130,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authorize Credential with invalid scopes', function (done) {
-      authService.authorizeCredential(user.username, _credential.secret, 'oauth', [ 'otherScope', 'someScope2' ])
+      authService.authorizeCredential(user.username, 'oauth', [ 'otherScope', 'someScope2' ])
       .then((authResponse) => {
         should.exist(authResponse)
         authResponse.should.eql(false);
@@ -151,7 +150,7 @@ describe('Auth tests', function () {
         res.should.eql(true);
       })
       .then(() => {
-        authService.authorizeCredential(user.username, _credential.secret, 'oauth', [ 'otherScope', 'someScope2' ])
+        authService.authorizeCredential(user.username, 'oauth', [ 'otherScope', 'someScope2' ])
         .then((authResponse) => {
           should.exist(authResponse)
           authResponse.should.eql(false);

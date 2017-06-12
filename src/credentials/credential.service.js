@@ -123,7 +123,7 @@ module.exports = function(config) {
 
   // Helper method to insertCredentials
   function validateNewCredentialScopes(credentialConfig, credentialDetails) {
-    if (!credentialConfig.properties['scopes']) {
+    if (!credentialConfig.properties || !credentialConfig.properties['scopes']) {
       return Promise.resolve(null);
     }
 
