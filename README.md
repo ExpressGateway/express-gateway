@@ -675,20 +675,36 @@ Providing Configuration
 Express-Gateway requires application configuration to be passed during start.
 YML and JSON formats are supported.
 
+There are 2 config files to take care of:
+#### Gateway Config
+The config file where you define endpoints, pipelines, port settings for gateway
+
+#### System Config
+Here you can define dabase connections, custom schemes for user\application entities
+For the most cases default settings are good enough
+
 There are several options how to do this:
 
 ##### Default
-If nothing is provided EG will try to find config in **$HOME/.express-gateway/config.yml**
+If nothing is provided EG will try to find config in **$HOME/.express-gateway/gateway.config.yml**
+**$HOME/.express-gateway/system.config.yml**
 
 You can put your config file there or somehow map it to real location
 
 Docker example: docker run -v <source_path>:<dest_path> ...
 
-##### Location to file in env variable EG\_CONFIG\_PATH
-example: EG\_CONFIG\_PATH=/some/path/config.yml npm start
+##### Location to file in env variable EG\_GATEWAY\_CONFIG\_PATH
+example:
+EG\_GATEWAY\_CONFIG\_PATH=/some/path/config.yml EG\_SYSTEM\_CONFIG\_PATH=/some/path/config.yml npm start
 
 ##### Entire JSON serialized config env variable EG\_APP\_CONFIG
-example: EG\_APP\_CONFIG='{"apiEndpoints": ....}' npm start
+example:
+
+EG\_GATEWAY\_CONFIG='{"apiEndpoints": ....}'  EG\_SYSTEM\_CONFIG='{"apiEndpoints": ....}' npm start
+
+more grannular control over configs through env variables will arrive later
+
+EG\_SYSTEM\_CONFIG\_db\_redis\_url='redis connection string'
 
 ##### Path as command line argument
 npm start /path/here

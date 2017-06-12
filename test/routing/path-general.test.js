@@ -17,12 +17,12 @@ describe('path resolution for specific and general domains', () => {
     };
     describe('paths configuration without wildcards paths:/admin host:' + host, () => {
       let helper = testHelper();
-      let appConfig = _.cloneDeep(configTemplate);
-      appConfig.apiEndpoints.test.paths = '/admin'
+      let gatewayConfig = _.cloneDeep(configTemplate);
+      gatewayConfig.apiEndpoints.test.paths = '/admin'
 
       before('setup', helper.setup({
         fakeActions: ['test_policy'],
-        appConfig
+        gatewayConfig
       }))
       after('cleanup', helper.cleanup());
 
@@ -52,11 +52,11 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths configuration with  /admin/*', () => {
       let helper = testHelper();
-      let appConfig = _.cloneDeep(configTemplate);
-      appConfig.apiEndpoints.test.paths = '/admin/*'
+      let gatewayConfig = _.cloneDeep(configTemplate);
+      gatewayConfig.apiEndpoints.test.paths = '/admin/*'
       before('setup', helper.setup({
         fakeActions: ['test_policy'],
-        appConfig
+        gatewayConfig
       }))
       after('cleanup', helper.cleanup());
 
@@ -87,11 +87,11 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths with one named parameter /admin/:id', () => {
       let helper = testHelper();
-      let appConfig = _.cloneDeep(configTemplate);
-      appConfig.apiEndpoints.test.paths = '/admin/:id'
+      let gatewayConfig = _.cloneDeep(configTemplate);
+      gatewayConfig.apiEndpoints.test.paths = '/admin/:id'
       before('setup', helper.setup({
         fakeActions: ['test_policy'],
-        appConfig
+        gatewayConfig
       }))
       after('cleanup', helper.cleanup());
 
@@ -121,11 +121,11 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths with one named parameter /admin/:group/:id', () => {
       let helper = testHelper();
-      let appConfig = _.cloneDeep(configTemplate);
-      appConfig.apiEndpoints.test.paths = '/admin/:group/:id'
+      let gatewayConfig = _.cloneDeep(configTemplate);
+      gatewayConfig.apiEndpoints.test.paths = '/admin/:group/:id'
       before('setup', helper.setup({
         fakeActions: ['test_policy'],
-        appConfig
+        gatewayConfig
       }))
       after('cleanup', helper.cleanup());
 
@@ -155,11 +155,11 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths configuration with wildcard after slash or directory ["/admin","/admin/*"]', () => {
       let helper = testHelper();
-      let appConfig = _.cloneDeep(configTemplate);
-      appConfig.apiEndpoints.test.paths = ['/admin', '/admin/*']
+      let gatewayConfig = _.cloneDeep(configTemplate);
+      gatewayConfig.apiEndpoints.test.paths = ['/admin', '/admin/*']
       before('setup', helper.setup({
         fakeActions: ['test_policy'],
-        appConfig
+        gatewayConfig
       }))
       after('cleanup', helper.cleanup());
 

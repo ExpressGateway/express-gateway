@@ -1,5 +1,5 @@
 let testHelper = require('./routing.helper')
-let appConfig = {
+let gatewayConfig = {
   http: { port: 9081 },
   apiEndpoints: {
     test_regex: { pathRegex: "/wild-cats$" },
@@ -17,11 +17,11 @@ let appConfig = {
 ['*', '', undefined].forEach(hostBind => {
   describe('When configured to capture all hosts with config host:' + hostBind, () => {
     let helper = testHelper()
-    appConfig.apiEndpoints.test_regex.host = hostBind
-    appConfig.apiEndpoints.test_path.host = hostBind
+    gatewayConfig.apiEndpoints.test_regex.host = hostBind
+    gatewayConfig.apiEndpoints.test_path.host = hostBind
     before('setup', helper.setup({
       fakeActions: ['test_policy'],
-      appConfig
+      gatewayConfig
     }))
     after('cleanup', helper.cleanup())
     it('should serve for random host and pathRegex matched', helper.validateSuccess({

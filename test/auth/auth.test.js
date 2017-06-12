@@ -5,7 +5,7 @@ let getUserService = require('../../src/consumers/user.service.js')
 let getTokenService = require('../../src/tokens/token.service.js');
 let getAuthService = require('../../src/auth.js');
 let _ = require('lodash');
-let db = require('../../src/db')(config.redis.host, config.redis.port);
+let db = require('../../src/db').getDb();
 
 describe('Auth tests', function () {
   let credentialService, tokenService, authService, userService, user, userFromDb;

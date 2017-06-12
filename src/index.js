@@ -3,13 +3,13 @@
 let gateway = require('./gateway');
 
 if (require.main === module) {
-  let configPath;
-  let appConfig = process.env.EG_APP_CONFIG;
-  if (!appConfig) {
-    configPath = process.env.EG_CONFIG_PATH || process.argv[2] || require('os').homedir() + '/.express-gateway/config.yml'
+  let gatewayConfigPath;
+  let gatewayConfig = process.env.EG_GATEWAY_CONFIG;
+  if (!gatewayConfig) {
+    gatewayConfigPath = process.env.EG_GATEWAY_CONFIG_PATH || process.argv[2] || require('os').homedir() + '/.express-gateway/gateway.config.yml'
   }
   gateway.start({
-    configPath,
-    appConfig
+    gatewayConfigPath,
+    gatewayConfig
   });
 }

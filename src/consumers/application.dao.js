@@ -1,6 +1,6 @@
 'use strict';
 
-let getDb = require('../db');
+let {getDb} = require('../db');
 let applicationDao, db, applicationDbConfig;
 
 module.exports = function(config) {
@@ -8,7 +8,7 @@ module.exports = function(config) {
     return applicationDao;
   }
 
-  db = getDb(config.redis.host, config.redis.port);
+  db = getDb();
   applicationDbConfig = config.applications.redis;
 
   function insert(app) {

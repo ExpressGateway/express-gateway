@@ -1,7 +1,7 @@
 'use strict';
 
 let Promise = require('bluebird');
-let getDb = require('../db');
+let {getDb} = require('../db');
 let credentialDao, db;
 
 module.exports = function(config) {
@@ -9,7 +9,7 @@ module.exports = function(config) {
     return credentialDao;
   }
 
-  db = getDb(config.redis.host, config.redis.port);
+  db = getDb();
 
   function insertScopes(_scopes) {
     let scopes = {};
@@ -103,7 +103,7 @@ module.exports = function(config) {
 
   function getAllScopes() {
     return db.hgetallAsync(config.credentials.redis.scopePrefix)
-    .then(res => { 
+    .then(res => {
       return res ? Object.keys(res) : null;
     });
   }
@@ -134,7 +134,7 @@ module.exports = function(config) {
   function removeAllCredentials(id) {
     let dbTransaction = db.multi();
     let credentialTypes = Object.keys(config.credentials.types);
-    
+
     credentialTypes.forEach((type) => {
       dbTransaction = dbTransaction.del(config.credentials.redis.credentialPrefixes[type].concat(':', id));
     });

@@ -4,7 +4,7 @@ let uuid = require('node-uuid');
 let services = require('../src/consumers')(config);
 let userService = services.userService;
 let _ = require('lodash');
-let db = require('../src/db')(config.redis.host, config.redis.port);
+let db = require('../src/db').getDb();
 
 describe('User service tests', function () {
 

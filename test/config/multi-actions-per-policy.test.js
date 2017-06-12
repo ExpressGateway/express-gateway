@@ -5,7 +5,7 @@ const request = require('supertest');
 const port1 = 5998;
 const port2 = 5999;
 let app1, app2, appTarget;
-let appConfig = {
+let gatewayConfig = {
   http: { port: 9091 },
   apiEndpoints: {
     test: {}
@@ -38,7 +38,7 @@ describe('multi step policy ', () => {
   before('start servers', async() => {
     app1 = (await serverHelper.generateBackendServer(port1)).app
     app2 = (await serverHelper.generateBackendServer(port2)).app;
-    appTarget = (await gateway.start({ appConfig })).app;
+    appTarget = (await gateway.start({ gatewayConfig })).app;
   });
 
   it('should proxy to server on ' + port1, (done) => {

@@ -2,7 +2,7 @@ let should = require('should');
 let config = require('./config.models.js');
 let getTokenService = require('../src/tokens/token.service.js');
 let tokenService = getTokenService(config);
-let db = require('../src/db')(config.redis.host, config.redis.port);
+let db = require('../src/db').getDb();
 
 
 describe('Token tests', function () {
