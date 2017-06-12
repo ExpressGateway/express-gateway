@@ -7,7 +7,7 @@ let gatewayConfig = {
   pipelines: {
     pipeline1: {
       apiEndpoints: ['parrots'],
-      policies: { test: [{ action: { name: 'parrot_policy' } }] }
+      policies: [{ test: [{ action: { name: 'parrot_policy' } }] }]
     }
   }
 };

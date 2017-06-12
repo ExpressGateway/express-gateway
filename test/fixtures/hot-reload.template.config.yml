@@ -11,9 +11,10 @@ pipelines:
     apiEndpoints:
       - api
     policies:
-      test:
-        -
-          action:
+      -
+        test:
+          -
+            action:
               name: proxy
               serviceEndpoint: backend
 http:

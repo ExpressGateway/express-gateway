@@ -1,13 +1,7 @@
 apiEndpoints:
   users:
     host: '*'
-    paths: ['/users']
-    scopes: #by defyning this attribute you can assigne scopes to endpoints
-      - scope: Admin # assumes verbs *
-      - scope: User
-        verbs: GET
-      - scope: Manager
-        verbs: [GET, POST, PUT]
+    paths: ['/users/*']
 
 http:
   port: 8080
@@ -16,7 +10,6 @@ https:
   port: 9999
   tls: {}
 
-
 serviceEndpoints:
   backend:
     url: 'http://www.example.com'
@@ -24,10 +17,14 @@ pipelines:
   -
     name: ecommerce
     apiEndpoints:
-       - users
+      - users
     policies:
-        - condition:
+      -     # this is array of policies
+        proxy:    # this is policy name
+          -       # policy can multiple condition/action steps
+            condition:    # optional condtion, will not execution of actions if not matched
               name: always
-          action:
-              name: proxy
-              serviceEndpoint: backend
+            action:       #
+              name: proxy   # action name
+              serviceEndpoint: backend  # action parameters
+              param2: test  # action parameters

@@ -5,7 +5,7 @@ let request = session(app);
 let Promise = require('bluebird');
 
 let config = require('../config.models.js');
-let db = require('../../src/db')(config.redis.host, config.redis.port);
+let db = require('../../src/db').getDb();
 
 let credentialService, userService, applicationService;
 
