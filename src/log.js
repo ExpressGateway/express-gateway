@@ -1,4 +1,6 @@
 const winston = require('winston');
+// TODO: rm LOG_LEVEL and LOG_LEVEL_xxx env vars and configure it system config;
+// system config will provide env vars support
 winston.loggers.add('EG:gateway', {
   console: {
     level: process.env.LOG_LEVEL_GATEWAY || process.env.LOG_LEVEL || 'error',
@@ -27,6 +29,13 @@ winston.loggers.add('EG:config', {
     label: 'EG:config'
   }
 });
+winston.loggers.add('EG:db', {
+  console: {
+    level: process.env.LOG_LEVEL_DB || process.env.LOG_LEVEL || 'error',
+    colorize: true,
+    label: 'EG:db'
+  }
+});
 winston.loggers.add('EG:log-policy', {
   console: {
     level: process.env.LOG_LEVEL_LOG_POLICY || process.env.LOG_LEVEL || 'error',
@@ -40,5 +49,6 @@ module.exports = {
   policy: winston.loggers.get('EG:policy'),
   test: winston.loggers.get('EG:test'),
   config: winston.loggers.get('EG:config'),
+  db: winston.loggers.get('EG:db'),
   logPolicy: winston.loggers.get('EG:log-policy')
 }

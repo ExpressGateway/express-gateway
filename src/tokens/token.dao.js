@@ -1,6 +1,6 @@
 'use strict';
 
-let getDb = require('../db');
+let {getDb} = require('../db');
 let Promise = require('bluebird');
 let tokenDao, db, tokenDbConfig;
 
@@ -9,7 +9,7 @@ module.exports = function(config) {
     return tokenDao;
   }
 
-  db = getDb(config.redis.host, config.redis.port);
+  db = getDb();
   tokenDbConfig = config.tokens.redis;
 
   function save(token) {

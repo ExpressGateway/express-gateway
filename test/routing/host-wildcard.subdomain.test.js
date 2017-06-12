@@ -1,5 +1,5 @@
  let testHelper = require('./routing.helper')
- let appConfig = {
+ let gatewayConfig = {
    http: { port: 9084 },
    apiEndpoints: {
      "test_domain": { "host": "*.acme.com" }, // path defaults to *
@@ -16,7 +16,7 @@
    let helper = testHelper();
    before('setup', helper.setup({
      fakeActions: ['test_policy'],
-     appConfig
+     gatewayConfig
    }))
    after('cleanup', helper.cleanup());
    it('abc.acme.com/', helper.validateSuccess({

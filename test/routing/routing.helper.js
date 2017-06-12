@@ -19,10 +19,10 @@ module.exports = function() {
         }, 'test')
       })
       let options = {};
-      if (testSuite.configPath) {
-        options.configPath = path.join(__dirname, testSuite.configPath)
+      if (testSuite.gatewayConfigPath) {
+        options.gatewayConfigPath = path.join(__dirname, testSuite.gatewayConfigPath)
       } else {
-        options.appConfig = testSuite.appConfig
+        options.gatewayConfig = testSuite.gatewayConfig
       }
       return gateway.start(options)
         .then(result => {

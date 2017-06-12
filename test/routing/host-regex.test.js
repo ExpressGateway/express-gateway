@@ -1,5 +1,5 @@
 let helper = require('./routing.helper')()
-let appConfig = {
+let gatewayConfig = {
   http: { port: 9083 },
   apiEndpoints: {
     "parrots": { hostRegex: '[a-z]{3}.parrots.com' },
@@ -15,7 +15,7 @@ let appConfig = {
 describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
   before('setup', helper.setup({
     fakeActions: ['parrot_policy'],
-    appConfig
+    gatewayConfig
   }))
   after('cleanup', helper.cleanup())
   describe('regex host name configuration /[a-z]{3}.parrots.com/', () => {

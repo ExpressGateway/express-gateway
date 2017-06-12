@@ -19,7 +19,7 @@ let app1, app2, appTarget, tmpConfigFile;
       configTemplate.serviceEndpoints.backend.url = 'http://localhost:' + port1;
       helper.saveTempFile(configTemplate, tmpConfigFile.name)
       appTarget = (await gateway.start({
-        configPath: tmpConfigFile.name,
+        gatewayConfigPath: tmpConfigFile.name,
       })).app;
     });
 

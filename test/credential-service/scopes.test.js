@@ -1,7 +1,7 @@
 let should = require('should');
 let config = require('../config.models.js');
 let getCredentialService = require('../../src/credentials/credential.service.js');
-let db = require('../../src/db')(config.redis.host, config.redis.port);
+let db = require('../../src/db').getDb();
 
 describe('Scope tests', function () {
   let credentialService = getCredentialService(config);

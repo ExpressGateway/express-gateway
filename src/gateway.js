@@ -1,24 +1,25 @@
 'use strict';
 const logger = require('./log').gateway
-let configParser = require('./config-loader');
+let config = require('./config-loader');
 
 async function start(startupConfig) {
-  let processedConfig;
+  let servers;
   try {
-    processedConfig = await configParser.loadConfig(startupConfig);
+    await config.loadConfig(startupConfig)
+    servers = config.bootstrapGateway();
   } catch (err) {
     logger.error(err);
     logger.error('system is misconfigured, shutdown initiated %j', err)
     process.exit(1);
   }
-
+  let gatewayConfig = config.getGatewayConfig()
   let httpPromise = new Promise((resolve) => {
-    if (!processedConfig.config.http || !processedConfig.httpServer) {
+    if (!gatewayConfig.http || !servers.httpServer) {
       logger.info('HTTP server disabled (no http section provided in config)');
       return resolve(null);
     }
-    let port = processedConfig.config.http.port
-    let runningApp = processedConfig.httpServer.listen(port, () => {
+    let port = gatewayConfig.http.port
+    let runningApp = servers.httpServer.listen(port, () => {
       logger.info(`Listening on ${port}`);
       resolve({
         app: runningApp,
@@ -26,12 +27,12 @@ async function start(startupConfig) {
     });
   });
   let httpsPromise = new Promise((resolve) => {
-    if (!processedConfig.config.https || !processedConfig.httpsServer) {
+    if (!gatewayConfig.https || !servers.httpsServer) {
       logger.info('HTTPS server disabled (no https section provided in config)');
       return resolve(null);
     }
-    let port = processedConfig.config.https.port
-    let runningApp = processedConfig.httpsServer.listen(port, () => {
+    let port = gatewayConfig.https.port
+    let runningApp = servers.httpsServer.listen(port, () => {
       logger.info(`Listening on ${port}`);
       resolve({
         app: runningApp,

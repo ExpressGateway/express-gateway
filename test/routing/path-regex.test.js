@@ -2,7 +2,7 @@ const testHelper = require('./routing.helper');
 [undefined, 'sample.com', 'sub.acme.com'].forEach(host => {
   describe('pathRegex resolution for host:' + host, () => {
     let helper = testHelper();
-    let appConfig = {
+    let gatewayConfig = {
       http: { port: 9086 },
       apiEndpoints: {
         test: { pathRegex: '/id-[0-9]{3}', host }
@@ -16,7 +16,7 @@ const testHelper = require('./routing.helper');
     };
     before('setup', helper.setup({
       fakeActions: ['test_policy'],
-      appConfig: appConfig
+      gatewayConfig: gatewayConfig
     }))
     after('cleanup', helper.cleanup())
     it('mathing regex animals.com/id-123', helper.validateSuccess({

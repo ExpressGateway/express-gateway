@@ -2,7 +2,7 @@ let should = require('should');
 let config = require('../config.models.js');
 let getCredentialService = require('../../src/credentials/credential.service.js');
 let getUserService = require('../../src/consumers/user.service.js');
-let db = require('../../src/db')(config.redis.host, config.redis.port);
+let db = require('../../src/db').getDb();
 let Promise = require('bluebird');
 
 describe('Credential service tests', function () {

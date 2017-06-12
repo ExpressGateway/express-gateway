@@ -4,7 +4,7 @@ const tls = require('tls');
 const path = require('path');
 
 let testHelper = require('./routing/routing.helper')
-let appConfig = {
+let gatewayConfig = {
   https: {
     port: 10441,
     options: {
@@ -104,7 +104,7 @@ describe('sni', () => {
     helper = testHelper()
     servers = await helper.setup({
       fakeActions: ['test_policy'],
-      appConfig
+      gatewayConfig
     })();
     servers.httpsApp.on('tlsClientError', function(err) {
       serverResult = null;

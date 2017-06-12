@@ -5,7 +5,7 @@ let config = require('./config.models.js');
 let uuid = require('node-uuid');
 let getApplicationService = require('../src/consumers/application.service.js');
 let userService = require('../src/consumers/user.service.js')(config);
-let db = require('../src/db')(config.redis.host, config.redis.port);
+let db = require('../src/db').getDb();
 
 describe('Application service tests', function () {
   describe('Insert tests', function () {

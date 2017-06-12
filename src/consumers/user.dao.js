@@ -1,6 +1,6 @@
 'use strict';
 
-let getDb = require('../db');
+let {getDb} = require('../db');
 let userDao, db;
 
 module.exports = function(config) {
@@ -8,7 +8,7 @@ module.exports = function(config) {
     return userDao;
   }
 
-  db = getDb(config.redis.host, config.redis.port);
+  db = getDb();
 
   /**
    * Insert user to the database. User should be searchable by its ID and username.

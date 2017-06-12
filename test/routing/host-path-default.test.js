@@ -1,5 +1,5 @@
 let testHelper = require('./routing.helper')
-let appConfig = {
+let gatewayConfig = {
   http: { port: 9081 },
   apiEndpoints: {
     test_default: {}
@@ -17,7 +17,7 @@ describe('When uses defaults (capture all hosts and paths)', () => {
   let helper = testHelper()
   before('setup', helper.setup({
     fakeActions: ['test_policy'],
-    appConfig
+    gatewayConfig
   }))
   after('cleanup', helper.cleanup());
 

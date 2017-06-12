@@ -4,22 +4,46 @@ const fileLoader = require('./file-loader');
 const pipelineLoader = require('./pipelines-loader');
 const fs = require('fs');
 let logger = require('../log').config;
-
-/// expecting configPath if loading from file
-/// if config was provided as code or env var use appConfig
+let gatewayConfig = {}
+let systemConfig = {}
+let rootRouter
+  /// expecting gatewayConfigPath if loading from file
+  /// if config was provided as code or env var use gatewayConfig
 function loadConfig(startupConfig) {
-  let fileName = startupConfig.configPath
-  let config
-  if (fileName) {
-    config = fileLoader.readConfigFile(fileName)
-    logger.debug('loaded config from file %s %j', fileName, config)
+  let gatewayConfigFileName = startupConfig.gatewayConfigPath
+  if (gatewayConfigFileName) {
+    gatewayConfig = fileLoader.readConfigFile(gatewayConfigFileName)
+    logger.debug('loaded gatewayConfig from file %s %j', gatewayConfigFileName, gatewayConfig)
   } else {
-    config = startupConfig.appConfig
-    logger.debug('loaded config from code %j', config)
+    gatewayConfig = startupConfig.gatewayConfig
+    logger.debug('loaded gatewayConfig from code %j', gatewayConfig)
   }
 
+  let systemConfigFileName = startupConfig.systemConfigPath
+  if (systemConfigFileName) {
+    systemConfig = fileLoader.readConfigFile(systemConfigFileName)
+    logger.debug('loaded systemConfig from file %s %j', systemConfigFileName, systemConfig)
+  } else {
+    systemConfig = startupConfig.systemConfig
+    logger.debug('loaded systemConfig from code %j', systemConfig)
+  }
+
+  if (gatewayConfigFileName) {
+    //hot reload only if config provided by file and for gateway config only
+    fs.watch(gatewayConfigFileName, (evt, name) => {
+      logger.info(`watch file triggered ${evt} file ${name}
+      note: loading file ${gatewayConfigFileName}`);
+      let config = fileLoader.readConfigFile(gatewayConfigFileName);
+      //hot swap router
+      rootRouter = pipelineLoader.bootstrap(express.Router(), config);
+    });
+  }
+}
+
+
+function bootstrapGateway() {
   let app = express();
-  let rootRouter = pipelineLoader.bootstrap(express.Router(), config);
+  rootRouter = pipelineLoader.bootstrap(express.Router(), gatewayConfig);
 
   app.use((req, res, next) => {
     // rootRouter will process all requests;
@@ -28,20 +52,17 @@ function loadConfig(startupConfig) {
     // once all old requests are served old instance is target for GC
     rootRouter(req, res, next);
   });
-  if (fileName) { //hot reload only if config provided by file
-    fs.watch(fileName, (evt, name) => {
-      logger.info(`watch file triggered ${evt} file ${name}
-      note: loading file ${fileName}`);
-      let config = fileLoader.readConfigFile(fileName);
-      //hot swap router
-      rootRouter = pipelineLoader.bootstrap(express.Router(), config);
-    });
-  }
-  let servers = serverLoader.bootstrap(app, config)
 
-  return { httpsServer: servers.httpsServer, httpServer: servers.httpServer, config };
+  let servers = serverLoader.bootstrap(app, gatewayConfig)
+  return { httpsServer: servers.httpsServer, httpServer: servers.httpServer };
 }
 
 module.exports = {
-  loadConfig
+  loadConfig,
+  bootstrapGateway,
+
+  // NOTE: it may be needed in furture to allow argument to select some part not entire config
+  // example "https.port" to not pollute code with if`s like if(https && https.port)
+  getGatewayConfig: () => gatewayConfig,
+  getSystemConfig: () => systemConfig
 };
