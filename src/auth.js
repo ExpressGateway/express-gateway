@@ -2,7 +2,7 @@
 
 let getCredentialService = require('./credentials/credential.service.js');
 let getUserService = require('./consumers/user.service.js');
-let getApplicationService = require('./consumers/user.service.js');
+let getApplicationService = require('./consumers/application.service.js');
 let getTokenService = require('./tokens/token.service.js');
 let utils = require('./utils');
 
@@ -13,6 +13,9 @@ module.exports = function(config) {
   let tokens = getTokenService(config);
 
   function authenticateCredential(id, password, type) {
+    if (!id || !password || !type) {
+      return false;
+    }
     return validateConsumer(id)
     .then((consumer) => {
       if (!consumer) {
@@ -20,7 +23,7 @@ module.exports = function(config) {
       } else return credentials.getCredential(id, type, { includePassword: true })
         .then(_credential => {
           if (_credential && _credential.isActive) {
-            return utils.compareSaltAndHashed(password, _credential[config.credentials[type]['passwordKey']])
+            return utils.compareSaltAndHashed(password, _credential[config.credentials.types[type]['passwordKey']])
             .then(authenticated => {
               return authenticated ? consumer : false;
             })
@@ -73,7 +76,7 @@ module.exports = function(config) {
     });
   }
 
-  function authorizeCredential(id, password, authType, scopes) {
+  function authorizeCredential(id, authType, scopes) {
     if (!scopes || !scopes.length) {
       return true;
     }
@@ -104,35 +107,32 @@ module.exports = function(config) {
               return null;
             }
             return createUserObject(user);
-          } else return null;
+          } else return users.get(id)
+            .then(_user => {
+              if (_user) {
+                if (!_user.isActive) {
+                  return null;
+                }
+                return createUserObject(_user);
+              } else return null;
+            });
         });
     });
   }
 
   function createUserObject(user) {
-    return {
-      type     : 'user',
-      id       : user.id,
-      user     : user,
-      username : user.username,
-      isActive : user.isActive
-    };
+    return Object.assign({ type: 'user' }, user);
   }
 
   function createApplicationObject(app) {
-    return {
-      type        : 'application',
-      id          : app.id,
-      application : app,
-      userId      : app.userId,
-      isActive    : app.isActive
-    };
+    return Object.assign({ type: 'application' }, app);
   }
 
   return {
     authenticateToken,
     authenticateCredential,
     authorizeToken,
+    validateConsumer,
     authorizeCredential
   }
 }
