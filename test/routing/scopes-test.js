@@ -12,7 +12,7 @@ let gatewayConfig = {
   pipelines: {
     pipeline1: {
       apiEndpoints: ['test_default'],
-      policies: { test: [{ action: { name: 'test_policy' } }] }
+      policies: [{ test: [{ action: { name: 'test_policy' } }] }]
     }
   }
 };
@@ -33,5 +33,4 @@ describe('When scopes defined for apiEndpoint', () => {
       scopes: gatewayConfig.apiEndpoints.test_default.scopes
     }
   }))
-
 })

@@ -73,7 +73,9 @@ function processApiEndpoints(apiEndpoints) {
 function configurePipeline(policies, config) {
   let router = express.Router();
   conditions.init()
-  for (let [policyName, policySteps] of Object.entries(policies)) {
+  for (let policy of policies) {
+    let policyName = Object.keys(policy)[0]
+    let policySteps = policy[policyName]
     for (let policyStep of policySteps) {
       const condition = policyStep.condition;
       const actionCtr = actions.resolve(policyStep.action.name, policyName);

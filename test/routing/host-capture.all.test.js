@@ -8,7 +8,7 @@ let gatewayConfig = {
   pipelines: {
     pipeline1: {
       apiEndpoints: ['test_regex', 'test_path'],
-      policies: { test: [{ action: { name: 'test_policy' } }] }
+      policies: [{ test: [{ action: { name: 'test_policy' } }] }]
     }
   }
 };

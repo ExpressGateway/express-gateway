@@ -21,7 +21,7 @@ let gatewayConfig = {
   pipelines: {
     pipeline1: {
       apiEndpoints: ['test'],
-      policies: {
+      policies: [{
         proxy: [{
           condition: { name: 'pathExact', path: '/admin' },
           action: { name: 'proxy', serviceEndpoint: 'admin' }
@@ -29,7 +29,7 @@ let gatewayConfig = {
           condition: { name: 'pathExact', path: '/staff' },
           action: { name: 'proxy', serviceEndpoint: 'staff' }
         }]
-      }
+      }]
     }
   }
 };

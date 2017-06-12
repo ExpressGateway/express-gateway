@@ -8,7 +8,7 @@
    pipelines: {
      pipeline1: {
        apiEndpoints: ['test_domain', 'test_second_level_domain'],
-       policies: { test: [{ action: { name: 'test_policy' } }] }
+       policies: [{ test: [{ action: { name: 'test_policy' } }] }]
      }
    }
  };

@@ -11,7 +11,7 @@ describe('path resolution for specific and general domains', () => {
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test'],
-          policies: { test: [{ action: { name: 'test_policy' } }] }
+          policies: [{ test: [{ action: { name: 'test_policy' } }] }]
         }
       }
     };

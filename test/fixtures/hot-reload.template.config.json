@@ -14,14 +14,14 @@
       "apiEndpoints": [
         "api"
       ],
-      "policies": {
+      "policies": [{
         "test": [{
           "action": {
             "name": "proxy",
             "serviceEndpoint": "backend"
           }
         }]
-      }
+      }]
     }
   },
   "http": {
