@@ -110,7 +110,7 @@ describe('Credential service tests', function () {
       .insertCredential(username, 'basicAuth', _credential)
       .then(function(newCredential) {
         should.exist(newCredential);
-        newCredential.isActive.should.eql(true);
+        newCredential.isActive.should.eql('true');
         done();
       })
       .catch(function(err) {
@@ -125,7 +125,7 @@ describe('Credential service tests', function () {
       .then(function(cred) {
         should.exist(cred);
         should.not.exist(cred.secret);
-        credential.isActive.should.eql(true);
+        credential.isActive.should.eql('true');
         done();
       })
       .catch(function(err) {
@@ -345,7 +345,7 @@ describe('Credential service tests', function () {
         .insertCredential(username, 'oauth', _credential)
         .then(function(newCredential) {
           should.exist(newCredential);
-          newCredential.isActive.should.eql(true);
+          newCredential.isActive.should.eql('true');
           newCredential.scopes.should.exist;
           newCredential.scopes.should.eql(['someScope']);
           newCredential.someProperty.should.eql('propVal');
@@ -465,7 +465,7 @@ describe('Credential service tests', function () {
       .insertCredential(username2, 'oauth', cred)
       .then(function(newCredential) {
         should.exist(newCredential);
-        newCredential.isActive.should.eql(true);
+        newCredential.isActive.should.eql('true');
         newCredential.scopes.should.exist;
         newCredential.scopes.should.eql(['someOtherOne']);
         newCredential.someProperty.should.eql('propVal');

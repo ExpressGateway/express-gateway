@@ -1,3 +1,5 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
 let should = require('should');
 let config = require('./config.models.js');
 let uuid = require('node-uuid');

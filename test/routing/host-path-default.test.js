@@ -19,28 +19,32 @@ describe('When uses defaults (capture all hosts and paths)', () => {
     fakeActions: ['test_policy'],
     appConfig
   }))
-  after('cleanup', helper.cleanup())
-  it('should serve for random host and random path', helper.validateSuccess({
-    setup: {
-      host: 'zu.io',
-      url: '/random/17'
-    },
-    test: {
-      host: 'zu.io',
-      url: '/random/17',
-      result: 'test_policy'
-    }
-  }))
+  after('cleanup', helper.cleanup());
 
-  it('should serve for default host and random path', helper.validateSuccess({
-    setup: {
-      host: undefined,
-      url: '/magic'
-    },
-    test: {
-      host: '127.0.0.1',
-      url: '/magic',
-      result: 'test_policy'
-    }
-  }))
+  ['/random/17/3', '/', '/admin'].forEach(url => {
+    it('should serve for random host and random path: ' + url, helper.validateSuccess({
+      setup: {
+        host: 'zu.io',
+        url
+      },
+      test: {
+        host: 'zu.io',
+        url,
+        result: 'test_policy'
+      }
+    }))
+
+    it('should serve for default host and path ' + url, helper.validateSuccess({
+      setup: {
+        host: undefined,
+        url
+      },
+      test: {
+        host: '127.0.0.1',
+        url,
+        result: 'test_policy'
+      }
+    }))
+  })
+
 })

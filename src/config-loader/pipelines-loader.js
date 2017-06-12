@@ -3,7 +3,6 @@ const actions = require('../actions').init();
 const conditions = require('../conditions');
 const express = require('express');
 const vhost = require('vhost')
-const mm = require('micromatch')
 const ConfigurationError = require('../errors').ConfigurationError;
 
 module.exports.bootstrap = function(app, config) {
@@ -20,32 +19,28 @@ module.exports.bootstrap = function(app, config) {
   let apiEndpoints = processApiEndpoints(config.apiEndpoints);
   for (let [host, hostConfig] of Object.entries(apiEndpoints)) {
     let router = express.Router()
-    router.use((req, res, next) => {
-      req.egContext = req.egContext || {}
-      logger.debug("processing vhost %s %j", host, hostConfig.routes)
-      for (let route of hostConfig.routes) {
-        if (route.pathRegex) {
-          if (req.url.match(RegExp(route.pathRegex))) {
-            logger.debug("regex path matched for apiEndpointName %s", route.apiEndpointName)
-            req.egContext.apiEndpoint = route
-            return apiEndpointToPipelineMap[route.apiEndpointName](req, res, next);
-          }
-          continue;
-        }
-
-        let paths = route.paths ? (Array.isArray(route.paths) ? route.paths : [route.paths]) : ['**']
-          // defaults to serve all requests
-        for (let path of paths) {
-          if (mm.isMatch(req.url, path)) {
-            logger.debug("path matched for apiEndpointName %s", route.apiEndpointName)
-            req.egContext.apiEndpoint = route;
-            return apiEndpointToPipelineMap[route.apiEndpointName](req, res, next);
-          }
-        }
+    logger.debug("processing vhost %s %j", host, hostConfig.routes)
+    for (let route of hostConfig.routes) {
+      let mountPaths = [];
+      if (route.pathRegex) {
+        mountPaths.push(RegExp(route.pathRegex));
+      } else if (route.paths && route.paths.length) {
+        mountPaths = mountPaths.concat(route.paths)
+      } else {
+        mountPaths.push('*')
       }
-      return next()
-    })
-    if (!host || host === '*' || host === '**') {
+      for (let path of mountPaths) {
+        logger.debug("mounting routes for apiEndpointName %s, mount %s", route.apiEndpointName, path)
+        router.all(path, (req, res, next) => {
+          logger.debug("executing pipeline for api %s, mounted at %s", route.apiEndpointName, path)
+
+          req.egContext = req.egContext || {}
+          req.egContext.apiEndpoint = route
+          return apiEndpointToPipelineMap[route.apiEndpointName](req, res, next);
+        })
+      }
+    }
+    if (!host || host === '*') {
       app.use(router);
     } else {
       let virtualHost = hostConfig.isRegex ? new RegExp(host) : host

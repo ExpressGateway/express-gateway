@@ -12,15 +12,15 @@ module.exports = function(config) {
 
   function insertScopes(scopes) {
     return validateNewScopes(scopes)
-    .then(newScopes => {
-      if (!newScopes) {
-        return true; // no scopes to insert
-      }
-      
-      return credentialDao.insertScopes(newScopes)
-      .then(res => !!res);
-    })
-    .catch(() => Promise.reject(new Error('failed to insert scope'))); // TODO: replace with server error
+      .then(newScopes => {
+        if (!newScopes) {
+          return true; // no scopes to insert
+        }
+
+        return credentialDao.insertScopes(newScopes)
+          .then(res => !!res);
+      })
+      .catch(() => Promise.reject(new Error('failed to insert scope'))); // TODO: replace with server error
   }
 
   function removeScopes(scopes) {
@@ -28,9 +28,9 @@ module.exports = function(config) {
     if (!_scopes) {
       return Promise.reject(new Error('invalid scopes')); // TODO: replace with validation error
     } else return credentialDao.removeScopes(_scopes)
-    .then(function(removed) {
-      return removed ? true : false;
-    });
+      .then(function(removed) {
+        return removed ? true : false;
+      });
   }
 
   function existsScope(scope) {
@@ -53,49 +53,49 @@ module.exports = function(config) {
     }
 
     return getCredential(id, type) // check if credential already exists
-    .then((cred) => {
-      let newCredential, credentialConfig;
+      .then((cred) => {
+        let newCredential, credentialConfig;
 
-      if (cred) {
-        if (cred.isActive) {
-          return Promise.reject(new Error('credential already exists and is active')); // TODO: replace with validation error
-        } else return Promise.reject(new Error('credential already exists but it is inactive. activate credential instead.')); // TODO: replace with validation error
-      }
+        if (cred) {
+          if (cred.isActive) {
+            return Promise.reject(new Error('credential already exists and is active')); // TODO: replace with validation error
+          } else return Promise.reject(new Error('credential already exists but it is inactive. activate credential instead.')); // TODO: replace with validation error
+        }
 
-      credentialConfig = config.credentials.types[type];
-      newCredential = { isActive: true };
+        credentialConfig = config.credentials.types[type];
+        newCredential = { isActive: 'true' };
 
-      return Promise.all([validateNewCredentialScopes(credentialConfig, credentialDetails),
-                          validateAndHashPassword(credentialConfig, credentialDetails),
-                          validateNewCredentialproperties(credentialConfig, _.omit(credentialDetails, ['scopes']))
-                        ])
-      .then(([ scopes, { hash, password }, credentialProps ]) => {
-        let associateCredentialWithScopesPromise;
-        if (scopes) {
-          newCredential['scopes'] = JSON.stringify(scopes);
-          associateCredentialWithScopesPromise = credentialDao.associateCredentialWithScopes(id, type, scopes);
-        } else associateCredentialWithScopesPromise = Promise.resolve(null);
+        return Promise.all([validateNewCredentialScopes(credentialConfig, credentialDetails),
+            validateAndHashPassword(credentialConfig, credentialDetails),
+            validateNewCredentialproperties(credentialConfig, _.omit(credentialDetails, ['scopes']))
+          ])
+          .then(([scopes, { hash, password }, credentialProps]) => {
+            let associateCredentialWithScopesPromise;
+            if (scopes) {
+              newCredential['scopes'] = JSON.stringify(scopes);
+              associateCredentialWithScopesPromise = credentialDao.associateCredentialWithScopes(id, type, scopes);
+            } else associateCredentialWithScopesPromise = Promise.resolve(null);
 
-        newCredential[credentialConfig.passwordKey] = hash;
-        Object.assign(newCredential, credentialProps)
+            newCredential[credentialConfig.passwordKey] = hash;
+            Object.assign(newCredential, credentialProps)
 
-        return Promise.all([credentialDao.insertCredential(id, type, newCredential),
-                            associateCredentialWithScopesPromise
-                          ])
-        .then(() => {
-          let credential = _.omit(newCredential, [credentialConfig.passwordKey]);
-          credential['id'] = id;
-          if (password) {
-            credential[credentialConfig.passwordKey] = password;
-          }
-          if (credential.scopes && credential.scopes.length > 0) {
-            credential.scopes = JSON.parse(credential.scopes);
-          }
-          return credential;
-        })
-        .catch((err) => Promise.reject(new Error('failed to insert credential: ' + err.message))); // TODO: replace with server error
+            return Promise.all([credentialDao.insertCredential(id, type, newCredential),
+                associateCredentialWithScopesPromise
+              ])
+              .then(() => {
+                let credential = _.omit(newCredential, [credentialConfig.passwordKey]);
+                credential['id'] = id;
+                if (password) {
+                  credential[credentialConfig.passwordKey] = password;
+                }
+                if (credential.scopes && credential.scopes.length > 0) {
+                  credential.scopes = JSON.parse(credential.scopes);
+                }
+                return credential;
+              })
+              .catch((err) => Promise.reject(new Error('failed to insert credential: ' + err.message))); // TODO: replace with server error
+          });
       });
-    });
   }
 
   // Helper method to insertCredentials
@@ -104,9 +104,9 @@ module.exports = function(config) {
 
     if (credentialDetails[credentialConfig.passwordKey]) {
       return utils.saltAndHash(credentialDetails[credentialConfig.passwordKey], config.bcrypt.saltRounds)
-      .then(hash => {
-        return { hash };
-      });
+        .then(hash => {
+          return { hash };
+        });
     }
 
     if (!credentialConfig.autoGeneratePassword) {
@@ -116,9 +116,9 @@ module.exports = function(config) {
     password = uuid.v4();
 
     return utils.saltAndHash(password, config.bcrypt.saltRounds)
-    .then((hash) => {
-      return { hash, password }
-    });
+      .then((hash) => {
+        return { hash, password }
+      });
   }
 
   // Helper method to insertCredentials
@@ -147,17 +147,17 @@ module.exports = function(config) {
       return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
     return credentialDao.getCredential(id, type)
-    .then(credential => {
-      if (!credential) {
-        return null;
-      }
+      .then(credential => {
+        if (!credential) {
+          return null;
+        }
 
-      if (credential.scopes && credential.scopes.length > 0) {
-        credential.scopes = JSON.parse(credential.scopes);
-      }
+        if (credential.scopes && credential.scopes.length > 0) {
+          credential.scopes = JSON.parse(credential.scopes);
+        }
 
-      return (options && options.includePassword === true) ? credential : _.omit(credential, [ config.credentials.types[type].passwordKey ]);
-    });
+        return (options && options.includePassword === true) ? credential : _.omit(credential, [config.credentials.types[type].passwordKey]);
+      });
   }
 
   function deactivateCredential(id, type) {
@@ -166,12 +166,12 @@ module.exports = function(config) {
     }
 
     return getCredential(id, type) // verify credential exists
-    .then((credential) => {
-      if (credential) {
-        return credentialDao.deactivateCredential(id, type)
-        .then(() => true);
-      } else return Promise.reject(new Error('credential does not exist')); // TODO: replace with validation error
-    });
+      .then((credential) => {
+        if (credential) {
+          return credentialDao.deactivateCredential(id, type)
+            .then(() => true);
+        } else return Promise.reject(new Error('credential does not exist')); // TODO: replace with validation error
+      });
   }
 
   function activateCredential(id, type) {
@@ -180,25 +180,25 @@ module.exports = function(config) {
     }
 
     return getCredential(id, type) // verify credential exists
-    .then((credential) => {
-      if (credential) {
-        return credentialDao.activateCredential(id, type)
-        .then(() => true);
-      } else return Promise.reject(new Error('credential does not exist')); // TODO: replace with validation error
-    });
+      .then((credential) => {
+        if (credential) {
+          return credentialDao.activateCredential(id, type)
+            .then(() => true);
+        } else return Promise.reject(new Error('credential does not exist')); // TODO: replace with validation error
+      });
   }
 
   function updateCredential(id, type, properties) {
     return getCredential(id, type)
-    .then((credential) => {
-      if (!credential) {
-        return Promise.reject(new Error('credential does not exist')); // TODO: replace with validation error
-      }
-      return validateUpdatedCredentialproperties(type, properties);
-    })
-    .then((credentialProperties) => {
-      return credentialDao.updateCredential(id, type, credentialProperties);
-    });
+      .then((credential) => {
+        if (!credential) {
+          return Promise.reject(new Error('credential does not exist')); // TODO: replace with validation error
+        }
+        return validateUpdatedCredentialproperties(type, properties);
+      })
+      .then((credentialProperties) => {
+        return credentialDao.updateCredential(id, type, credentialProperties);
+      });
   }
 
   function removeCredential(id, type) {
@@ -207,7 +207,7 @@ module.exports = function(config) {
     }
 
     return credentialDao.removeCredential(id, type)
-    .return(true);
+      .return(true);
   }
 
   function removeAllCredentials(id) {
@@ -215,31 +215,31 @@ module.exports = function(config) {
       return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
     return credentialDao.removeAllCredentials(id)
-    .then(() => true);
+      .then(() => true);
   }
 
   function addScopesToCredential(id, type, scopes) {
     return Promise.all([validateExistingScopes(scopes), getCredential(id, type)])
-    .then(([ _scopes, credential ]) => {
-      let existingScopes = credential.scopes ? (Array.isArray(credential.scopes) ? credential.scopes : [ credential.scopes ]) : [];
-      let newScopes = _.uniq(_scopes.concat(existingScopes));
-      return Promise.all([credentialDao.updateCredential(id, type, { scopes: JSON.stringify(newScopes) }),
-                          credentialDao.associateCredentialWithScopes(id, type, _scopes)
-                        ]);
-    })
-    .then(() => true);
+      .then(([_scopes, credential]) => {
+        let existingScopes = credential.scopes ? (Array.isArray(credential.scopes) ? credential.scopes : [credential.scopes]) : [];
+        let newScopes = _.uniq(_scopes.concat(existingScopes));
+        return Promise.all([credentialDao.updateCredential(id, type, { scopes: JSON.stringify(newScopes) }),
+          credentialDao.associateCredentialWithScopes(id, type, _scopes)
+        ]);
+      })
+      .then(() => true);
   }
 
   function removeScopesFromCredential(id, type, scopes) {
     return Promise.all([validateScopes(scopes), getCredential(id, type)])
-    .then(([ _scopes, credential ]) => {
-      let existingScopes = credential.scopes ? (Array.isArray(credential.scopes) ? credential.scopes : [ credential.scopes ]) : [];
-      let newScopes = existingScopes.filter(val => _scopes.indexOf(val) === -1);
-      return Promise.all([credentialDao.updateCredential(id, type, { scopes: JSON.stringify(newScopes) }),
-                          credentialDao.dissociateCredentialFromScopes(id, type, _scopes)
-                        ]);
-    })
-    .return(true);
+      .then(([_scopes, credential]) => {
+        let existingScopes = credential.scopes ? (Array.isArray(credential.scopes) ? credential.scopes : [credential.scopes]) : [];
+        let newScopes = existingScopes.filter(val => _scopes.indexOf(val) === -1);
+        return Promise.all([credentialDao.updateCredential(id, type, { scopes: JSON.stringify(newScopes) }),
+          credentialDao.dissociateCredentialFromScopes(id, type, _scopes)
+        ]);
+      })
+      .return(true);
   }
 
   // This function validates all user defined properties, excluding scopes
@@ -301,12 +301,12 @@ module.exports = function(config) {
   }
 
   function validateScopes(scopes) {
-    let _scopes = Array.isArray(scopes) ? _.uniq(scopes) : [ scopes ];
+    let _scopes = Array.isArray(scopes) ? _.uniq(scopes) : [scopes];
     if (!_scopes || _scopes.some(val => typeof val !== 'string')) {
       return false;
     } else return _scopes;
   }
-  
+
   credentialService = {
     insertScopes,
     removeScopes,

@@ -12,7 +12,7 @@
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "test": "mocha --recursive --compilers js:babel-register test/*",
-    "dev-test": "LOG_LEVEL=info node --harmony node_modules/mocha/bin/_mocha --grep='tests' --invert --recursive  test"
+    "dev-test": "LOG_LEVEL=info node --harmony node_modules/mocha/bin/_mocha  --recursive  test"
   },
   "author": "Roman Lisagor <roman@lunchbadger.com>",
   "license": "UNLICENSED",
@@ -47,12 +47,13 @@
     "errorhandler": "1.5.0",
     "express": "4.15.2",
     "express-session": "1.15.3",
+    "fakeredis": "^2.0.0",
     "http-proxy": "1.16.2",
     "js-yaml": "3.8.3",
     "limiter": "1.1.0",
     "lodash": "4.17.4",
-    "micromatch": "2.3.11",
     "minimatch": "3.0.3",
+    "mock-require": "^2.0.2",
     "node-uuid": "1.4.8",
     "npm": "4.5.0",
     "oauth2orize": "1.8.0",
