@@ -1,4 +1,9 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const passport = require('passport');
+
 const serverLoader = require('./server-loader');
 const fileLoader = require('./file-loader');
 const pipelineLoader = require('./pipelines-loader');
@@ -43,6 +48,9 @@ function loadConfig(startupConfig) {
 
 function bootstrapGateway() {
   let app = express();
+
+  loadDependencies(app);
+
   rootRouter = pipelineLoader.bootstrap(express.Router(), gatewayConfig);
 
   app.use((req, res, next) => {
@@ -55,6 +63,16 @@ function bootstrapGateway() {
 
   let servers = serverLoader.bootstrap(app, gatewayConfig)
   return { httpsServer: servers.httpsServer, httpServer: servers.httpServer };
+}
+
+function loadDependencies(app) {
+  app.use(bodyParser.json({ extended: true }));
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(cookieParser());
+  //TODO: add session options to config file
+  app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+  app.use(passport.initialize());
+  app.use(passport.session());
 }
 
 module.exports = {
