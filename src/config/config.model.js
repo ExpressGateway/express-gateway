@@ -7,8 +7,8 @@ module.exports = {
   },
   users: {
     redis: {
-      userHashPrefix: 'TEST-ENV-USER',
-      usernameSetPrefix: 'TEST-ENV-USERNAME'
+      userHashPrefix: 'EG-USER',
+      usernameSetPrefix: 'EG-USERNAME'
     },
     usernameMaxLength: 15,
     usernameMinLength: 3,
@@ -28,8 +28,8 @@ module.exports = {
   },
   applications: {
     redis: {
-      appHashPrefix: 'TEST-ENV-APP',
-      userAppsHashPrefix: 'TEST-ENV-USER-APPS'
+      appHashPrefix: 'EG-APP',
+      userAppsHashPrefix: 'EG-USER-APPS'
     },
     properties: {
       name: { isRequired: true, isMutable: true },
@@ -38,18 +38,24 @@ module.exports = {
   },
   tokens: {
     redis: {
-      tokenHashPrefix: 'TEST-ENV-TOKEN',
-      consumerTokensHashPrefix: 'TEST-ENV-CONSUMER-TOKENS'
+      tokenHashPrefix: 'EG-TOKEN',
+      consumerTokensHashPrefix: 'EG-CONSUMER-TOKENS'
     },
     timeToExpiry: 7200000 // 2 hours
   },
+  authorizationCodes: {
+    redis: {
+      codeHashPrefix: 'EG-AUTH-CODE',
+    },
+    timeToExpiry: 300000 // 5 minutes
+  },
   credentials: {
     redis: {
-      scopePrefix: 'TEST-ENV-SCOPE',
-      scopeCredentialPrefix: 'TEST-ENV-SCOPE-CREDENTIAL', // 'SCOPE-CREDENTIAL:someScope': { cred100: true, cred200: true }
+      scopePrefix: 'EG-SCOPE',
+      scopeCredentialPrefix: 'EG-SCOPE-CREDENTIAL', // 'SCOPE-CREDENTIAL:someScope': { cred100: true, cred200: true }
       credentialPrefixes: {
-        oauth: 'TEST-ENV-OAUTH',
-        basicAuth: 'TEST-ENV-BASIC-AUTH'
+        oauth: 'EG-OAUTH',
+        basicAuth: 'EG-BASIC-AUTH'
       }
     },
     types: {
