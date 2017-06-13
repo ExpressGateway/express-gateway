@@ -3,14 +3,10 @@
 const oauth2orize = require('oauth2orize');
 const passport = require('passport');
 const login = require('connect-ensure-login');
-// const db = require('./db');
-// const utils = require('./utils');
 let config = require('../../config/config.model.js')
 
-// let credentialService = require('../../credentials/credential.service.js')(config);
-// let userService = require('../../consumers/user.service.js')(config);
-// let applicationService = require('../../consumers/application.service.js')(config);
 let tokenService = require('../../tokens/token.service.js')(config);
+let authCodeService = require('../../authorization-codes/authorization-code.service.js')(config);
 let authService = require('../../auth.js')(config);
 
 // Create OAuth 2.0 server
@@ -54,14 +50,19 @@ server.deserializeClient((id, done) => {
 // the application. The application issues a code, which is bound to these
 // values, and will be exchanged for an access token.
 
-// server.grant(oauth2orize.grant.code((client, redirectUri, user, ares, done) => {
-//   const code = utils.getUid(16);
-//   db.authorizationCodes.save(code, client.id, redirectUri, user.id, (error) => {
-//     if (error) return done(error);
-//     return done(null, code);
-//   })
-//   .catch(err => done(err));
-// }));
+server.grant(oauth2orize.grant.code((consumer, redirectUri, user, ares, done) => {
+  let code = {
+    consumerId: consumer.id,
+    redirectUri: redirectUri,
+    userId: user.id
+  };
+
+  return authCodeService.save(code)
+  .then((codeObj) => {
+    return done(null, codeObj.id);
+  })
+  .catch(err => done(err));
+}));
 
 // Grant implicit authorization. The callback takes the `client` requesting
 // authorization, the authenticated `user` granting access, and
@@ -96,19 +97,32 @@ server.grant(oauth2orize.grant.token((consumer, authenticatedUser, ares, done) =
 // application issues an access token on behalf of the user who authorized the
 // code.
 
-// server.exchange(oauth2orize.exchange.code((client, code, redirectUri, done) => {
-//   db.authorizationCodes.find(code, (error, authCode) => {
-//     if (error) return done(error);
-//     if (client.id !== authCode.clientId) return done(null, false);
-//     if (redirectUri !== authCode.redirectUri) return done(null, false);
-    
-//     const token = utils.getUid(256);
-//     db.accessTokens.save(token, authCode.userId, authCode.clientId, (error) => {
-//       if (error) return done(error);
-//       return done(null, token);
-//     });
-//   });
-// }));
+server.exchange(oauth2orize.exchange.code((consumer, code, redirectUri, done) => {
+  let codeCriteria = {
+    id: code,
+    consumerId: consumer.id,
+    redirectUri: redirectUri
+  };
+
+  authCodeService.find(codeCriteria)
+  .then(codeObj => {
+    if (!codeObj) {
+      return done(null, false);
+    }
+
+    let tokenCriteria = {
+      authenticatedUser: codeObj.userId
+    };
+
+    if (codeObj.scopes) tokenCriteria.scopes = codeObj.scopes;
+
+    return tokenService.findOrSave(tokenCriteria)
+    .then(token => {
+      return done(null, token);
+    });
+  })
+  .catch(err => done(err));
+}));
 
 // Exchange user id and password for access tokens. The callback accepts the
 // `client`, which is exchanging the user's name and password from the
@@ -146,7 +160,8 @@ server.exchange(oauth2orize.exchange.password((consumer, username, password, sco
           return done(null, token);
         });
       });
-    });
+    })
+    .catch(err => done(err));
   });
 }));
 
