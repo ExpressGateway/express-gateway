@@ -5,14 +5,9 @@ const LocalStrategy = require('passport-local').Strategy;
 const BasicStrategy = require('passport-http').BasicStrategy;
 const ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 // const BearerStrategy = require('passport-http-bearer').Strategy;
-// const db = require('../db');
 
 let config = require('../../config/config.model.js')
 
-// let credentialService = require('../../credentials/credential.service.js')(config);
-// let userService = require('../../consumers/user.service.js')(config);
-// let applicationService = require('../../consumers/application.service.js')(config);
-// let tokenService = require('../../tokens/token.service.js')(config);
 let authService = require('../../auth.js')(config);
 
 /**
