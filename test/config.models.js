@@ -41,6 +41,12 @@ module.exports = {
     },
     timeToExpiry: 7200000 // 2 hours
   },
+  authorizationCodes: {
+    redis: {
+      codeHashPrefix: 'EG-AUTH-CODE',
+    },
+    timeToExpiry: 300000 // 5 minutes
+  },
   credentials: {
     redis: {
       scopePrefix: 'TEST-ENV-SCOPE',
