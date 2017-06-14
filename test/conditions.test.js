@@ -91,27 +91,27 @@ describe('pathMatch', function() {
 
 describe('method', function() {
   let req = Object.create(express.request);
-  it('should return true if methods param is string and matches', function() {
+  it('should return true if verbs param is string and matches', function() {
     req.method = 'GET'
     assert.isTrue(req.matchEGCondition({
-      name: 'method',
-      methods: 'GET'
+      name: 'verb',
+      verbs: 'GET'
     }));
   });
 
-  it('should return true if methods param is list and method is member', function() {
+  it('should return true if verbs param is list and method is member', function() {
     req.method = 'POST'
     assert.isTrue(req.matchEGCondition({
-      name: 'method',
-      methods: ['GET', 'POST', 'PUT']
+      name: 'verb',
+      verbs: ['GET', 'POST', 'PUT']
     }));
   });
 
-  it('should return false if methods param is string and does not match', function() {
-    req.method = 'POST'
+  it('should return false if verbs param is string and does not match', function() {
+    req.verb = 'POST'
     assert.isFalse(req.matchEGCondition({
-      name: 'method',
-      methods: 'GET'
+      name: 'verb',
+      verbs: 'GET'
     }));
   });
 
@@ -119,8 +119,8 @@ describe('method', function() {
     function() {
       req.method = 'HEAD'
       assert.isFalse(req.matchEGCondition({
-        name: 'method',
-        methods: ['GET', 'POST', 'PUT']
+        name: 'verb',
+        verbs: ['GET', 'POST', 'PUT']
       }));
     });
 });
