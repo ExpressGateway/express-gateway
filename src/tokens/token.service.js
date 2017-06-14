@@ -9,13 +9,19 @@ module.exports = function(config) {
   tokenDao = getTokenDao(config);
 
   function save(tokenObj) {
+    if (!tokenObj.consumerId) {
+      return Promise.reject(new Error('invalid token args'));
+    }
+
     let id = uuid.v4().replace(new RegExp('-', 'g'), '');
     let token = uuid.v4().replace(new RegExp('-', 'g'), '');
+
     let baseTokenProps = {
       id,
       tokenEncrypted: utils.encrypt(token, config.crypto),
       expiresAt: Date.now() + config.tokens.timeToExpiry
     }
+
     let tokenProps = Object.assign(baseTokenProps, tokenObj);
 
     utils.appendCreatedAt(tokenProps);
@@ -23,7 +29,7 @@ module.exports = function(config) {
     if (tokenProps.scopes && Array.isArray(tokenProps.scopes)) {
       tokenProps.scopes = JSON.stringify(tokenProps.scopes.sort());
     }
-    
+
     return tokenDao.save(tokenProps)
     .then(() => id.concat('|', token));
   }

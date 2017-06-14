@@ -4,12 +4,11 @@ let url = require('url');
 let qs = require('querystring');
 let app = require('./bootstrap');
 let Promise = require('bluebird');
-let request = session(app);
 
 let config = require('../config.models.js');
 let db = require('../../src/db').getDb();
 
-let credentialService, userService, applicationService;
+let credentialService, userService, applicationService, tokenService;
 
 describe('Functional Test Authorization Code grant', function () {
   let originalAppConfig, originalOauthConfig;
@@ -25,12 +24,14 @@ describe('Functional Test Authorization Code grant', function () {
     };
 
     config.credentials.types.oauth = {
-      passwordKey: 'secret'
+      passwordKey: 'secret',
+      properties: { scopes: { isRequired: false } }
     };
 
     credentialService = require('../../src/credentials/credential.service.js')(config);
     userService = require('../../src/consumers/user.service.js')(config);
     applicationService = require('../../src/consumers/application.service.js')(config);
+    tokenService = require('../../src/tokens/token.service.js')(config);
 
 
     db.flushdbAsync()
@@ -69,13 +70,16 @@ describe('Functional Test Authorization Code grant', function () {
           should.exist(_fromDbApp);
           fromDbApp = _fromDbApp;
 
-          return Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth', { secret: 'user-secret' }),
-            credentialService.insertCredential(fromDbApp.id, 'oauth', { secret: 'app-secret' }) ])
-            .spread((userRes, appRes) => {
-              should.exist(userRes);
-              should.exist(appRes);
-              done();
-            });
+          return credentialService.insertScopes('someScope')
+          .then(() => {
+            return Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth', { secret: 'user-secret' }),
+              credentialService.insertCredential(fromDbApp.id, 'oauth', { secret: 'app-secret', scopes: ['someScope'] }) ])
+              .spread((userRes, appRes) => {
+                should.exist(userRes);
+                should.exist(appRes);
+                done();
+              });
+          });
         });
       });
     })
@@ -91,14 +95,14 @@ describe('Functional Test Authorization Code grant', function () {
     done();
   });
 
-  it('should grant access token', function (done) {
+  it('should grant access token if requesting without scopes', function (done) {
+    let request = session(app);
     request
       .get('/oauth2/authorize')
       .query({
         redirect_uri: fromDbApp.redirectUri,
         response_type: 'code',
-        client_id: fromDbApp.id,
-        client_secret: 'app-secret'
+        client_id: fromDbApp.id
       })
       .redirects(1)
       .expect(200)
@@ -122,8 +126,7 @@ describe('Functional Test Authorization Code grant', function () {
           .query({
             redirect_uri: fromDbApp.redirectUri,
             response_type: 'code',
-            client_id: fromDbApp.id,
-            client_secret: 'app-secret'
+            client_id: fromDbApp.id
           })
           .expect(200)
           .end(function (err, res) {
@@ -159,6 +162,128 @@ describe('Functional Test Authorization Code grant', function () {
                 done();
               });
             });
+          });
+        });
+      });
+  });
+
+  it('should grant access token if requesting with scopes and scopes are authorized', function (done) {
+    let request = session(app);
+    request
+      .get('/oauth2/authorize')
+      .query({
+        redirect_uri: fromDbApp.redirectUri,
+        response_type: 'code',
+        client_id: fromDbApp.id,
+      })
+      .redirects(1)
+      .expect(200)
+      .end(function (err, res) {
+        should.not.exist(err);
+        res.redirects.length.should.equal(1);
+        res.redirects[0].should.containEql('/login');
+        request
+        .post('/login')
+        .query({
+          username: 'irfanbaqui',
+          password: 'user-secret'
+        })
+        .expect(302)
+        .end(function (err, res) {
+          should.not.exist(err);
+          should.exist(res.headers.location);
+          res.headers.location.should.containEql('/oauth2/authorize');
+          request
+          .get('/oauth2/authorize')
+          .query({
+            redirect_uri: fromDbApp.redirectUri,
+            response_type: 'code',
+            client_id: fromDbApp.id,
+            scope: 'someScope'
+          })
+          .expect(200)
+          .end(function (err, res) {
+            should.not.exist(err);
+            request
+            .post('/oauth2/authorize/decision')
+            .query({
+              transaction_id: res.headers.transaction_id
+            })
+            .expect(302)
+            .end(function (err, res) {
+              should.not.exist(err);
+              should.exist(res.headers.location);
+              res.headers.location.should.containEql(fromDbApp.redirectUri);
+              let params = qs.parse(url.parse(res.headers.location).search.slice(1));
+              should.exist(params.code);
+              request
+              .post('/oauth2/token')
+              .send({
+                grant_type: 'authorization_code',
+                redirect_uri: fromDbApp.redirectUri,
+                client_id: fromDbApp.id,
+                client_secret: 'app-secret',
+                code: params.code
+              })
+              .expect(200)
+              .end(function (err, res) {
+                should.not.exist(err);
+                should.exist(res.body.access_token);
+                res.body.access_token.length.should.be.greaterThan(15);
+                should.exist(res.body.token_type);
+                res.body.token_type.should.eql('Bearer');
+                tokenService.get(res.body.access_token)
+                .then(token => {
+                  should.exist(token);
+                  token.scopes.should.eql([ 'someScope' ]);
+                  [ token.id, token.tokenDecrypted ].should.eql(res.body.access_token.split('|'));
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+  });
+
+  it('should not grant access token if consumer is not authorized to requested scopes', function (done) {
+    let request = session(app);
+    request
+      .get('/oauth2/authorize')
+      .query({
+        redirect_uri: fromDbApp.redirectUri,
+        response_type: 'code',
+        client_id: fromDbApp.id
+      })
+      .redirects(1)
+      .expect(200)
+      .end(function (err, res) {
+        should.not.exist(err);
+        res.redirects.length.should.equal(1);
+        res.redirects[0].should.containEql('/login');
+        request
+        .post('/login')
+        .query({
+          username: 'irfanbaqui',
+          password: 'user-secret'
+        })
+        .expect(302)
+        .end(function (err, res) {
+          should.not.exist(err);
+          should.exist(res.headers.location);
+          res.headers.location.should.containEql('/oauth2/authorize');
+          request
+          .get('/oauth2/authorize')
+          .query({
+            redirect_uri: fromDbApp.redirectUri,
+            response_type: 'code',
+            client_id: fromDbApp.id,
+            scope: 'someScope, unauthorizedScope'
+          })
+          .expect(403)
+          .end(function (err) {
+            should.not.exist(err);
+            done();
           });
         });
       });

@@ -1,7 +1,6 @@
 let session = require('supertest-session');
 let should = require('should');
 let app = require('./bootstrap');
-let request = session(app);
 let Promise = require('bluebird');
 
 let config = require('../config.models.js');
@@ -23,7 +22,10 @@ describe('Functional Test Client Password grant', function () {
     };
 
     config.credentials.types.oauth = {
-      passwordKey: 'secret'
+      passwordKey: 'secret',
+      properties: {
+        scopes: { isRequired: false }
+      }
     };
 
     credentialService = require('../../src/credentials/credential.service.js')(config);
@@ -67,13 +69,16 @@ describe('Functional Test Client Password grant', function () {
           should.exist(_fromDbApp);
           fromDbApp = _fromDbApp;
 
-          return Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth', { secret: 'user-secret' }),
-            credentialService.insertCredential(fromDbApp.id, 'oauth', { secret: 'app-secret' }) ])
+          credentialService.insertScopes('someScope')
+          .then(() => {
+            Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth', { secret: 'user-secret' }),
+            credentialService.insertCredential(fromDbApp.id, 'oauth', { secret: 'app-secret', scopes: [ 'someScope' ] }) ])
             .spread((userRes, appRes) => {
               should.exist(userRes);
               should.exist(appRes);
               done();
             });
+          });
         });
       });
     })
@@ -89,7 +94,8 @@ describe('Functional Test Client Password grant', function () {
     done();
   });
 
-  it('should grant access token', function (done) {
+  it('should grant access token when no scopes are specified', function (done) {
+    let request = session(app);
     let credentials = new Buffer(fromDbApp.id.concat(':app-secret')).toString('base64');
 
     request
@@ -109,6 +115,54 @@ describe('Functional Test Client Password grant', function () {
       should.exist(token);
       should.exist(token.access_token);
       token.token_type.should.equal('Bearer');
+      done();
+    });
+  });
+
+  it('should grant access token with authorized scopes', function (done) {
+    let request = session(app);
+    let credentials = new Buffer(fromDbApp.id.concat(':app-secret')).toString('base64');
+
+    request
+    .post('/oauth2/token')
+    .set('Authorization','basic ' + credentials)
+    .set('content-type', 'application/x-www-form-urlencoded')
+    .type('form')
+    .send({
+      grant_type: 'password',
+      username: 'irfanbaqui',
+      password: 'user-secret',
+      scope: 'someScope'
+    })
+    .expect(200)
+    .end(function (err, res) {
+      should.not.exist(err);
+      let token = res.body;
+      should.exist(token);
+      should.exist(token.access_token);
+      token.token_type.should.equal('Bearer');
+      done();
+    });
+  });
+
+  it('should not grant access token with unauthorized scopes', function (done) {
+    let request = session(app);
+    let credentials = new Buffer(fromDbApp.id.concat(':app-secret')).toString('base64');
+
+    request
+    .post('/oauth2/token')
+    .set('Authorization','basic ' + credentials)
+    .set('content-type', 'application/x-www-form-urlencoded')
+    .type('form')
+    .send({
+      grant_type: 'password',
+      username: 'irfanbaqui',
+      password: 'user-secret',
+      scope: 'someScope unauthorizedScope'
+    })
+    .expect(401)
+    .end(function (err) {
+      should.not.exist(err);
       done();
     });
   });

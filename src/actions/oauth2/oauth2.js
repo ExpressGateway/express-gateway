@@ -25,12 +25,14 @@ const server = oauth2orize.createServer();
 // simple matter of serializing the client's ID, and deserializing by finding
 // the client by ID from the database.
 
-server.serializeClient((consumer, done) => done(null, consumer.id));
+server.serializeClient((consumer, done) => done(null, consumer));
 
-server.deserializeClient((id, done) => {
+server.deserializeClient((consumer, done) => {
+  let id = consumer.id;
+
   return authService.validateConsumer(id)
-  .then(consumer => {
-    if (!consumer) return done(null, false);
+  .then(foundConsumer => {
+    if (!foundConsumer) return done(null, false);
     return done(null, consumer);
   })
   .catch(err => done(err));
@@ -57,6 +59,8 @@ server.grant(oauth2orize.grant.code((consumer, redirectUri, user, ares, done) =>
     userId: user.id
   };
 
+  if (consumer.authorizedScopes) code.scopes = consumer.authorizedScopes;
+
   return authCodeService.save(code)
   .then((codeObj) => {
     return done(null, codeObj.id);
@@ -72,17 +76,13 @@ server.grant(oauth2orize.grant.code((consumer, redirectUri, user, ares, done) =>
 
 server.grant(oauth2orize.grant.token((consumer, authenticatedUser, ares, done) => {
   let tokenCriteria = {
-    authenticatedUser: authenticatedUser.id,
-    redirectUri: consumer.redirectUri
+    consumerId: consumer.id,
+    authenticatedUserId: authenticatedUser.id,
+    redirectUri: consumer.redirectUri,
+    authType: 'oauth'
   }
 
-  if (!consumer.username) {
-    tokenCriteria.applicationId = consumer.id;
-  } else {
-    tokenCriteria.username = consumer.id;
-  }
-
-  consumer.authenticatedUserId = authenticatedUser.id;
+  if (consumer.authorizedScopes) tokenCriteria.scopes = consumer.authorizedScopes;
 
   return tokenService.findOrSave(tokenCriteria)
   .then(token => {
@@ -101,7 +101,7 @@ server.exchange(oauth2orize.exchange.code((consumer, code, redirectUri, done) =>
   let codeCriteria = {
     id: code,
     consumerId: consumer.id,
-    redirectUri: redirectUri
+    redirectUri: redirectUri,
   };
 
   authCodeService.find(codeCriteria)
@@ -111,7 +111,9 @@ server.exchange(oauth2orize.exchange.code((consumer, code, redirectUri, done) =>
     }
 
     let tokenCriteria = {
-      authenticatedUser: codeObj.userId
+      consumerId: consumer.id,
+      authenticatedUser: codeObj.userId,
+      authType: 'oauth'
     };
 
     if (codeObj.scopes) tokenCriteria.scopes = codeObj.scopes;
@@ -150,6 +152,7 @@ server.exchange(oauth2orize.exchange.password((consumer, username, password, sco
         if (!authorized) return done(null, false);
 
         let tokenCriteria = {
+          consumerId: consumer.id,
           authenticatedUser: user.id
         };
 
@@ -186,7 +189,10 @@ server.exchange(oauth2orize.exchange.clientCredentials((consumer, scopes, done) 
       .then(authorized => {
         if (!authorized) return done(null, false);
 
-        let tokenCriteria = {};
+        let tokenCriteria = {
+          consumerId: consumer.id,
+          authType: 'oauth'
+        };
 
         if (scopes) tokenCriteria.scopes = scopes;
 
@@ -217,11 +223,25 @@ server.exchange(oauth2orize.exchange.clientCredentials((consumer, scopes, done) 
 
 module.exports.authorization = [
   login.ensureLoggedIn(),
-  server.authorization((consumerId, redirectUri, done) => {
-    return authService.validateConsumer(consumerId)
+  server.authorization((areq, done) => {
+    return authService.validateConsumer(areq.clientID)
     .then(consumer => {
-      if (!consumer || consumer.redirectUri !== redirectUri) return done(null, false);
-      return done(null, consumer, redirectUri);
+      if (!consumer || consumer.redirectUri !== areq.redirectURI) return done(null, false);
+
+      if (!areq.scope) {
+        return done(null, consumer, areq.redirectURI);
+      }
+
+      return authService.authorizeCredential(areq.clientID, 'oauth', areq.scope)
+      .then(authorized => {
+        if (!authorized) {
+          return done(null, false);
+        }
+
+        consumer.authorizedScopes = areq.scope;
+
+        return done(null, consumer, areq.redirectURI);
+      });
     });
   }),
   (request, response) => {
