@@ -274,8 +274,21 @@ The name specifies a condition function. This can be one of the following:
     path: "/foo(/bar)?"
 ```
 
-  - `method`. Matches if the request's method matches the `methods` parameter.
-    Accepts can be either a string (e.g. 'GET') or an array of such strings.
+  - `verb`. Matches the request HTTP verb.
+    Accepts paramter `verbs` that can be either a string (e.g. 'GET') or an array of such strings.
+```yaml
+  condition:
+    name: verb
+    verbs: GET
+```
+```yaml
+  condition:
+    name: verb
+    verbs:
+      - GET
+      - POST
+```
+
   - `hostMatch`. Parameter should be a regular expression. Matches if the
     `Host` header passed with the request matches the parameter.
 
@@ -295,7 +308,7 @@ Example:
     "conditions": [
       {"name":"pathExact", "path": "/foo/bar"},
       { "name":"not",
-        "condition":{ "name":"method", "methods": ["POST", "HEAD"]}
+        "condition":{ "name":"method", "verbs": ["POST", "HEAD"]}
       }
     ]
 }

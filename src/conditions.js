@@ -33,11 +33,11 @@ const predefinedConditions = {
     return req.url === actionConfig.path;
   },
 
-  method: function(req, actionConfig) {
-    if (Array.isArray(actionConfig.methods)) {
-      return actionConfig.methods.includes(req.method);
+  verb: function(req, actionConfig) {
+    if (Array.isArray(actionConfig.verbs)) {
+      return actionConfig.verbs.includes(req.method);
     } else {
-      return req.method === actionConfig.methods;
+      return req.method === actionConfig.verbs;
     }
   },
 
