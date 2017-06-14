@@ -1,6 +1,7 @@
 const logger = require('../log').config;
 const actions = require('../actions').init();
 const conditions = require('../conditions');
+const {EgContextBase} = require('./context');
 const express = require('express');
 const vhost = require('vhost');
 const ConfigurationError = require('../errors').ConfigurationError;
@@ -34,8 +35,10 @@ module.exports.bootstrap = function (app, config) {
         router.all(path, (req, res, next) => {
           logger.debug('executing pipeline for api %s, mounted at %s', route.apiEndpointName, path);
 
-          req.egContext = req.egContext || {};
-          req.egContext.apiEndpoint = route;
+          req.egContext = Object.create(new EgContextBase());
+          req.egContext.req = req;
+          req.egContext.res = res;
+          req.egContext.apiEndpoint = route
           return apiEndpointToPipelineMap[route.apiEndpointName](req, res, next);
         });
       }

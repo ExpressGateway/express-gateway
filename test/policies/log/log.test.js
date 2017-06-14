@@ -4,6 +4,16 @@ const sinon = require('sinon');
 const assert = require('assert');
 
 describe('logging policy', () => {
+  let res = {
+    test: 'text'
+  }
+  let req = {
+    url: '/test',
+    method: 'GET',
+    egContext: Object.create(new EgContextBase())
+  };
+  req.egContext.req = req;
+  req.egContext.res = res;
   before('prepare mocks', () => {
     sinon.spy(logger, 'info');
     sinon.spy(logger, 'error');
@@ -11,25 +21,25 @@ describe('logging policy', () => {
   it('should log url', () => {
     let next = sinon.spy();
     let logMiddleware = logAction({
-      // eslint-disable-next-line no-template-curly-in-string
-      message: '${url} ${method}'
-    });
-    logMiddleware({ url: '/test', method: 'GET' }, {}, next);
-    assert.equal(logger.info.getCall(0).args[0], '/test GET');
-    assert.ok(next.calledOnce);
-  });
+      message: '${req.url} ${egContext.req.method} ${res.test}'
+    })
+
+    logMiddleware(req, {}, next)
+    assert.equal(logger.info.getCall(0).args[0], '/test GET text')
+    assert.ok(next.calledOnce)
+  })
   it('should fail to access global context', () => {
     let next = sinon.spy();
     let logMiddleware = logAction({
       // eslint-disable-next-line no-template-curly-in-string
       message: '${process.exit(1)}'
-    });
-    logMiddleware({ url: '/test', method: 'GET' }, {}, next);
+    })
+    logMiddleware(req, res, next);
     assert.ok(logger.info.notCalled);
 
-    assert.equal(logger.error.getCall(0).args[0], 'failed to build log message; process is not defined');
+    assert.ok(logger.error.getCall(0).args[0].indexOf('failed to build log message') >= 0);
     assert.ok(next.calledOnce);
-  });
+  })
 
   afterEach(function () {
     logger.info.reset();
