@@ -3,6 +3,8 @@ Express Gateway
 
 This is an API Gateway built using Express and Express middleware.
 
+[![CircleCI](https://circleci.com/gh/ExpressGateway/express-gateway/tree/master.svg?style=svg)](https://circleci.com/gh/ExpressGateway/express-gateway/tree/master)
+
 Configuration
 -------------
 
