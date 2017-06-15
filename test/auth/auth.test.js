@@ -176,7 +176,7 @@ describe('Auth tests', function () {
     let userToken, tokenId, tokenDecrypted;
     before(function (done) {
       let tokenObj = {
-        username: user.username,
+        consumerId: userFromDb.id,
         authType: 'oauth',
         scopes: [ 'someScope1', 'someScope2', 'someScope3' ]
       };
@@ -193,10 +193,10 @@ describe('Auth tests', function () {
     it('should authenticate token', function (done) {
       authService.authenticateToken(userToken, 'oauth')
       .then(authResponse => {
-        let expectedTokenProps = [ 'username', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted' ];
+        let expectedTokenProps = [ 'consumerId', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted' ];
 
         let expectedResponse = {
-          username: user.username,
+          consumerId: userFromDb.id,
           authType: 'oauth',
           tokenDecrypted: tokenDecrypted,
           id: tokenId,
@@ -209,7 +209,6 @@ describe('Auth tests', function () {
         done();
       })
       .catch(function (err) {
-        console.log(err);
         should.not.exist(err);
         done();
       });

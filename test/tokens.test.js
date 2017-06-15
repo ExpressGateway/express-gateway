@@ -23,7 +23,7 @@ describe('Token tests', function () {
 
     it('should save a token', function (done) {
       newToken = {
-        username: 'someUsername',
+        consumerId: '1234',
         authType: 'oauth'
       };
       tokenService.save(newToken)
@@ -52,7 +52,7 @@ describe('Token tests', function () {
     });
 
     it('should get a token', function (done) {
-      let tokenFields = ['id', 'tokenDecrypted', 'username', 'createdAt', 'expiresAt'];
+      let tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt'];
       let [ id, _tokenDecrypted ] = tokenFromDb.split('|');
 
       tokenService.get(id)
@@ -62,7 +62,7 @@ describe('Token tests', function () {
         });
 
         tokenObj.tokenDecrypted.should.eql(_tokenDecrypted);
-        tokenObj.username.should.eql(newToken.username);
+        tokenObj.consumerId.should.eql(newToken.consumerId);
         done();
       })
       .catch(function (err) {
@@ -85,7 +85,7 @@ describe('Token tests', function () {
 
     it('should save a token with scopes', function (done) {
       newTokenWithScopes = {
-        username: 'someUsername',
+        consumerId: '1234',
         authType: 'oauth',
         scopes: ['scope1', 'scope2', 'scope3']
       };
@@ -118,7 +118,7 @@ describe('Token tests', function () {
     });
 
     it('should get a token with scopes', function (done) {
-      let tokenFields = ['id', 'tokenDecrypted', 'username', 'createdAt', 'expiresAt', 'scopes'];
+      let tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt', 'scopes'];
       let [ id, _tokenDecrypted ] = tokenFromDbWithScopes.split('|');
 
       tokenService.get(id)
@@ -129,7 +129,7 @@ describe('Token tests', function () {
 
         tokenObj.tokenDecrypted.should.eql(_tokenDecrypted);
         tokenObj.scopes.should.eql(newTokenWithScopes.scopes);
-        tokenObj.username.should.eql(newTokenWithScopes.username);
+        tokenObj.consumerId.should.eql(newTokenWithScopes.consumerId);
         done();
       })
       .catch(function (err) {
@@ -180,7 +180,7 @@ describe('Token tests', function () {
 
     it('should save a token', function (done) {
       newToken = {
-        username: 'someUsername',
+        consumerId: '1234',
         authType: 'oauth'
       };
       tokenService.save(newToken)

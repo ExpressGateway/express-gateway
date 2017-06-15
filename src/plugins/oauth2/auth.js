@@ -18,17 +18,36 @@ let authService = require('../../auth.js')(config);
  * a user is logged in before asking them to approve the request.
  */
 
-function verifyClient (clientId, clientSecret, done) {
+function verifyClient (req, clientId, clientSecret, done) {
   return authService.authenticateCredential(clientId, clientSecret, 'oauth')
   .then(consumer => {
-    if (consumer) {
+    let scopes;
+
+    if (!consumer) {
+      return done(null, false);
+    }
+
+    if (req.query.scope) {
+      scopes = req.query.scope.split(' ');
+    } else if (req.body.scope) {
+      scopes = req.body.scope.split(' ');
+    }
+
+    return authService.authorizeCredential(clientId, 'oauth', scopes)
+    .then(authorized => {
+      if (!authorized) {
+        return done(null, false);
+      }
+
+      consumer.authorizedScopes = scopes;
+
       return done(null, consumer);
-    } else return done(null, false);
+    });
   })
   .catch(err => done(err));
 }
 
-passport.use(new LocalStrategy(verifyClient));
+passport.use(new LocalStrategy({ passReqToCallback: true }, verifyClient));
 
 passport.serializeUser((user, done) => done(null, user.id));
 
@@ -53,9 +72,9 @@ passport.deserializeUser((id, done) => {
  * the specification, in practice it is quite common.
  */
 
-passport.use(new BasicStrategy(verifyClient));
+passport.use(new BasicStrategy({ passReqToCallback: true }, verifyClient));
 
-passport.use(new ClientPasswordStrategy(verifyClient));
+passport.use(new ClientPasswordStrategy({ passReqToCallback: true }, verifyClient));
 
 /**
  * BearerStrategy

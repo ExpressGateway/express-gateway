@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
 
-let oauth = require('../../src/actions/oauth2');
+let oauth = require('../../src/plugins/oauth2');
 let app = express();
 
 app.use(bodyParser.json({ extended: true }));
