@@ -81,7 +81,7 @@ server.grant(oauth2orize.grant.token((consumer, authenticatedUser, ares, done) =
     authenticatedUserId: authenticatedUser.id,
     redirectUri: consumer.redirectUri,
     authType: 'oauth'
-  }
+  };
 
   if (consumer.authorizedScopes) tokenCriteria.scopes = consumer.authorizedScopes;
 
@@ -102,7 +102,7 @@ server.exchange(oauth2orize.exchange.code((consumer, code, redirectUri, done) =>
   let codeCriteria = {
     id: code,
     consumerId: consumer.id,
-    redirectUri: redirectUri,
+    redirectUri: redirectUri
   };
 
   authCodeService.find(codeCriteria)

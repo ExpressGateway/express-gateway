@@ -18,7 +18,7 @@ let authService = require('../../auth.js')(config);
  * a user is logged in before asking them to approve the request.
  */
 
-function verifyClient (clientId, clientSecret, done) {
+function verifyClient (req, clientId, clientSecret, done) {
   return authService.authenticateCredential(clientId, clientSecret, 'oauth')
   .then(consumer => {
     let scopes;

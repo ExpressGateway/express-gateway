@@ -94,7 +94,7 @@ describe('Credential service tests', function () {
         newCredential.secret.length.should.greaterThanOrEqual(10);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -127,7 +127,7 @@ describe('Credential service tests', function () {
         credential.isActive.should.eql('true');
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -149,7 +149,7 @@ describe('Credential service tests', function () {
           done();
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -171,7 +171,7 @@ describe('Credential service tests', function () {
           done();
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -428,7 +428,7 @@ describe('Credential service tests', function () {
           done();
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });

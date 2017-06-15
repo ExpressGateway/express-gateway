@@ -101,7 +101,7 @@ describe('Functional Test Authorization Code grant', function () {
       .query({
         redirect_uri: fromDbApp.redirectUri,
         response_type: 'token',
-        client_id: fromDbApp.id,
+        client_id: fromDbApp.id
       })
       .redirects(1)
       .expect(200)
@@ -125,7 +125,7 @@ describe('Functional Test Authorization Code grant', function () {
           .query({
             redirect_uri: fromDbApp.redirectUri,
             response_type: 'token',
-            client_id: fromDbApp.id,
+            client_id: fromDbApp.id
           })
           .expect(200)
           .end(function (err, res) {
@@ -150,7 +150,7 @@ describe('Functional Test Authorization Code grant', function () {
                 should.not.exist(token.scopes);
                 [ token.id, token.tokenDecrypted ].should.eql(params.access_token.split('|'));
                 done();
-              })
+              });
             });
           });
         });
@@ -164,7 +164,7 @@ describe('Functional Test Authorization Code grant', function () {
       .query({
         redirect_uri: fromDbApp.redirectUri,
         response_type: 'token',
-        client_id: fromDbApp.id,
+        client_id: fromDbApp.id
       })
       .redirects(1)
       .expect(200)
@@ -213,7 +213,7 @@ describe('Functional Test Authorization Code grant', function () {
                 token.scopes.should.eql([ 'someScope' ]);
                 [ token.id, token.tokenDecrypted ].should.eql(params.access_token.split('|'));
                 done();
-              })
+              });
             });
           });
         });
@@ -227,7 +227,7 @@ describe('Functional Test Authorization Code grant', function () {
       .query({
         redirect_uri: fromDbApp.redirectUri,
         response_type: 'token',
-        client_id: fromDbApp.id,
+        client_id: fromDbApp.id
       })
       .redirects(1)
       .expect(200)

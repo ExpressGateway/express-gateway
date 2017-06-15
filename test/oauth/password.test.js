@@ -71,7 +71,7 @@ describe('Functional Test Client Password grant', function () {
           credentialService.insertScopes('someScope')
           .then(() => {
             Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth', { secret: 'user-secret' }),
-            credentialService.insertCredential(fromDbApp.id, 'oauth', { secret: 'app-secret', scopes: [ 'someScope' ] }) ])
+              credentialService.insertCredential(fromDbApp.id, 'oauth', { secret: 'app-secret', scopes: [ 'someScope' ] }) ])
             .spread((userRes, appRes) => {
               should.exist(userRes);
               should.exist(appRes);
@@ -120,11 +120,11 @@ describe('Functional Test Client Password grant', function () {
 
   it('should grant access token with authorized scopes', function (done) {
     let request = session(app);
-    let credentials = new Buffer(fromDbApp.id.concat(':app-secret')).toString('base64');
+    let credentials = Buffer.from(fromDbApp.id.concat(':app-secret')).toString('base64');
 
     request
     .post('/oauth2/token')
-    .set('Authorization','basic ' + credentials)
+    .set('Authorization', 'basic ' + credentials)
     .set('content-type', 'application/x-www-form-urlencoded')
     .type('form')
     .send({
@@ -146,11 +146,11 @@ describe('Functional Test Client Password grant', function () {
 
   it('should not grant access token with unauthorized scopes', function (done) {
     let request = session(app);
-    let credentials = new Buffer(fromDbApp.id.concat(':app-secret')).toString('base64');
+    let credentials = Buffer.from(fromDbApp.id.concat(':app-secret')).toString('base64');
 
     request
     .post('/oauth2/token')
-    .set('Authorization','basic ' + credentials)
+    .set('Authorization', 'basic ' + credentials)
     .set('content-type', 'application/x-www-form-urlencoded')
     .type('form')
     .send({

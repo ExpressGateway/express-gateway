@@ -173,7 +173,7 @@ describe('Functional Test Authorization Code grant', function () {
       .query({
         redirect_uri: fromDbApp.redirectUri,
         response_type: 'code',
-        client_id: fromDbApp.id,
+        client_id: fromDbApp.id
       })
       .redirects(1)
       .expect(200)

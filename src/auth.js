@@ -98,7 +98,7 @@ module.exports = function (config) {
     });
   }
 
-  function validateConsumer(id, options) {
+  function validateConsumer (id, options) {
     return applications.get(id)
     .then(app => {
       if (app && app.isActive) {

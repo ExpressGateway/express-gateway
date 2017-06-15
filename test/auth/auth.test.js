@@ -193,9 +193,9 @@ describe('Auth tests', function () {
     it('should authenticate token', function (done) {
       authService.authenticateToken(userToken, 'oauth')
       .then(authResponse => {
-        let expectedTokenProps = [ 'consumerId', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted'];
+        let expectedTokenProps = [ 'consumerId', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted' ];
 
-        let expectedResponse = { 
+        let expectedResponse = {
           consumerId: userFromDb.id,
           authType: 'oauth',
           tokenDecrypted: tokenDecrypted,
@@ -208,7 +208,7 @@ describe('Auth tests', function () {
         should.deepEqual(_.omit(authResponse, ['expiresAt', 'createdAt']), expectedResponse);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });

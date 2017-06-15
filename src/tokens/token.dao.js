@@ -12,7 +12,7 @@ module.exports = function (config) {
   db = getDb();
   tokenDbConfig = config.tokens.redis;
 
-  function save(token) {
+  function save (token) {
     // key for the token hash table
     let redisTokenKey = tokenDbConfig.tokenHashPrefix.concat(':', token.id);
 
@@ -27,7 +27,7 @@ module.exports = function (config) {
     .return(token.id.concat(':', token.tokenEncrypted));
   }
 
-  function find(tokenObj) {
+  function find (tokenObj) {
     return db.hgetallAsync(tokenDbConfig.consumerTokensHashPrefix.concat(':', tokenObj.consumerId))
     .then((tokenIds) => {
       let tokenPromises, activeTokenIds, foundToken;

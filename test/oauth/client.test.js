@@ -30,7 +30,6 @@ describe('Functional Test Authorization Code grant', function () {
     applicationService = require('../../src/consumers/application.service.js')(config);
     tokenService = require('../../src/tokens/token.service.js')(config);
 
-
     db.flushdbAsync()
     .then(function (didSucceed) {
       if (!didSucceed) {
@@ -89,7 +88,7 @@ describe('Functional Test Authorization Code grant', function () {
     .send({
       grant_type: 'client_credentials',
       client_id: application.id,
-      client_secret: 'app-secret',
+      client_secret: 'app-secret'
     })
     .expect(200)
     .end(function (err, res) {

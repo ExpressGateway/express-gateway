@@ -8,7 +8,7 @@ let tokenService, tokenDao;
 module.exports = function (config) {
   tokenDao = getTokenDao(config);
 
-  function save(tokenObj) {
+  function save (tokenObj) {
     if (!tokenObj.consumerId) {
       return Promise.reject(new Error('invalid token args'));
     }
