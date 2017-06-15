@@ -38,7 +38,7 @@ module.exports.bootstrap = function (app, config) {
           req.egContext = Object.create(new EgContextBase());
           req.egContext.req = req;
           req.egContext.res = res;
-          req.egContext.apiEndpoint = route
+          req.egContext.apiEndpoint = route;
           return apiEndpointToPipelineMap[route.apiEndpointName](req, res, next);
         });
       }
