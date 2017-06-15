@@ -15,7 +15,7 @@ describe('Functional Test Implicit grant', function () {
   let originalAppConfig, originalOauthConfig;
   let fromDbUser1, fromDbApp;
 
-  before(function(done) {
+  before(function (done) {
     originalAppConfig = config.applications;
     originalOauthConfig = config.credentials.types.oauth;
 
@@ -32,9 +32,8 @@ describe('Functional Test Implicit grant', function () {
     userService = require('../../src/consumers/user.service.js')(config);
     applicationService = require('../../src/consumers/application.service.js')(config);
 
-
     db.flushdbAsync()
-    .then(function(didSucceed) {
+    .then(function (didSucceed) {
       if (!didSucceed) {
         console.log('Failed to flush the database');
       }
@@ -79,7 +78,7 @@ describe('Functional Test Implicit grant', function () {
         });
       });
     })
-    .catch(function(err) {
+    .catch(function (err) {
       should.not.exist(err);
       done();
     });

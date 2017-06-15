@@ -7,17 +7,16 @@ let _ = require('lodash');
 let db = require('../src/db').getDb();
 
 describe('User service tests', function () {
-
   describe('Insert tests', function () {
-    before(function(done) {
+    before(function (done) {
       db.flushdbAsync()
-      .then(function(didSucceed) {
+      .then(function (didSucceed) {
         if (!didSucceed) {
           console.log('Failed to flush the database');
         }
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -33,9 +32,9 @@ describe('User service tests', function () {
 
       userService
       .insert(user)
-      .then(function(newUser) {
+      .then(function (newUser) {
         let expectedUserProps = ['firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt'];
-        /* including what's predictable. id, createdAt and updatedAt are initialized at 
+        /* including what's predictable. id, createdAt and updatedAt are initialized at
         time of creation, so they're not predictable */
         let expectedPartialUserObj = {
           firstname: user.firstname,
@@ -47,16 +46,16 @@ describe('User service tests', function () {
         Object.keys(newUser).should.eql(expectedUserProps);
         should.deepEqual(_.omit(newUser, ['id', 'createdAt', 'updatedAt']), expectedPartialUserObj);
         db.hgetallAsync(config.users.redis.userHashPrefix.concat(':', newUser.id))
-        .then(function(userObj) {
+        .then(function (userObj) {
           userObj.isActive = userObj.isActive === 'true';
           should.deepEqual(userObj, newUser);
           done();
-        })
+        });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
-      })
+      });
     });
 
     it('should throw an error when inserting a user with missing properties', function (done) {
@@ -68,10 +67,10 @@ describe('User service tests', function () {
 
       userService
       .insert(user)
-      .then(function(newUser) {
+      .then(function (newUser) {
         should.not.exist(newUser);
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.exist(err);
         err.message.should.eql('firstname is required');
         done();
@@ -88,10 +87,10 @@ describe('User service tests', function () {
 
       userService
       .insert(user)
-      .then(function(newUser) {
+      .then(function (newUser) {
         should.not.exist(newUser);
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.exist(err);
         err.message.should.eql('username already exists');
         done();
@@ -99,24 +98,24 @@ describe('User service tests', function () {
     });
   });
 
-  describe('Get and Find User tests', function () { 
+  describe('Get and Find User tests', function () {
     let user;
-    before(function(done) {
+    before(function (done) {
       db.flushdbAsync()
-      .then(function(didSucceed) {
+      .then(function (didSucceed) {
         if (!didSucceed) {
           console.log('Failed to flush the database');
         }
         user = createRandomUserObject();
         userService
         .insert(user)
-        .then(function(newUser) {
+        .then(function (newUser) {
           should.exist(newUser);
           user.id = newUser.id;
           done();
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -124,7 +123,7 @@ describe('User service tests', function () {
 
     it('should get user by userId', function (done) {
       userService.get(user.id)
-        .then(function(_user) {
+        .then(function (_user) {
           let expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
           let expectedPartialObj = {
             firstname: user.firstname,
@@ -140,28 +139,28 @@ describe('User service tests', function () {
           _user.id.length.should.be.greaterThan(10);
           done();
         })
-        .catch(function(err) {
+        .catch(function (err) {
           should.not.exist(err);
           done();
-        })
+        });
     });
 
     it('should not get user by invalid userId', function (done) {
       userService.get(uuid.v4())
-        .then(function(user) {
+        .then(function (user) {
           should.exist(user);
           user.should.eql(false);
           done();
         })
-        .catch(function(err) {
+        .catch(function (err) {
           should.not.exist(err);
           done();
-        })
+        });
     });
 
     it('should find user by username', function (done) {
       userService.find(user.username)
-        .then(function(_user) {
+        .then(function (_user) {
           let expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
           let expectedPartialObj = {
             firstname: user.firstname,
@@ -177,58 +176,58 @@ describe('User service tests', function () {
           _user.id.length.should.be.greaterThan(10);
           done();
         })
-        .catch(function(err) {
+        .catch(function (err) {
           should.not.exist(err);
           done();
-        })
+        });
     });
 
     it('should not find user by invalid username', function (done) {
       userService.find('invalid_username')
-        .then(function(user) {
+        .then(function (user) {
           should.exist(user);
           user.should.eql(false);
           done();
         })
-        .catch(function(err) {
+        .catch(function (err) {
           should.not.exist(err);
           done();
-        })
+        });
     });
   });
 
-  describe('Update user tests', function() {
+  describe('Update user tests', function () {
     let user, updatedUser;
-    before(function(done) {
+    before(function (done) {
       db.flushdbAsync()
-      .then(function(didSucceed) {
+      .then(function (didSucceed) {
         if (!didSucceed) {
           console.log('Failed to flush the database');
         }
         user = createRandomUserObject();
         userService
         .insert(user)
-        .then(function(newUser) {
+        .then(function (newUser) {
           should.exist(newUser);
           user.id = newUser.id;
           user.createdAt = newUser.createdAt;
           done();
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
     });
 
-    it('should update user', function(done) {
+    it('should update user', function (done) {
       updatedUser = createRandomUserObject();
       userService.update(user.id, updatedUser)
-      .then(function(res) {
+      .then(function (res) {
         should.exist(res);
         res.should.eql(true);
         return userService.get(user.id)
-        .then(function(_user) {
+        .then(function (_user) {
           should.exist(_user.username);
           _user.username.should.eql(user.username); // Cannot update username
           should.exist(_user.email);
@@ -242,23 +241,23 @@ describe('User service tests', function () {
           should.exist(_user.updatedAt);
           done();
         })
-        .catch(function(err) {
+        .catch(function (err) {
           should.not.exist(err);
           done();
-        })
+        });
       });
     });
 
-    it('should allow update of any single user property user', function(done) {
+    it('should allow update of any single user property user', function (done) {
       let anotherUpdatedUser = {
         email: 'baq@eg.com'
       };
       userService.update(user.id, anotherUpdatedUser)
-      .then(function(res) {
+      .then(function (res) {
         should.exist(res);
         res.should.eql(true);
         return userService.get(user.id)
-        .then(function(_user) {
+        .then(function (_user) {
           should.exist(_user.email);
           _user.email.should.eql(anotherUpdatedUser.email);
           should.exist(_user.firstname);
@@ -271,42 +270,42 @@ describe('User service tests', function () {
           done();
         });
       })
-      .catch(function(err) {
-        should.not.exist(err);
-        done();
-      })
-    });
-
-    it('should not update user with unvalid id', function(done) {
-      let updatedUser = {
-        username: 'joecamper', 
-        firstname: 'Joe', 
-        lastname: 'Camper',
-        email: 'joecamper@eg.com'
-      };
-      userService.update('invalid_id', updatedUser)
-      .then(function(res) {
-        should.exist(res);
-        res.should.eql(false);
-        done();
-      })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
     });
 
-    it('should not update user with invalid properties', function(done) {
+    it('should not update user with unvalid id', function (done) {
       let updatedUser = {
-        username: 'joecamper', 
-        invalid_prop: 'xyz111', 
+        username: 'joecamper',
+        firstname: 'Joe',
+        lastname: 'Camper',
+        email: 'joecamper@eg.com'
+      };
+      userService.update('invalid_id', updatedUser)
+      .then(function (res) {
+        should.exist(res);
+        res.should.eql(false);
+        done();
+      })
+      .catch(function (err) {
+        should.not.exist(err);
+        done();
+      });
+    });
+
+    it('should not update user with invalid properties', function (done) {
+      let updatedUser = {
+        username: 'joecamper',
+        invalid_prop: 'xyz111'
       };
       userService.update(user.id, updatedUser)
-      .then(function(res) {
+      .then(function (res) {
         should.not.exist(res);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.exist(err);
         err.message.should.eql('one or more properties is invalid');
         done();
@@ -314,37 +313,37 @@ describe('User service tests', function () {
     });
   });
 
-  describe('Activate and deactivate user tests', function() {
+  describe('Activate and deactivate user tests', function () {
     let user;
-    before(function(done) {
+    before(function (done) {
       db.flushdbAsync()
-      .then(function(didSucceed) {
+      .then(function (didSucceed) {
         if (!didSucceed) {
           console.log('Failed to flush the database');
         }
         user = createRandomUserObject();
         userService
         .insert(user)
-        .then(function(newUser) {
+        .then(function (newUser) {
           should.exist(newUser);
           user = Object.assign(user, newUser);
           user.createdAt = newUser.createdAt;
           done();
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
     });
 
-    it('should deactivate user', function(done) {
+    it('should deactivate user', function (done) {
       userService.deactivate(user.id)
-      .then(function(res) {
+      .then(function (res) {
         should.exist(res);
         res.should.eql(true);
         return userService.get(user.id)
-        .then(function(_user) {
+        .then(function (_user) {
           should.exist(_user.username);
           _user.username.should.eql(user.username);
           should.exist(_user.email);
@@ -360,20 +359,20 @@ describe('User service tests', function () {
           should.exist(_user.updatedAt);
           done();
         })
-        .catch(function(err) {
+        .catch(function (err) {
           should.not.exist(err);
           done();
-        })
+        });
       });
     });
 
-    it('should reactivate user', function(done) {
+    it('should reactivate user', function (done) {
       userService.activate(user.id)
-      .then(function(res) {
+      .then(function (res) {
         should.exist(res);
         res.should.eql(true);
         return userService.get(user.id)
-        .then(function(_user) {
+        .then(function (_user) {
           should.exist(_user.username);
           _user.username.should.eql(user.username);
           should.exist(_user.email);
@@ -389,58 +388,58 @@ describe('User service tests', function () {
           should.exist(_user.updatedAt);
           done();
         })
-        .catch(function(err) {
+        .catch(function (err) {
           should.not.exist(err);
           done();
-        })
+        });
       });
     });
   });
 
-  describe('Delete user tests', function() {
+  describe('Delete user tests', function () {
     let user;
-    before(function(done) {
+    before(function (done) {
       db.flushdbAsync()
-      .then(function(didSucceed) {
+      .then(function (didSucceed) {
         if (!didSucceed) {
           console.log('Failed to flush the database');
         }
         user = createRandomUserObject();
         userService
         .insert(user)
-        .then(function(newUser) {
+        .then(function (newUser) {
           should.exist(newUser);
           user.id = newUser.id;
           done();
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
     });
 
-    it('should delete user', function(done) {
+    it('should delete user', function (done) {
       userService.remove(user.id)
-      .then(function(deleted) {
+      .then(function (deleted) {
         should.exist(deleted);
         deleted.should.eql(true);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
     });
 
-    it('should not delete user with invalid id', function(done) {
+    it('should not delete user with invalid id', function (done) {
       userService.remove('invalid_id')
-      .then(function(deleted) {
+      .then(function (deleted) {
         should.exist(deleted);
         deleted.should.eql(false);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -448,11 +447,11 @@ describe('User service tests', function () {
   });
 });
 
-function createRandomUserObject() {
+function createRandomUserObject () {
   return {
     username: uuid.v4(),
     firstname: uuid.v4(),
     lastname: uuid.v4(),
     email: uuid.v4()
-  }
+  };
 }

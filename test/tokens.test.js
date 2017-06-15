@@ -4,19 +4,18 @@ let getTokenService = require('../src/tokens/token.service.js');
 let tokenService = getTokenService(config);
 let db = require('../src/db').getDb();
 
-
 describe('Token tests', function () {
   describe('Save, Find and Get Token tests', function () {
     let newToken, tokenFromDb, newTokenWithScopes, tokenFromDbWithScopes;
-    before(function(done) {
+    before(function (done) {
       db.flushdbAsync()
-      .then(function(didSucceed) {
+      .then(function (didSucceed) {
         if (!didSucceed) {
           console.log('Failed to flush the database');
         }
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -26,7 +25,7 @@ describe('Token tests', function () {
       newToken = {
         username: 'someUsername',
         authType: 'oauth'
-      }
+      };
       tokenService.save(newToken)
       .then((token) => {
         should.exist(token);
@@ -34,7 +33,7 @@ describe('Token tests', function () {
         tokenFromDb = token;
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -46,7 +45,7 @@ describe('Token tests', function () {
         token.should.eql(tokenFromDb);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -66,7 +65,7 @@ describe('Token tests', function () {
         tokenObj.username.should.eql(newToken.username);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -78,7 +77,7 @@ describe('Token tests', function () {
         token.should.eql(tokenFromDb);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -89,7 +88,7 @@ describe('Token tests', function () {
         username: 'someUsername',
         authType: 'oauth',
         scopes: ['scope1', 'scope2', 'scope3']
-      }
+      };
       tokenService.save(newTokenWithScopes)
       .then((token) => {
         should.exist(token);
@@ -97,7 +96,7 @@ describe('Token tests', function () {
         tokenFromDbWithScopes = token;
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -112,7 +111,7 @@ describe('Token tests', function () {
         token.should.eql(tokenFromDbWithScopes);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -133,7 +132,7 @@ describe('Token tests', function () {
         tokenObj.username.should.eql(newTokenWithScopes.username);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -145,7 +144,7 @@ describe('Token tests', function () {
         token.should.eql(tokenFromDbWithScopes);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -156,19 +155,19 @@ describe('Token tests', function () {
     let newToken, expiredToken;
     let tokenService, originalTokenConfig;
 
-    before(function(done) {
+    before(function (done) {
       originalTokenConfig = config.tokens;
       config.tokens.timeToExpiry = 0;
       tokenService = getTokenService(config);
 
       db.flushdbAsync()
-      .then(function(didSucceed) {
+      .then(function (didSucceed) {
         if (!didSucceed) {
           console.log('Failed to flush the database');
         }
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -183,7 +182,7 @@ describe('Token tests', function () {
       newToken = {
         username: 'someUsername',
         authType: 'oauth'
-      }
+      };
       tokenService.save(newToken)
       .then((token) => {
         should.exist(token);
@@ -191,7 +190,7 @@ describe('Token tests', function () {
         expiredToken = token;
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -204,7 +203,7 @@ describe('Token tests', function () {
         should.equal(token, null);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -216,7 +215,7 @@ describe('Token tests', function () {
         token.should.not.eql(expiredToken);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });
@@ -229,7 +228,7 @@ describe('Token tests', function () {
         should.equal(token, null);
         done();
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.not.exist(err);
         done();
       });

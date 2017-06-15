@@ -12,7 +12,7 @@ describe('Functional Test Client Credentials grant', function () {
   let originalAppConfig, originalOauthConfig;
   let fromDbUser1, fromDbApp;
 
-  before(function(done) {
+  before(function (done) {
     originalAppConfig = config.applications;
     originalOauthConfig = config.credentials.types.oauth;
 
@@ -30,7 +30,7 @@ describe('Functional Test Client Credentials grant', function () {
     applicationService = require('../../src/consumers/application.service.js')(config);
 
     db.flushdbAsync()
-    .then(function(didSucceed) {
+    .then(function (didSucceed) {
       if (!didSucceed) {
         console.log('Failed to flush the database');
       }
@@ -64,7 +64,7 @@ describe('Functional Test Client Credentials grant', function () {
         });
       });
     })
-    .catch(function(err) {
+    .catch(function (err) {
       should.not.exist(err);
       done();
     });
@@ -82,7 +82,7 @@ describe('Functional Test Client Credentials grant', function () {
     .send({
       grant_type: 'client_credentials',
       client_id: fromDbApp.id,
-      client_secret: 'app-secret',
+      client_secret: 'app-secret'
     })
     .expect(200)
     .end(function (err, res) {

@@ -1,9 +1,9 @@
- let testHelper = require('./routing.helper')
+ let testHelper = require('./routing.helper');
  let gatewayConfig = {
    http: { port: 9084 },
    apiEndpoints: {
-     "test_domain": { "host": "*.acme.com" }, // path defaults to *
-     "test_second_level_domain": { "host": "*.*.example.com" } // path defaults to *
+     'test_domain': { 'host': '*.acme.com' }, // path defaults to *
+     'test_second_level_domain': { 'host': '*.*.example.com' } // path defaults to *
    },
    pipelines: {
      pipeline1: {
@@ -17,7 +17,7 @@
    before('setup', helper.setup({
      fakeActions: ['test_policy'],
      gatewayConfig
-   }))
+   }));
    after('cleanup', helper.cleanup());
    it('abc.acme.com/', helper.validateSuccess({
      setup: {
@@ -88,4 +88,4 @@
        url: '/'
      }
    }));
- })
+ });

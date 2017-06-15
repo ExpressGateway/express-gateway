@@ -1,39 +1,39 @@
-const minimatch = require('minimatch')
-const express = require('express')
+const minimatch = require('minimatch');
+const express = require('express');
 const logger = require('./log').policy;
 
 const predefinedConditions = {
-  always: function(_req) {
+  always: function (_req) {
     return true;
   },
 
-  never: function(_req) {
+  never: function (_req) {
     // Not sure if anyone would ever use this in real life, but it is a
     // "legitimate" condition, and is useful during tests.
     return false;
   },
 
-  allOf: function(req, actionConfig) {
+  allOf: function (req, actionConfig) {
     return actionConfig.conditions.every(subItem => req.matchEGCondition(subItem));
   },
 
-  oneOf: function(req, actionConfig) {
+  oneOf: function (req, actionConfig) {
     return actionConfig.conditions.some(subItem => req.matchEGCondition(subItem));
   },
 
-  not: function(req, actionConfig) {
+  not: function (req, actionConfig) {
     return !req.matchEGCondition(actionConfig.condition);
   },
 
-  pathMatch: function(req, actionConfig) {
+  pathMatch: function (req, actionConfig) {
     return req.url.match(new RegExp(actionConfig.pattern)) != null;
   },
 
-  pathExact: function(req, actionConfig) {
+  pathExact: function (req, actionConfig) {
     return req.url === actionConfig.path;
   },
 
-  method: function(req, actionConfig) {
+  method: function (req, actionConfig) {
     if (Array.isArray(actionConfig.methods)) {
       return actionConfig.methods.includes(req.method);
     } else {
@@ -41,7 +41,7 @@ const predefinedConditions = {
     }
   },
 
-  hostMatch: function(req, actionConfig) {
+  hostMatch: function (req, actionConfig) {
     if (req.headers.host) {
       return minimatch(req.headers.host, actionConfig.pattern);
     }
@@ -49,11 +49,11 @@ const predefinedConditions = {
   }
 };
 
-module.exports.init = function() {
+module.exports.init = function () {
   const conditions = Object.assign({}, predefinedConditions);
 
-  //extending express.request
-  express.request.matchEGCondition = function(conditionConfig) {
+  // extending express.request
+  express.request.matchEGCondition = function (conditionConfig) {
     logger.debug('matchEGCondition for %o', conditionConfig);
     const func = conditions[conditionConfig.name];
     if (!func) {
@@ -62,10 +62,10 @@ module.exports.init = function() {
     } else {
       return func(this, conditionConfig);
     }
-  }
+  };
   return {
-    register: function({ name, handler }) {
-      conditions[name] = handler
-    },
-  }
-}
+    register: function ({ name, handler }) {
+      conditions[name] = handler;
+    }
+  };
+};

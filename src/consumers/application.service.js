@@ -6,17 +6,17 @@ let utils = require('../utils');
 let uuid = require('node-uuid');
 let applicationDao;
 
-module.exports = function(config) {
+module.exports = function (config) {
   const applicationPropsDefinitions = config.applications.properties;
   applicationDao = getApplicationDao(config);
 
-  function insert(_app, userId) {
+  function insert (_app, userId) {
     return new Promise((resolve, reject) => {
       let app = validateAndCreateApp(_app, userId);
       return applicationDao.insert(app)
-      .then(function(success) {
+      .then(function (success) {
         if (!success) {
-          return reject('one or more insert operations failed'); // TODO: replace with server error
+          return reject(new Error('one or more insert operations failed')); // TODO: replace with server error
         }
 
         app.isActive = app.isActive === 'true';
@@ -26,7 +26,7 @@ module.exports = function(config) {
     .catch(err => Promise.reject(new Error('Failed to insert application: ' + err.message)));
   }
 
-  function get(id) {
+  function get (id) {
     return applicationDao.get(id)
     .then(app => {
       if (!app) {
@@ -38,58 +38,58 @@ module.exports = function(config) {
     });
   }
 
-  function getAll(userId) {
+  function getAll (userId) {
     return applicationDao.getAll(userId)
     .then(apps => {
       return apps.map(app => {
         app.isActive = app.isActive === 'true';
         return app;
       });
-    })
+    });
   }
 
-  function remove(id) {
+  function remove (id) {
     return get(id) // make sure app exists
-    .then(function(app) {
+    .then(function (app) {
       return applicationDao.remove(id, app.userId);
     })
-    .then(function(removed) {
+    .then(function (removed) {
       return removed ? true : Promise.reject(new Error('failed to remove app')); // TODO: replace with server error
     });
   }
 
-  function deactivate(id) {
+  function deactivate (id) {
     return get(id) // make sure app exists
-    .then(function() {
+    .then(function () {
       return applicationDao.deactivate(id);
     })
     .return(true)
     .catch(() => Promise.reject(new Error('failed to deactivate application')));
   }
 
-  function deactivateAll(userId) {
+  function deactivateAll (userId) {
     return applicationDao.deactivateAll(userId)
     .return(true)
     .catch(() => Promise.reject(new Error('failed to deactivate all applications')));
   }
 
-  function activate(id) {
+  function activate (id) {
     return get(id) // make sure app exists
-    .then(function() {
+    .then(function () {
       return applicationDao.activate(id);
     })
     .return(true)
     .catch(() => Promise.reject(new Error('failed to activate user')));
   }
 
-  function removeAll(userId) {
+  function removeAll (userId) {
     return applicationDao.removeAll(userId)
     .then(removed => {
       return removed ? true : Promise.reject(new Error('failed to remove all apps')); // TODO: replace with server error
     });
   }
 
-  function update(id, applicationProperties) {
+  function update (id, applicationProperties) {
     let updatedAppProperties = {};
 
     if (!applicationProperties || !id) {
@@ -97,7 +97,7 @@ module.exports = function(config) {
     }
 
     return get(id) // validate app exists
-    .then(function() {
+    .then(function () {
       if (!Object.keys(applicationProperties).every(key => typeof key === 'string' && applicationPropsDefinitions[key])) {
         return Promise.reject(new Error('one or more properties is invalid')); // TODO: replace with validation error
       }
@@ -111,12 +111,12 @@ module.exports = function(config) {
       utils.appendUpdatedAt(updatedAppProperties);
       return applicationDao.update(id, updatedAppProperties);
     })
-    .then(function(updated) {
+    .then(function (updated) {
       return updated ? true : Promise.reject(new Error('app update failed')); // TODO: replace with server error
     });
   }
 
-  function validateAndCreateApp(appProperties, userId) {
+  function validateAndCreateApp (appProperties, userId) {
     let app = {};
     let baseAppProps;
 
@@ -161,4 +161,4 @@ module.exports = function(config) {
     remove,
     removeAll
   };
-}
+};

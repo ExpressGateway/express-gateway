@@ -5,17 +5,17 @@ let utils = require('../utils');
 let uuid = require('node-uuid');
 let tokenService, tokenDao;
 
-module.exports = function(config) {
+module.exports = function (config) {
   tokenDao = getTokenDao(config);
 
-  function save(tokenObj) {
+  function save (tokenObj) {
     let id = uuid.v4().replace(new RegExp('-', 'g'), '');
     let token = uuid.v4().replace(new RegExp('-', 'g'), '');
     let baseTokenProps = {
       id,
       tokenEncrypted: utils.encrypt(token, config.crypto),
       expiresAt: Date.now() + config.tokens.timeToExpiry
-    }
+    };
     let tokenProps = Object.assign(baseTokenProps, tokenObj);
 
     utils.appendCreatedAt(tokenProps);
@@ -23,19 +23,19 @@ module.exports = function(config) {
     if (tokenProps.scopes && Array.isArray(tokenProps.scopes)) {
       tokenProps.scopes = JSON.stringify(tokenProps.scopes.sort());
     }
-    
+
     return tokenDao.save(tokenProps)
     .then(() => id.concat('|', token));
   }
 
-  function findOrSave(tokenObj) {
+  function findOrSave (tokenObj) {
     return find(tokenObj)
     .then(token => {
-      return token ? token : save(tokenObj);
+      return token || save(tokenObj);
     });
   }
 
-  function find(tokenObj) {
+  function find (tokenObj) {
     let tokenQueryCriteria = Object.assign({}, tokenObj);
 
     if (tokenQueryCriteria.scopes && Array.isArray(tokenQueryCriteria.scopes)) {
@@ -48,11 +48,10 @@ module.exports = function(config) {
         return null;
       }
       return formToken(token);
-    })
+    });
   }
 
-
-  function get(_token) {
+  function get (_token) {
     let tokenId = _token.split('|')[0];
 
     return tokenDao.get(tokenId)
@@ -69,11 +68,11 @@ module.exports = function(config) {
       delete token.tokenEncrypted;
 
       return token;
-    })
+    });
   }
 
-  function formToken(tokenObj) {
-    return tokenObj.id.concat('|', utils.decrypt(tokenObj.tokenEncrypted, config.crypto))
+  function formToken (tokenObj) {
+    return tokenObj.id.concat('|', utils.decrypt(tokenObj.tokenEncrypted, config.crypto));
   }
 
   tokenService = {
@@ -84,4 +83,4 @@ module.exports = function(config) {
   };
 
   return tokenService;
-}
+};

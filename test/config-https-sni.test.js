@@ -3,13 +3,13 @@ const fs = require('fs');
 const tls = require('tls');
 const path = require('path');
 
-let testHelper = require('./routing/routing.helper')
+let testHelper = require('./routing/routing.helper');
 let gatewayConfig = {
   https: {
     port: 10441,
     options: {
       requestCert: true,
-      rejectUnauthorized: false,
+      rejectUnauthorized: false
     },
     tls: {
       'a.example.com': {
@@ -20,7 +20,7 @@ let gatewayConfig = {
       'b.example.com': {
         key: './test/fixtures/agent3-key.pem',
         cert: './test/fixtures/agent3-cert.pem'
-      },
+      }
     }
   },
   apiEndpoints: { test: {} },
@@ -31,7 +31,6 @@ let gatewayConfig = {
     }
   }
 };
-
 
 const testCases = [{
   clientOptions: {
@@ -101,19 +100,19 @@ let serverError;
 describe('sni', () => {
   let servers, helper;
   before('setup', async() => {
-    helper = testHelper()
+    helper = testHelper();
     servers = await helper.setup({
       fakeActions: ['test_policy'],
       gatewayConfig
     })();
-    servers.httpsApp.on('tlsClientError', function(err) {
+    servers.httpsApp.on('tlsClientError', function (err) {
       serverResult = null;
       serverError = err.message;
     });
     servers.httpsApp.on('secureConnection', (tlsSocket) => {
-      serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized }
-    })
-  })
+      serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized };
+    });
+  });
   testCases.forEach(tc => {
     let options = tc.clientOptions;
     tc.actual = {};
@@ -121,36 +120,36 @@ describe('sni', () => {
       serverError = null;
       serverResult = null;
       options.port = servers.httpsApp.address().port;
-      const client = tls.connect(options, function() {
+      const client = tls.connect(options, function () {
         tc.actual.clientResult =
           /Hostname\/IP doesn't/.test(client.authorizationError || '');
         client.destroy();
         tc.actual.serverResult = serverResult;
         tc.actual.clientError = null;
         tc.actual.serverError = serverError;
-        done()
+        done();
       });
 
-      client.on('error', function(err) {
+      client.on('error', function (err) {
         tc.actual.clientResult = false;
         tc.actual.clientError = err.message;
         tc.actual.serverError = serverError;
         tc.actual.serverResult = serverResult;
-        done()
+        done();
       });
-    })
-  })
+    });
+  });
   after('check', () => {
     testCases.forEach((tc) => {
-      assert.deepStrictEqual(tc.actual.serverResult, tc.expected.serverResult)
-      assert.equal(tc.actual.clientResult, tc.expected.clientResult)
-      assert.equal(tc.actual.clientError, tc.expected.clientError)
-      assert.equal(tc.actual.serverError, tc.expected.serverError)
-    })
-    helper.cleanup()
-  })
-})
+      assert.deepStrictEqual(tc.actual.serverResult, tc.expected.serverResult);
+      assert.equal(tc.actual.clientResult, tc.expected.clientResult);
+      assert.equal(tc.actual.clientError, tc.expected.clientError);
+      assert.equal(tc.actual.serverError, tc.expected.serverError);
+    });
+    helper.cleanup();
+  });
+});
 
-function loadPEM(n) {
+function loadPEM (n) {
   return fs.readFileSync(path.join(__dirname, './fixtures', `${n}.pem`));
 }

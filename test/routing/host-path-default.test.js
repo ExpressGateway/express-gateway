@@ -1,4 +1,4 @@
-let testHelper = require('./routing.helper')
+let testHelper = require('./routing.helper');
 let gatewayConfig = {
   http: { port: 9081 },
   apiEndpoints: {
@@ -14,11 +14,11 @@ let gatewayConfig = {
 
 // there are several configuration ways to listen to all hosts
 describe('When uses defaults (capture all hosts and paths)', () => {
-  let helper = testHelper()
+  let helper = testHelper();
   before('setup', helper.setup({
     fakeActions: ['test_policy'],
     gatewayConfig
-  }))
+  }));
   after('cleanup', helper.cleanup());
 
   ['/random/17/3', '/', '/admin'].forEach(url => {
@@ -32,7 +32,7 @@ describe('When uses defaults (capture all hosts and paths)', () => {
         url,
         result: 'test_policy'
       }
-    }))
+    }));
 
     it('should serve for default host and path ' + url, helper.validateSuccess({
       setup: {
@@ -44,7 +44,6 @@ describe('When uses defaults (capture all hosts and paths)', () => {
         url,
         result: 'test_policy'
       }
-    }))
-  })
-
-})
+    }));
+  });
+});

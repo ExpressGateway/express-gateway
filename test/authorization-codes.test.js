@@ -4,19 +4,18 @@ let config = require('./config.models.js');
 let authCodeService = require('../src/authorization-codes/authorization-code.service.js')(config);
 let db = require('../src/db').getDb();
 
-
 describe('Authorization Code Tests', function () {
   let newCode, codeFromDb;
 
-  before(function(done) {
+  before(function (done) {
     db.flushdbAsync()
-    .then(function(didSucceed) {
+    .then(function (didSucceed) {
       if (!didSucceed) {
         console.log('Failed to flush the database');
       }
       done();
     })
-    .catch(function(err) {
+    .catch(function (err) {
       should.not.exist(err);
       done();
     });
@@ -28,7 +27,7 @@ describe('Authorization Code Tests', function () {
       userId: 'userId',
       redirectUri: 'redirectUri',
       scopes: [ 'scope1', 'scope2' ]
-    }
+    };
 
     authCodeService.save(newCode)
     .then((code) => {
@@ -39,7 +38,7 @@ describe('Authorization Code Tests', function () {
       codeFromDb = code;
       done();
     })
-    .catch(function(err) {
+    .catch(function (err) {
       should.not.exist(err);
       done();
     });
@@ -53,7 +52,7 @@ describe('Authorization Code Tests', function () {
       codeFromDb.should.deepEqual(code);
       done();
     })
-    .catch(function(err) {
+    .catch(function (err) {
       should.not.exist(err);
       done();
     });
@@ -67,7 +66,7 @@ describe('Authorization Code Tests', function () {
       should.not.exist(code);
       done();
     })
-    .catch(function(err) {
+    .catch(function (err) {
       should.not.exist(err);
       done();
     });

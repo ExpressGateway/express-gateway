@@ -3,20 +3,20 @@
 let db = require('../db').getDb();
 let authCodeDao, authCodeDbConfig;
 
-module.exports = function(config) {
+module.exports = function (config) {
   if (authCodeDao) {
     return authCodeDao;
   }
 
   authCodeDbConfig = config.authorizationCodes.redis;
 
-  function save(code) {
+  function save (code) {
     // key for the code hash table
     let redisCodeKey = authCodeDbConfig.codeHashPrefix.concat(':', code.id);
     return db.hmsetAsync(redisCodeKey, code);
   }
 
-  function find(criteria) {
+  function find (criteria) {
     return db.hgetallAsync(authCodeDbConfig.codeHashPrefix.concat(':', criteria.id))
     .then((code) => {
       let isEqual;
@@ -35,11 +35,11 @@ module.exports = function(config) {
     });
   }
 
-  function get(id) {
+  function get (id) {
     return db.hgetallAsync(authCodeDbConfig.codeHashPrefix.concat(':', id));
   }
 
-  function remove(id) {
+  function remove (id) {
     return db.delAsync(authCodeDbConfig.codeHashPrefix.concat(':', id));
   }
 
@@ -51,4 +51,4 @@ module.exports = function(config) {
   };
 
   return authCodeDao;
-}
+};
