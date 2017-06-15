@@ -4,7 +4,7 @@ let getUserService = require('./user.service.js');
 let getApplicationService = require('./application.service.js');
 let userService, applicationService;
 
-module.exports = function(config) {
+module.exports = function (config) {
   if (!config) {
     console.error('config not found');
     process.exit(1);
@@ -21,5 +21,5 @@ module.exports = function(config) {
   return {
     userService,
     applicationService
-  }
-}
+  };
+};

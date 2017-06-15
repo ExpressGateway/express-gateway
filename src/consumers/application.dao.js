@@ -3,7 +3,7 @@
 let {getDb} = require('../db');
 let applicationDao, db, applicationDbConfig;
 
-module.exports = function(config) {
+module.exports = function (config) {
   if (applicationDao) {
     return applicationDao;
   }
@@ -11,7 +11,7 @@ module.exports = function(config) {
   db = getDb();
   applicationDbConfig = config.applications.redis;
 
-  function insert(app) {
+  function insert (app) {
     // key for the app hash table
     let appHashKey = applicationDbConfig.appHashPrefix.concat(':', app.id);
 
@@ -26,55 +26,55 @@ module.exports = function(config) {
     .then(res => res.every(val => val));
   }
 
-  function update(id, props) {
+  function update (id, props) {
     // key for the app hash table
     let appHashKey = applicationDbConfig.appHashPrefix.concat(':', id);
 
     return db
     .hmsetAsync(appHashKey, props)
-    .then(function(res) {
+    .then(function (res) {
       return !!res;
     });
   }
 
-  function get(id) {
+  function get (id) {
     return db.hgetallAsync(applicationDbConfig.appHashPrefix.concat(':', id))
-    .then(function(app) {
+    .then(function (app) {
       if (!app || !Object.keys(app).length) {
         return false;
       } else return app;
     });
   }
 
-  function getAll(userId) {
+  function getAll (userId) {
     return getAllAppIdsByUser(userId)
-    .then(function(appIds) {
+    .then(function (appIds) {
       return Promise.all(appIds.map(get))
       .then(apps => apps.filter(app => app !== false));
     });
   }
 
-  function getAllAppIdsByUser(userId) {
+  function getAllAppIdsByUser (userId) {
     return db.smembersAsync(applicationDbConfig.userAppsHashPrefix.concat(':', userId));
   }
 
-  function activate(id) {
+  function activate (id) {
     return db.hsetAsync(config.applications.redis.appHashPrefix.concat(':', id), 'isActive', 'true');
   }
 
-  function deactivate(id) {
+  function deactivate (id) {
     return db.hsetAsync(config.applications.redis.appHashPrefix.concat(':', id), 'isActive', 'false');
   }
 
-  function deactivateAll(userId) {
+  function deactivateAll (userId) {
     return getAllAppIdsByUser(userId)
-    .then(function(appIds) {
+    .then(function (appIds) {
       let deactivateAppPromises = appIds.map(appId => deactivate(appId));
-      return Promise.all(deactivateAppPromises)
+      return Promise.all(deactivateAppPromises);
     });
   }
 
-  function remove(id, userId) {
+  function remove (id, userId) {
     return db
     .multi()
     .del(applicationDbConfig.appHashPrefix.concat(':', id))
@@ -83,9 +83,9 @@ module.exports = function(config) {
     .then(responses => responses.every(res => res));
   }
 
-  function removeAll(userId) {
+  function removeAll (userId) {
     return getAllAppIdsByUser(userId)
-    .then(function(appIds) {
+    .then(function (appIds) {
       let removeAppPromises = appIds.map(appId => remove(appId, userId));
       return Promise.all(removeAppPromises)
       .then(responses => responses.every(res => res));
@@ -106,4 +106,4 @@ module.exports = function(config) {
   };
 
   return applicationDao;
-}
+};

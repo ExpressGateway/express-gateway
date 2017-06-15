@@ -3,8 +3,8 @@
 const logger = require('../log').policy;
 const RateLimiter = require('limiter').RateLimiter;
 
-function createThrottleGroupMiddleware(params) {
-  return function throttleGroupMiddleware(req, _res, next) {
+function createThrottleGroupMiddleware (params) {
+  return function throttleGroupMiddleware (req, _res, next) {
     if (req.throttleGroups === undefined) {
       req.throttleGroups = new Set();
     }
@@ -16,13 +16,13 @@ function createThrottleGroupMiddleware(params) {
   };
 }
 
-function createThrottleMiddleware(params) {
+function createThrottleMiddleware (params) {
   let limiters = {};
   for (const key in params) {
     limiters[key] = new RateLimiter(params[key].rate, params[key].period, true);
   }
 
-  return function throttleMiddleware(req, res, next) {
+  return function throttleMiddleware (req, res, next) {
     let throttleGroups = req.throttleGroups || [];
     let rejectedGroups = [...throttleGroups].filter(key => {
       return (limiters[key] && limiters[key].getTokensRemaining() < 1);

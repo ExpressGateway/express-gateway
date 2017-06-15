@@ -3,18 +3,16 @@
   "parserOptions": {
     "sourceType": "script"
   },
-  "extends": "defaults",
+  "extends": "standard",
   "env": {
     "es6": true,
     "node": true
   },
+  "plugins": [ "markdown", "promise", "node" ],
   "rules": {
-    "comma-dangle": "off",
+    "comma-dangle": [2, "never"],
     "no-var": "error",
-    "no-unused-vars": ["error", {
-      "argsIgnorePattern": "^_.*",
-      "args": "after-used"
-    }],
+    "semi": [2, "always"],
     "no-console": "warn"
   },
   "root": true

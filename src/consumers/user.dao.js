@@ -3,7 +3,7 @@
 let {getDb} = require('../db');
 let userDao, db;
 
-module.exports = function(config) {
+module.exports = function (config) {
   if (userDao) {
     return userDao;
   }
@@ -15,7 +15,7 @@ module.exports = function(config) {
    * @param  {Object}  user
    * @return {string}  username
    */
-  function insert(user) {
+  function insert (user) {
     let redisUserKey, redisUsernameSetKey;
 
     // key for the user hash table
@@ -32,9 +32,9 @@ module.exports = function(config) {
     .then(res => res.every(val => val));
   }
 
-  function getUserById(userId) {
+  function getUserById (userId) {
     return db.hgetallAsync(config.users.redis.userHashPrefix.concat(':', userId))
-    .then(function(user) {
+    .then(function (user) {
       if (!user || !Object.keys(user).length) {
         return false;
       }
@@ -42,16 +42,16 @@ module.exports = function(config) {
     });
   }
 
-  function find(username) {
+  function find (username) {
     return db.smembersAsync(config.users.redis.usernameSetPrefix.concat(':', username))
-    .then(function(Ids) {
+    .then(function (Ids) {
       if (Ids && Ids.length !== 0) {
         return Ids[0];
       } else return false;
     });
   }
 
-  function update(userId, props) {
+  function update (userId, props) {
     let redisUserKey;
 
     // key for the user in redis
@@ -62,17 +62,17 @@ module.exports = function(config) {
     .then(res => !!res);
   }
 
-  function activate(id) {
+  function activate (id) {
     return db.hsetAsync(config.users.redis.userHashPrefix.concat(':', id), 'isActive', 'true');
   }
 
-  function deactivate(id) {
+  function deactivate (id) {
     return db.hsetAsync(config.users.redis.userHashPrefix.concat(':', id), 'isActive', 'false');
   }
 
-  function remove(userId) {
+  function remove (userId) {
     return getUserById(userId)
-    .then(function(user) {
+    .then(function (user) {
       if (!user) {
         return false;
       }
@@ -96,4 +96,4 @@ module.exports = function(config) {
   };
 
   return userDao;
-}
+};

@@ -1,21 +1,21 @@
-const https = require('https')
-const minimatch = require('minimatch')
-const tls = require('tls')
-const http = require('http')
-const fs = require('fs')
-const path = require('path')
+const https = require('https');
+const minimatch = require('minimatch');
+const tls = require('tls');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 const logger = require('../log').gateway;
 
-module.exports.bootstrap = function(app, config) {
+module.exports.bootstrap = function (app, config) {
   let httpServer = config.http ? http.createServer(app) : null;
-  let httpsServer = config.https && config.https.tls ? createTlsServer(config.https, app) : null
+  let httpsServer = config.https && config.https.tls ? createTlsServer(config.https, app) : null;
   return {
     httpServer,
     httpsServer
-  }
-}
+  };
+};
 
-function createTlsServer(httpsConfig, app) {
+function createTlsServer (httpsConfig, app) {
   let defaultCert = null;
   let sniCerts = [];
 

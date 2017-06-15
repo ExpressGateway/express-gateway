@@ -6,13 +6,13 @@ let getApplicationService = require('./consumers/application.service.js');
 let getTokenService = require('./tokens/token.service.js');
 let utils = require('./utils');
 
-module.exports = function(config) {
+module.exports = function (config) {
   let credentials = getCredentialService(config);
   let users = getUserService(config);
   let applications = getApplicationService(config);
   let tokens = getTokenService(config);
 
-  function authenticateCredential(id, password, type) {
+  function authenticateCredential (id, password, type) {
     if (!id || !password || !type) {
       return false;
     }
@@ -20,19 +20,21 @@ module.exports = function(config) {
     .then((consumer) => {
       if (!consumer) {
         return false;
-      } else return credentials.getCredential(id, type, { includePassword: true })
+      } else {
+        return credentials.getCredential(id, type, { includePassword: true })
         .then(_credential => {
           if (_credential && _credential.isActive) {
             return utils.compareSaltAndHashed(password, _credential[config.credentials.types[type]['passwordKey']])
             .then(authenticated => {
               return authenticated ? consumer : false;
-            })
+            });
           } else return false;
         });
+      }
     });
   }
 
-  function authenticateToken(token) {
+  function authenticateToken (token) {
     let tokenObj;
     let tokenPassword = token.split('|')[1];
 
@@ -52,10 +54,10 @@ module.exports = function(config) {
       if (!consumer || !consumer.isActive) {
         return false;
       } else return tokenObj.tokenDecrypted === tokenPassword ? tokenObj : false;
-    })
+    });
   }
 
-  function authorizeToken(_token, authType, scopes) {
+  function authorizeToken (_token, authType, scopes) {
     if (!scopes || scopes.length === 0) {
       return true;
     }
@@ -76,7 +78,7 @@ module.exports = function(config) {
     });
   }
 
-  function authorizeCredential(id, authType, scopes) {
+  function authorizeCredential (id, authType, scopes) {
     if (!scopes || !scopes.length) {
       return true;
     }
@@ -92,7 +94,7 @@ module.exports = function(config) {
     });
   }
 
-  function validateConsumer(id) {
+  function validateConsumer (id) {
     return applications.get(id)
     .then(app => {
       if (app) {
@@ -100,14 +102,16 @@ module.exports = function(config) {
           return null;
         }
         return createApplicationObject(app);
-      } else return users.find(id)
+      } else {
+        return users.find(id)
         .then(user => {
           if (user) {
             if (!user.isActive) {
               return null;
             }
             return createUserObject(user);
-          } else return users.get(id)
+          } else {
+            return users.get(id)
             .then(_user => {
               if (_user) {
                 if (!_user.isActive) {
@@ -116,15 +120,17 @@ module.exports = function(config) {
                 return createUserObject(_user);
               } else return null;
             });
+          }
         });
+      }
     });
   }
 
-  function createUserObject(user) {
+  function createUserObject (user) {
     return Object.assign({ type: 'user' }, user);
   }
 
-  function createApplicationObject(app) {
+  function createApplicationObject (app) {
     return Object.assign({ type: 'application' }, app);
   }
 
@@ -134,5 +140,5 @@ module.exports = function(config) {
     authorizeToken,
     validateConsumer,
     authorizeCredential
-  }
-}
+  };
+};

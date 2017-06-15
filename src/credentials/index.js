@@ -3,7 +3,7 @@
 let getCredentialService = require('./credential.service.js');
 let credentialService;
 
-module.exports = function(config) {
+module.exports = function (config) {
   if (!config) {
     console.error('config not found');
     process.exit(1);
@@ -14,4 +14,4 @@ module.exports = function(config) {
   }
 
   return credentialService;
-}
+};

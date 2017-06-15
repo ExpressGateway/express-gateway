@@ -6,10 +6,10 @@ let uuid = require('node-uuid');
 let Promise = require('bluebird');
 let authCodeService, authCodeDao;
 
-module.exports = function(config) {
+module.exports = function (config) {
   authCodeDao = getAuthCodeDao(config);
 
-  function save(criteria) {
+  function save (criteria) {
     if (!criteria || !criteria.consumerId || !criteria.userId) {
       return Promise.reject(new Error('Invalid arguments'));
     }
@@ -19,7 +19,7 @@ module.exports = function(config) {
       id: uuid.v4().replace(new RegExp('-', 'g'), ''),
       consumerId: criteria.consumerId,
       userId: criteria.userId
-    }
+    };
 
     if (criteria.redirectUri) code.redirectUri = criteria.redirectUri;
 
@@ -31,7 +31,7 @@ module.exports = function(config) {
     }
 
     utils.appendCreatedAt(code);
-    
+
     return authCodeDao.save(code)
     .then((res) => {
       if (!res) {
@@ -44,7 +44,7 @@ module.exports = function(config) {
     });
   }
 
-  function find(criteria) {
+  function find (criteria) {
     let codeQueryCriteria = Object.assign({}, criteria);
 
     if (codeQueryCriteria.scopes && Array.isArray(codeQueryCriteria.scopes)) {
@@ -72,4 +72,4 @@ module.exports = function(config) {
   };
 
   return authCodeService;
-}
+};

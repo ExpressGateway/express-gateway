@@ -2,7 +2,7 @@
 
 const ConfigurationError = require('../errors').ConfigurationError;
 
-function createRewriteMiddleware(params) {
+function createRewriteMiddleware (params) {
   if (!params || !params.match || !params.replace) {
     throw new ConfigurationError(
       'Rewrite middleware requires "match" and "replace" params');
@@ -16,7 +16,7 @@ function createRewriteMiddleware(params) {
   let match = new RegExp(params.match);
 
   // eslint-disable-next-line no-unused-vars
-  return function(req, res, next) {
+  return function (req, res, next) {
     let newUrl = req.url.replace(match, params.replace, params.flags || 'g');
     if (params.redirect) {
       res.redirect(params.redirect, req.baseUrl + newUrl);

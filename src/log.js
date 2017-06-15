@@ -51,4 +51,4 @@ module.exports = {
   config: winston.loggers.get('EG:config'),
   db: winston.loggers.get('EG:db'),
   logPolicy: winston.loggers.get('EG:log-policy')
-}
+};

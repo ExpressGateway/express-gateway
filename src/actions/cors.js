@@ -2,7 +2,7 @@
 
 const cors = require('cors');
 
-function createCorsMiddleware(params) {
+function createCorsMiddleware (params) {
   return cors(params);
 }
 

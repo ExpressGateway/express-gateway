@@ -17,8 +17,8 @@ const testHelper = require('./routing.helper');
     before('setup', helper.setup({
       fakeActions: ['test_policy'],
       gatewayConfig: gatewayConfig
-    }))
-    after('cleanup', helper.cleanup())
+    }));
+    after('cleanup', helper.cleanup());
     it('mathing regex animals.com/id-123', helper.validateSuccess({
       setup: {
         host,
@@ -52,5 +52,5 @@ const testHelper = require('./routing.helper');
         result: 'test_policy'
       }
     }));
-  })
-})
+  });
+});

@@ -6,7 +6,7 @@ const logger = require('../log').gateway;
 
 const ConfigurationError = require('../errors').ConfigurationError;
 
-function createMiddleware(params, config) {
+function createMiddleware (params, config) {
   let serviceEndpoint = lodash.get(config, ['serviceEndpoints',
     params.serviceEndpoint, 'url'
   ]);
@@ -30,7 +30,7 @@ function createMiddleware(params, config) {
     }
   });
 
-  return function proxyHandler(req, res, _next) {
+  return function proxyHandler (req, res, _next) {
     logger.debug(`proxying to ${serviceEndpoint}`);
     proxy.web(req, res);
   };

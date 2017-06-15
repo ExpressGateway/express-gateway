@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 module.exports = {
   redis: {
@@ -45,7 +45,7 @@ module.exports = {
   },
   authorizationCodes: {
     redis: {
-      codeHashPrefix: 'EG-AUTH-CODE',
+      codeHashPrefix: 'EG-AUTH-CODE'
     },
     timeToExpiry: 300000 // 5 minutes
   },
@@ -60,24 +60,24 @@ module.exports = {
     },
     types: {
       basicAuth: {
-        /* passwordKey is required for all credentials. 
-         * Usually it's just 'password' or 'secret', but users can define it themselves 
-         * In the case below, passwordKey is 'password'. So, when defining a credential, 
+        /* passwordKey is required for all credentials.
+         * Usually it's just 'password' or 'secret', but users can define it themselves
+         * In the case below, passwordKey is 'password'. So, when defining a credential,
          * 'password' must be supplied as a parameter
          */
         passwordKey: 'password',
         autoGeneratePassword: true, // If password is not supplied, it will auto-generate a uuid as password
         properties: { // additional properties part of the credentials object
-          scopes:   { isRequired: true },
+          scopes: { isRequired: true }
         }
       },
       oauth: {
         passwordKey: 'secret',
         autoGeneratePassword: true,
-        properties: { 
+        properties: {
           scopes: { isRequired: false }
         }
       }
     }
   }
-}
+};

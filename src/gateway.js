@@ -1,28 +1,28 @@
 'use strict';
-const logger = require('./log').gateway
+const logger = require('./log').gateway;
 let config = require('./config-loader');
 
-async function start(startupConfig) {
+async function start (startupConfig) {
   let servers;
   try {
-    await config.loadConfig(startupConfig)
+    await config.loadConfig(startupConfig);
     servers = config.bootstrapGateway();
   } catch (err) {
     logger.error(err);
-    logger.error('system is misconfigured, shutdown initiated %j', err)
+    logger.error('system is misconfigured, shutdown initiated %j', err);
     process.exit(1);
   }
-  let gatewayConfig = config.getGatewayConfig()
+  let gatewayConfig = config.getGatewayConfig();
   let httpPromise = new Promise((resolve) => {
     if (!gatewayConfig.http || !servers.httpServer) {
       logger.info('HTTP server disabled (no http section provided in config)');
       return resolve(null);
     }
-    let port = gatewayConfig.http.port
+    let port = gatewayConfig.http.port;
     let runningApp = servers.httpServer.listen(port, () => {
       logger.info(`Listening on ${port}`);
       resolve({
-        app: runningApp,
+        app: runningApp
       });
     });
   });
@@ -31,11 +31,11 @@ async function start(startupConfig) {
       logger.info('HTTPS server disabled (no https section provided in config)');
       return resolve(null);
     }
-    let port = gatewayConfig.https.port
+    let port = gatewayConfig.https.port;
     let runningApp = servers.httpsServer.listen(port, () => {
       logger.info(`Listening on ${port}`);
       resolve({
-        app: runningApp,
+        app: runningApp
       });
     });
   });
@@ -45,8 +45,8 @@ async function start(startupConfig) {
     return {
       app,
       httpsApp
-    }
-  })
+    };
+  });
 }
 
 module.exports = {

@@ -3,7 +3,8 @@
 const oauth2orize = require('oauth2orize');
 const passport = require('passport');
 const login = require('connect-ensure-login');
-let config = require('../../config/config.model.js')
+const path = require('path');
+let config = require('../../config/config.model.js');
 
 let tokenService = require('../../tokens/token.service.js')(config);
 let authCodeService = require('../../authorization-codes/authorization-code.service.js')(config);
@@ -74,7 +75,7 @@ server.grant(oauth2orize.grant.token((consumer, authenticatedUser, ares, done) =
   let tokenCriteria = {
     authenticatedUser: authenticatedUser.id,
     redirectUri: consumer.redirectUri
-  }
+  };
 
   if (!consumer.username) {
     tokenCriteria.applicationId = consumer.id;
@@ -226,8 +227,8 @@ module.exports.authorization = [
   }),
   (request, response) => {
     response.set('transaction_id', request.oauth2.transactionID);
-    response.render(__dirname + '/views/dialog', { transactionId: request.oauth2.transactionID, user: request.user, client: request.oauth2.client });
-  },
+    response.render(path.join(__dirname, 'views/dialog'), { transactionId: request.oauth2.transactionID, user: request.user, client: request.oauth2.client });
+  }
 ];
 
 // User decision endpoint.
@@ -239,9 +240,8 @@ module.exports.authorization = [
 
 exports.decision = [
   login.ensureLoggedIn(),
-  server.decision(),
+  server.decision()
 ];
-
 
 // Token endpoint.
 //
@@ -253,5 +253,5 @@ exports.decision = [
 exports.token = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
   server.token(),
-  server.errorHandler(),
+  server.errorHandler()
 ];

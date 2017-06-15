@@ -12,7 +12,7 @@ let app = express();
 app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: false })); //TODO: add session options to config file
+app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: false })); // TODO: add session options to config file
 app.use(passport.initialize());
 app.use(passport.session());
 
