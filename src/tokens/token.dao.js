@@ -4,7 +4,7 @@ let {getDb} = require('../db');
 let Promise = require('bluebird');
 let tokenDao, db, tokenDbConfig;
 
-module.exports = function(config) {
+module.exports = function (config) {
   if (tokenDao) {
     return tokenDao;
   }
@@ -45,25 +45,23 @@ module.exports = function(config) {
         return true;
       });
 
-
       tokenPromises = activeTokenIds.map((id) => {
         return db.hgetallAsync(tokenDbConfig.tokenHashPrefix.concat(':', id))
         .then((token) => {
           let isEqual;
 
           if (!token) {
-            return Promise.reject();
+            return Promise.reject(new Error());
           }
 
           isEqual = Object.keys(tokenObj).every((key) => tokenObj[key] === token[key]);
-          return isEqual ? token : Promise.reject();
+          return isEqual ? token : Promise.reject(new Error());
         });
       });
 
       return Promise.some(tokenPromises, 1)
       .spread((token) => {
         foundToken = token;
-        return;
       })
       .catch(() => null)
       .then(() => {
@@ -84,7 +82,7 @@ module.exports = function(config) {
     });
   }
 
-  function get(tokenId) {
+  function get (tokenId) {
     return db.hgetallAsync(tokenDbConfig.tokenHashPrefix.concat(':', tokenId))
     .then(token => {
       if (!token) {
@@ -97,7 +95,7 @@ module.exports = function(config) {
       }
 
       return token;
-    })
+    });
   }
 
   tokenDao = {
@@ -107,4 +105,4 @@ module.exports = function(config) {
   };
 
   return tokenDao;
-}
+};

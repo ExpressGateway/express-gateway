@@ -12,7 +12,7 @@ describe('Functional Test Client Password grant', function () {
   let originalAppConfig, originalOauthConfig;
   let fromDbUser1, fromDbApp;
 
-  before(function(done) {
+  before(function (done) {
     originalAppConfig = config.applications;
     originalOauthConfig = config.credentials.types.oauth;
 
@@ -32,9 +32,8 @@ describe('Functional Test Client Password grant', function () {
     userService = require('../../src/consumers/user.service.js')(config);
     applicationService = require('../../src/consumers/application.service.js')(config);
 
-
     db.flushdbAsync()
-    .then(function(didSucceed) {
+    .then(function (didSucceed) {
       if (!didSucceed) {
         console.log('Failed to flush the database');
       }
@@ -82,7 +81,7 @@ describe('Functional Test Client Password grant', function () {
         });
       });
     })
-    .catch(function(err) {
+    .catch(function (err) {
       should.not.exist(err);
       done();
     });
@@ -96,11 +95,11 @@ describe('Functional Test Client Password grant', function () {
 
   it('should grant access token when no scopes are specified', function (done) {
     let request = session(app);
-    let credentials = new Buffer(fromDbApp.id.concat(':app-secret')).toString('base64');
+    let credentials = Buffer.from(fromDbApp.id.concat(':app-secret')).toString('base64');
 
     request
     .post('/oauth2/token')
-    .set('Authorization','basic ' + credentials)
+    .set('Authorization', 'basic ' + credentials)
     .set('content-type', 'application/x-www-form-urlencoded')
     .type('form')
     .send({

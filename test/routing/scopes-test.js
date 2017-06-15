@@ -1,4 +1,4 @@
-let testHelper = require('./routing.helper')
+let testHelper = require('./routing.helper');
 let gatewayConfig = {
   http: { port: 9089 },
   apiEndpoints: {
@@ -18,12 +18,12 @@ let gatewayConfig = {
 };
 
 describe('When scopes defined for apiEndpoint', () => {
-  let helper = testHelper()
+  let helper = testHelper();
   before('setup', helper.setup({
     fakeActions: ['test_policy'],
     gatewayConfig
-  }))
-  after('cleanup', helper.cleanup())
+  }));
+  after('cleanup', helper.cleanup());
   it('should set scopes to egContext', helper.validateSuccess({
     setup: {
       url: '/'
@@ -32,5 +32,5 @@ describe('When scopes defined for apiEndpoint', () => {
       url: '/',
       scopes: gatewayConfig.apiEndpoints.test_default.scopes
     }
-  }))
-})
+  }));
+});

@@ -4,32 +4,32 @@ let Promise = require('bluebird');
 let {getDb} = require('../db');
 let credentialDao, db;
 
-module.exports = function(config) {
+module.exports = function (config) {
   if (credentialDao) {
     return credentialDao;
   }
 
   db = getDb();
 
-  function insertScopes(_scopes) {
+  function insertScopes (_scopes) {
     let scopes = {};
     if (Array.isArray(_scopes)) {
-      _scopes.forEach(el => scopes[el] = 'true');
+      _scopes.forEach(el => { scopes[el] = 'true'; });
     } else scopes[_scopes] = 'true';
     return db.hmsetAsync(config.credentials.redis.scopePrefix, scopes);
   }
 
-  function associateCredentialWithScopes(id, type, scopes) {
+  function associateCredentialWithScopes (id, type, scopes) {
     let credentialId = config.credentials.redis.credentialPrefixes[type].concat(':', id);
     let associationPromises;
-    Array.isArray(scopes) ? scopes : [ scopes ];
+    scopes = Array.isArray(scopes) ? scopes : [ scopes ];
     associationPromises = scopes.map(scope => db.hsetAsync(config.credentials.redis.scopeCredentialPrefix.concat(':', scope), credentialId, 'true'));
 
     return Promise.all(associationPromises)
     .catch(() => Promise.reject(new Error('failed to associate credential with scopes in db'))); // TODO: replace with server error
   }
 
-  function dissociateCredentialFromScopes(id, type, scopes) {
+  function dissociateCredentialFromScopes (id, type, scopes) {
     let credentialId = config.credentials.redis.credentialPrefixes[type].concat(':', id);
     let dissociationPromises;
     scopes = Array.isArray(scopes) ? scopes : [ scopes ];
@@ -39,7 +39,7 @@ module.exports = function(config) {
     .catch(() => Promise.reject(new Error('failed to dissociate credential with scopes in db'))); // TODO: replace with server error
   }
 
-  function removeScopes(scopes) {
+  function removeScopes (scopes) {
     let removeScopesTransaction;
     let getScopeCredentialPromises = [];
 
@@ -96,42 +96,42 @@ module.exports = function(config) {
     });
   }
 
-  function existsScope(scope) {
+  function existsScope (scope) {
     return db.hgetAsync(config.credentials.redis.scopePrefix, scope)
     .then(res => !!res);
   }
 
-  function getAllScopes() {
+  function getAllScopes () {
     return db.hgetallAsync(config.credentials.redis.scopePrefix)
     .then(res => {
       return res ? Object.keys(res) : null;
     });
   }
 
-  function insertCredential(id, type, credentialObj) {
+  function insertCredential (id, type, credentialObj) {
     if (!credentialObj) {
       return Promise.resolve(null);
     }
     return db.hmsetAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id), credentialObj);
   }
 
-  function getCredential(id, type) {
+  function getCredential (id, type) {
     return db.hgetallAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id));
   }
 
-  function activateCredential(id, type) {
+  function activateCredential (id, type) {
     return db.hsetAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id), 'isActive', 'true');
   }
 
-  function deactivateCredential(id, type) {
+  function deactivateCredential (id, type) {
     return db.hsetAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id), 'isActive', 'false');
   }
 
-  function removeCredential(id, type) {
+  function removeCredential (id, type) {
     return db.delAsync(config.credentials.redis.credentialPrefixes[type].concat(':', id));
   }
 
-  function removeAllCredentials(id) {
+  function removeAllCredentials (id) {
     let dbTransaction = db.multi();
     let credentialTypes = Object.keys(config.credentials.types);
 
@@ -142,11 +142,11 @@ module.exports = function(config) {
     return dbTransaction.execAsync();
   }
 
-  function updateCredential(id, type, credentialObj) {
+  function updateCredential (id, type, credentialObj) {
     return insertCredential(id, type, credentialObj);
   }
 
-  credentialDao =  {
+  credentialDao = {
     insertScopes,
     removeScopes,
     existsScope,
@@ -163,5 +163,4 @@ module.exports = function(config) {
   };
 
   return credentialDao;
-
-}
+};

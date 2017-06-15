@@ -5,7 +5,7 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const logger = require('../log').policy;
 
-function createJwtMiddleware(params) {
+function createJwtMiddleware (params) {
   let jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeader(),
     issuer: params.issuer,
@@ -17,7 +17,7 @@ function createJwtMiddleware(params) {
   passport.use(new JwtStrategy(jwtOptions, (jwt, done) => {
     done(null, jwt);
   }));
-  return function jwtMiddleware(req, res, next) {
+  return function jwtMiddleware (req, res, next) {
     logger.debug('authenticating with JWT token');
     passport.authenticate('jwt', (err, user, info) => {
       if (err) {

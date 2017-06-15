@@ -7,10 +7,10 @@ let utils = require('../utils');
 let uuid = require('node-uuid');
 let credentialService, credentialDao;
 
-module.exports = function(config) {
+module.exports = function (config) {
   credentialDao = getCredentialDao(config);
 
-  function insertScopes(scopes) {
+  function insertScopes (scopes) {
     return validateNewScopes(scopes)
       .then(newScopes => {
         if (!newScopes) {
@@ -23,25 +23,27 @@ module.exports = function(config) {
       .catch(() => Promise.reject(new Error('failed to insert scope'))); // TODO: replace with server error
   }
 
-  function removeScopes(scopes) {
-    let _scopes = validateScopes(scopes)
+  function removeScopes (scopes) {
+    let _scopes = validateScopes(scopes);
     if (!_scopes) {
       return Promise.reject(new Error('invalid scopes')); // TODO: replace with validation error
-    } else return credentialDao.removeScopes(_scopes)
-      .then(function(removed) {
-        return removed ? true : false;
+    } else {
+      return credentialDao.removeScopes(_scopes)
+      .then(function (removed) {
+        return !!removed;
       });
+    }
   }
 
-  function existsScope(scope) {
+  function existsScope (scope) {
     return scope ? credentialDao.existsScope(scope) : Promise.resolve(false);
   }
 
-  function getAllScopes() {
+  function getAllScopes () {
     return credentialDao.getAllScopes();
   }
 
-  function insertCredential(id, type, credentialDetails) {
+  function insertCredential (id, type, credentialDetails) {
     credentialDetails = credentialDetails || {};
 
     if (!id || typeof id !== 'string' || !type) {
@@ -66,9 +68,9 @@ module.exports = function(config) {
         newCredential = { isActive: 'true' };
 
         return Promise.all([validateNewCredentialScopes(credentialConfig, credentialDetails),
-            validateAndHashPassword(credentialConfig, credentialDetails),
-            validateNewCredentialproperties(credentialConfig, _.omit(credentialDetails, ['scopes']))
-          ])
+          validateAndHashPassword(credentialConfig, credentialDetails),
+          validateNewCredentialproperties(credentialConfig, _.omit(credentialDetails, ['scopes']))
+        ])
           .then(([scopes, { hash, password }, credentialProps]) => {
             let associateCredentialWithScopesPromise;
             if (scopes) {
@@ -77,11 +79,11 @@ module.exports = function(config) {
             } else associateCredentialWithScopesPromise = Promise.resolve(null);
 
             newCredential[credentialConfig.passwordKey] = hash;
-            Object.assign(newCredential, credentialProps)
+            Object.assign(newCredential, credentialProps);
 
             return Promise.all([credentialDao.insertCredential(id, type, newCredential),
-                associateCredentialWithScopesPromise
-              ])
+              associateCredentialWithScopesPromise
+            ])
               .then(() => {
                 let credential = _.omit(newCredential, [credentialConfig.passwordKey]);
                 credential['id'] = id;
@@ -99,7 +101,7 @@ module.exports = function(config) {
   }
 
   // Helper method to insertCredentials
-  function validateAndHashPassword(credentialConfig, credentialDetails) {
+  function validateAndHashPassword (credentialConfig, credentialDetails) {
     let password;
 
     if (credentialDetails[credentialConfig.passwordKey]) {
@@ -117,12 +119,12 @@ module.exports = function(config) {
 
     return utils.saltAndHash(password, config.bcrypt.saltRounds)
       .then((hash) => {
-        return { hash, password }
+        return { hash, password };
       });
   }
 
   // Helper method to insertCredentials
-  function validateNewCredentialScopes(credentialConfig, credentialDetails) {
+  function validateNewCredentialScopes (credentialConfig, credentialDetails) {
     if (!credentialConfig.properties || !credentialConfig.properties['scopes']) {
       return Promise.resolve(null);
     }
@@ -142,7 +144,7 @@ module.exports = function(config) {
     return Promise.resolve(null);
   }
 
-  function getCredential(id, type, options) {
+  function getCredential (id, type, options) {
     if (!id || !type || typeof id !== 'string' || typeof type !== 'string') {
       return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
@@ -160,7 +162,7 @@ module.exports = function(config) {
       });
   }
 
-  function deactivateCredential(id, type) {
+  function deactivateCredential (id, type) {
     if (!id || !type) {
       return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
@@ -174,7 +176,7 @@ module.exports = function(config) {
       });
   }
 
-  function activateCredential(id, type) {
+  function activateCredential (id, type) {
     if (!id || !type) {
       return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
@@ -188,7 +190,7 @@ module.exports = function(config) {
       });
   }
 
-  function updateCredential(id, type, properties) {
+  function updateCredential (id, type, properties) {
     return getCredential(id, type)
       .then((credential) => {
         if (!credential) {
@@ -201,7 +203,7 @@ module.exports = function(config) {
       });
   }
 
-  function removeCredential(id, type) {
+  function removeCredential (id, type) {
     if (!id || !type) {
       return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
@@ -210,7 +212,7 @@ module.exports = function(config) {
       .return(true);
   }
 
-  function removeAllCredentials(id) {
+  function removeAllCredentials (id) {
     if (!id) {
       return Promise.reject(new Error('invalid credential')); // TODO: replace with validation error
     }
@@ -218,7 +220,7 @@ module.exports = function(config) {
       .then(() => true);
   }
 
-  function addScopesToCredential(id, type, scopes) {
+  function addScopesToCredential (id, type, scopes) {
     return Promise.all([validateExistingScopes(scopes), getCredential(id, type)])
       .then(([_scopes, credential]) => {
         let existingScopes = credential.scopes ? (Array.isArray(credential.scopes) ? credential.scopes : [credential.scopes]) : [];
@@ -230,7 +232,7 @@ module.exports = function(config) {
       .then(() => true);
   }
 
-  function removeScopesFromCredential(id, type, scopes) {
+  function removeScopesFromCredential (id, type, scopes) {
     return Promise.all([validateScopes(scopes), getCredential(id, type)])
       .then(([_scopes, credential]) => {
         let existingScopes = credential.scopes ? (Array.isArray(credential.scopes) ? credential.scopes : [credential.scopes]) : [];
@@ -243,7 +245,7 @@ module.exports = function(config) {
   }
 
   // This function validates all user defined properties, excluding scopes
-  function validateNewCredentialproperties(credentialConfig, credentialDetails) {
+  function validateNewCredentialproperties (credentialConfig, credentialDetails) {
     let newCredentialProperties = {};
 
     for (let prop in _.omit(credentialConfig.properties, ['scopes'])) {
@@ -262,7 +264,7 @@ module.exports = function(config) {
   }
 
   // This function validates all user defined properties, excluding scopes
-  function validateUpdatedCredentialproperties(type, credentialDetails) {
+  function validateUpdatedCredentialproperties (type, credentialDetails) {
     let newCredentialProperties = {};
     let credentialConfig = config.credentials.types[type];
 
@@ -280,27 +282,27 @@ module.exports = function(config) {
     return Object.keys(newCredentialProperties).length > 0 ? Promise.resolve(newCredentialProperties) : Promise.resolve(null);
   }
 
-  function validateNewScopes(scopes) {
+  function validateNewScopes (scopes) {
     let _scopes = validateScopes(scopes);
-    return !_scopes ? Promise.reject(new Error('invalid scopes')) : // TODO: replace with validation error
-      Promise.all(_scopes.map(val => existsScope(val)))
+    return !_scopes ? Promise.reject(new Error('invalid scopes')) // TODO: replace with validation error
+      : Promise.all(_scopes.map(val => existsScope(val)))
       .then(res => {
-        return res.every(val => !val) ? _scopes :
-          Promise.reject(new Error('one or more scopes already exist')); // TODO: replace with validation error
+        return res.every(val => !val) ? _scopes
+          : Promise.reject(new Error('one or more scopes already exist')); // TODO: replace with validation error
       });
   }
 
-  function validateExistingScopes(scopes) {
+  function validateExistingScopes (scopes) {
     let _scopes = validateScopes(scopes);
-    return !_scopes ? Promise.reject(new Error('invalid scopes')) : // TODO: replace with validation error
-      Promise.all(_scopes.map(val => existsScope(val)))
+    return !_scopes ? Promise.reject(new Error('invalid scopes')) // TODO: replace with validation error
+      : Promise.all(_scopes.map(val => existsScope(val)))
       .then(res => {
-        return res.every(val => val) ? _scopes :
-          Promise.reject(new Error('one or more scopes don\'t exist')); // TODO: replace with validation error
+        return res.every(val => val) ? _scopes
+          : Promise.reject(new Error('one or more scopes don\'t exist')); // TODO: replace with validation error
       });
   }
 
-  function validateScopes(scopes) {
+  function validateScopes (scopes) {
     let _scopes = Array.isArray(scopes) ? _.uniq(scopes) : [scopes];
     if (!_scopes || _scopes.some(val => typeof val !== 'string')) {
       return false;
@@ -320,8 +322,8 @@ module.exports = function(config) {
     removeScopesFromCredential,
     updateCredential,
     removeCredential,
-    removeAllCredentials,
+    removeAllCredentials
   };
 
   return credentialService;
-}
+};

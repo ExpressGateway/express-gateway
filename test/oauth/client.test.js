@@ -11,7 +11,7 @@ describe('Functional Test Authorization Code grant', function () {
   let originalAppConfig, originalOauthConfig;
   let user, application;
 
-  before(function(done) {
+  before(function (done) {
     originalAppConfig = config.applications;
     originalOauthConfig = config.credentials.types.oauth;
 
@@ -32,7 +32,7 @@ describe('Functional Test Authorization Code grant', function () {
 
 
     db.flushdbAsync()
-    .then(function(didSucceed) {
+    .then(function (didSucceed) {
       if (!didSucceed) {
         console.log('Failed to flush the database');
       }
@@ -69,7 +69,7 @@ describe('Functional Test Authorization Code grant', function () {
         });
       });
     })
-    .catch(function(err) {
+    .catch(function (err) {
       should.not.exist(err);
       done();
     });

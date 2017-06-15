@@ -12,10 +12,10 @@ let gatewayConfig = {
   },
   serviceEndpoints: {
     admin: {
-      url: "http://localhost:" + port1
+      url: 'http://localhost:' + port1
     },
     staff: {
-      url: "http://localhost:" + port2
+      url: 'http://localhost:' + port2
     }
   },
   pipelines: {
@@ -36,7 +36,7 @@ let gatewayConfig = {
 
 describe('multi step policy ', () => {
   before('start servers', async() => {
-    app1 = (await serverHelper.generateBackendServer(port1)).app
+    app1 = (await serverHelper.generateBackendServer(port1)).app;
     app2 = (await serverHelper.generateBackendServer(port2)).app;
     appTarget = (await gateway.start({ gatewayConfig })).app;
   });
@@ -45,7 +45,7 @@ describe('multi step policy ', () => {
     request(appTarget).get('/admin')
       .expect(200)
       .expect('Content-Type', /text/)
-      .end(function(error, res) {
+      .end(function (error, res) {
         if (error) {
           done(error);
         }
@@ -58,7 +58,7 @@ describe('multi step policy ', () => {
     request(appTarget).get('/staff')
       .expect(200)
       .expect('Content-Type', /text/)
-      .end(function(err, res) {
+      .end(function (err, res) {
         if (err) {
           done(err);
         }

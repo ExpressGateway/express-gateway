@@ -3,7 +3,7 @@
 const site = require('./site');
 const oauth2 = require('./oauth2');
 
-module.exports = function(app) {
+module.exports = function (app) {
   app.set('view engine', 'ejs');
   require('./auth');
 
@@ -16,4 +16,4 @@ module.exports = function(app) {
   app.post('/oauth2/token', oauth2.token);
 
   return app;
-}
+};

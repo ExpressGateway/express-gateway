@@ -6,7 +6,7 @@ const BasicStrategy = require('passport-http').BasicStrategy;
 const ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 // const BearerStrategy = require('passport-http-bearer').Strategy;
 
-let config = require('../../config/config.model.js')
+let config = require('../../config/config.model.js');
 
 let authService = require('../../auth.js')(config);
 
@@ -18,7 +18,7 @@ let authService = require('../../auth.js')(config);
  * a user is logged in before asking them to approve the request.
  */
 
-function verifyClient(req, clientId, clientSecret, done) {
+function verifyClient (clientId, clientSecret, done) {
   return authService.authenticateCredential(clientId, clientSecret, 'oauth')
   .then(consumer => {
     let scopes;
@@ -49,7 +49,7 @@ function verifyClient(req, clientId, clientSecret, done) {
 
 passport.use(new LocalStrategy({ passReqToCallback: true }, verifyClient));
 
-passport.serializeUser((user, done) =>  done(null, user.id));
+passport.serializeUser((user, done) => done(null, user.id));
 
 passport.deserializeUser((id, done) => {
   return authService.validateConsumer(id)

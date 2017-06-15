@@ -6,13 +6,13 @@ let getApplicationService = require('./consumers/application.service.js');
 let getTokenService = require('./tokens/token.service.js');
 let utils = require('./utils');
 
-module.exports = function(config) {
+module.exports = function (config) {
   let credentials = getCredentialService(config);
   let users = getUserService(config);
   let applications = getApplicationService(config);
   let tokens = getTokenService(config);
 
-  function authenticateCredential(id, password, type) {
+  function authenticateCredential (id, password, type) {
     if (!id || !password || !type) {
       return Promise.resolve(false);
     }
@@ -40,7 +40,7 @@ module.exports = function(config) {
     });
   }
 
-  function authenticateToken(token) {
+  function authenticateToken (token) {
     let tokenObj;
     let tokenPassword = token.split('|')[1];
 
@@ -58,10 +58,10 @@ module.exports = function(config) {
       if (!consumer || !consumer.isActive) {
         return false;
       } else return tokenObj.tokenDecrypted === tokenPassword ? tokenObj : false;
-    })
+    });
   }
 
-  function authorizeToken(_token, authType, scopes) {
+  function authorizeToken (_token, authType, scopes) {
     if (!scopes || scopes.length === 0) {
       return Promise.resolve(true);
     }
@@ -82,7 +82,7 @@ module.exports = function(config) {
     });
   }
 
-  function authorizeCredential(id, authType, scopes) {
+  function authorizeCredential (id, authType, scopes) {
     if (!scopes || !scopes.length) {
       return Promise.resolve(true);
     }
@@ -126,11 +126,11 @@ module.exports = function(config) {
     });
   }
 
-  function createUserObject(user) {
+  function createUserObject (user) {
     return Object.assign({ type: 'user' }, user);
   }
 
-  function createApplicationObject(app) {
+  function createApplicationObject (app) {
     return Object.assign({ type: 'application' }, app);
   }
 
@@ -140,5 +140,5 @@ module.exports = function(config) {
     authorizeToken,
     validateConsumer,
     authorizeCredential
-  }
-}
+  };
+};
