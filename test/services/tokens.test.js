@@ -1,8 +1,11 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
+
 let should = require('should');
-let config = require('./config.models.js');
-let getTokenService = require('../src/tokens/token.service.js');
-let tokenService = getTokenService(config);
-let db = require('../src/db').getDb();
+let systemConfig = require('../../src/config/config.system.js');
+let services = require('../../src/services');
+let tokenService = services.token;
+let db = require('../../src/db')();
 
 describe('Token tests', function () {
   describe('Save, Find and Get Token tests', function () {
@@ -152,13 +155,11 @@ describe('Token tests', function () {
   });
 
   describe('Delete Token tests', function () {
-    let newToken, expiredToken;
-    let tokenService, originalTokenConfig;
+    let newToken, expiredToken, originalSystemConfig;
 
     before(function (done) {
-      originalTokenConfig = config.tokens;
-      config.tokens.timeToExpiry = 0;
-      tokenService = getTokenService(config);
+      originalSystemConfig = systemConfig;
+      systemConfig.access_tokens.timeToExpiry = 0;
 
       db.flushdbAsync()
       .then(function (didSucceed) {
@@ -174,7 +175,7 @@ describe('Token tests', function () {
     });
 
     after((done) => {
-      tokenService.tokens = originalTokenConfig;
+      systemConfig.access_tokens.timeToExpiry = originalSystemConfig.access_tokens.timeToExpiry;
       done();
     });
 

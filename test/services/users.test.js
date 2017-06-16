@@ -1,10 +1,13 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
+
 let should = require('should');
-let config = require('./config.models.js');
 let uuid = require('node-uuid');
-let services = require('../src/consumers')(config);
-let userService = services.userService;
+let redisConfig = require('../../src/config/config.redis.js').users;
+let services = require('../../src/services');
+let userService = services.user;
+let db = require('../../src/db')();
 let _ = require('lodash');
-let db = require('../src/db').getDb();
 
 describe('User service tests', function () {
   describe('Insert tests', function () {
@@ -45,7 +48,7 @@ describe('User service tests', function () {
         };
         Object.keys(newUser).should.eql(expectedUserProps);
         should.deepEqual(_.omit(newUser, ['id', 'createdAt', 'updatedAt']), expectedPartialUserObj);
-        db.hgetallAsync(config.users.redis.userHashPrefix.concat(':', newUser.id))
+        db.hgetallAsync(redisConfig.userHashPrefix.concat(':', newUser.id))
         .then(function (userObj) {
           userObj.isActive = userObj.isActive === 'true';
           should.deepEqual(userObj, newUser);
@@ -53,6 +56,7 @@ describe('User service tests', function () {
         });
       })
       .catch(function (err) {
+        console.log(err);
         should.not.exist(err);
         done();
       });

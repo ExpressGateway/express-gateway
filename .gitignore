@@ -1,5 +1,6 @@
 dist/
 .vscode
+.idea
 node_modules/
 npm-debug.log
 example/keys/*.pem

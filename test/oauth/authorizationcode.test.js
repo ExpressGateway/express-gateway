@@ -1,3 +1,6 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
+
 let session = require('supertest-session');
 let should = require('should');
 let url = require('url');
@@ -5,33 +8,40 @@ let qs = require('querystring');
 let app = require('./bootstrap');
 let Promise = require('bluebird');
 
-let config = require('../config.models.js');
-let db = require('../../src/db').getDb();
-
-let credentialService, userService, applicationService, tokenService;
+let credentialModelConfig = require('../../src/config/models/credentials');
+let userModelConfig = require('../../src/config/models/users');
+let appModelConfig = require('../../src/config/models/applications');
+let services = require('../../src/services');
+let credentialService = services.credential;
+let userService = services.user;
+let applicationService = services.application;
+let tokenService = services.token;
+let db = require('../../src/db')();
 
 describe('Functional Test Authorization Code grant', function () {
-  let originalAppConfig, originalOauthConfig;
+  let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let fromDbUser1, fromDbApp;
 
   before(function (done) {
-    originalAppConfig = config.applications;
-    originalOauthConfig = config.credentials.types.oauth;
+    originalAppConfig = appModelConfig;
+    originalCredentialConfig = credentialModelConfig;
+    originalUserConfig = userModelConfig;
 
-    config.applications.properties = {
+    appModelConfig.properties = {
       name: { isRequired: true, isMutable: true },
       redirectUri: { isRequired: true, isMutable: true }
     };
 
-    config.credentials.types.oauth = {
+    credentialModelConfig.oauth = {
       passwordKey: 'secret',
       properties: { scopes: { isRequired: false } }
     };
 
-    credentialService = require('../../src/credentials/credential.service.js')(config);
-    userService = require('../../src/consumers/user.service.js')(config);
-    applicationService = require('../../src/consumers/application.service.js')(config);
-    tokenService = require('../../src/tokens/token.service.js')(config);
+    userModelConfig.properties = {
+      firstname: {isRequired: true, isMutable: true},
+      lastname: {isRequired: true, isMutable: true},
+      email: {isRequired: false, isMutable: true}
+    };
 
     db.flushdbAsync()
     .then(function (didSucceed) {
@@ -89,8 +99,9 @@ describe('Functional Test Authorization Code grant', function () {
   });
 
   after((done) => {
-    config.applications = originalAppConfig;
-    config.credentials.types.oauth = originalOauthConfig;
+    appModelConfig.properties = originalAppConfig.properties;
+    credentialModelConfig.oauth = originalCredentialConfig.oauth;
+    userModelConfig.properties = originalUserConfig.properties;
     done();
   });
 

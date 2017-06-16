@@ -1,19 +1,25 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
+
 let should = require('should');
-let config = require('../config.models.js');
-let getCredentialService = require('../../src/credentials/credential.service.js');
-let getUserService = require('../../src/consumers/user.service.js');
-let getTokenService = require('../../src/tokens/token.service.js');
-let getAuthService = require('../../src/auth.js');
 let _ = require('lodash');
-let db = require('../../src/db').getDb();
+let credentialModelConfig = require('../../src/config/models/credentials');
+let userModelConfig = require('../../src/config/models/users');
+let services = require('../../src/services');
+let credentialService = services.credential;
+let userService = services.user;
+let tokenService = services.token;
+let authService = services.auth;
+let db = require('../../src/db')();
 
 describe('Auth tests', function () {
-  let credentialService, tokenService, authService, userService, user, userFromDb;
-  let originalCredentialConfig = config.credentials;
+  let user, userFromDb;
+  let originalModelConfig = credentialModelConfig;
   let _credential;
+  let originalUserModelConfig;
 
   before(function (done) {
-    config.credentials.oauth = {
+    credentialModelConfig.oauth = {
       passwordKey: 'secret',
       autoGeneratePassword: true,
       properties: {
@@ -21,10 +27,12 @@ describe('Auth tests', function () {
       }
     };
 
-    credentialService = getCredentialService(config);
-    userService = getUserService(config);
-    tokenService = getTokenService(config);
-    authService = getAuthService(config);
+    originalUserModelConfig = userModelConfig.properties;
+    userModelConfig.properties = {
+      firstname: {isRequired: true, isMutable: true},
+      lastname: {isRequired: true, isMutable: true},
+      email: {isRequired: false, isMutable: true}
+    };
 
     db.flushdbAsync()
     .then(function (didSucceed) {
@@ -66,7 +74,8 @@ describe('Auth tests', function () {
   });
 
   after(function (done) {
-    config.credentials = originalCredentialConfig;
+    credentialModelConfig.oauth = originalModelConfig.oauth;
+    userModelConfig.properties = originalUserModelConfig;
     done();
   });
 

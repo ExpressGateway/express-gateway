@@ -1,8 +1,11 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
+
 let should = require('should');
 let _ = require('lodash');
-let config = require('./config.models.js');
-let authCodeService = require('../src/authorization-codes/authorization-code.service.js')(config);
-let db = require('../src/db').getDb();
+let services = require('../../src/services');
+let authCodeService = services.authorizationCode;
+let db = require('../../src/db')();
 
 describe('Authorization Code Tests', function () {
   let newCode, codeFromDb;

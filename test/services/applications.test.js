@@ -1,25 +1,43 @@
 let mock = require('mock-require');
 mock('redis', require('fakeredis'));
+
 let should = require('should');
-let config = require('./config.models.js');
 let uuid = require('node-uuid');
-let getApplicationService = require('../src/consumers/application.service.js');
-let userService = require('../src/consumers/user.service.js')(config);
-let db = require('../src/db').getDb();
+let appModelConfig = require('../../src/config/models/applications');
+let userModelConfig = require('../../src/config/models/users');
+let services = require('../../src/services');
+let applicationService = services.application;
+let userService = services.user;
+let db = require('../../src/db')();
 
 describe('Application service tests', function () {
+  let originalUserModelConfig;
+
+  before(function (done) {
+    originalUserModelConfig = userModelConfig.properties;
+    userModelConfig.properties = {
+      firstname: {isRequired: true, isMutable: true},
+      lastname: {isRequired: true, isMutable: true},
+      email: {isRequired: false, isMutable: true}
+    };
+    done();
+  });
+
+  after(function (done) {
+    userModelConfig.properties = originalUserModelConfig;
+    done();
+  });
+
   describe('Insert tests', function () {
-    let user, applicationService, originalAppConfig;
+    let user, originalAppModelConfig;
 
     before(function (done) {
-      originalAppConfig = config.applications;
-      config.applications.properties = {
+      originalAppModelConfig = appModelConfig.properties;
+      appModelConfig.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'someGroup', isMutable: false },
         irrelevantProp: { isMutable: true } // isRequired is false by default
       };
-
-      applicationService = getApplicationService(config);
 
       db.flushdbAsync()
       .then(function (didSucceed) {
@@ -35,7 +53,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      config.applications = originalAppConfig;
+      appModelConfig.properties = originalAppModelConfig;
       done();
     });
 
@@ -116,17 +134,15 @@ describe('Application service tests', function () {
   });
 
   describe('Get application tests', function () {
-    let user, app, originalAppConfig, applicationService;
+    let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppConfig = config.applications;
-      config.applications.properties = {
+      originalAppModelConfig = appModelConfig.properties;
+      appModelConfig.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'someGroup', isMutable: false },
         irrelevantProp: { isMutable: true } // isRequired is false by default
       };
-
-      applicationService = getApplicationService(config);
 
       db.flushdbAsync()
       .then(function (didSucceed) {
@@ -158,7 +174,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      config.applications = originalAppConfig;
+      appModelConfig.properties = originalAppModelConfig;
       done();
     });
 
@@ -242,16 +258,14 @@ describe('Application service tests', function () {
   });
 
   describe('Update tests', function () {
-    let user, app, _applicationService, originalAppConfig;
+    let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppConfig = config.applications;
-      config.applications.properties = {
+      originalAppModelConfig = appModelConfig.properties;
+      appModelConfig.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'admin', isMutable: false }
       };
-
-      _applicationService = getApplicationService(config);
 
       db.flushdbAsync()
       .then(function (didSucceed) {
@@ -267,7 +281,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      config.applications = originalAppConfig;
+      appModelConfig.properties = originalAppModelConfig;
       done();
     });
 
@@ -283,7 +297,7 @@ describe('Application service tests', function () {
           name: 'test-app-1'
         };
 
-        _applicationService
+        applicationService
         .insert(app, user.id)
         .then(function (newApp) {
           app = newApp;
@@ -299,10 +313,10 @@ describe('Application service tests', function () {
           let updatedApp = {
             name: 'test-app-updated'
           };
-          _applicationService.update(app.id, updatedApp)
+          applicationService.update(app.id, updatedApp)
           .then((res) => {
             res.should.eql(true);
-            _applicationService
+            applicationService
             .get(app.id)
             .then(function (_app) {
               should.exist(_app);
@@ -327,7 +341,7 @@ describe('Application service tests', function () {
     it('should throw an error when updating an app with invalid properties', function (done) {
       let updatedApp = { invalid: 'someVal' };
 
-      _applicationService
+      applicationService
       .update(app.id, updatedApp)
       .then(function (newApp) {
         should.not.exist(newApp);
@@ -342,7 +356,7 @@ describe('Application service tests', function () {
     it('should throw an error when updating an immutable property', function (done) {
       let updatedApp = { group: 'marketing' };
 
-      _applicationService
+      applicationService
       .update(app.id, updatedApp)
       .then(function (newApp) {
         should.not.exist(newApp);
@@ -356,16 +370,14 @@ describe('Application service tests', function () {
   });
 
   describe('activate/deactivate application tests', function () {
-    let user, app, _applicationService, originalAppConfig;
+    let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppConfig = config.applications;
-      config.applications.properties = {
+      originalAppModelConfig = appModelConfig.properties;
+      appModelConfig.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'admin', isMutable: false }
       };
-
-      _applicationService = getApplicationService(config);
 
       db.flushdbAsync()
       .then(function (didSucceed) {
@@ -381,7 +393,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      config.applications = originalAppConfig;
+      appModelConfig.properties = originalAppModelConfig;
       done();
     });
 
@@ -397,7 +409,7 @@ describe('Application service tests', function () {
           name: 'test-app-1'
         };
 
-        _applicationService
+        applicationService
         .insert(app, user.id)
         .then(function (newApp) {
           app = newApp;
@@ -410,10 +422,10 @@ describe('Application service tests', function () {
           newApp.userId.should.eql(user.id);
         })
         .then(() => {
-          _applicationService.deactivate(app.id)
+          applicationService.deactivate(app.id)
           .then((res) => {
             res.should.eql(true);
-            _applicationService
+            applicationService
             .get(app.id)
             .then(function (_app) {
               should.exist(_app);
@@ -438,10 +450,10 @@ describe('Application service tests', function () {
     });
 
     it('should reactivate an application', function (done) {
-      _applicationService.activate(app.id)
+      applicationService.activate(app.id)
       .then((res) => {
         res.should.eql(true);
-        _applicationService
+        applicationService
         .get(app.id)
         .then(function (_app) {
           should.exist(_app);
@@ -478,7 +490,7 @@ describe('Application service tests', function () {
       .then(function (newUser) {
         should.exist(newUser);
         user1 = newUser;
-        return _applicationService
+        return applicationService
         .insert(app1, user1.id)
         .then(function (newApp) {
           should.exist(newApp);
@@ -486,7 +498,7 @@ describe('Application service tests', function () {
         });
       })
       .then(() => {
-        return _applicationService
+        return applicationService
         .insert(app2, user1.id)
         .then(function (newApp) {
           should.exist(newApp);
@@ -501,7 +513,7 @@ describe('Application service tests', function () {
         });
       })
       .then(function () {
-        _applicationService
+        applicationService
         .get(app1.id)
         .then(function (_app) {
           should.exist(_app);
@@ -509,7 +521,7 @@ describe('Application service tests', function () {
         });
       })
       .then(function () {
-        _applicationService
+        applicationService
         .get(app2.id)
         .then(function (_app) {
           should.exist(_app);
@@ -525,17 +537,15 @@ describe('Application service tests', function () {
   });
 
   describe('Delete app tests', function () {
-    let user, app, originalAppConfig, applicationService;
+    let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppConfig = config.applications;
-      config.applications.properties = {
+      originalAppModelConfig = appModelConfig.properties;
+      appModelConfig.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'someGroup', isMutable: false },
         irrelevantProp: { isMutable: true } // isRequired is false by default
       };
-
-      applicationService = getApplicationService(config);
 
       db.flushdbAsync()
       .then(function (didSucceed) {
@@ -567,7 +577,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      config.applications = originalAppConfig;
+      appModelConfig.properties = originalAppModelConfig;
       done();
     });
 

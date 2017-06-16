@@ -1,11 +1,12 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
+
 let should = require('should');
-let config = require('../config.models.js');
-let getCredentialService = require('../../src/credentials/credential.service.js');
-let db = require('../../src/db').getDb();
+let services = require('../../../src/services');
+let credentialService = services.credential;
+let db = require('../../../src/db')();
 
 describe('Scope tests', function () {
-  let credentialService = getCredentialService(config);
-
   before(function (done) {
     db.flushdbAsync()
     .then(function (didSucceed) {
