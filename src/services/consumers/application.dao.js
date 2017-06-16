@@ -1,7 +1,7 @@
 'use strict';
 
 let db = require('../../db')();
-let redisConfig = require('../../config/config.redis.js').applications;
+let redisConfig = require('../../config/config.system.js').db.redis.applications;
 
 let dao = {};
 

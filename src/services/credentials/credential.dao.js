@@ -2,7 +2,7 @@
 
 let Promise = require('bluebird');
 let db = require('../../db')();
-let redisConfig = require('../../config/config.redis.js').credentials;
+let redisConfig = require('../../config/config.system.js').db.redis.credentials;
 let modelConfig = require('../../config/models/credentials');
 
 let dao = {};
