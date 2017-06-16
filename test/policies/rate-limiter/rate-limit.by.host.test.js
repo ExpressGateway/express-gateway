@@ -24,7 +24,7 @@ let gatewayConfig = {
   }
 };
 
-describe.only('rate-limit by host', () => {
+describe('rate-limit by host', () => {
   let helper = testHelper();
   before('setup', helper.setup({
     fakeActions: ['test_policy'],
