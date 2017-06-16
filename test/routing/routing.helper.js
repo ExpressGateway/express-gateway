@@ -35,7 +35,12 @@ module.exports = function () {
       httpsApp && httpsApp.close();
       done();
     },
-    validate404: testCase => {
+    validate404: function (testCase) {
+      testCase.test = testCase.test || {};
+      testCase.test.errorCode = 404;
+      return this.validateError(testCase);
+    },
+    validateError: (testCase) => {
       return (done) => {
         let testScenario = request(app);
         if (testCase.setup.postData) {
@@ -48,9 +53,9 @@ module.exports = function () {
           testScenario.set('Host', testCase.setup.host);
         }
         testScenario.set('Content-Type', 'application/json')
-          .expect(404)
+          .expect(testCase.test.errorCode)
           .expect('Content-Type', /text\/html/)
-          .end(function (err, res) {
+          .end((err, res) => {
             if (err) { logger.error(res.body); }
             err ? done(err) : done();
           });
@@ -83,7 +88,7 @@ module.exports = function () {
               assert.ok(_.isEqual(res.body.apiEndpoint.scopes, testCase.test.scopes));
             }
           })
-          .end(function (err, res) {
+          .end((err, res) => {
             if (err) { logger.error(res.body); }
             err ? done(err) : done();
           });

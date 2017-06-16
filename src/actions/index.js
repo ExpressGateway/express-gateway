@@ -1,12 +1,10 @@
 'use strict';
 const logger = require('../log').policy;
 const MODULES = [ // TODO: what is core what is plugin;
-  './throttle',
+  './rate-limit',
   './proxy',
-  './jwt',
   './cors',
-  './log',
-  './rewrite'
+  './log'
 ];
 const coreNamespace = 'EGCore';
 let actions;
