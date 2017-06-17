@@ -46,6 +46,9 @@ const predefinedConditions = {
       return minimatch(req.headers.host, actionConfig.pattern);
     }
     return false;
+  },
+  expression: function (req, conditionConfig) {
+    return req.egContext.match(conditionConfig.expression);
   }
 };
 

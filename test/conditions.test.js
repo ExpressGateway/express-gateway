@@ -1,3 +1,4 @@
+const {EgContextBase} = require('../src/config-loader/context');
 require('../src/conditions').init();
 const express = require('express');
 const assert = require('chai').assert;
@@ -86,6 +87,26 @@ describe('pathMatch', function () {
   it('should return false if request url does not match', function () {
     req.url = '/froo/brar';
     assert.isFalse(req.matchEGCondition({ name: 'pathMatch', pattern: '(/(foo|bar|baz))/?' }));
+  });
+});
+
+describe('expression', () => {
+  let req = Object.create(express.request);
+  req.egContext = Object.create(new EgContextBase());
+  req.egContext.req = req;
+  it('should return false if expression does not match', function () {
+    req.url = 'test';
+    assert.isFalse(req.matchEGCondition({
+      name: 'expression',
+      expression: 'req.url.length>5'
+    }));
+  });
+  it('should pass if expression match', function () {
+    req.url = 'test_123';
+    assert.isTrue(req.matchEGCondition({
+      name: 'expression',
+      expression: 'req.url.length>5'
+    }));
   });
 });
 

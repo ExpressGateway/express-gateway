@@ -280,6 +280,15 @@ The name specifies a condition function. This can be one of the following:
     Accepts can be either a string (e.g. 'GET') or an array of such strings.
   - `hostMatch`. Parameter should be a regular expression. Matches if the
     `Host` header passed with the request matches the parameter.
+  - `expression`. Matches execution result of JS code provided in `expression` property. Code is executed in limited space that has access only to egContext
+  Example:
+```yaml
+  condition:
+    name: expression
+    expression: "req.url.length>5"
+    # will match for for path /long_path
+    # will not match /a
+```
 
 In addition, several functions are provided that allow you to create logical
 combinations of conditions. The parameters to these functions should be other
