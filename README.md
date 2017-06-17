@@ -385,66 +385,69 @@ pipelines:
 Several Policies are available. Please note that the order of Policies
 is important.
 
-#### Throttling (TODO:Update doc, non relevant)
+#### Rate-limit
+Use to limit repeated requests to public APIs and/or endpoints such as password reset.
 
-Throttles the requests to a specific rate limit. If the rate limit is reached,
-the gateway will return an HTTP 429 return code with an error message.
+By default it will limit based on client IP address (req.ip).
+option `rateLimitBy` can be used to override the behaviour.
 
-Each request can be attached to one or more _throttle groups_. Each throttle
-group can be specified with its own rate limit. When a request is a member of
-multiple groups, each rate limit will be evaluated; exceeding any of the limits
-will cause the request to be rejected.
+Consider example to rate-limit based on passed host:
+```yml
+apiEndpoints:
+  example:
+    host: '*'
+serviceEndpoints:
+  backend:
+    url: 'http://www.example.com'
+pipeline1:
+    apiEndpoints:
+      - 'example',
+    policies:
+      - rate-limit:
+        -
+          action:
+            name: 'rate-limit'
+            max: 10
+            rateLimitBy: "${req.host}"
+      - proxy:
+        -
+          action:
+            name: proxy
+            serviceEndpoint: backend
 
-To add a request to a throttle group, use the `throttleGroup` action. The
-params format is an object with the following keys:
-
-- `key`: the name of the throttle group to add the request to.
-
-To specify a rate limit use the `throttle` action. The params format is an
-object. Each key corresponds to the name of the throttle group. Each value is
-an object with the keys:
-
-- `rate`: the number of requests to allow per period
-- `period`: the period. Could be one of `second`, `minute`, `hour`.
-
-Example:
-
-```json
-{
-  "condition": {
-    "name": "pathExact",
-     "path" :"/foo"
-  },
-  "action": {
-    "name":"throttleGroup",
-    "key": "foo"
-  }
-},
-{
-  "action": {
-    "name":"throttleGroup",
-    "key": "all"
-  }
-},
-{
-  "action":{
-    "name": "throttle",
-    "all": {
-      "rate": 1000,
-      "period": "minute"
-    },
-    "foo": {
-      "rate": 100,
-      "period": "minute"
-    }
-  }
-}
 ```
 
-The above example sets up an overall rate limit of 1000 req/minute, and a more
-specific limit for requests to `/foo` of 100 req/minute. Note that since the
-overall limit matches *all* requests, successful `/foo` requests will also
-count against the overall limit.
+#####Supported options:
+
+* `rateLimitBy`: JS template string to generate key based. default is "${req.ip}"
+* `windowMs`: milliseconds - how long to keep records of requests in memory. Defaults to 60000 (1 minute).
+* `max`: max number of connections during windowMs milliseconds before sending a 429 response. Defaults to 5. Set to 0 to disable.
+* `message`: Error message returned when max is exceeded. Defaults to 'Too many requests, please try again later.'
+* `statusCode`: HTTP status code returned when max is exceeded. Defaults to 429.
+* `headers`: Enable header to show request limit and current usage
+* `delayAfter`: max number of connections during windowMs before starting to delay responses. Defaults to 1. Set to 0 to disable delaying.
+* `delayMs`: milliseconds - how long to delay the response, multiplied by (number of recent hits - delayAfter). Defaults to 1000 (1 second). Set to 0 to disable delaying.
+
+#####Here are some additional scenarious:
+
+###### Limit only for specific domain
+```yml
+policies:
+  -
+    rate-limiter:
+      -
+        condition:
+          name: hostMatch,
+          pattern: example.com
+        action:
+          name: rate-limit
+          max: 500
+```
+
+
+Implementation is based on [express-rate-limit](https://www.npmjs.com/package/express-rate-limit)
+Please check for advanced information
+
 
 #### Proxying (TODO:Update doc, non relevant)
 
