@@ -61,6 +61,24 @@ module.exports = function () {
           });
       };
     },
+    validateOptions: (testCase) => {
+      return (done) => {
+        let testScenario = request(app).options(testCase.setup.url);
+
+        if (testCase.setup.host) {
+          testScenario.set('Host', testCase.setup.host);
+        }
+        if (testCase.test.headers) {
+          for (let [ header, value ] of Object.entries(testCase.test.headers)) {
+            testScenario.expect(header, value);
+          }
+        }
+        testScenario.expect(204)
+          .end((err, res) => {
+            err ? done(err) : done();
+          });
+      };
+    },
     validateSuccess: (testCase) => {
       return (done) => {
         let testScenario = request(app);
