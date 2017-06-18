@@ -1,7 +1,7 @@
 'use strict';
 
 let db = require('../../db')();
-let redisConfig = require('../../config/config.system.js').db.redis.users;
+let config = require('../../config');
 
 let dao = {};
 
@@ -9,10 +9,10 @@ dao.insert = function (user) {
   let redisUserKey, redisUsernameSetKey;
 
   // key for the user hash table
-  redisUserKey = redisConfig.userHashPrefix.concat(':', user.id);
+  redisUserKey = config.systemConfig.db.redis.users.userHashPrefix.concat(':', user.id);
 
   // name for the user's username set
-  redisUsernameSetKey = redisConfig.usernameSetPrefix.concat(':', user.username);
+  redisUsernameSetKey = config.systemConfig.db.redis.users.usernameSetPrefix.concat(':', user.username);
 
   return db
   .multi()
@@ -23,7 +23,7 @@ dao.insert = function (user) {
 };
 
 dao.getUserById = function (userId) {
-  return db.hgetallAsync(redisConfig.userHashPrefix.concat(':', userId))
+  return db.hgetallAsync(config.systemConfig.db.redis.users.userHashPrefix.concat(':', userId))
   .then(function (user) {
     if (!user || !Object.keys(user).length) {
       return false;
@@ -33,7 +33,7 @@ dao.getUserById = function (userId) {
 };
 
 dao.find = function (username) {
-  return db.smembersAsync(redisConfig.usernameSetPrefix.concat(':', username))
+  return db.smembersAsync(config.systemConfig.db.redis.users.usernameSetPrefix.concat(':', username))
   .then(function (Ids) {
     if (Ids && Ids.length !== 0) {
       return Ids[0];
@@ -45,7 +45,7 @@ dao.update = function (userId, props) {
   let redisUserKey;
 
   // key for the user in redis
-  redisUserKey = redisConfig.userHashPrefix.concat(':', userId);
+  redisUserKey = config.systemConfig.db.redis.users.userHashPrefix.concat(':', userId);
 
   return db
   .hmsetAsync(redisUserKey, props)
@@ -53,11 +53,11 @@ dao.update = function (userId, props) {
 };
 
 dao.activate = function (id) {
-  return db.hsetAsync(redisConfig.userHashPrefix.concat(':', id), 'isActive', 'true');
+  return db.hsetAsync(config.systemConfig.db.redis.users.userHashPrefix.concat(':', id), 'isActive', 'true');
 };
 
 dao.deactivate = function (id) {
-  return db.hsetAsync(redisConfig.userHashPrefix.concat(':', id), 'isActive', 'false');
+  return db.hsetAsync(config.systemConfig.db.redis.users.userHashPrefix.concat(':', id), 'isActive', 'false');
 };
 
 dao.remove = function (userId) {
@@ -68,8 +68,8 @@ dao.remove = function (userId) {
     }
     return db
     .multi()
-    .del(redisConfig.userHashPrefix.concat(':', userId))
-    .srem(redisConfig.usernameSetPrefix.concat(':', user.username), userId)
+    .del(config.systemConfig.db.redis.users.userHashPrefix.concat(':', userId))
+    .srem(config.systemConfig.db.redis.users.usernameSetPrefix.concat(':', user.username), userId)
     .execAsync()
     .then(replies => replies.every(res => res));
   });

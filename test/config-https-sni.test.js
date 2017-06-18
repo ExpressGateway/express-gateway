@@ -2,35 +2,8 @@ const assert = require('assert');
 const fs = require('fs');
 const tls = require('tls');
 const path = require('path');
-
+let config = require('../src/config');
 let testHelper = require('./routing/routing.helper');
-let gatewayConfig = {
-  https: {
-    port: 10441,
-    options: {
-      requestCert: true,
-      rejectUnauthorized: false
-    },
-    tls: {
-      'a.example.com': {
-        key: './test/fixtures/agent1-key.pem',
-        cert: './test/fixtures/agent1-cert.pem',
-        ca: ['./test/fixtures/ca2-cert.pem']
-      },
-      'b.example.com': {
-        key: './test/fixtures/agent3-key.pem',
-        cert: './test/fixtures/agent3-cert.pem'
-      }
-    }
-  },
-  apiEndpoints: { test: {} },
-  pipelines: {
-    pipeline1: {
-      apiEndpoints: ['test'],
-      policies: [{ test: [{ action: { name: 'test_policy' } }] }]
-    }
-  }
-};
 
 const testCases = [{
   clientOptions: {
@@ -98,13 +71,42 @@ let serverResult;
 let serverError;
 
 describe('sni', () => {
-  let servers, helper;
+  let servers, helper, originalGatewayConfig;
   before('setup', async() => {
+    originalGatewayConfig = config.gatewayConfig;
+    config.gatewayConfig = {
+      https: {
+        port: 10441,
+        options: {
+          requestCert: true,
+          rejectUnauthorized: false
+        },
+        tls: {
+          'a.example.com': {
+            key: './test/fixtures/agent1-key.pem',
+            cert: './test/fixtures/agent1-cert.pem',
+            ca: ['./test/fixtures/ca2-cert.pem']
+          },
+          'b.example.com': {
+            key: './test/fixtures/agent3-key.pem',
+            cert: './test/fixtures/agent3-cert.pem'
+          }
+        }
+      },
+      apiEndpoints: { test: {} },
+      pipelines: {
+        pipeline1: {
+          apiEndpoints: ['test'],
+          policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+        }
+      }
+    };
+
     helper = testHelper();
     servers = await helper.setup({
-      fakeActions: ['test_policy'],
-      gatewayConfig
+      fakeActions: ['test_policy']
     })();
+
     servers.httpsApp.on('tlsClientError', function (err) {
       serverResult = null;
       serverError = err.message;
@@ -113,6 +115,7 @@ describe('sni', () => {
       serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized };
     });
   });
+
   testCases.forEach(tc => {
     let options = tc.clientOptions;
     tc.actual = {};
@@ -146,6 +149,7 @@ describe('sni', () => {
       assert.equal(tc.actual.clientError, tc.expected.clientError);
       assert.equal(tc.actual.serverError, tc.expected.serverError);
     });
+    config.gatewayConfig = originalGatewayConfig;
     helper.cleanup();
   });
 });

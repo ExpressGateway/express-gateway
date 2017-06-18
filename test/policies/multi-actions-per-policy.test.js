@@ -1,44 +1,52 @@
 const serverHelper = require('../common/server-helper');
 const assert = require('chai').assert;
-const gateway = require('../../src/gateway');
+let config = require('../../src/config');
 const request = require('supertest');
 const port1 = 5998;
 const port2 = 5999;
 let app1, app2, appTarget;
-let gatewayConfig = {
-  http: { port: 9091 },
-  apiEndpoints: {
-    test: {}
-  },
-  serviceEndpoints: {
-    admin: {
-      url: 'http://localhost:' + port1
-    },
-    staff: {
-      url: 'http://localhost:' + port2
-    }
-  },
-  pipelines: {
-    pipeline1: {
-      apiEndpoints: ['test'],
-      policies: [{
-        proxy: [{
-          condition: { name: 'pathExact', path: '/admin' },
-          action: { name: 'proxy', serviceEndpoint: 'admin' }
-        }, {
-          condition: { name: 'pathExact', path: '/staff' },
-          action: { name: 'proxy', serviceEndpoint: 'staff' }
-        }]
-      }]
-    }
-  }
-};
+
+const gateway = require('../../src/gateway');
 
 describe('multi step policy ', () => {
+  let originalGatewayConfig;
+
   before('start servers', async() => {
+    originalGatewayConfig = config.gatewayConfig;
+
+    config.gatewayConfig = {
+      http: { port: 9091 },
+      apiEndpoints: {
+        test: {}
+      },
+      serviceEndpoints: {
+        admin: {
+          url: 'http://localhost:' + port1
+        },
+        staff: {
+          url: 'http://localhost:' + port2
+        }
+      },
+      pipelines: {
+        pipeline1: {
+          apiEndpoints: ['test'],
+          policies: [{
+            proxy: [{
+              condition: { name: 'pathExact', path: '/admin' },
+              action: { name: 'proxy', serviceEndpoint: 'admin' }
+            }, {
+              condition: { name: 'pathExact', path: '/staff' },
+              action: { name: 'proxy', serviceEndpoint: 'staff' }
+            }]
+          }]
+        }
+      }
+    };
+
     app1 = (await serverHelper.generateBackendServer(port1)).app;
     app2 = (await serverHelper.generateBackendServer(port2)).app;
-    appTarget = (await gateway.start({ gatewayConfig })).app;
+    console.log('calling ', config.gatewayConfig);
+    appTarget = (await gateway()).app;
   });
 
   it('should proxy to server on ' + port1, (done) => {
@@ -68,6 +76,8 @@ describe('multi step policy ', () => {
   });
 
   after(() => {
+    config.gatewayConfig = originalGatewayConfig;
+
     app1.close();
     app2.close();
     appTarget.close();

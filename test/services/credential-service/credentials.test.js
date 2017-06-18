@@ -2,7 +2,7 @@ let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 let should = require('should');
-let modelConfig = require('../../../src/config/models/credentials');
+let config = require('../../../src/config');
 let services = require('../../../src/services');
 let credentialService = services.credential;
 let userService = services.user;
@@ -12,11 +12,11 @@ let Promise = require('bluebird');
 describe('Credential service tests', function () {
   describe('Credential tests', function () {
     let credential;
-    let originalModelConfig = modelConfig;
+    let originalModelConfig = config.models.credentials;
     let username = 'someUser';
 
     before(function (done) {
-      modelConfig.oauth = {
+      config.models.credentials.oauth = {
         passwordKey: 'secret',
         autoGeneratePassword: true,
         properties: {
@@ -24,7 +24,7 @@ describe('Credential service tests', function () {
         }
       };
 
-      modelConfig.basicAuth = {
+      config.models.credentials.basicAuth = {
         passwordKey: 'password',
         autoGeneratePassword: true,
         properties: {
@@ -46,7 +46,7 @@ describe('Credential service tests', function () {
     });
 
     after(function (done) {
-      modelConfig = originalModelConfig;
+      config.models.credentials = originalModelConfig;
       done();
     });
 
@@ -182,10 +182,10 @@ describe('Credential service tests', function () {
 
   describe('Credential Cascade Delete tests', function () {
     let user;
-    let originalModelConfig = modelConfig;
+    let originalModelConfig = config.models.credentials;
 
     before(function (done) {
-      modelConfig.oauth = {
+      config.models.credentials.oauth = {
         passwordKey: 'secret',
         autoGeneratePassword: true,
         properties: {
@@ -193,7 +193,7 @@ describe('Credential service tests', function () {
         }
       };
 
-      modelConfig.basicAuth = {
+      config.models.credentials.basicAuth = {
         passwordKey: 'password',
         autoGeneratePassword: true,
         properties: {
@@ -236,7 +236,7 @@ describe('Credential service tests', function () {
     });
 
     after(function (done) {
-      modelConfig = originalModelConfig;
+      config.models.credentials = originalModelConfig;
       done();
     });
 
@@ -279,7 +279,7 @@ describe('Credential service tests', function () {
   });
 
   describe('Credential Property tests', function () {
-    let originalModelConfig = modelConfig;
+    let originalModelConfig = config.models.credentials;
     let username = 'someUser';
     let _credential = {
       secret: 'password',
@@ -288,7 +288,7 @@ describe('Credential service tests', function () {
     };
 
     before(function (done) {
-      modelConfig.oauth = {
+      config.models.credentials.oauth = {
         passwordKey: 'secret',
         autoGeneratePassword: true,
         properties: {
@@ -312,7 +312,7 @@ describe('Credential service tests', function () {
     });
 
     after(function (done) {
-      modelConfig = originalModelConfig;
+      config.models.credentials = originalModelConfig;
       done();
     });
 

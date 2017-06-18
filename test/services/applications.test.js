@@ -3,8 +3,7 @@ mock('redis', require('fakeredis'));
 
 let should = require('should');
 let uuid = require('node-uuid');
-let appModelConfig = require('../../src/config/models/applications');
-let userModelConfig = require('../../src/config/models/users');
+let config = require('../../src/config');
 let services = require('../../src/services');
 let applicationService = services.application;
 let userService = services.user;
@@ -14,8 +13,8 @@ describe('Application service tests', function () {
   let originalUserModelConfig;
 
   before(function (done) {
-    originalUserModelConfig = userModelConfig.properties;
-    userModelConfig.properties = {
+    originalUserModelConfig = config.models.users.properties;
+    config.models.users.properties = {
       firstname: {isRequired: true, isMutable: true},
       lastname: {isRequired: true, isMutable: true},
       email: {isRequired: false, isMutable: true}
@@ -24,7 +23,7 @@ describe('Application service tests', function () {
   });
 
   after(function (done) {
-    userModelConfig.properties = originalUserModelConfig;
+    config.models.users.properties = originalUserModelConfig;
     done();
   });
 
@@ -32,8 +31,8 @@ describe('Application service tests', function () {
     let user, originalAppModelConfig;
 
     before(function (done) {
-      originalAppModelConfig = appModelConfig.properties;
-      appModelConfig.properties = {
+      originalAppModelConfig = config.models.applications.properties;
+      config.models.applications.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'someGroup', isMutable: false },
         irrelevantProp: { isMutable: true } // isRequired is false by default
@@ -53,7 +52,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      appModelConfig.properties = originalAppModelConfig;
+      config.models.applications.properties = originalAppModelConfig;
       done();
     });
 
@@ -137,8 +136,8 @@ describe('Application service tests', function () {
     let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppModelConfig = appModelConfig.properties;
-      appModelConfig.properties = {
+      originalAppModelConfig = config.models.applications.properties;
+      config.models.applications.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'someGroup', isMutable: false },
         irrelevantProp: { isMutable: true } // isRequired is false by default
@@ -174,7 +173,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      appModelConfig.properties = originalAppModelConfig;
+      config.models.applications.properties = originalAppModelConfig;
       done();
     });
 
@@ -261,8 +260,8 @@ describe('Application service tests', function () {
     let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppModelConfig = appModelConfig.properties;
-      appModelConfig.properties = {
+      originalAppModelConfig = config.models.applications.properties;
+      config.models.applications.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'admin', isMutable: false }
       };
@@ -281,7 +280,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      appModelConfig.properties = originalAppModelConfig;
+      config.models.applications.properties = originalAppModelConfig;
       done();
     });
 
@@ -373,8 +372,8 @@ describe('Application service tests', function () {
     let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppModelConfig = appModelConfig.properties;
-      appModelConfig.properties = {
+      originalAppModelConfig = config.models.applications.properties;
+      config.models.applications.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'admin', isMutable: false }
       };
@@ -393,7 +392,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      appModelConfig.properties = originalAppModelConfig;
+      config.models.applications.properties = originalAppModelConfig;
       done();
     });
 
@@ -540,8 +539,8 @@ describe('Application service tests', function () {
     let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppModelConfig = appModelConfig.properties;
-      appModelConfig.properties = {
+      originalAppModelConfig = config.models.applications.properties;
+      config.models.applications.properties = {
         name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'someGroup', isMutable: false },
         irrelevantProp: { isMutable: true } // isRequired is false by default
@@ -577,7 +576,7 @@ describe('Application service tests', function () {
     });
 
     after(function (done) {
-      appModelConfig.properties = originalAppModelConfig;
+      config.models.applications.properties = originalAppModelConfig;
       done();
     });
 

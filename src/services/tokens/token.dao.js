@@ -2,16 +2,16 @@
 
 let Promise = require('bluebird');
 let db = require('../../db')();
-let redisConfig = require('../../config/config.system.js').db.redis.tokens;
+let config = require('../../config');
 
 let dao = {};
 
 dao.save = function (token) {
   // key for the token hash table
-  let redisTokenKey = redisConfig.tokenHashPrefix.concat(':', token.id);
+  let redisTokenKey = config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', token.id);
 
   // key for the consumer-tokens hash table
-  let consumerTokensHashKey = redisConfig.consumerTokensHashPrefix.concat(':', token.consumerId);
+  let consumerTokensHashKey = config.systemConfig.db.redis.tokens.consumerTokensHashPrefix.concat(':', token.consumerId);
 
   return db
   .multi()
@@ -22,7 +22,7 @@ dao.save = function (token) {
 };
 
 dao.find = function (tokenObj) {
-  return db.hgetallAsync(redisConfig.consumerTokensHashPrefix.concat(':', tokenObj.consumerId))
+  return db.hgetallAsync(config.systemConfig.db.redis.tokens.consumerTokensHashPrefix.concat(':', tokenObj.consumerId))
   .then((tokenIds) => {
     let tokenPromises, activeTokenIds, foundToken;
     let expiredTokenIds = [];
@@ -40,7 +40,7 @@ dao.find = function (tokenObj) {
     });
 
     tokenPromises = activeTokenIds.map((id) => {
-      return db.hgetallAsync(redisConfig.tokenHashPrefix.concat(':', id))
+      return db.hgetallAsync(config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', id))
       .then((token) => {
         let isEqual;
 
@@ -66,8 +66,8 @@ dao.find = function (tokenObj) {
       }
 
       expiredTokenIds.forEach((id) => {
-        removeExpiredTokensPromises.push(db.delAsync(redisConfig.tokenHashPrefix.concat(':', id)));
-        removeExpiredTokensPromises.push(db.hdelAsync(redisConfig.consumerTokensHashPrefix.concat(':', tokenObj.consumerId), id));
+        removeExpiredTokensPromises.push(db.delAsync(config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', id)));
+        removeExpiredTokensPromises.push(db.hdelAsync(config.systemConfig.db.redis.tokens.consumerTokensHashPrefix.concat(':', tokenObj.consumerId), id));
       });
 
       return Promise.all(removeExpiredTokensPromises);
@@ -77,14 +77,14 @@ dao.find = function (tokenObj) {
 };
 
 dao.get = function (tokenId) {
-  return db.hgetallAsync(redisConfig.tokenHashPrefix.concat(':', tokenId))
+  return db.hgetallAsync(config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', tokenId))
   .then(token => {
     if (!token) {
       return null;
     }
 
     if (token.expiresAt < Date.now()) {
-      return db.delAsync(redisConfig.tokenHashPrefix.concat(':', tokenId))
+      return db.delAsync(config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', tokenId))
       .return(null);
     }
 

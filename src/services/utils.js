@@ -12,7 +12,7 @@ module.exports = {
 let crypto = require('crypto');
 let Promise = require('bluebird');
 let bcrypt = Promise.promisifyAll(require('bcrypt'));
-let cryptoConfig = require('../config/config.system.js').crypto;
+let config = require('../config');
 
 function appendCreatedAt (obj) {
   obj['createdAt'] = String(new Date());
@@ -23,12 +23,12 @@ function appendUpdatedAt (obj) {
 }
 
 function encrypt (text) {
-  let cipher = crypto.createCipher(cryptoConfig.algorithm, cryptoConfig.cipherKey);
+  let cipher = crypto.createCipher(config.systemConfig.crypto.algorithm, config.systemConfig.crypto.cipherKey);
   return cipher.update(text, 'utf8', 'hex') + cipher.final('hex');
 }
 
 function decrypt (password) {
-  let decipher = crypto.createDecipher(cryptoConfig.algorithm, cryptoConfig.cipherKey);
+  let decipher = crypto.createDecipher(config.systemConfig.crypto.algorithm, config.systemConfig.crypto.cipherKey);
   return decipher.update(password, 'hex', 'utf8') + decipher.final('utf8');
 }
 
@@ -43,7 +43,7 @@ function saltAndHash (password) {
   if (!password || typeof password !== 'string') {
     return Promise.reject(new Error('invalid arguments'));
   }
-  return bcrypt.genSalt(cryptoConfig.saltRounds)
+  return bcrypt.genSalt(config.systemConfig.crypto.saltRounds)
   .then(function (salt) {
     return bcrypt.hashAsync(password, salt);
   })

@@ -1,26 +1,33 @@
 const serverHelper = require('./common/server-helper');
 const assert = require('chai').assert;
+const fs = require('fs');
 const gateway = require('../src/gateway');
-const tmp = require('tmp');
-const fileHelper = require('./common/temp.config.helper');
+const path = require('path');
+const fileHelper = require('./common/file-helper');
 const request = require('supertest');
 const port1 = 5998;
 const port2 = 5999;
-let app1, app2, appTarget, tmpConfigFile;
+let config = require('../src/config');
+let app1, app2, appTarget;
 
-['JSON', 'YAML'].forEach(function (configType) {
-  let helper = fileHelper[configType];
-  let configTemplate = helper.readTemplate();
+['json', 'yml'].forEach(function (configType) {
+  let configDirectory;
+  let originalGatewayConfig = config.gatewayConfig;
+  let configTemplate = fileHelper.read(path.join(__dirname, 'fixtures/hot-reload.template.config.' + configType), configType);
   describe('hot-reload ' + configType, () => {
     before('start servers', async() => {
       app1 = (await serverHelper.generateBackendServer(port1)).app;
       app2 = (await serverHelper.generateBackendServer(port2)).app;
-      tmpConfigFile = tmp.fileSync({ postfix: '.' + configType.toLocaleLowerCase() });
+
+      if (configType === 'yml') {
+        fs.renameSync(path.join(__dirname, 'config/gateway.config.json'), path.join(__dirname, 'config/gateway.config.yml'));
+      } else fs.renameSync(path.join(__dirname, 'config/gateway.config.yml'), path.join(__dirname, 'config/gateway.config.json'));
+
+      configDirectory = path.join(__dirname, 'config/gateway.config.' + configType);
+
       configTemplate.serviceEndpoints.backend.url = 'http://localhost:' + port1;
-      helper.saveTempFile(configTemplate, tmpConfigFile.name);
-      appTarget = (await gateway.start({
-        gatewayConfigPath: tmpConfigFile.name
-      })).app;
+      fileHelper.save(configTemplate, configDirectory, configType);
+      appTarget = (await gateway()).app;
     });
 
     it('should proxy to server on ' + port1, (done) => {
@@ -39,7 +46,7 @@ let app1, app2, appTarget, tmpConfigFile;
 
     it('should proxy to server on ' + port2, (done) => {
       configTemplate.serviceEndpoints.backend.url = 'http://localhost:' + port2;
-      helper.saveTempFile(configTemplate, tmpConfigFile.name);
+      fileHelper.save(configTemplate, configDirectory, configType);
       request(appTarget).get('/')
         .set('Host', 'test.com')
         .expect(200)
@@ -54,6 +61,7 @@ let app1, app2, appTarget, tmpConfigFile;
     });
 
     after(() => {
+      fileHelper.save(originalGatewayConfig, path.join(__dirname, 'config/gateway.config.yml'), 'yml');
       app1.close();
       app2.close();
       appTarget.close();

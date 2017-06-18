@@ -7,10 +7,8 @@ let url = require('url');
 let qs = require('querystring');
 let app = require('./bootstrap');
 let Promise = require('bluebird');
+let config = require('../../src/config');
 
-let credentialModelConfig = require('../../src/config/models/credentials');
-let userModelConfig = require('../../src/config/models/users');
-let appModelConfig = require('../../src/config/models/applications');
 let services = require('../../src/services');
 let credentialService = services.credential;
 let userService = services.user;
@@ -23,21 +21,21 @@ describe('Functional Test Authorization Code grant', function () {
   let fromDbUser1, fromDbApp;
 
   before(function (done) {
-    originalAppConfig = appModelConfig;
-    originalCredentialConfig = credentialModelConfig;
-    originalUserConfig = userModelConfig;
+    originalAppConfig = config.models.applications;
+    originalCredentialConfig = config.models.credentials;
+    originalUserConfig = config.models.users;
 
-    appModelConfig.properties = {
+    config.models.applications.properties = {
       name: { isRequired: true, isMutable: true },
       redirectUri: { isRequired: true, isMutable: true }
     };
 
-    credentialModelConfig.oauth = {
+    config.models.credentials.oauth = {
       passwordKey: 'secret',
       properties: { scopes: { isRequired: false } }
     };
 
-    userModelConfig.properties = {
+    config.models.users.properties = {
       firstname: {isRequired: true, isMutable: true},
       lastname: {isRequired: true, isMutable: true},
       email: {isRequired: false, isMutable: true}
@@ -99,9 +97,9 @@ describe('Functional Test Authorization Code grant', function () {
   });
 
   after((done) => {
-    appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth = originalCredentialConfig.oauth;
-    userModelConfig.properties = originalUserConfig.properties;
+    config.models.applications.properties = originalAppConfig.properties;
+    config.models.credentials.oauth = originalCredentialConfig.oauth;
+    config.models.users.properties = originalUserConfig.properties;
     done();
   });
 

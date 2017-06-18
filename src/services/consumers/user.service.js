@@ -4,7 +4,7 @@ let userDao = require('./user.dao.js');
 let applicationService = require('./application.service.js');
 let credentialService = require('../credentials/credential.service.js');
 let _ = require('lodash');
-let modelConfig = require('../../config/models/users');
+let config = require('../../config');
 let Promise = require('bluebird');
 let utils = require('../utils');
 let uuid = require('node-uuid');
@@ -138,12 +138,12 @@ function validateAndCreateUser (_user) {
 function validateUpdateToUserProperties (userProperties) {
   let updatedUserProperties = {};
 
-  if (!Object.keys(userProperties).every(key => typeof key === 'string' && modelConfig.properties[key])) {
+  if (!Object.keys(userProperties).every(key => typeof key === 'string' && config.models.users.properties[key])) {
     return Promise.reject(new Error('one or more properties is invalid')); // TODO: replace with validation error
   }
 
   for (let prop in userProperties) {
-    if (modelConfig.properties[prop].isMutable !== false) {
+    if (config.models.users.properties[prop].isMutable !== false) {
       updatedUserProperties[prop] = userProperties[prop];
     } else return Promise.reject(new Error('one or more properties is immutable')); // TODO: replace with validation error
   }
@@ -154,12 +154,12 @@ function validateUpdateToUserProperties (userProperties) {
 function validateNewUserProperties (userProperties) {
   let newUserProperties = {};
 
-  if (!Object.keys(userProperties).every(key => (typeof key === 'string' && !!modelConfig.properties[key]))) {
+  if (!Object.keys(userProperties).every(key => (typeof key === 'string' && !!config.models.users.properties[key]))) {
     return Promise.reject(new Error('one or more property is invalid')); // TODO: replace with validation error
   }
 
-  for (let prop in modelConfig.properties) {
-    let descriptor = modelConfig.properties[prop];
+  for (let prop in config.models.users.properties) {
+    let descriptor = config.models.users.properties[prop];
     if (!userProperties[prop]) {
       if (descriptor.isRequired) {
         return Promise.reject(new Error(`${prop} is required`)); // TODO: replace with validation error

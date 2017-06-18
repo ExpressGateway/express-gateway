@@ -2,8 +2,7 @@
 
 let Promise = require('bluebird');
 let db = require('../../db')();
-let redisConfig = require('../../config/config.system.js').db.redis.credentials;
-let modelConfig = require('../../config/models/credentials');
+let config = require('../../config');
 
 let dao = {};
 
@@ -12,24 +11,24 @@ dao.insertScopes = function (_scopes) {
   if (Array.isArray(_scopes)) {
     _scopes.forEach(el => { scopes[el] = 'true'; });
   } else scopes[_scopes] = 'true';
-  return db.hmsetAsync(redisConfig.scopePrefix, scopes);
+  return db.hmsetAsync(config.systemConfig.db.redis.credentials.scopePrefix, scopes);
 };
 
 dao.associateCredentialWithScopes = function (id, type, scopes) {
-  let credentialId = redisConfig.credentialPrefixes[type].concat(':', id);
+  let credentialId = config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id);
   let associationPromises;
   scopes = Array.isArray(scopes) ? scopes : [ scopes ];
-  associationPromises = scopes.map(scope => db.hsetAsync(redisConfig.scopeCredentialPrefix.concat(':', scope), credentialId, 'true'));
+  associationPromises = scopes.map(scope => db.hsetAsync(config.systemConfig.db.redis.credentials.scopeCredentialPrefix.concat(':', scope), credentialId, 'true'));
 
   return Promise.all(associationPromises)
   .catch(() => Promise.reject(new Error('failed to associate credential with scopes in db'))); // TODO: replace with server error
 };
 
 dao.dissociateCredentialFromScopes = function (id, type, scopes) {
-  let credentialId = redisConfig.credentialPrefixes[type].concat(':', id);
+  let credentialId = config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id);
   let dissociationPromises;
   scopes = Array.isArray(scopes) ? scopes : [ scopes ];
-  dissociationPromises = scopes.map(scope => db.hdelAsync(redisConfig.scopeCredentialPrefix.concat(':', scope), credentialId));
+  dissociationPromises = scopes.map(scope => db.hdelAsync(config.systemConfig.db.redis.credentials.scopeCredentialPrefix.concat(':', scope), credentialId));
 
   return Promise.all(dissociationPromises)
   .catch(() => Promise.reject(new Error('failed to dissociate credential with scopes in db'))); // TODO: replace with server error
@@ -43,12 +42,12 @@ dao.removeScopes = function (scopes) {
 
   removeScopesTransaction = db
   .multi()
-  .hdel(redisConfig.scopePrefix, scopes);
+  .hdel(config.systemConfig.db.redis.credentials.scopePrefix, scopes);
 
   // Get the list of ids with scopes to be removed, and remove scope-ids association
   scopes.forEach(scope => {
-    getScopeCredentialPromises.push(db.hgetallAsync(redisConfig.scopeCredentialPrefix.concat(':', scope)));
-    removeScopesTransaction = removeScopesTransaction.del(redisConfig.scopeCredentialPrefix.concat(':', scope));
+    getScopeCredentialPromises.push(db.hgetallAsync(config.systemConfig.db.redis.credentials.scopeCredentialPrefix.concat(':', scope)));
+    removeScopesTransaction = removeScopesTransaction.del(config.systemConfig.db.redis.credentials.scopeCredentialPrefix.concat(':', scope));
   });
 
   return Promise.all(getScopeCredentialPromises)
@@ -93,12 +92,12 @@ dao.removeScopes = function (scopes) {
 };
 
 dao.existsScope = function (scope) {
-  return db.hgetAsync(redisConfig.scopePrefix, scope)
+  return db.hgetAsync(config.systemConfig.db.redis.credentials.scopePrefix, scope)
   .then(res => !!res);
 };
 
 dao.getAllScopes = function () {
-  return db.hgetallAsync(redisConfig.scopePrefix)
+  return db.hgetallAsync(config.systemConfig.db.redis.credentials.scopePrefix)
   .then(res => {
     return res ? Object.keys(res) : null;
   });
@@ -108,31 +107,31 @@ dao.insertCredential = function (id, type, credentialObj) {
   if (!credentialObj) {
     return Promise.resolve(null);
   }
-  return db.hmsetAsync(redisConfig.credentialPrefixes[type].concat(':', id), credentialObj);
+  return db.hmsetAsync(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id), credentialObj);
 };
 
 dao.getCredential = function (id, type) {
-  return db.hgetallAsync(redisConfig.credentialPrefixes[type].concat(':', id));
+  return db.hgetallAsync(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id));
 };
 
 dao.activateCredential = function (id, type) {
-  return db.hsetAsync(redisConfig.credentialPrefixes[type].concat(':', id), 'isActive', 'true');
+  return db.hsetAsync(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id), 'isActive', 'true');
 };
 
 dao.deactivateCredential = function (id, type) {
-  return db.hsetAsync(redisConfig.credentialPrefixes[type].concat(':', id), 'isActive', 'false');
+  return db.hsetAsync(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id), 'isActive', 'false');
 };
 
 dao.removeCredential = function (id, type) {
-  return db.delAsync(redisConfig.credentialPrefixes[type].concat(':', id));
+  return db.delAsync(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id));
 };
 
 dao.removeAllCredentials = function (id) {
   let dbTransaction = db.multi();
-  let credentialTypes = Object.keys(modelConfig);
+  let credentialTypes = Object.keys(config.models.credentials);
 
   credentialTypes.forEach((type) => {
-    dbTransaction = dbTransaction.del(redisConfig.credentialPrefixes[type].concat(':', id));
+    dbTransaction = dbTransaction.del(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id));
   });
 
   return dbTransaction.execAsync();

@@ -1,23 +1,34 @@
 let helper = require('./routing.helper')();
-let gatewayConfig = {
-  http: { port: 9083 },
-  apiEndpoints: {
-    'parrots': { hostRegex: '[a-z]{3}.parrots.com' }
-  },
-  pipelines: {
-    pipeline1: {
-      apiEndpoints: ['parrots'],
-      policies: [{ test: [{ action: { name: 'parrot_policy' } }] }]
-    }
-  }
-};
+let config = require('../../src/config');
 
 describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
-  before('setup', helper.setup({
-    fakeActions: ['parrot_policy'],
-    gatewayConfig
-  }));
-  after('cleanup', helper.cleanup());
+  let originalGatewayConfig;
+
+  before('setup', () => {
+    originalGatewayConfig = config.gatewayConfig;
+
+    config.gatewayConfig = {
+      http: { port: 9083 },
+      apiEndpoints: {
+        'parrots': { hostRegex: '[a-z]{3}.parrots.com' }
+      },
+      pipelines: {
+        pipeline1: {
+          apiEndpoints: ['parrots'],
+          policies: [{ test: [{ action: { name: 'parrot_policy' } }] }]
+        }
+      }
+    };
+
+    helper.setup({ fakeActions: ['parrot_policy'] })();
+  });
+
+  after('cleanup', (done) => {
+    config.gatewayConfig = originalGatewayConfig;
+    helper.cleanup();
+    done();
+  });
+
   describe('regex host name configuration /[a-z]{3}.parrots.com/', () => {
     describe('should not load root domain parrots.com', () => {
       it('parrots.com/', helper.validate404({

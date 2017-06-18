@@ -22,7 +22,7 @@ pipelines:
       -     # this is array of policies
         proxy:    # this is policy name
           -       # policy can multiple condition/action steps
-            condition:    # optional condtion, will not execution of actions if not matched
+            condition:    # optional condition, will not execution of actions if not matched
               name: always
             action:       #
               name: proxy   # action name

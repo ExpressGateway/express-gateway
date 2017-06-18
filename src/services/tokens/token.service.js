@@ -3,7 +3,7 @@
 let tokenDao = require('./token.dao.js');
 let utils = require('../utils');
 let uuid = require('node-uuid');
-let systemConfig = require('../../config/config.system').access_tokens;
+let config = require('../../config');
 
 let s = {};
 
@@ -18,7 +18,7 @@ s.save = function (tokenObj) {
   let baseTokenProps = {
     id,
     tokenEncrypted: utils.encrypt(token),
-    expiresAt: Date.now() + systemConfig.timeToExpiry
+    expiresAt: Date.now() + config.systemConfig.access_tokens.timeToExpiry
   };
 
   let tokenProps = Object.assign(baseTokenProps, tokenObj);

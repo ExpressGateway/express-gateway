@@ -2,7 +2,7 @@ let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 let should = require('should');
-let systemConfig = require('../../src/config/config.system.js');
+let config = require('../../src/config');
 let services = require('../../src/services');
 let tokenService = services.token;
 let db = require('../../src/db')();
@@ -158,8 +158,8 @@ describe('Token tests', function () {
     let newToken, expiredToken, originalSystemConfig;
 
     before(function (done) {
-      originalSystemConfig = systemConfig;
-      systemConfig.access_tokens.timeToExpiry = 0;
+      originalSystemConfig = config.systemConfig;
+      config.systemConfig.access_tokens.timeToExpiry = 0;
 
       db.flushdbAsync()
       .then(function (didSucceed) {
@@ -175,7 +175,7 @@ describe('Token tests', function () {
     });
 
     after((done) => {
-      systemConfig.access_tokens.timeToExpiry = originalSystemConfig.access_tokens.timeToExpiry;
+      config.systemConfig.access_tokens.timeToExpiry = originalSystemConfig.access_tokens.timeToExpiry;
       done();
     });
 

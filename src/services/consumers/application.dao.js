@@ -1,16 +1,16 @@
 'use strict';
 
 let db = require('../../db')();
-let redisConfig = require('../../config/config.system.js').db.redis.applications;
+let config = require('../../config');
 
 let dao = {};
 
 dao.insert = function (app) {
   // key for the app hash table
-  let appHashKey = redisConfig.appHashPrefix.concat(':', app.id);
+  let appHashKey = config.systemConfig.db.redis.applications.appHashPrefix.concat(':', app.id);
 
   // key for the user-applications hash table
-  let userAppsHashKey = redisConfig.userAppsHashPrefix.concat(':', app.userId);
+  let userAppsHashKey = config.systemConfig.db.redis.applications.userAppsHashPrefix.concat(':', app.userId);
 
   return db
   .multi()
@@ -22,7 +22,7 @@ dao.insert = function (app) {
 
 dao.update = function (id, props) {
   // key for the app hash table
-  let appHashKey = redisConfig.appHashPrefix.concat(':', id);
+  let appHashKey = config.systemConfig.db.redis.applications.appHashPrefix.concat(':', id);
 
   return db
   .hmsetAsync(appHashKey, props)
@@ -32,7 +32,7 @@ dao.update = function (id, props) {
 };
 
 dao.get = function (id) {
-  return db.hgetallAsync(redisConfig.appHashPrefix.concat(':', id))
+  return db.hgetallAsync(config.systemConfig.db.redis.applications.appHashPrefix.concat(':', id))
   .then(function (app) {
     if (!app || !Object.keys(app).length) {
       return false;
@@ -49,15 +49,15 @@ dao.getAll = function (userId) {
 };
 
 dao.getAllAppIdsByUser = function (userId) {
-  return db.smembersAsync(redisConfig.userAppsHashPrefix.concat(':', userId));
+  return db.smembersAsync(config.systemConfig.db.redis.applications.userAppsHashPrefix.concat(':', userId));
 };
 
 dao.activate = function (id) {
-  return db.hsetAsync(redisConfig.appHashPrefix.concat(':', id), 'isActive', 'true');
+  return db.hsetAsync(config.systemConfig.db.redis.applications.appHashPrefix.concat(':', id), 'isActive', 'true');
 };
 
 dao.deactivate = function (id) {
-  return db.hsetAsync(redisConfig.appHashPrefix.concat(':', id), 'isActive', 'false');
+  return db.hsetAsync(config.systemConfig.db.redis.applications.appHashPrefix.concat(':', id), 'isActive', 'false');
 };
 
 dao.deactivateAll = function (userId) {
@@ -71,8 +71,8 @@ dao.deactivateAll = function (userId) {
 dao.remove = function (id, userId) {
   return db
   .multi()
-  .del(redisConfig.appHashPrefix.concat(':', id))
-  .srem(redisConfig.userAppsHashPrefix.concat(':', userId), id)
+  .del(config.systemConfig.db.redis.applications.appHashPrefix.concat(':', id))
+  .srem(config.systemConfig.db.redis.applications.userAppsHashPrefix.concat(':', userId), id)
   .execAsync()
   .then(responses => responses.every(res => res));
 };

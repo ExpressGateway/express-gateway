@@ -5,10 +5,11 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const logger = require('../log').gateway;
+let config = require('../config');
 
-module.exports.bootstrap = function (app, config) {
-  let httpServer = config.http ? http.createServer(app) : null;
-  let httpsServer = config.https && config.https.tls ? createTlsServer(config.https, app) : null;
+module.exports.bootstrap = function (app) {
+  let httpServer = config.gatewayConfig.http ? http.createServer(app) : null;
+  let httpsServer = config.gatewayConfig.https && config.gatewayConfig.https.tls ? createTlsServer(config.gatewayConfig.https, app) : null;
   return {
     httpServer,
     httpsServer

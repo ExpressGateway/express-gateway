@@ -5,7 +5,7 @@ let users = require('./consumers/user.service.js');
 let applications = require('./consumers/application.service.js');
 let tokens = require('./tokens/token.service.js');
 let utils = require('./utils');
-let credentialModelConfig = require('../config/models/credentials');
+let config = require('../config');
 
 let s = {};
 
@@ -25,7 +25,7 @@ s.authenticateCredential = function (id, password, type) {
         return false;
       }
 
-      return utils.compareSaltAndHashed(password, credential[credentialModelConfig[type]['passwordKey']])
+      return utils.compareSaltAndHashed(password, credential[config.models.credentials[type]['passwordKey']])
       .then(authenticated => {
         if (!authenticated) {
           return false;

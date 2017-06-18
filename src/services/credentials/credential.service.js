@@ -5,7 +5,7 @@ let _ = require('lodash');
 let Promise = require('bluebird');
 let utils = require('../utils');
 let uuid = require('node-uuid');
-let modelConfig = require('../../config/models/credentials');
+let config = require('../../config');
 
 let s = {};
 
@@ -49,7 +49,7 @@ s.insertCredential = function (id, type, credentialDetails) {
     return Promise.reject(new Error('invalid credentials')); // TODO: replace with validation error
   }
 
-  if (!modelConfig[type]) {
+  if (!config.models.credentials[type]) {
     return Promise.reject(new Error('invalid credential type')); // TODO: replace with validation error
   }
 
@@ -63,7 +63,7 @@ s.insertCredential = function (id, type, credentialDetails) {
         } else return Promise.reject(new Error('credential already exists but it is inactive. activate credential instead.')); // TODO: replace with validation error
       }
 
-      credentialConfig = modelConfig[type];
+      credentialConfig = config.models.credentials[type];
       newCredential = { isActive: 'true' };
 
       return Promise.all([validateNewCredentialScopes(credentialConfig, credentialDetails),
@@ -113,7 +113,7 @@ s.getCredential = function (id, type, options) {
         credential.scopes = JSON.parse(credential.scopes);
       }
 
-      return (options && options.includePassword === true) ? credential : _.omit(credential, [modelConfig[type].passwordKey]);
+      return (options && options.includePassword === true) ? credential : _.omit(credential, [config.models.credentials[type].passwordKey]);
     });
 };
 
@@ -263,7 +263,7 @@ function validateNewCredentialProperties (credentialConfig, credentialDetails) {
 // This function validates all user defined properties, excluding scopes
 function validateUpdatedCredentialProperties (type, credentialDetails) {
   let newCredentialProperties = {};
-  let credentialConfig = modelConfig[type];
+  let credentialConfig = config.models.credentials[type];
 
   for (let prop in _.omit(credentialConfig.properties, ['scopes'])) {
     if (credentialDetails[prop]) {

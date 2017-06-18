@@ -2,7 +2,7 @@
 
 let applicationDao = require('./application.dao.js');
 let Promise = require('bluebird');
-let modelConfig = require('../../config/models/applications');
+let config = require('../../config');
 let utils = require('../utils');
 let uuid = require('node-uuid');
 
@@ -97,12 +97,12 @@ s.update = function (id, applicationProperties) {
 
   return this.get(id) // validate app exists
   .then(function () {
-    if (!Object.keys(applicationProperties).every(key => typeof key === 'string' && modelConfig.properties[key])) {
+    if (!Object.keys(applicationProperties).every(key => typeof key === 'string' && config.models.applications.properties[key])) {
       return Promise.reject(new Error('one or more properties is invalid')); // TODO: replace with validation error
     }
 
     for (let prop in applicationProperties) {
-      if (modelConfig.properties[prop].isMutable !== false) {
+      if (config.models.applications.properties[prop].isMutable !== false) {
         updatedAppProperties[prop] = applicationProperties[prop];
       } else return Promise.reject(new Error('invalid property ' + prop)); // TODO: replace with validation error
     }
@@ -123,14 +123,14 @@ function validateAndCreateApp (appProperties, userId) {
     throw new Error('invalid application properties'); // TODO: replace with validation error
   }
 
-  if (!Object.keys(appProperties).every(key => (typeof key === 'string' && !!modelConfig.properties[key]))) {
+  if (!Object.keys(appProperties).every(key => (typeof key === 'string' && !!config.models.applications.properties[key]))) {
     throw new Error('one or more property is invalid'); // TODO: replace with validation error
   }
 
   baseAppProps = { isActive: 'true', id: uuid.v4(), userId };
 
-  for (let prop in modelConfig.properties) {
-    let descriptor = modelConfig.properties[prop];
+  for (let prop in config.models.applications.properties) {
+    let descriptor = config.models.applications.properties[prop];
     if (!appProperties[prop]) {
       if (descriptor.isRequired) {
         throw new Error(`${prop} is required`);

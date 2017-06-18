@@ -1,7 +1,7 @@
 let redis = require('redis');
 let Promise = require('bluebird');
 const logger = require('./log').db;
-const systemConfig = require('./config/config.system.js');
+const systemConfig = require('./config/system.config.yml');
 
 let db;
 

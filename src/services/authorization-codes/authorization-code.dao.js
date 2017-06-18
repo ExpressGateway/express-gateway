@@ -1,18 +1,18 @@
 'use strict';
 
 let db = require('../../db')();
-let redisConfig = require('../../config/config.system.js').db.redis.authorizationCodes;
+let config = require('../../config');
 
 let dao = {};
 
 dao.save = function (code) {
   // key for the code hash table
-  let redisCodeKey = redisConfig.codeHashPrefix.concat(':', code.id);
+  let redisCodeKey = config.systemConfig.db.redis.authorizationCodes.codeHashPrefix.concat(':', code.id);
   return db.hmsetAsync(redisCodeKey, code);
 };
 
 dao.find = function (criteria) {
-  return db.hgetallAsync(redisConfig.codeHashPrefix.concat(':', criteria.id))
+  return db.hgetallAsync(config.systemConfig.db.redis.authorizationCodes.codeHashPrefix.concat(':', criteria.id))
   .then((code) => {
     let isEqual;
 
@@ -31,11 +31,11 @@ dao.find = function (criteria) {
 };
 
 dao.get = function (id) {
-  return db.hgetallAsync(redisConfig.codeHashPrefix.concat(':', id));
+  return db.hgetallAsync(config.systemConfig.db.redis.authorizationCodes.codeHashPrefix.concat(':', id));
 };
 
 dao.remove = function (id) {
-  return db.delAsync(redisConfig.codeHashPrefix.concat(':', id));
+  return db.delAsync(config.systemConfig.db.redis.authorizationCodes.codeHashPrefix.concat(':', id));
 };
 
 module.exports = dao;

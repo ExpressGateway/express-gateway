@@ -5,19 +5,20 @@ const {EgContextBase} = require('./context');
 const express = require('express');
 const vhost = require('vhost');
 const ConfigurationError = require('../errors').ConfigurationError;
+let config = require('../config');
 
-module.exports.bootstrap = function (app, config) {
-  validateConfig(config);
+module.exports.bootstrap = function (app) {
+  validateConfig(config.gatewayConfig);
   let apiEndpointToPipelineMap = {};
-  for (const [pipelineName, pipeline] of Object.entries(config.pipelines)) {
+  for (const [pipelineName, pipeline] of Object.entries(config.gatewayConfig.pipelines)) {
     logger.debug(`processing pipeline ${pipelineName}`);
-    let router = configurePipeline(pipeline.policies || [], config);
+    let router = configurePipeline(pipeline.policies || []);
     for (let apiName of pipeline.apiEndpoints) {
       apiEndpointToPipelineMap[apiName] = router;
     }
   }
 
-  let apiEndpoints = processApiEndpoints(config.apiEndpoints);
+  let apiEndpoints = processApiEndpoints(config.gatewayConfig.apiEndpoints);
   for (let [host, hostConfig] of Object.entries(apiEndpoints)) {
     let router = express.Router();
     logger.debug('processing vhost %s %j', host, hostConfig.routes);
@@ -73,7 +74,7 @@ function processApiEndpoints (apiEndpoints) {
   return cfg;
 }
 
-function configurePipeline (policies, config) {
+function configurePipeline (policies) {
   let router = express.Router();
   conditions.init();
   for (let policy of policies) {
@@ -86,7 +87,7 @@ function configurePipeline (policies, config) {
         throw new ConfigurationError(
           `Could not find action "${policyStep.action.name}"`);
       }
-      const action = actionCtr(policyStep.action, config);
+      const action = actionCtr(policyStep.action, config.gatewayConfig);
 
       router.use((req, res, next) => {
         if (!condition || req.matchEGCondition(condition)) {
