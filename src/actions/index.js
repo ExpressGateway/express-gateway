@@ -3,6 +3,7 @@ const logger = require('../log').policy;
 const MODULES = [ // TODO: what is core what is plugin;
   './rate-limit',
   './proxy',
+  './expression',
   './cors',
   './log',
   './oauth',
