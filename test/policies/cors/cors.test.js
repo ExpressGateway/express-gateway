@@ -23,7 +23,7 @@ let gatewayConfig = {
   }
 };
 
-describe.only('cors', () => {
+describe('cors', () => {
   let helper = testHelper();
   before('setup', helper.setup({
     fakeActions: ['test_policy'],
