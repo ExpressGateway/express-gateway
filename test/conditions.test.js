@@ -1,4 +1,4 @@
-const {EgContextBase} = require('../src/config-loader/context');
+const {EgContextBase} = require('../src/gateway/context');
 require('../src/conditions').init();
 const express = require('express');
 const assert = require('chai').assert;
