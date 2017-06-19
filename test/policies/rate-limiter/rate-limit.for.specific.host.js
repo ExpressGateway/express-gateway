@@ -1,3 +1,6 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
+
 let testHelper = require('../../routing/routing.helper');
 let config = require('../../../src/config');
 let originalGatewayConfig = config.gatewayConfig;

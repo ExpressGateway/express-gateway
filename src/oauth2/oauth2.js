@@ -5,7 +5,7 @@ const passport = require('passport');
 const login = require('connect-ensure-login');
 const path = require('path');
 
-let services = require('../../services');
+let services = require('../services/index');
 let tokenService = services.token;
 let authCodeService = services.authorizationCode;
 let authService = services.auth;
@@ -113,7 +113,7 @@ server.exchange(oauth2orize.exchange.code((consumer, code, redirectUri, done) =>
 
     let tokenCriteria = {
       consumerId: consumer.id,
-      authenticatedUser: codeObj.userId,
+      authenticatedUserId: codeObj.userId,
       authType: 'oauth'
     };
 

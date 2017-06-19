@@ -203,18 +203,32 @@ describe('Auth tests', function () {
       authService.authenticateToken(userToken, 'oauth')
       .then(authResponse => {
         let expectedTokenProps = [ 'consumerId', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted' ];
+        let expectedConsumerProps = [ 'type', 'createdAt', 'email', 'firstname', 'id', 'isActive', 'lastname', 'updatedAt', 'username' ];
 
         let expectedResponse = {
-          consumerId: userFromDb.id,
-          authType: 'oauth',
-          tokenDecrypted: tokenDecrypted,
-          id: tokenId,
-          scopes: [ 'someScope1', 'someScope2', 'someScope3' ]
+          token: {
+            consumerId: userFromDb.id,
+            authType: 'oauth',
+            tokenDecrypted: tokenDecrypted,
+            id: tokenId,
+            scopes: [ 'someScope1', 'someScope2', 'someScope3' ]
+          },
+          consumer: {
+            id: userFromDb.id,
+            type: 'user',
+            email: 'irfan@eg.com',
+            firstname: 'irfan',
+            isActive: true,
+            lastname: 'baqui',
+            username: 'irfanbaqui'
+          }
         };
 
         should.exist(authResponse);
-        Object.keys(authResponse).sort().should.eql(expectedTokenProps.sort());
-        should.deepEqual(_.omit(authResponse, ['expiresAt', 'createdAt']), expectedResponse);
+        Object.keys(authResponse.token).sort().should.eql(expectedTokenProps.sort());
+        Object.keys(authResponse.consumer).sort().should.eql(expectedConsumerProps.sort());
+        should.deepEqual(_.omit(authResponse.token, ['expiresAt', 'createdAt']), expectedResponse.token);
+        should.deepEqual(_.omit(authResponse.consumer, ['updatedAt', 'createdAt']), expectedResponse.consumer);
         done();
       })
       .catch(function (err) {
