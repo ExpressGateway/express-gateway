@@ -1,24 +1,36 @@
  let testHelper = require('./routing.helper');
- let gatewayConfig = {
-   http: { port: 9084 },
-   apiEndpoints: {
-     'test_domain': { 'host': '*.acme.com' }, // path defaults to *
-     'test_second_level_domain': { 'host': '*.*.example.com' } // path defaults to *
-   },
-   pipelines: {
-     pipeline1: {
-       apiEndpoints: ['test_domain', 'test_second_level_domain'],
-       policies: [{ test: [{ action: { name: 'test_policy' } }] }]
-     }
-   }
- };
+ let config = require('../../src/config');
+
  describe('exact host name configuration', () => {
    let helper = testHelper();
-   before('setup', helper.setup({
-     fakeActions: ['test_policy'],
-     gatewayConfig
-   }));
-   after('cleanup', helper.cleanup());
+   let originalGatewayConfig;
+
+   before('setup', () => {
+     originalGatewayConfig = config.gatewayConfig;
+
+     config.gatewayConfig = {
+       http: { port: 9084 },
+       apiEndpoints: {
+         'test_domain': { 'host': '*.acme.com' }, // path defaults to *
+         'test_second_level_domain': { 'host': '*.*.example.com' } // path defaults to *
+       },
+       pipelines: {
+         pipeline1: {
+           apiEndpoints: ['test_domain', 'test_second_level_domain'],
+           policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+         }
+       }
+     };
+
+     helper.setup({ fakeActions: ['test_policy'] })();
+   });
+
+   after('cleanup', (done) => {
+     config.gatewayConfig = originalGatewayConfig;
+     helper.cleanup();
+     done();
+   });
+
    it('abc.acme.com/', helper.validateSuccess({
      setup: {
        host: 'abc.acme.com',

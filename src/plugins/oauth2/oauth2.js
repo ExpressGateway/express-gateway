@@ -4,11 +4,11 @@ const oauth2orize = require('oauth2orize');
 const passport = require('passport');
 const login = require('connect-ensure-login');
 const path = require('path');
-let config = require('../../config/config.model.js');
 
-let tokenService = require('../../tokens/token.service.js')(config);
-let authCodeService = require('../../authorization-codes/authorization-code.service.js')(config);
-let authService = require('../../auth.js')(config);
+let services = require('../../services');
+let tokenService = services.token;
+let authCodeService = services.authorizationCode;
+let authService = services.auth;
 
 // Create OAuth 2.0 server
 const server = oauth2orize.createServer();

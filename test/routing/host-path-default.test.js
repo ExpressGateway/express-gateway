@@ -1,25 +1,35 @@
 let testHelper = require('./routing.helper');
-let gatewayConfig = {
-  http: { port: 9081 },
-  apiEndpoints: {
-    test_default: {}
-  },
-  pipelines: {
-    pipeline1: {
-      apiEndpoints: ['test_default'],
-      policies: [{ test: [{ action: { name: 'test_policy' } }] }]
-    }
-  }
-};
+let config = require('../../src/config');
 
 // there are several configuration ways to listen to all hosts
 describe('When uses defaults (capture all hosts and paths)', () => {
   let helper = testHelper();
-  before('setup', helper.setup({
-    fakeActions: ['test_policy'],
-    gatewayConfig
-  }));
-  after('cleanup', helper.cleanup());
+  let originalGatewayConfig;
+
+  before('setup', () => {
+    originalGatewayConfig = config.gatewayConfig;
+
+    config.gatewayConfig = {
+      http: { port: 9081 },
+      apiEndpoints: {
+        test_default: {}
+      },
+      pipelines: {
+        pipeline1: {
+          apiEndpoints: ['test_default'],
+          policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+        }
+      }
+    };
+
+    helper.setup({ fakeActions: ['test_policy'] })();
+  });
+
+  after('cleanup', (done) => {
+    config.gatewayConfig = originalGatewayConfig;
+    helper.cleanup();
+    done();
+  });
 
   ['/random/17/3', '/', '/admin'].forEach(url => {
     it('should serve for random host and random path: ' + url, helper.validateSuccess({

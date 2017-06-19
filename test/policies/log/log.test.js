@@ -1,5 +1,5 @@
 const logAction = require('../../../src/actions/log').log;
-const {EgContextBase} = require('../../../src/config-loader/context');
+const {EgContextBase} = require('../../../src/gateway/context');
 const logger = require('../../../src/log').logPolicy;
 const sinon = require('sinon');
 const assert = require('assert');

@@ -1,4 +1,4 @@
-const path = require('path');
+// const path = require('path');
 const request = require('supertest');
 const assert = require('chai').assert;
 const logger = require('../../src/log').test;
@@ -17,23 +17,22 @@ module.exports = function () {
           };
         }, 'test');
       });
-      let options = {};
-      if (testSuite.gatewayConfigPath) {
-        options.gatewayConfigPath = path.join(__dirname, testSuite.gatewayConfigPath);
-      } else {
-        options.gatewayConfig = testSuite.gatewayConfig;
-      }
-      return gateway.start(options)
-        .then(result => {
-          app = result.app;
-          httpsApp = result.httpsApp;
-          return result;
+      // let options = {};
+      // if (testSuite.gatewayConfigPath) {
+      //   options.gatewayConfigPath = path.join(__dirname, testSuite.gatewayConfigPath);
+      // } else {
+      //   options.gatewayConfig = testSuite.gatewayConfig;
+      // }
+      return gateway()
+        .then(apps => {
+          app = apps.app;
+          httpsApp = apps.httpsApp;
+          return apps;
         });
     },
-    cleanup: () => done => {
+    cleanup: () => {
       app && app.close();
       httpsApp && httpsApp.close();
-      done();
     },
     validate404: function (testCase) {
       testCase.test = testCase.test || {};
@@ -64,7 +63,6 @@ module.exports = function () {
     validateSuccess: (testCase) => {
       return (done) => {
         let testScenario = request(app);
-
         if (testCase.setup.postData) {
           testScenario = testScenario.post(testCase.setup.url, testCase.setup.postData);
         } else {

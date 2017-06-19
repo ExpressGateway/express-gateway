@@ -1,7 +1,8 @@
 const testHelper = require('./routing.helper');
-const _ = require('lodash');
+let config = require('../../src/config');
 
 describe('path resolution for specific and general domains', () => {
+  let originalGatewayConfig = config.gatewayConfig;
   [undefined, 'example.com', 'sub.demo.com'].forEach(host => {
     let configTemplate = {
       http: { port: 9085 },
@@ -17,14 +18,18 @@ describe('path resolution for specific and general domains', () => {
     };
     describe('paths configuration without wildcards paths:/admin host:' + host, () => {
       let helper = testHelper();
-      let gatewayConfig = _.cloneDeep(configTemplate);
-      gatewayConfig.apiEndpoints.test.paths = '/admin';
 
-      before('setup', helper.setup({
-        fakeActions: ['test_policy'],
-        gatewayConfig
-      }));
-      after('cleanup', helper.cleanup());
+      before('setup', () => {
+        config.gatewayConfig = configTemplate;
+        config.gatewayConfig.apiEndpoints.test.paths = '/admin';
+        helper.setup({ fakeActions: ['test_policy'] })();
+      });
+
+      after('cleanup', (done) => {
+        config.gatewayConfig = originalGatewayConfig;
+        helper.cleanup();
+        done();
+      });
 
       ['/admin/', '/admin'].forEach(function (url) {
         it('should serve exact matched url', helper.validateSuccess({
@@ -52,13 +57,18 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths configuration with  /admin/*', () => {
       let helper = testHelper();
-      let gatewayConfig = _.cloneDeep(configTemplate);
-      gatewayConfig.apiEndpoints.test.paths = '/admin/*';
-      before('setup', helper.setup({
-        fakeActions: ['test_policy'],
-        gatewayConfig
-      }));
-      after('cleanup', helper.cleanup());
+
+      before('setup', () => {
+        config.gatewayConfig = configTemplate;
+        config.gatewayConfig.apiEndpoints.test.paths = '/admin/*';
+        helper.setup({ fakeActions: ['test_policy'] })();
+      });
+
+      after('cleanup', (done) => {
+        config.gatewayConfig = originalGatewayConfig;
+        helper.cleanup();
+        done();
+      });
 
       ['/admin/new', '/admin/new/1', '/admin/', '/admin/new/1/test'].forEach(function (url) {
         it('should serve matched url: ' + url, helper.validateSuccess({
@@ -86,13 +96,18 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths with one named parameter /admin/:id', () => {
       let helper = testHelper();
-      let gatewayConfig = _.cloneDeep(configTemplate);
-      gatewayConfig.apiEndpoints.test.paths = '/admin/:id';
-      before('setup', helper.setup({
-        fakeActions: ['test_policy'],
-        gatewayConfig
-      }));
-      after('cleanup', helper.cleanup());
+
+      before('setup', () => {
+        config.gatewayConfig = configTemplate;
+        config.gatewayConfig.apiEndpoints.test.paths = '/admin/:id';
+        helper.setup({ fakeActions: ['test_policy'] })();
+      });
+
+      after('cleanup', (done) => {
+        config.gatewayConfig = originalGatewayConfig;
+        helper.cleanup();
+        done();
+      });
 
       ['/admin/new', '/admin/4040040', '/admin/1'].forEach(function (url) {
         it('should serve matched url: ' + url, helper.validateSuccess({
@@ -120,13 +135,18 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths with one named parameter /admin/:group/:id', () => {
       let helper = testHelper();
-      let gatewayConfig = _.cloneDeep(configTemplate);
-      gatewayConfig.apiEndpoints.test.paths = '/admin/:group/:id';
-      before('setup', helper.setup({
-        fakeActions: ['test_policy'],
-        gatewayConfig
-      }));
-      after('cleanup', helper.cleanup());
+
+      before('setup', () => {
+        config.gatewayConfig = configTemplate;
+        config.gatewayConfig.apiEndpoints.test.paths = '/admin/:group/:id';
+        helper.setup({ fakeActions: ['test_policy'] })();
+      });
+
+      after('cleanup', (done) => {
+        config.gatewayConfig = originalGatewayConfig;
+        helper.cleanup();
+        done();
+      });
 
       ['/admin/new/1'].forEach(function (url) {
         it('should serve matched url: ' + url, helper.validateSuccess({
@@ -154,13 +174,18 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths configuration with wildcard after slash or directory ["/admin","/admin/*"]', () => {
       let helper = testHelper();
-      let gatewayConfig = _.cloneDeep(configTemplate);
-      gatewayConfig.apiEndpoints.test.paths = ['/admin', '/admin/*'];
-      before('setup', helper.setup({
-        fakeActions: ['test_policy'],
-        gatewayConfig
-      }));
-      after('cleanup', helper.cleanup());
+
+      before('setup', () => {
+        config.gatewayConfig = configTemplate;
+        config.gatewayConfig.apiEndpoints.test.paths = ['/admin', '/admin/*'];
+        helper.setup({ fakeActions: ['test_policy'] })();
+      });
+
+      after('cleanup', (done) => {
+        config.gatewayConfig = originalGatewayConfig;
+        helper.cleanup();
+        done();
+      });
 
       ['/admin', '/admin/new', '/admin/', '/admin/new/1', '/admin/new/1/test'].forEach(function (url) {
         it('should serve matched url: ' + url, helper.validateSuccess({
