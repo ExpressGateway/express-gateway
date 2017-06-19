@@ -10,19 +10,14 @@ module.exports = function () {
   return {
     setup: testSuite => () => {
       let actions = require('../../src/actions').init();
-      testSuite.fakeActions.forEach((key) => {
+      testSuite && testSuite.fakeActions && testSuite.fakeActions.forEach((key) => {
         actions.register(key, (params) => {
           return (req, res) => {
             res.json({ result: key, params, hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
           };
         }, 'test');
       });
-      // let options = {};
-      // if (testSuite.gatewayConfigPath) {
-      //   options.gatewayConfigPath = path.join(__dirname, testSuite.gatewayConfigPath);
-      // } else {
-      //   options.gatewayConfig = testSuite.gatewayConfig;
-      // }
+
       return gateway()
         .then(apps => {
           app = apps.app;

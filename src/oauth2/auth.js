@@ -4,9 +4,10 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const BasicStrategy = require('passport-http').BasicStrategy;
 const ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
-// const BearerStrategy = require('passport-http-bearer').Strategy;
+const BearerStrategy = require('passport-http-bearer').Strategy;
+const _ = require('lodash');
 
-let services = require('../../services');
+let services = require('../services/index');
 let authService = services.auth;
 
 /**
@@ -83,30 +84,51 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true }, verifyClien
  * application, which is issued an access token to make requests on behalf of
  * the authorizing user.
  */
-// passport.use(new BearerStrategy(
-//   (accessToken, done) => {
-//     db.accessTokens.find(accessToken, (error, token) => {
-//       if (error) return done(error);
-//       if (!token) return done(null, false);
-//       if (token.userId) {
-//         db.users.findByUserId(token.userId, (error, user) => {
-//           if (error) return done(error);
-//           if (!user) return done(null, false);
-//           // To keep this example simple, restricted scopes are not implemented,
-//           // and this is just for illustrative purposes.
-//           done(null, user, { scope: '*' });
-//         });
-//       } else {
-//         // The request came from a client only since userId is null,
-//         // therefore the client is passed back instead of a user.
-//         db.clients.findByClientId(token.clientId, (error, client) => {
-//           if (error) return done(error);
-//           if (!client) return done(null, false);
-//           // To keep this example simple, restricted scopes are not implemented,
-//           // and this is just for illustrative purposes.
-//           done(null, client, { scope: '*' });
-//         });
-//       }
-//     });
-//   }
-// ));
+
+passport.use(new BearerStrategy({ passReqToCallback: true }, authenticateToken));
+
+function authenticateToken (req, accessToken, done) {
+  let endpointScopes;
+  if (req.egContext.apiEndpoint && req.egContext.apiEndpoint.scopes) {
+    endpointScopes = _.map(req.egContext.apiEndpoint.scopes, 'scope');
+  }
+
+  let token, consumer;
+
+  return authService.authenticateToken(accessToken)
+    .then(res => {
+      if (!res) {
+        return done(null, false);
+      }
+
+      token = res.token;
+      consumer = res.consumer;
+
+      return authService.authorizeToken(accessToken, 'oauth', endpointScopes)
+        .then(authorized => {
+          if (!authorized) {
+            return done(null, false);
+          }
+
+          if (!token.authenticatedUserId) {
+            req.egContext.consumer = consumer;
+            req.egContext.token = token;
+
+            return done(null, consumer);
+          }
+
+          return authService.validateConsumer(token.authenticatedUserId)
+            .then(user => {
+              if (!user) {
+                return done(null, false);
+              }
+
+              req.egContext.consumer = consumer;
+              req.egContext.token = token;
+              req.egContext.authenticatedUserId = token.authenticatedUserId;
+
+              return done(null, consumer);
+            });
+        });
+    });
+}
