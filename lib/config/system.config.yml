@@ -1,7 +1,7 @@
 db:
   redis:
     host: localhost
-    port: 5555
+    port: 6379
     namespace: EG
 crypto:
   cipherKey: sensitiveKey
