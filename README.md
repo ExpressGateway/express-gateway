@@ -489,8 +489,72 @@ pipelines:
             name: proxy # proxy policy has one action - "proxy"
             serviceEndpoint: example # reference to serviceEndpoints Section
 ```
+#### ExpressJS wrapper
+This policy provides a way to plugin almost any ExpressJS middleware allowing endless extensibility
 
-#### CORS (TODO:Update doc, non relevant)
+ExpressJS Middlewares typically is one of the following forms:
+
+1) Package is already a middleware: package = (req,res,next) => {}
+This is the simpliest but not the most common type
+
+```yml
+policies:
+  -
+    express: # policy name
+      -
+        action:
+          name: 'express',  # action name
+          middlewareName: 'some-npm-pkg-name', # name of npm package to reference
+          noMiddlewareParams: true # use in raw form, the package is the middleware
+
+```
+
+2) Factory function with params: package = (params) => (req,res,next) => {}
+```yml
+policies:
+  -
+    express: # policy name
+      -
+        action:
+          name: express   # action name
+          middlewareName: cors # name of npm package to reference
+          middlewareParams:   # params to be passed into middleware factory function
+            origin: 'http://www.example.com'
+            methods: 'HEAD,PUT,PATCH,POST,DELETE'
+            allowedHeaders: 'X-TEST'
+```
+
+3) Some require be called as constructor: new package(params)
+```yml
+policies:
+  -
+    express: # policy name
+      -
+        action:
+          name: express   # action name
+          middlewareName: express-rate-limit # name of npm package to reference
+          useConstructor: true
+          middlewareParams:   # params to be passed into middleware constructor
+            max: 1
+```
+4) middleware is not entire package but a property: package.property(params)
+```yml
+policies:
+  -
+    express: # policy name
+      -
+        action:
+          name: 'express',  # action name
+          middlewareName: 'some-npm-pkg-name', # name of npm package to reference
+          middlewareProperty: custom # the package propery is the middleware Factory function
+          middlewareParams:   # params to be passed into middleware factory function
+            p1: 'http://www.example.com'
+
+```
+
+Still some advanced use cases may not be covered, so please check EG plugin framework
+
+#### CORS
 
 Provides [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 support via the [cors](https://www.npmjs.com/package/cors) node package. The
@@ -499,16 +563,15 @@ details.
 
 Example:
 
-```json
+```yml
 ...
-"policies": {
-  "cors":[{
-    "condition": {"name":"always"},
-    "action": { "name":"cors",
-                "origin": ["http://www.example.com"],
-                "credentials": true
-    }
-  }]
+policies:
+  - cors:
+      -
+        action:
+          name: cors
+          origin: http://www.example.com
+          credentials: true
 }
 ```
 
