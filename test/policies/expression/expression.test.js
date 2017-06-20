@@ -1,5 +1,5 @@
 const expressionAction = require('../../../src/actions/expression').expression;
-const {EgContextBase} = require('../../../src/config-loader/context');
+const {EgContextBase} = require('../../../src/gateway/context');
 const assert = require('assert');
 
 describe('expression action', () => {
