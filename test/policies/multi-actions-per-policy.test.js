@@ -45,7 +45,6 @@ describe('multi step policy ', () => {
 
     app1 = (await serverHelper.generateBackendServer(port1)).app;
     app2 = (await serverHelper.generateBackendServer(port2)).app;
-    console.log('calling ', config.gatewayConfig);
     appTarget = (await gateway()).app;
   });
 

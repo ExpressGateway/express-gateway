@@ -21,25 +21,28 @@ let authService = services.auth;
 function verifyClient (req, clientId, clientSecret, done) {
   return authService.authenticateCredential(clientId, clientSecret, 'oauth')
   .then(consumer => {
-    let scopes;
+    let endpointScopes, requestedScopes;
+    if (req.egContext && req.egContext.apiEndpoint && req.egContext.apiEndpoint.scopes) {
+      endpointScopes = _.map(req.egContext.apiEndpoint.scopes, 'scope');
+    } else {
+      if (req.query.scope) {
+        requestedScopes = req.query.scope.split(' ');
+      } else if (req.body.scope) {
+        requestedScopes = req.body.scope.split(' ');
+      }
+    }
 
     if (!consumer) {
       return done(null, false);
     }
 
-    if (req.query.scope) {
-      scopes = req.query.scope.split(' ');
-    } else if (req.body.scope) {
-      scopes = req.body.scope.split(' ');
-    }
-
-    return authService.authorizeCredential(clientId, 'oauth', scopes)
+    return authService.authorizeCredential(clientId, 'oauth', endpointScopes || requestedScopes)
     .then(authorized => {
       if (!authorized) {
         return done(null, false);
       }
 
-      consumer.authorizedScopes = scopes;
+      consumer.authorizedScopes = endpointScopes;
 
       return done(null, consumer);
     });

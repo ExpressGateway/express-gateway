@@ -5,7 +5,8 @@ const MODULES = [ // TODO: what is core what is plugin;
   './proxy',
   './cors',
   './log',
-  './oauth'
+  './oauth',
+  './basic-auth'
 ];
 const coreNamespace = 'EGCore';
 let actions;
