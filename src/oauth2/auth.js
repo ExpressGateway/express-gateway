@@ -18,39 +18,7 @@ let authService = services.auth;
  * a user is logged in before asking them to approve the request.
  */
 
-function verifyClient (req, clientId, clientSecret, done) {
-  return authService.authenticateCredential(clientId, clientSecret, 'oauth')
-  .then(consumer => {
-    let endpointScopes, requestedScopes;
-    if (req.egContext && req.egContext.apiEndpoint && req.egContext.apiEndpoint.scopes) {
-      endpointScopes = _.map(req.egContext.apiEndpoint.scopes, 'scope');
-    } else {
-      if (req.query.scope) {
-        requestedScopes = req.query.scope.split(' ');
-      } else if (req.body.scope) {
-        requestedScopes = req.body.scope.split(' ');
-      }
-    }
-
-    if (!consumer) {
-      return done(null, false);
-    }
-
-    return authService.authorizeCredential(clientId, 'oauth', endpointScopes || requestedScopes)
-    .then(authorized => {
-      if (!authorized) {
-        return done(null, false);
-      }
-
-      consumer.authorizedScopes = endpointScopes;
-
-      return done(null, consumer);
-    });
-  })
-  .catch(err => done(err));
-}
-
-passport.use(new LocalStrategy({ passReqToCallback: true }, verifyClient));
+passport.use(new LocalStrategy({ passReqToCallback: true }, authenticateLocal));
 
 passport.serializeUser((user, done) => done(null, user.id));
 
@@ -75,9 +43,9 @@ passport.deserializeUser((id, done) => {
  * the specification, in practice it is quite common.
  */
 
-passport.use(new BasicStrategy({ passReqToCallback: true }, verifyClient));
+passport.use(new BasicStrategy({ passReqToCallback: true }, authenticateBasic));
 
-passport.use(new ClientPasswordStrategy({ passReqToCallback: true }, verifyClient));
+passport.use(new ClientPasswordStrategy({ passReqToCallback: true }, authenticateBasic));
 
 /**
  * BearerStrategy
@@ -134,4 +102,59 @@ function authenticateToken (req, accessToken, done) {
             });
         });
     });
+}
+
+function authenticateBasic (req, clientId, clientSecret, done) {
+  let credentialType, endpointScopes, requestedScopes;
+
+  if (req.egContext && req.egContext.apiEndpoint && req.egContext.apiEndpoint.scopes) {
+    endpointScopes = _.map(req.egContext.apiEndpoint.scopes, 'scope');
+    credentialType = 'basic-auth';
+  } else {
+    credentialType = 'oauth';
+    if (req.query.scope) {
+      requestedScopes = req.query.scope.split(' ');
+    } else if (req.body.scope) {
+      requestedScopes = req.body.scope.split(' ');
+    }
+  }
+
+  return authService.authenticateCredential(clientId, clientSecret, credentialType)
+    .then(consumer => {
+      if (!consumer) {
+        return done(null, false);
+      }
+
+      return authService.authorizeCredential(clientId, credentialType, endpointScopes || requestedScopes)
+        .then(authorized => {
+          if (!authorized) {
+            return done(null, false);
+          }
+
+          consumer.authorizedScopes = endpointScopes;
+
+          return done(null, consumer);
+        });
+    })
+    .catch(err => done(err));
+}
+
+function authenticateLocal (req, clientId, clientSecret, done) {
+  let credentialType = 'basic-auth';
+
+  return authService.authenticateCredential(clientId, clientSecret, credentialType)
+    .then(consumer => {
+      if (!consumer) {
+        return done(null, false);
+      }
+
+      return authService.authorizeCredential(clientId, credentialType)
+        .then(authorized => {
+          if (!authorized) {
+            return done(null, false);
+          }
+          return done(null, consumer);
+        });
+    })
+    .catch(err => done(err));
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  basicAuth: {
+  'basic-auth': {
     passwordKey: 'password',
     autoGeneratePassword: true,
     properties: {

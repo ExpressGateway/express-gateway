@@ -35,6 +35,11 @@ describe('Functional Test Authorization Code grant', function () {
       properties: { scopes: { isRequired: false } }
     };
 
+    config.models.credentials['basic-auth'] = {
+      passwordKey: 'password',
+      properties: { scopes: { isRequired: false } }
+    };
+
     config.models.users.properties = {
       firstname: {isRequired: true, isMutable: true},
       lastname: {isRequired: true, isMutable: true},
@@ -79,7 +84,7 @@ describe('Functional Test Authorization Code grant', function () {
 
           return credentialService.insertScopes('someScope')
           .then(() => {
-            return Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth', { secret: 'user-secret' }),
+            return Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'basic-auth', { password: 'user-secret' }),
               credentialService.insertCredential(fromDbApp.id, 'oauth', { secret: 'app-secret', scopes: ['someScope'] }) ])
               .spread((userRes, appRes) => {
                 should.exist(userRes);
