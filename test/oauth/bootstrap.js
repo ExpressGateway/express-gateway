@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
+let config = require('../../src/config');
 
 let oauth = require('../../src/oauth2');
 let app = express();
@@ -15,7 +16,7 @@ let app = express();
 app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+app.use(session(config.systemConfig.session));
 app.use(passport.initialize());
 app.use(passport.session());
 
