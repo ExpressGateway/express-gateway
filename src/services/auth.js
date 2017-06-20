@@ -54,7 +54,7 @@ s.authenticateToken = function (token) {
   .then(consumer => {
     if (!consumer || !consumer.isActive) {
       return false;
-    } else return tokenObj.tokenDecrypted === tokenPassword ? tokenObj : false;
+    } else return tokenObj.tokenDecrypted === tokenPassword ? { token: tokenObj, consumer } : false;
   });
 };
 

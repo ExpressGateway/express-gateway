@@ -8,6 +8,7 @@ const log = require('../log').gateway;
 const serverLoader = require('./server');
 const pipelineLoader = require('./pipelines');
 let config = require('../config');
+let oauth2 = require('../oauth2');
 
 module.exports = function start () {
   let appPromises = [];
@@ -78,4 +79,6 @@ function loadDependencies (app) {
   app.use(session(config.systemConfig.session));
   app.use(passport.initialize());
   app.use(passport.session());
+
+  oauth2(app);
 }
