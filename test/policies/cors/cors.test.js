@@ -29,7 +29,7 @@ describe('cors', () => {
     fakeActions: ['test_policy'],
     gatewayConfig
   }));
-  after('cleanup', helper.cleanup());
+  after('cleanup', helper.cleanup);
   it('should allow first request for host', helper.validateOptions({
     setup: {
       url: '/',

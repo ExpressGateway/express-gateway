@@ -4,12 +4,17 @@ const assert = require('chai').assert;
 const logger = require('../../src/log').test;
 let gateway = require('../../src/gateway');
 const _ = require('lodash');
+let config = require('../../src/config');
 
 module.exports = function () {
-  let app, httpsApp;
+  let app, httpsApp, originalGatewayConfig;
   return {
     setup: testSuite => () => {
       let actions = require('../../src/actions').init();
+      if (testSuite && testSuite.gatewayConfig) {
+        originalGatewayConfig = config.gatewayConfig;
+        config.gatewayConfig = testSuite.gatewayConfig;
+      }
       testSuite && testSuite.fakeActions && testSuite.fakeActions.forEach((key) => {
         actions.register(key, (params) => {
           return (req, res) => {
@@ -26,6 +31,9 @@ module.exports = function () {
         });
     },
     cleanup: () => {
+      if (originalGatewayConfig) {
+        config.gatewayConfig = originalGatewayConfig;
+      }
       app && app.close();
       httpsApp && httpsApp.close();
     },
