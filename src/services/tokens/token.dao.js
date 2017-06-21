@@ -6,12 +6,15 @@ let config = require('../../config');
 
 let dao = {};
 
+const tokenNamespace = 'token';
+const consumerTokensPerfix = 'consumer-tokens';
+
 dao.save = function (token) {
   // key for the token hash table
-  let redisTokenKey = config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', token.id);
+  let redisTokenKey = config.systemConfig.db.redis.namespace.concat('-', tokenNamespace).concat(':', token.id);
 
   // key for the consumer-tokens hash table
-  let consumerTokensHashKey = config.systemConfig.db.redis.tokens.consumerTokensHashPrefix.concat(':', token.consumerId);
+  let consumerTokensHashKey = config.systemConfig.db.redis.namespace.concat('-', consumerTokensPerfix).concat(':', token.consumerId);
 
   return db
   .multi()
@@ -22,7 +25,7 @@ dao.save = function (token) {
 };
 
 dao.find = function (tokenObj) {
-  return db.hgetallAsync(config.systemConfig.db.redis.tokens.consumerTokensHashPrefix.concat(':', tokenObj.consumerId))
+  return db.hgetallAsync(config.systemConfig.db.redis.namespace.concat('-', consumerTokensPerfix).concat(':', tokenObj.consumerId))
   .then((tokenIds) => {
     let tokenPromises, activeTokenIds, foundToken;
     let expiredTokenIds = [];
@@ -40,7 +43,7 @@ dao.find = function (tokenObj) {
     });
 
     tokenPromises = activeTokenIds.map((id) => {
-      return db.hgetallAsync(config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', id))
+      return db.hgetallAsync(config.systemConfig.db.redis.namespace.concat('-', tokenNamespace).concat(':', id))
       .then((token) => {
         let isEqual;
 
@@ -66,8 +69,8 @@ dao.find = function (tokenObj) {
       }
 
       expiredTokenIds.forEach((id) => {
-        removeExpiredTokensPromises.push(db.delAsync(config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', id)));
-        removeExpiredTokensPromises.push(db.hdelAsync(config.systemConfig.db.redis.tokens.consumerTokensHashPrefix.concat(':', tokenObj.consumerId), id));
+        removeExpiredTokensPromises.push(config.systemConfig.db.redis.namespace.concat('-', tokenNamespace).concat(':', id));
+        removeExpiredTokensPromises.push(db.hdelAsync(config.systemConfig.db.redis.namespace.concat('-', consumerTokensPerfix).concat(':', tokenObj.consumerId), id));
       });
 
       return Promise.all(removeExpiredTokensPromises);
@@ -77,14 +80,14 @@ dao.find = function (tokenObj) {
 };
 
 dao.get = function (tokenId) {
-  return db.hgetallAsync(config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', tokenId))
+  return db.hgetallAsync(config.systemConfig.db.redis.namespace.concat('-', tokenNamespace).concat(':', tokenId))
   .then(token => {
     if (!token) {
       return null;
     }
 
     if (token.expiresAt < Date.now()) {
-      return db.delAsync(config.systemConfig.db.redis.tokens.tokenHashPrefix.concat(':', tokenId))
+      return db.delAsync(config.systemConfig.db.redis.namespace.concat('-', tokenNamespace).concat(':', tokenId))
       .return(null);
     }
 
