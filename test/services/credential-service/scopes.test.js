@@ -127,7 +127,6 @@ describe('Scope tests', function () {
       done();
     })
     .catch(function (err) {
-      console.log(err);
       should.not.exist(err);
       done();
     });

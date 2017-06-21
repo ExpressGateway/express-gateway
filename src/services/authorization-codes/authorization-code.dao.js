@@ -5,14 +5,16 @@ let config = require('../../config');
 
 let dao = {};
 
+const authCodeNamespace = 'auth-code';
+
 dao.save = function (code) {
   // key for the code hash table
-  let redisCodeKey = config.systemConfig.db.redis.authorizationCodes.codeHashPrefix.concat(':', code.id);
+  let redisCodeKey = config.systemConfig.db.redis.namespace.concat('-', authCodeNamespace).concat(':', code.id);
   return db.hmsetAsync(redisCodeKey, code);
 };
 
 dao.find = function (criteria) {
-  return db.hgetallAsync(config.systemConfig.db.redis.authorizationCodes.codeHashPrefix.concat(':', criteria.id))
+  return db.hgetallAsync(config.systemConfig.db.redis.namespace.concat('-', authCodeNamespace).concat(':', criteria.id))
   .then((code) => {
     let isEqual;
 
@@ -31,11 +33,11 @@ dao.find = function (criteria) {
 };
 
 dao.get = function (id) {
-  return db.hgetallAsync(config.systemConfig.db.redis.authorizationCodes.codeHashPrefix.concat(':', id));
+  return db.hgetallAsync(config.systemConfig.db.redis.namespace.concat('-', authCodeNamespace).concat(':', id));
 };
 
 dao.remove = function (id) {
-  return db.delAsync(config.systemConfig.db.redis.authorizationCodes.codeHashPrefix.concat(':', id));
+  return db.delAsync(config.systemConfig.db.redis.namespace.concat('-', authCodeNamespace).concat(':', id));
 };
 
 module.exports = dao;
