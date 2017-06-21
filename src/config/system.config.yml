@@ -1,30 +1,30 @@
 db:
   redis:
-    host: 'localhost'
+    host: localhost
     port: 5555
     users:
-      userHashPrefix: 'EG-USER'
-      usernameSetPrefix: 'EG-USERNAME'
+      userHashPrefix: EG-USER
+      usernameSetPrefix: EG-USERNAME
     applications:
-      appHashPrefix: 'EG-APP'
-      userAppsHashPrefix: 'EG-USER-APPS'
+      appHashPrefix: EG-APP
+      userAppsHashPrefix: EG-USER-APPS
     tokens:
-      tokenHashPrefix: 'EG-TOKEN'
-      consumerTokensHashPrefix: 'EG-CONSUMER-TOKENS'
+      tokenHashPrefix: EG-TOKEN
+      consumerTokensHashPrefix: EG-CONSUMER-TOKENS
     authorizationCodes:
-      codeHashPrefix: 'EG-AUTH-CODE'
+      codeHashPrefix: EG-AUTH-CODE
     credentials:
-      scopePrefix: 'EG-SCOPE'
-      scopeCredentialPrefix: 'EG-SCOPE-CREDENTIAL'
+      scopePrefix: EG-SCOPE
+      scopeCredentialPrefix: EG-SCOPE-CREDENTIAL
       credentialPrefixes:
-        oauth: 'EG-OAUTH'
-        basicAuth: 'EG-BASIC-AUTH'
+        oauth: EG-OAUTH
+        basic-auth: EG-BASIC-AUTH
 crypto:
-  cipherKey: 'sensitiveKey'
-  algorithm: 'aes256'
+  cipherKey: sensitiveKey
+  algorithm: aes256
   saltRounds: 10
 session:
-  secret: 'keyboard cat'
+  secret: keyboard cat
   resave: false
   saveUninitialized: false
 access_tokens:

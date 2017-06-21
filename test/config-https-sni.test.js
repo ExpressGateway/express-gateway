@@ -1,3 +1,6 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
+
 const assert = require('assert');
 const fs = require('fs');
 const tls = require('tls');

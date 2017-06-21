@@ -18,7 +18,7 @@ db:
       scopeCredentialPrefix: EG-SCOPE-CREDENTIAL
       credentialPrefixes:
         oauth: EG-OAUTH
-        basicAuth: EG-BASIC-AUTH
+        basic-auth: EG-BASIC-AUTH
 crypto:
   cipherKey: sensitiveKey
   algorithm: aes256

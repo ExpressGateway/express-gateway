@@ -24,7 +24,7 @@ describe('Credential service tests', function () {
         }
       };
 
-      config.models.credentials.basicAuth = {
+      config.models.credentials['basic-auth'] = {
         passwordKey: 'password',
         autoGeneratePassword: true,
         properties: {
@@ -108,7 +108,7 @@ describe('Credential service tests', function () {
       };
 
       credentialService
-      .insertCredential(username, 'basicAuth', _credential)
+      .insertCredential(username, 'basic-auth', _credential)
       .then(function (newCredential) {
         should.exist(newCredential);
         newCredential.isActive.should.eql('true');
@@ -193,7 +193,7 @@ describe('Credential service tests', function () {
         }
       };
 
-      config.models.credentials.basicAuth = {
+      config.models.credentials['basic-auth'] = {
         passwordKey: 'password',
         autoGeneratePassword: true,
         properties: {
@@ -221,7 +221,7 @@ describe('Credential service tests', function () {
           credentialService.insertCredential(user.username, 'oauth')
           .then((oauthCred) => {
             should.exist(oauthCred.secret);
-            credentialService.insertCredential(user.username, 'basicAuth')
+            credentialService.insertCredential(user.username, 'basic-auth')
             .then((basicAuthCred) => {
               should.exist(basicAuthCred.password);
               done();
@@ -240,9 +240,9 @@ describe('Credential service tests', function () {
       done();
     });
 
-    it('should delete all credentials associated with a user when user is deleted a credential', function (done) {
+    it('should delete all credentials associated with a user when user is deleted', function (done) {
       Promise.all([ credentialService.getCredential(user.username, 'oauth'),
-        credentialService.getCredential(user.username, 'basicAuth') ])
+        credentialService.getCredential(user.username, 'basic-auth') ])
       .spread((oauthRes, basicAuthRes) => {
         should.exist(oauthRes); // Check to confirm the credentials exist
         should.exist(basicAuthRes);
@@ -251,7 +251,7 @@ describe('Credential service tests', function () {
           should.exist(res);
           res.should.eql(true);
           return Promise.all([ credentialService.getCredential(user.username, 'oauth'),
-            credentialService.getCredential(user.username, 'basicAuth') ])
+            credentialService.getCredential(user.username, 'basic-auth') ])
           .spread((oauthResAfterDelete, basicAuthResAfterDelete) => {
             should.not.exist(oauthResAfterDelete);
             should.not.exist(basicAuthResAfterDelete);

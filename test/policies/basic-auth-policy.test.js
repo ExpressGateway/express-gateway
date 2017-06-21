@@ -121,7 +121,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
 
             credentialService.insertScopes('authorizedScope', 'unauthorizedScope')
               .then(() => {
-                return credentialService.insertCredential(user.username, 'oauth', { secret: 'user-secret', scopes: [ 'authorizedScope' ] })
+                return credentialService.insertCredential(user.username, 'basic-auth', { password: 'user-secret', scopes: [ 'authorizedScope' ] })
                   .then((userRes) => {
                     should.exist(userRes);
                     return serverHelper.generateBackendServer(6067)

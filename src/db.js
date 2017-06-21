@@ -1,7 +1,7 @@
 let redis = require('redis');
 let Promise = require('bluebird');
 const logger = require('./log').db;
-const systemConfig = require('./config/system.config.yml');
+let config = require('./config');
 
 let db;
 
@@ -13,7 +13,7 @@ module.exports = function () {
     return db;
   }
 
-  let redisOptions = systemConfig.db && systemConfig.db.redis;
+  let redisOptions = config.systemConfig.db && config.systemConfig.db.redis;
   db = redis.createClient(redisOptions);
 
   db.on('ready', function () {
