@@ -115,11 +115,11 @@ dao.getCredential = function (id, type) {
 };
 
 dao.activateCredential = function (id, type) {
-  return db.hsetAsync(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id), 'isActive', 'true');
+  return db.hmsetAsync(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id), ['isActive', 'true', 'updatedAt', String(new Date())]);
 };
 
 dao.deactivateCredential = function (id, type) {
-  return db.hsetAsync(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id), 'isActive', 'false');
+  return db.hmsetAsync(config.systemConfig.db.redis.credentials.credentialPrefixes[type].concat(':', id), ['isActive', 'false', 'updatedAt', String(new Date())]);
 };
 
 dao.removeCredential = function (id, type) {

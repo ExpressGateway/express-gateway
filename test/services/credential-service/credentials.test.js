@@ -479,28 +479,38 @@ describe('Credential service tests', function () {
 
       credentialService
       .insertCredential(username3, 'oauth', cred)
-      .then(function (newCredential) {
-        should.not.exist(newCredential);
-        done();
+      .then(function () {
+        throw new Error('test failed');
       })
       .catch(function (err) {
         should.exist(err);
         err.message.should.eql('someProperty is required');
-        done();
+        credentialService.getCredential(username3, 'oauth')
+          .then(credential => {
+            should.not.exist(credential);
+            done();
+          })
+          .catch(err => {
+            should.not.exist(err);
+            done();
+          });
       });
     });
 
     it('should not update credential with an update to an immutable property', function (done) {
       credentialService
       .updateCredential(username, 'oauth', { someProperty: 'something' })
-      .then(function (newCredential) {
-        should.not.exist(newCredential);
-        done();
+      .then(function () {
+        throw new Error('test failed');
       })
       .catch(function (err) {
         should.exist(err);
         err.message.should.eql('someProperty is immutable');
-        done();
+        credentialService.getCredential(username, 'oauth')
+          .then(credential => {
+            should.exist(credential);
+            done();
+          });
       });
     });
 
@@ -509,7 +519,11 @@ describe('Credential service tests', function () {
       .updateCredential(username, 'oauth', {})
       .then(function (newCredential) {
         should.not.exist(newCredential);
-        done();
+        credentialService.getCredential(username, 'oauth')
+          .then(credential => {
+            should.exist(credential);
+            done();
+          });
       })
       .catch(function (err) {
         should.not.exist(err);
