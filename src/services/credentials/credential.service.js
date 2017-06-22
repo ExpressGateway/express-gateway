@@ -80,6 +80,9 @@ s.insertCredential = function (id, type, credentialDetails) {
           newCredential[credentialConfig.passwordKey] = hash;
           Object.assign(newCredential, credentialProps);
 
+          utils.appendCreatedAt(newCredential);
+          utils.appendUpdatedAt(newCredential);
+
           return Promise.all([credentialDao.insertCredential(id, type, newCredential),
             associateCredentialWithScopesPromise
           ])
@@ -154,6 +157,10 @@ s.updateCredential = function (id, type, properties) {
       return validateUpdatedCredentialProperties(type, properties);
     })
     .then((credentialProperties) => {
+      if (!credentialProperties) {
+        return null;
+      }
+      utils.appendUpdatedAt(credentialProperties);
       return credentialDao.updateCredential(id, type, credentialProperties);
     });
 };
@@ -272,7 +279,7 @@ function validateUpdatedCredentialProperties (type, credentialDetails) {
       }
       if (credentialConfig.properties[prop].isMutable !== false) {
         newCredentialProperties[prop] = credentialDetails[prop];
-      }
+      } else return Promise.reject(new Error(`${prop} is immutable`));
     }
   }
 

@@ -55,11 +55,11 @@ dao.update = function (userId, props) {
 };
 
 dao.activate = function (id) {
-  return db.hsetAsync(config.systemConfig.db.redis.namespace.concat('-', userNamespace).concat(':', id), 'isActive', 'true');
+  return db.hmsetAsync(config.systemConfig.db.redis.namespace.concat('-', userNamespace).concat(':', id), ['isActive', 'true', 'updatedAt', String(new Date())]);
 };
 
 dao.deactivate = function (id) {
-  return db.hsetAsync(config.systemConfig.db.redis.namespace.concat('-', userNamespace).concat(':', id), 'isActive', 'false');
+  return db.hmsetAsync(config.systemConfig.db.redis.namespace.concat('-', userNamespace).concat(':', id), ['isActive', 'false', 'updatedAt', String(new Date())]);
 };
 
 dao.remove = function (userId) {
