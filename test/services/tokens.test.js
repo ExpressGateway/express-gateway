@@ -2,6 +2,8 @@ let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 let should = require('should');
+let Promise = require('bluebird');
+let _ = require('lodash');
 let config = require('../../src/config');
 let services = require('../../src/services');
 let tokenService = services.token;
@@ -154,7 +156,7 @@ describe('Token tests', function () {
     });
   });
 
-  describe('Delete Token tests', function () {
+  describe('Archive Token tests', function () {
     let newToken, expiredToken, originalSystemConfig;
 
     before(function (done) {
@@ -197,7 +199,7 @@ describe('Token tests', function () {
       });
     });
 
-    it('should not find an expired token', function (done) {
+    it('should not find an expired token if not using the includeExpired flag', function (done) {
       tokenService.find(newToken)
       .then((token) => {
         should.not.exist(token);
@@ -222,17 +224,134 @@ describe('Token tests', function () {
       });
     });
 
-    it('should delete an expired token', function (done) {
-      tokenService.get(expiredToken)
+    it('should find an expired token with includeExpired flag', function (done) {
+      tokenService.get(expiredToken, { includeExpired: true })
       .then((token) => {
-        should.not.exist(token);
-        should.equal(token, null);
+        should.exist(token);
+        token.id.should.eql(expiredToken.split('|')[0]);
         done();
       })
       .catch(function (err) {
         should.not.exist(err);
         done();
       });
+    });
+
+    it('should find an expired token with includeExpired flag', function (done) {
+      tokenService.get(expiredToken, { includeExpired: true })
+        .then((token) => {
+          should.exist(token);
+          token.id.should.eql(expiredToken.split('|')[0]);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
+    });
+  });
+
+  describe('Get Tokens By Consumer', function () {
+    let originalSystemConfig, tokenObjs;
+
+    before(function (done) {
+      originalSystemConfig = config.systemConfig;
+      config.systemConfig.access_tokens.timeToExpiry = 0;
+
+      tokenObjs = [
+        {
+          consumerId: '1234',
+          authType: 'oauth',
+          prop: '1'
+        },
+        {
+          consumerId: '1234',
+          authType: 'oauth',
+          prop: '2'
+        },
+        {
+          consumerId: '1234',
+          authType: 'oauth',
+          prop: '3'
+        },
+        {
+          consumerId: '1234',
+          authType: 'oauth',
+          prop: '4'
+        }
+      ];
+
+      db.flushdbAsync()
+        .then(function (didSucceed) {
+          if (!didSucceed) {
+            console.log('Failed to flush the database');
+          }
+
+          let expiredTokenPromises = [];
+
+          tokenObjs.forEach(tokenObj => {
+            expiredTokenPromises.push(tokenService.findOrSave(tokenObj));
+          });
+
+          Promise.all(expiredTokenPromises)
+            .then((res) => {
+              config.systemConfig.access_tokens.timeToExpiry = 20000000;
+
+              let activeTokenPromises = [];
+
+              tokenObjs.forEach(tokenObj => {
+                activeTokenPromises.push(tokenService.findOrSave(tokenObj));
+              });
+
+              Promise.all(activeTokenPromises)
+                .then(res => {
+                  should.exist(res);
+                  done();
+                });
+            });
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
+    });
+
+    after((done) => {
+      config.systemConfig.access_tokens.timeToExpiry = originalSystemConfig.access_tokens.timeToExpiry;
+      done();
+    });
+
+    it('should get active tokens by consumer', function (done) {
+      tokenService.getTokensByConsumer('1234')
+        .then((tokens) => {
+          should.exist(tokens);
+          tokens.length.should.eql(tokenObjs.length);
+          tokens.forEach(tokenObj => {
+            tokenObj.prop.should.be.oneOf(_.map(tokenObjs, 'prop'));
+          });
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
+    });
+
+    it('should get active and expired tokens by consumer if provided includeExpired flag', function (done) {
+      tokenService.getTokensByConsumer('1234', { includeExpired: true })
+        .then((tokens) => {
+          should.exist(tokens);
+          tokens.length.should.eql(tokenObjs.length * 2);
+          tokens.forEach(tokenObj => {
+            tokenObj.prop.should.be.oneOf(_.map(tokenObjs, 'prop'));
+          });
+          _.map(tokens, 'archived').filter(val => val).length.should.eql(4);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
   });
 });
