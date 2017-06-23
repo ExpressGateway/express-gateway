@@ -75,7 +75,7 @@ let serverError;
 
 describe('sni', () => {
   let servers, helper, originalGatewayConfig;
-  before('setup', async() => {
+  before('setup', (done) => {
     originalGatewayConfig = config.gatewayConfig;
     config.gatewayConfig = {
       https: {
@@ -106,17 +106,23 @@ describe('sni', () => {
     };
 
     helper = testHelper();
-    servers = await helper.setup({
-      fakeActions: ['test_policy']
-    })();
 
-    servers.httpsApp.on('tlsClientError', function (err) {
-      serverResult = null;
-      serverError = err.message;
-    });
-    servers.httpsApp.on('secureConnection', (tlsSocket) => {
-      serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized };
-    });
+    helper.setup({
+      fakeActions: ['test_policy']
+    })()
+      .then(_servers => {
+        servers = _servers;
+
+        servers.httpsApp.on('tlsClientError', function (err) {
+          serverResult = null;
+          serverError = err.message;
+        });
+        servers.httpsApp.on('secureConnection', (tlsSocket) => {
+          serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized };
+        });
+
+        done();
+      });
   });
 
   testCases.forEach(tc => {
@@ -145,7 +151,7 @@ describe('sni', () => {
       });
     });
   });
-  after('check', () => {
+  after('check', (done) => {
     testCases.forEach((tc) => {
       assert.deepStrictEqual(tc.actual.serverResult, tc.expected.serverResult);
       assert.equal(tc.actual.clientResult, tc.expected.clientResult);
@@ -154,6 +160,7 @@ describe('sni', () => {
     });
     config.gatewayConfig = originalGatewayConfig;
     helper.cleanup();
+    done();
   });
 });
 

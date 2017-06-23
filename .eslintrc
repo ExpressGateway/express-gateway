@@ -1,8 +1,4 @@
 {
-  "parser": "babel-eslint",
-  "parserOptions": {
-    "sourceType": "script"
-  },
   "extends": "standard",
   "env": {
     "es6": true,

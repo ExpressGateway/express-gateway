@@ -20,7 +20,9 @@ function createTlsServer (httpsConfig, app) {
   let defaultCert = null;
   let sniCerts = [];
 
-  for (let [domain, certPaths] of Object.entries(httpsConfig.tls)) {
+  for (let el in httpsConfig.tls) {
+    let domain = el;
+    let certPaths = httpsConfig.tls[el];
     let cert;
     if (domain === 'default') {
       cert = defaultCert = {};

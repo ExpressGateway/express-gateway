@@ -2,7 +2,7 @@
 const express = require('express');
 const logger = require('../../src/log').test;
 
-async function generateBackendServer (port) {
+function generateBackendServer (port) {
   let app = express();
 
   app.get('*', (req, res) => {

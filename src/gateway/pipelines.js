@@ -10,7 +10,10 @@ let config = require('../config');
 module.exports.bootstrap = function (app) {
   validateConfig(config.gatewayConfig);
   let apiEndpointToPipelineMap = {};
-  for (const [pipelineName, pipeline] of Object.entries(config.gatewayConfig.pipelines)) {
+  for (let el in config.gatewayConfig.pipelines) {
+    let pipelineName = el;
+    let pipeline = config.gatewayConfig.pipelines[el];
+
     logger.debug(`processing pipeline ${pipelineName}`);
     let router = configurePipeline(pipeline.policies || []);
     for (let apiName of pipeline.apiEndpoints) {
@@ -19,7 +22,9 @@ module.exports.bootstrap = function (app) {
   }
 
   let apiEndpoints = processApiEndpoints(config.gatewayConfig.apiEndpoints);
-  for (let [host, hostConfig] of Object.entries(apiEndpoints)) {
+  for (let el in apiEndpoints) {
+    let host = el;
+    let hostConfig = apiEndpoints[el];
     let router = express.Router();
     logger.debug('processing vhost %s %j', host, hostConfig.routes);
     for (let route of hostConfig.routes) {
@@ -57,7 +62,10 @@ module.exports.bootstrap = function (app) {
 function processApiEndpoints (apiEndpoints) {
   let cfg = {};
   logger.debug('loading apiEndpoints %j', apiEndpoints);
-  for (let [apiEndpointName, endpointConfig] of Object.entries(apiEndpoints)) {
+  for (let el in apiEndpoints) {
+    let apiEndpointName = el;
+    let endpointConfig = apiEndpoints[el];
+
     let host = endpointConfig.hostRegex;
     let isRegex = true;
     if (!host) {

@@ -71,7 +71,10 @@ module.exports = function () {
           testScenario.set('Host', testCase.setup.host);
         }
         if (testCase.test.headers) {
-          for (let [ header, value ] of Object.entries(testCase.test.headers)) {
+          for (let el in testCase.test.headers) {
+            let header = el;
+            let value = testCase.test.headers[el];
+
             testScenario.expect(header, value);
           }
         }

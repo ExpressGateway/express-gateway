@@ -11,7 +11,7 @@ const gateway = require('../../src/gateway');
 describe('multi step policy ', () => {
   let originalGatewayConfig;
 
-  before('start servers', async() => {
+  before('start servers', (done) => {
     originalGatewayConfig = config.gatewayConfig;
 
     config.gatewayConfig = {
@@ -43,9 +43,19 @@ describe('multi step policy ', () => {
       }
     };
 
-    app1 = (await serverHelper.generateBackendServer(port1)).app;
-    app2 = (await serverHelper.generateBackendServer(port2)).app;
-    appTarget = (await gateway()).app;
+    serverHelper.generateBackendServer(port1)
+      .then(apps => {
+        app1 = apps.app;
+        return serverHelper.generateBackendServer(port2);
+      })
+      .then(apps => {
+        app2 = apps.app;
+        return gateway();
+      })
+      .then(apps => {
+        appTarget = apps.app;
+        done();
+      });
   });
 
   it('should proxy to server on ' + port1, (done) => {
