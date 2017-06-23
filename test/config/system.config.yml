@@ -13,5 +13,7 @@ session:
   saveUninitialized: false
 access_tokens:
   timeToExpiry: 7200000
+refresh_tokens:
+  timeToExpiry: 7200000
 authorization_codes:
   timeToExpiry: 300000
