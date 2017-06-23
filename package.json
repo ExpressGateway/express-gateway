@@ -34,7 +34,6 @@
     "eslint-plugin-promise": "3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "mocha": "3.3.0",
-    "pre-commit": "1.2.2",
     "request": "2.81.0",
     "should": "11.2.1",
     "sinon": "2.1.0",
