@@ -17,8 +17,8 @@
 		"nodejs gateway",
 		"oauth2"
 	],
-  "author": "Roman Lisagor <roman@lunchbadger.com>",
   "contributors": [
+		"Roman Lisagor <roman@lunchbadger.com>",
 		"Serhii Kuts <serhii@lunchbadger.com>",
 		"Irfan Baqui <irfan@lunchbadger.com>",
 		"Kevin Swiber <kevin@lunchbadger.com>",
@@ -27,7 +27,7 @@
   "license": "Apache-2.0",
   "main": "src/index.js",
   "engines": {
-    "node" : ">= 4.0.0"
+    "node" : ">= 6.0.0"
   },
   "scripts": {
     "dist": "npm run clean && babel -d dist src",
