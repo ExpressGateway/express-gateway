@@ -1,5 +1,5 @@
 const testHelper = require('./routing.helper');
-let config = require('../../src/config');
+let config = require('../../lib/config');
 
 describe('path resolution for specific and general domains', () => {
   let originalGatewayConfig = config.gatewayConfig;

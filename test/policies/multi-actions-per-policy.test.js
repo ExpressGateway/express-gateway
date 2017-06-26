@@ -1,17 +1,17 @@
 const serverHelper = require('../common/server-helper');
 const assert = require('chai').assert;
-let config = require('../../src/config');
+let config = require('../../lib/config');
 const request = require('supertest');
 const port1 = 5998;
 const port2 = 5999;
 let app1, app2, appTarget;
 
-const gateway = require('../../src/gateway');
+const gateway = require('../../lib/gateway');
 
 describe('multi step policy ', () => {
   let originalGatewayConfig;
 
-  before('start servers', async() => {
+  before('start servers', (done) => {
     originalGatewayConfig = config.gatewayConfig;
 
     config.gatewayConfig = {
@@ -43,9 +43,19 @@ describe('multi step policy ', () => {
       }
     };
 
-    app1 = (await serverHelper.generateBackendServer(port1)).app;
-    app2 = (await serverHelper.generateBackendServer(port2)).app;
-    appTarget = (await gateway()).app;
+    serverHelper.generateBackendServer(port1)
+      .then(apps => {
+        app1 = apps.app;
+        return serverHelper.generateBackendServer(port2);
+      })
+      .then(apps => {
+        app2 = apps.app;
+        return gateway();
+      })
+      .then(apps => {
+        appTarget = apps.app;
+        done();
+      });
   });
 
   it('should proxy to server on ' + port1, (done) => {

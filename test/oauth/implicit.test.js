@@ -8,13 +8,13 @@ let qs = require('querystring');
 let app = require('./bootstrap');
 let Promise = require('bluebird');
 
-let config = require('../../src/config');
-let services = require('../../src/services');
+let config = require('../../lib/config');
+let services = require('../../lib/services');
 let credentialService = services.credential;
 let userService = services.user;
 let applicationService = services.application;
 let tokenService = services.token;
-let db = require('../../src/db')();
+let db = require('../../lib/db')();
 
 describe('Functional Test Implicit grant', function () {
   let originalAppConfig, originalCredentialConfig, originalUserConfig;

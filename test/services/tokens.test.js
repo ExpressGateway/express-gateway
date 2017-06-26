@@ -4,10 +4,10 @@ mock('redis', require('fakeredis'));
 let should = require('should');
 let Promise = require('bluebird');
 let _ = require('lodash');
-let config = require('../../src/config');
-let services = require('../../src/services');
+let config = require('../../lib/config');
+let services = require('../../lib/services');
 let tokenService = services.token;
-let db = require('../../src/db')();
+let db = require('../../lib/db')();
 
 describe('Token tests', function () {
   describe('Save, Find and Get Token tests', function () {

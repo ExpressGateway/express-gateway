@@ -4,18 +4,18 @@ mock('redis', require('fakeredis'));
 let session = require('supertest-session');
 let should = require('should');
 
-let credentialModelConfig = require('../../src/config/models/credentials');
-let userModelConfig = require('../../src/config/models/users');
-let appModelConfig = require('../../src/config/models/applications');
-let services = require('../../src/services');
+let credentialModelConfig = require('../../lib/config/models/credentials');
+let userModelConfig = require('../../lib/config/models/users');
+let appModelConfig = require('../../lib/config/models/applications');
+let services = require('../../lib/services');
 let credentialService = services.credential;
 let userService = services.user;
 let applicationService = services.application;
 let serverHelper = require('../common/server-helper');
-let db = require('../../src/db')();
+let db = require('../../lib/db')();
 
 let testHelper = require('../routing/routing.helper');
-let config = require('../../src/config');
+let config = require('../../lib/config');
 let originalGatewayConfig = config.gatewayConfig;
 
 describe('Functional Tests oAuth2.0 Policy', () => {

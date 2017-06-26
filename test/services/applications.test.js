@@ -3,11 +3,11 @@ mock('redis', require('fakeredis'));
 
 let should = require('should');
 let uuid = require('node-uuid');
-let config = require('../../src/config');
-let services = require('../../src/services');
+let config = require('../../lib/config');
+let services = require('../../lib/services');
 let applicationService = services.application;
 let userService = services.user;
-let db = require('../../src/db')();
+let db = require('../../lib/db')();
 
 describe('Application service tests', function () {
   let originalUserModelConfig;

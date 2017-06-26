@@ -1,5 +1,5 @@
 let testHelper = require('./routing.helper');
-let config = require('../../src/config');
+let config = require('../../lib/config');
 
 // there are several configuration ways to listen to all hosts
 describe('When uses defaults (capture all hosts and paths)', () => {

@@ -2,7 +2,7 @@ let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 let testHelper = require('../../routing/routing.helper');
-let config = require('../../../src/config');
+let config = require('../../../lib/config');
 let originalGatewayConfig = config.gatewayConfig;
 
 describe('rate-limit policy only for example.com host', () => {

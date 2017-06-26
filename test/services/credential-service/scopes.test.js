@@ -2,9 +2,9 @@ let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 let should = require('should');
-let services = require('../../../src/services');
+let services = require('../../../lib/services');
 let credentialService = services.credential;
-let db = require('../../../src/db')();
+let db = require('../../../lib/db')();
 
 describe('Scope tests', function () {
   before(function (done) {

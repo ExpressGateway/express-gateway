@@ -3,9 +3,9 @@ mock('redis', require('fakeredis'));
 
 let should = require('should');
 let _ = require('lodash');
-let services = require('../../src/services');
+let services = require('../../lib/services');
 let authCodeService = services.authorizationCode;
-let db = require('../../src/db')();
+let db = require('../../lib/db')();
 
 describe('Authorization Code Tests', function () {
   let newCode, codeFromDb;

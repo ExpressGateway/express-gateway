@@ -5,15 +5,15 @@ let session = require('supertest-session');
 let should = require('should');
 let app = require('./bootstrap');
 
-let credentialModelConfig = require('../../src/config/models/credentials');
-let userModelConfig = require('../../src/config/models/users');
-let appModelConfig = require('../../src/config/models/applications');
-let services = require('../../src/services');
+let credentialModelConfig = require('../../lib/config/models/credentials');
+let userModelConfig = require('../../lib/config/models/users');
+let appModelConfig = require('../../lib/config/models/applications');
+let services = require('../../lib/services');
 let credentialService = services.credential;
 let userService = services.user;
 let applicationService = services.application;
 let tokenService = services.token;
-let db = require('../../src/db')();
+let db = require('../../lib/db')();
 
 describe('Functional Test Client Credentials grant', function () {
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
