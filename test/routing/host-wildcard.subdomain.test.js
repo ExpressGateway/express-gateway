@@ -1,5 +1,5 @@
  let testHelper = require('./routing.helper');
- let config = require('../../src/config');
+ let config = require('../../lib/config');
 
  describe('exact host name configuration', () => {
    let helper = testHelper();

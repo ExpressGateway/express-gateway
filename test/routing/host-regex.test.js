@@ -1,5 +1,5 @@
 let helper = require('./routing.helper')();
-let config = require('../../src/config');
+let config = require('../../lib/config');
 
 describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
   let originalGatewayConfig;

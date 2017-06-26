@@ -5,7 +5,7 @@ const assert = require('assert');
 const fs = require('fs');
 const tls = require('tls');
 const path = require('path');
-let config = require('../src/config');
+let config = require('../lib/config');
 let testHelper = require('./routing/routing.helper');
 
 const testCases = [{

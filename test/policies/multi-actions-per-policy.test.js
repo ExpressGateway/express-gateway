@@ -1,12 +1,12 @@
 const serverHelper = require('../common/server-helper');
 const assert = require('chai').assert;
-let config = require('../../src/config');
+let config = require('../../lib/config');
 const request = require('supertest');
 const port1 = 5998;
 const port2 = 5999;
 let app1, app2, appTarget;
 
-const gateway = require('../../src/gateway');
+const gateway = require('../../lib/gateway');
 
 describe('multi step policy ', () => {
   let originalGatewayConfig;

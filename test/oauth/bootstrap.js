@@ -8,9 +8,9 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
-let config = require('../../src/config');
+let config = require('../../lib/config');
 
-let oauth = require('../../src/oauth2');
+let oauth = require('../../lib/oauth2');
 let app = express();
 
 app.use(bodyParser.json({ extended: true }));

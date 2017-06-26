@@ -3,10 +3,10 @@ mock('redis', require('fakeredis'));
 
 let should = require('should');
 let uuid = require('node-uuid');
-let redisConfig = require('../../src/config').systemConfig.db.redis;
-let services = require('../../src/services');
+let redisConfig = require('../../lib/config').systemConfig.db.redis;
+let services = require('../../lib/services');
 let userService = services.user;
-let db = require('../../src/db')();
+let db = require('../../lib/db')();
 let _ = require('lodash');
 
 describe('User service tests', function () {

@@ -1,5 +1,5 @@
 const testHelper = require('./routing.helper');
-let config = require('../../src/config');
+let config = require('../../lib/config');
 let originalGatewayConfig = config.gatewayConfig;
 
 [undefined, 'sample.com', 'sub.acme.com'].forEach(host => {

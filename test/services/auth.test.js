@@ -3,14 +3,14 @@ mock('redis', require('fakeredis'));
 
 let should = require('should');
 let _ = require('lodash');
-let credentialModelConfig = require('../../src/config/models/credentials');
-let userModelConfig = require('../../src/config/models/users');
-let services = require('../../src/services');
+let credentialModelConfig = require('../../lib/config/models/credentials');
+let userModelConfig = require('../../lib/config/models/users');
+let services = require('../../lib/services');
 let credentialService = services.credential;
 let userService = services.user;
 let tokenService = services.token;
 let authService = services.auth;
-let db = require('../../src/db')();
+let db = require('../../lib/db')();
 
 describe('Auth tests', function () {
   let user, userFromDb;

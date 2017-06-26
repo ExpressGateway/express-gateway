@@ -1,13 +1,13 @@
 const serverHelper = require('./common/server-helper');
 const assert = require('chai').assert;
 const fs = require('fs');
-const gateway = require('../src/gateway');
+const gateway = require('../lib/gateway');
 const path = require('path');
 const fileHelper = require('./common/file-helper');
 const request = require('supertest');
 const port1 = 5998;
 const port2 = 5999;
-let config = require('../src/config');
+let config = require('../lib/config');
 
 ['json', 'yml'].forEach(function (configType) {
   let configDirectory, app1, app2, appTarget;

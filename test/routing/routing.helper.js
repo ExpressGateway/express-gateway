@@ -1,16 +1,16 @@
 // const path = require('path');
 const request = require('supertest');
 const assert = require('chai').assert;
-const logger = require('../../src/log').test;
-let gateway = require('../../src/gateway');
+const logger = require('../../lib/log').test;
+let gateway = require('../../lib/gateway');
 const _ = require('lodash');
-let config = require('../../src/config');
+let config = require('../../lib/config');
 
 module.exports = function () {
   let app, httpsApp, originalGatewayConfig;
   return {
     setup: testSuite => () => {
-      let actions = require('../../src/actions').init();
+      let actions = require('../../lib/actions').init();
       if (testSuite && testSuite.gatewayConfig) {
         originalGatewayConfig = config.gatewayConfig;
         config.gatewayConfig = testSuite.gatewayConfig;

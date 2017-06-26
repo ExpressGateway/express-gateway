@@ -2,11 +2,11 @@ let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 let should = require('should');
-let config = require('../../../src/config');
-let services = require('../../../src/services');
+let config = require('../../../lib/config');
+let services = require('../../../lib/services');
 let credentialService = services.credential;
 let userService = services.user;
-let db = require('../../../src/db')();
+let db = require('../../../lib/db')();
 let Promise = require('bluebird');
 
 describe('Credential service tests', function () {
