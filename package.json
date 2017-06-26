@@ -1,8 +1,34 @@
 {
-  "name": "gateway",
-  "version": "0.0.4",
-  "description": "Proxies HTTP requests with flexible policies",
+  "name": "express-gateway",
+  "version": "0.1.0",
+  "description": "A microservices API gateway built on top of ExpressJS",
+  "homepage": "https://www.express-gateway.io",
+  "repository": "expressgateway/express-gateway",
+  "keywords": [
+		"microservices",
+		"apis",
+		"api gateway",
+		"rest",
+		"express",
+		"middleware",
+		"endpoints",
+		"policies",
+		"pipelines",
+		"nodejs gateway",
+		"oauth2"
+	],
+  "contributors": [
+		"Roman Lisagor <roman@lunchbadger.com>",
+		"Serhii Kuts <serhii@lunchbadger.com>",
+		"Irfan Baqui <irfan@lunchbadger.com>",
+		"Kevin Swiber <kevin@lunchbadger.com>",
+		"Al Tsang <al@lunchbadger.com>"
+	],
+  "license": "Apache-2.0",
   "main": "src/index.js",
+  "engines": {
+    "node" : ">= 6.0.0"
+  },
   "scripts": {
     "start": "node src/index.js",
     "start-dev": "LOG_LEVEL=debug node src/index.js",
@@ -11,26 +37,6 @@
     "clean": "rimraf dist/",
     "pretest": "eslint .",
     "test": "EG_CONFIG_DIR=test/config mocha test/*"
-  },
-  "author": "Roman Lisagor <roman@lunchbadger.com>",
-  "license": "UNLICENSED",
-  "devDependencies": {
-    "chai": "3.5.0",
-    "eslint": "3.19.0",
-    "eslint-config-defaults": "9.0.0",
-    "eslint-config-standard": "10.2.1",
-    "eslint-plugin-import": "2.3.0",
-    "eslint-plugin-markdown": "1.0.0-beta.6",
-    "eslint-plugin-node": "4.2.2",
-    "eslint-plugin-promise": "3.5.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "mocha": "3.3.0",
-    "request": "2.81.0",
-    "should": "11.2.1",
-    "sinon": "2.1.0",
-    "supertest": "3.0.0",
-    "supertest-session": "3.0.0",
-    "tmp": "0.0.31"
   },
   "dependencies": {
     "bcrypt": "1.0.0",
@@ -63,5 +69,31 @@
     "redis": "2.7.1",
     "vhost": "3.0.2",
     "winston": "2.3.1"
+  },
+  "devDependencies": {
+    "babel-cli": "6.24.1",
+    "babel-core": "6.24.1",
+    "babel-eslint": "7.2.3",
+    "babel-plugin-transform-async-to-generator": "6.24.1",
+    "babel-plugin-transform-object-entries": "1.0.0",
+    "babel-preset-es2015-node6": "^0.4.0",
+    "babel-watch": "2.0.6",
+    "chai": "3.5.0",
+    "eslint": "3.19.0",
+    "eslint-config-defaults": "9.0.0",
+    "eslint-config-standard": "10.2.1",
+    "eslint-plugin-import": "2.3.0",
+    "eslint-plugin-markdown": "1.0.0-beta.6",
+    "eslint-plugin-node": "4.2.2",
+    "eslint-plugin-promise": "3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "mocha": "3.3.0",
+    "pre-commit": "1.2.2",
+    "request": "2.81.0",
+    "should": "11.2.1",
+    "sinon": "2.1.0",
+    "supertest": "3.0.0",
+    "supertest-session": "3.0.0",
+    "tmp": "0.0.31"
   }
 }
