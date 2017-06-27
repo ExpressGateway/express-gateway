@@ -36,7 +36,7 @@
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "pretest": "eslint .",
-    "test": "EG_CONFIG_DIR=test/config mocha test/*"
+    "test": "EG_CONFIG_DIR=test/config mocha --recursive test/*"
   },
   "dependencies": {
     "bcrypt": "1.0.0",
