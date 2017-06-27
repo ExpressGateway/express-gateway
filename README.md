@@ -1,12 +1,13 @@
-Express Gateway
-=======
+#### A Microservices API Gateway Built Using ExpressJS and Express Middleware
+- - - -
 
-This is an API Gateway built using Express and Express middleware.
+[![CircleCI][circleci-badge]][circleci-master-url]
 
-[![CircleCI](https://circleci.com/gh/ExpressGateway/express-gateway/tree/master.svg?style=shield&circle-token=ac6b0e86b46220da43a5ae63a267d12e81ccb2d5)](https://circleci.com/gh/ExpressGateway/express-gateway/tree/master)
+[![Express-Gateway][eg-wordmark-companion]][eg-url]
 
-Configuration
--------------
+Express Gateway is an API Gateway that sits at the heart of any microservices architecture, regardless of what language or platform you're using. Express Gateway secures your microservices and exposes them through APIs using Node.js, ExpressJS and Express middleware. Developing microservices, orchestrating and managing them now can be done all one one seamless platform without having to introduce additional infrastructure.
+
+# Configuration
 
 The configuration file is a YAML(or JSON) document.
 It consists of the following sections:
@@ -733,3 +734,8 @@ EG\_SYSTEM\_CONFIG\_db\_redis\_url='redis connection string'
 
 ##### Path as command line argument
 npm start /path/here
+
+[eg-wordmark-companion]: logo/wordmark-and-companion-graphic/ExpressGateway_Wordmark+Companion.png
+[eg-url]: https://www.express-gateway.io
+[circleci-badge]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master.svg?style=shield&circle-token=ac6b0e86b46220da43a5ae63a267d12e81ccb
+[circleci-master-url]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master
