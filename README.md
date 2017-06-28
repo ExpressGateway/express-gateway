@@ -1,5 +1,5 @@
 #### A Microservices API Gateway Built Using ExpressJS and Express Middleware
-- - - -
+----
 
 [![CircleCI][circleci-badge]][circleci-master-url]
 
@@ -737,5 +737,5 @@ npm start /path/here
 
 [eg-wordmark-companion]: logo/wordmark-and-companion-graphic/ExpressGateway_Wordmark+Companion.png
 [eg-url]: https://www.express-gateway.io
-[circleci-badge]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master.svg?style=shield&circle-token=ac6b0e86b46220da43a5ae63a267d12e81ccb
+[circleci-badge]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master.svg?style=shield&circle-token=ac6b0e86b46220da43a5ae63a267d12e81ccb2d5
 [circleci-master-url]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master
