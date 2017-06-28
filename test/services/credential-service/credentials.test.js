@@ -15,7 +15,7 @@ describe('Credential service tests', function () {
     let originalModelConfig = config.models.credentials;
     let username = 'someUser';
 
-    before(function (done) {
+    before(function () {
       config.models.credentials.oauth = {
         passwordKey: 'secret',
         autoGeneratePassword: true,
@@ -32,17 +32,7 @@ describe('Credential service tests', function () {
         }
       };
 
-      db.flushdbAsync()
-      .then(function (didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      return db.flushdbAsync();
     });
 
     after(function (done) {
@@ -50,21 +40,16 @@ describe('Credential service tests', function () {
       done();
     });
 
-    it('should insert a credential', function (done) {
+    it('should insert a credential', function () {
       let _credential = {
         secret: 'password'
       };
 
-      credentialService
+      return credentialService
       .insertCredential(username, 'oauth', _credential)
       .then(function (newCredential) {
         should.exist(newCredential);
         credential = Object.assign(newCredential, _credential);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
       });
     });
 
@@ -85,79 +70,59 @@ describe('Credential service tests', function () {
       });
     });
 
-    it('should insert a credential without password specified if autoGeneratePassword is set to true', function (done) {
+    it('should insert a credential without password specified if autoGeneratePassword is set to true', function () {
       let _credential = {};
 
-      credentialService
+      return credentialService
       .insertCredential('someUsername', 'oauth', _credential)
       .then(function (newCredential) {
         should.exist(newCredential);
         should.exist(newCredential.secret);
         newCredential.secret.length.should.greaterThanOrEqual(10);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
       });
     });
 
-    it('should insert a credential with id but different type that already exists', function (done) {
+    it('should insert a credential with id but different type that already exists', function () {
       let _credential = {
         password: 'password'
       };
 
-      credentialService
+      return credentialService
       .insertCredential(username, 'basic-auth', _credential)
       .then(function (newCredential) {
         should.exist(newCredential);
         newCredential.isActive.should.eql('true');
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
       });
     });
 
-    it('should get a credential', function (done) {
-      credentialService
-      .getCredential(username, 'oauth')
+    it('should get a credential', function () {
+      return credentialService
+      .getCredential({id: username}, 'oauth')
       .then(function (cred) {
         should.exist(cred);
         should.not.exist(cred.secret);
         credential.isActive.should.eql('true');
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
       });
     });
 
-    it('should deactivate a credential', function (done) {
-      credentialService
+    it('should deactivate a credential', function () {
+      return credentialService
       .deactivateCredential(username, 'oauth')
       .then(function (res) {
         should.exist(res);
         res.should.eql(true);
 
-        credentialService
-        .getCredential(username, 'oauth')
+        return credentialService
+        .getCredential({id: username}, 'oauth')
         .then(function (cred) {
           should.exist(cred);
           should.not.exist(cred.secret);
           cred.isActive.should.eql('false');
-          done();
         });
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
       });
     });
 
-    it('should reactivate a credential', function (done) {
+    it('should reactivate a credential', function () {
       credentialService
       .activateCredential(username, 'oauth')
       .then(function (res) {
@@ -165,17 +130,12 @@ describe('Credential service tests', function () {
         res.should.eql(true);
 
         credentialService
-        .getCredential(username, 'oauth')
+        .getCredential({id: username}, 'oauth')
         .then(function (cred) {
           should.exist(cred);
           should.not.exist(cred.secret);
           cred.isActive.should.eql('true');
-          done();
         });
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
       });
     });
   });
@@ -209,10 +169,7 @@ describe('Credential service tests', function () {
       };
 
       db.flushdbAsync()
-      .then(function (didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
+      .then(function () {
         userService
         .insert(user)
         .then(function (newUser) {
@@ -241,8 +198,8 @@ describe('Credential service tests', function () {
     });
 
     it('should delete all credentials associated with a user when user is deleted', function (done) {
-      Promise.all([ credentialService.getCredential(user.username, 'oauth'),
-        credentialService.getCredential(user.username, 'basic-auth') ])
+      Promise.all([ credentialService.getCredential({id: user.username}, 'oauth'),
+        credentialService.getCredential({id: user.username}, 'basic-auth') ])
       .spread((oauthRes, basicAuthRes) => {
         should.exist(oauthRes); // Check to confirm the credentials exist
         should.exist(basicAuthRes);
@@ -250,8 +207,8 @@ describe('Credential service tests', function () {
         .then(res => {
           should.exist(res);
           res.should.eql(true);
-          return Promise.all([ credentialService.getCredential(user.username, 'oauth'),
-            credentialService.getCredential(user.username, 'basic-auth') ])
+          return Promise.all([ credentialService.getCredential({id: user.username}, 'oauth'),
+            credentialService.getCredential({id: user.username}, 'basic-auth') ])
           .spread((oauthResAfterDelete, basicAuthResAfterDelete) => {
             should.not.exist(oauthResAfterDelete);
             should.not.exist(basicAuthResAfterDelete);
@@ -268,7 +225,7 @@ describe('Credential service tests', function () {
         credentialService.removeCredential(user.username, 'oauth')
         .then(deleted => {
           deleted.should.eql(true);
-          credentialService.getCredential(user.username, 'oauth')
+          credentialService.getCredential({id: user.username}, 'oauth')
           .then(resAfterDelete => {
             should.not.exist(resAfterDelete);
             done();
@@ -287,7 +244,7 @@ describe('Credential service tests', function () {
       someProperty: 'propVal'
     };
 
-    before(function (done) {
+    before(function () {
       config.models.credentials.oauth = {
         passwordKey: 'secret',
         autoGeneratePassword: true,
@@ -298,22 +255,11 @@ describe('Credential service tests', function () {
         }
       };
 
-      db.flushdbAsync()
-      .then(function (didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      return db.flushdbAsync();
     });
 
-    after(function (done) {
+    after(function () {
       config.models.credentials = originalModelConfig;
-      done();
     });
 
     it('should not insert a credential with scopes if the scopes are not defined', function (done) {
@@ -330,10 +276,10 @@ describe('Credential service tests', function () {
       });
     });
 
-    it('should insert a credential with scopes if the scopes are defined', function (done) {
-      credentialService.insertScopes('someScope')
+    it('should insert a credential with scopes if the scopes are defined', function () {
+      return credentialService.insertScopes('someScope')
       .then(() => {
-        credentialService
+        return credentialService
         .insertCredential(username, 'oauth', _credential)
         .then(function (newCredential) {
           should.exist(newCredential);
@@ -343,25 +289,20 @@ describe('Credential service tests', function () {
           newCredential.someProperty.should.eql('propVal');
           newCredential.otherProperty.should.eql('someDefaultValue');
           should.not.exist(newCredential.secret);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
       });
     });
 
-    it('should add scopes to existing credential if the scopes are defined', function (done) {
-      credentialService.insertScopes([ 'someScope1', 'someScope2', 'someScope3', 'someOtherOne' ])
+    it('should add scopes to existing credential if the scopes are defined', function () {
+      return credentialService.insertScopes([ 'someScope1', 'someScope2', 'someScope3', 'someOtherOne' ])
       .then(() => {
-        credentialService
+        return credentialService
         .addScopesToCredential(username, 'oauth', [ 'someScope1', 'someScope2', 'someScope3', 'someOtherOne' ])
         .then(function (res) {
           res.should.eql(true);
 
-          credentialService
-          .getCredential(username, 'oauth')
+          return credentialService
+          .getCredential({id: username}, 'oauth')
           .then(function (cred) {
             should.exist(cred);
             should.exist(cred.scopes);
@@ -371,49 +312,37 @@ describe('Credential service tests', function () {
             cred.scopes.should.containEql('someScope3');
             cred.scopes.should.containEql('someOtherOne');
             cred.isActive.should.eql('true');
-            done();
           });
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
       });
     });
 
-    it('should remove scopes from existing credential', function (done) {
-      credentialService
+    it('should remove scopes from existing credential', function () {
+      return credentialService
       .removeScopesFromCredential(username, 'oauth', [ 'someScope2', 'someScope3' ])
       .then(function (res) {
         res.should.eql(true);
-
-        credentialService
-        .getCredential(username, 'oauth')
-        .then(function (cred) {
-          should.exist(cred);
-          should.exist(cred.scopes);
-          cred.scopes.should.containEql(_credential.scopes);
-          cred.scopes.should.containEql('someScope1');
-          cred.scopes.should.not.containEql('someScope2');
-          cred.scopes.should.not.containEql('someScope3');
-          cred.isActive.should.eql('true');
-          done();
-        });
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
+        return credentialService
+          .getCredential({id: username}, 'oauth')
+          .then(function (cred) {
+            should.exist(cred);
+            should.exist(cred.scopes);
+            cred.scopes.should.containEql(_credential.scopes);
+            cred.scopes.should.containEql('someScope1');
+            cred.scopes.should.not.containEql('someScope2');
+            cred.scopes.should.not.containEql('someScope3');
+            cred.isActive.should.eql('true');
+          });
       });
     });
 
-    it('should remove scopes from credential if the scope is deleted', function (done) {
-      credentialService
+    it('should remove scopes from credential if the scope is deleted', function () {
+      return credentialService
       .removeScopes(['someScope1', 'someScope'])
       .then(function (res) {
         res.should.eql(true);
-
-        credentialService
-        .getCredential(username, 'oauth')
+        return credentialService
+        .getCredential({id: username}, 'oauth')
         .then(function (cred) {
           should.exist(cred);
           should.exist(cred.scopes);
@@ -421,12 +350,7 @@ describe('Credential service tests', function () {
           cred.scopes.should.not.containEql('someScope1');
           cred.scopes.should.not.containEql('someScope');
           cred.isActive.should.eql('true');
-          done();
         });
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
       });
     });
 
@@ -444,7 +368,7 @@ describe('Credential service tests', function () {
       });
     });
 
-    it('should use default property if not defined', function (done) {
+    it('should use default property if not defined', function () {
       let username2 = 'otherUser';
       let cred = {
         secret: 'password',
@@ -452,7 +376,7 @@ describe('Credential service tests', function () {
         someProperty: 'propVal'
       };
 
-      credentialService
+      return credentialService
       .insertCredential(username2, 'oauth', cred)
       .then(function (newCredential) {
         should.exist(newCredential);
@@ -462,22 +386,17 @@ describe('Credential service tests', function () {
         newCredential.someProperty.should.eql('propVal');
         should.not.exist(newCredential.secret);
         newCredential.otherProperty.should.eql('someDefaultValue');
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
       });
     });
 
-    it('should not create credential if a required property is not passed in', function (done) {
+    it('should not create credential if a required property is not passed in', function () {
       let username3 = 'anotherUser';
       let cred = {
         secret: 'password',
         scopes: 'someScope'
       };
 
-      credentialService
+      return credentialService
       .insertCredential(username3, 'oauth', cred)
       .then(function () {
         throw new Error('test failed');
@@ -485,14 +404,9 @@ describe('Credential service tests', function () {
       .catch(function (err) {
         should.exist(err);
         err.message.should.eql('someProperty is required');
-        credentialService.getCredential(username3, 'oauth')
+        credentialService.getCredential({id: username3}, 'oauth')
           .then(credential => {
             should.not.exist(credential);
-            done();
-          })
-          .catch(err => {
-            should.not.exist(err);
-            done();
           });
       });
     });
@@ -506,7 +420,7 @@ describe('Credential service tests', function () {
       .catch(function (err) {
         should.exist(err);
         err.message.should.eql('someProperty is immutable');
-        credentialService.getCredential(username, 'oauth')
+        credentialService.getCredential({id: username}, 'oauth')
           .then(credential => {
             should.exist(credential);
             done();
@@ -514,20 +428,15 @@ describe('Credential service tests', function () {
       });
     });
 
-    it('should not update credential when no properties are specified', function (done) {
-      credentialService
+    it('should not update credential when no properties are specified', function () {
+      return credentialService
       .updateCredential(username, 'oauth', {})
       .then(function (newCredential) {
         should.not.exist(newCredential);
-        credentialService.getCredential(username, 'oauth')
+        credentialService.getCredential({id: username}, 'oauth')
           .then(credential => {
             should.exist(credential);
-            done();
           });
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
       });
     });
   });

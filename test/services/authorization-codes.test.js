@@ -10,18 +10,8 @@ let db = require('../../lib/db')();
 describe('Authorization Code Tests', function () {
   let newCode, codeFromDb;
 
-  before(function (done) {
-    db.flushdbAsync()
-    .then(function (didSucceed) {
-      if (!didSucceed) {
-        console.log('Failed to flush the database');
-      }
-      done();
-    })
-    .catch(function (err) {
-      should.not.exist(err);
-      done();
-    });
+  before(function () {
+    return db.flushdbAsync();
   });
 
   it('should save a code', function (done) {

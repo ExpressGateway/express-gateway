@@ -429,7 +429,7 @@ pipeline1:
 
 #####Supported options:
 
-* `rateLimitBy`: JS template string to generate key based. default is "${req.ip}"
+* `rateLimitBy`: JS template string to generate key. Requests will be counted based on this key. default is "${req.ip}"
 * `windowMs`: milliseconds - how long to keep records of requests in memory. Defaults to 60000 (1 minute).
 * `max`: max number of connections during windowMs milliseconds before sending a 429 response. Defaults to 5. Set to 0 to disable.
 * `message`: Error message returned when max is exceeded. Defaults to 'Too many requests, please try again later.'
@@ -458,8 +458,70 @@ policies:
 Implementation is based on [express-rate-limit](https://www.npmjs.com/package/express-rate-limit)
 Please check for advanced information
 
+#### Key Auth
+Key auth is efficient way of securing your API. 
+Keys are generated for apps or users using CLI tool.
+API key has format of a key pair separated by colon: `1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA` 
 
-#### Proxying (TODO:Update doc, non relevant)
+EG supports several ways to authenticate with api key:
+##### Using header (recommended)
+By default Authorization header is used 
+Example:
+'Authorization':'Bearer 1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'
+
+Since api key scheme is not standardised, EG does not enforse it
+This examples will also work:
+'Authorization':'apikey 1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'
+'Authorization':'1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'
+
+Header is recommended way to pass your API key to the EG
+
+##### Using query paramter (common approach for browser apps to avoid CORS Options request)
+add `?apikey=key:secret` to query params in url and it will be read by EG
+
+`https://example.com?q=search&apikey=1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA` 
+
+##### Using in JSON body
+```json
+{
+  "name":"eg-customer",
+  "apikey":"1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA"
+}
+
+```
+
+By default, the property EG is looking in query params or url is called `apikey`
+And for expected header - `Authorization`
+
+For now, the way to change the names is to change in lib/config/models/credentials.js `key-auth` credential definition
+
+Config Example
+```yaml
+serviceEndpoints:
+  example: # will be referenced in proxy policy
+    url: 'http://example.com'
+
+apiEndpoints:
+  api:
+    path: '*'
+
+pipelines:
+  example-pipeline:
+    apiEndpoints:   # process all request matching "api" apiEndpoint
+      - api
+    policies:
+      keyauth: # secure API with key auth
+        -
+          action:
+            name: keyauth
+      proxy: # name of the policy
+        -   # list of actions
+          action:
+            name: proxy # proxy policy has one action - "proxy"
+            serviceEndpoint: example # reference to serviceEndpoints Section
+```
+
+#### Proxying
 
 Forwards the request to a service endpoint.
 Accepts serviceEndpoint parameter that can be one of the names of serviceEndpoints section

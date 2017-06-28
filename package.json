@@ -27,7 +27,7 @@
   "license": "Apache-2.0",
   "main": "src/index.js",
   "engines": {
-    "node" : ">= 6.0.0"
+    "node": ">= 6.0.0"
   },
   "scripts": {
     "start": "node src/index.js",
@@ -36,7 +36,8 @@
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "pretest": "eslint .",
-    "test": "EG_CONFIG_DIR=test/config mocha --recursive test/*"
+    "test": "EG_CONFIG_DIR=test/config mocha --recursive test/*",
+    "dev-test": "EG_CONFIG_DIR=test/config mocha --recursive test/*"
   },
   "dependencies": {
     "bcrypt": "1.0.0",
@@ -65,8 +66,10 @@
     "passport-http-bearer": "1.0.1",
     "passport-jwt": "2.2.1",
     "passport-local": "1.0.0",
+    "passport-localapikey-update": "^0.5.0",
     "passport-oauth2-client-password": "0.1.2",
     "redis": "2.7.1",
+    "uuid-base62": "^0.1.0",
     "vhost": "3.0.2",
     "winston": "2.3.1"
   },

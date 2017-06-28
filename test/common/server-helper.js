@@ -5,7 +5,7 @@ const logger = require('../../lib/log').test;
 function generateBackendServer (port) {
   let app = express();
 
-  app.get('*', (req, res) => {
+  app.all('*', (req, res) => {
     res.send('Hello from port ' + port);
   });
   return new Promise((resolve) => {
