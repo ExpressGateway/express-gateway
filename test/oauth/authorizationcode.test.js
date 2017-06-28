@@ -48,9 +48,6 @@ describe('Functional Test Authorization Code grant', function () {
 
     db.flushdbAsync()
     .then(function (didSucceed) {
-      if (!didSucceed) {
-        console.log('Failed to flush the database');
-      }
       let user1 = {
         username: 'irfanbaqui',
         firstname: 'irfan',

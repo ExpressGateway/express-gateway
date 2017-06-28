@@ -163,21 +163,19 @@ serviceEndpoints map of URLs that the gateway will proxy to.
 ```yaml
 serviceEndpoints: # urls to downstream services
   cats_service:
-    url: "http://localhost"
-    port: 3000
+    url: http://localhost:3000
     paths: /             # optional, defaults to /
   dogs_service:
-    url: http://localhost
-    port: 4000
+    url: http://localhost:4000
 ```
 Use name of properties (`cats_service` etc.) to reference in pipelines
 
 
-policies
+policies (PHASE 2)
 --------
 White-list Array of enabled policies with settings (if needed)
 
-#### Referencing well-known policies
+#### Referencing well-known policies (Phase2)
 ```yaml
 policies:
   - name: 'name-test'
@@ -186,7 +184,7 @@ EG will try to find and load package with prefix `express-gateway-policy-`
 
 in this case  `express-gateway-policy-name-test` npm package
 
-#### Referencing custom package
+#### Referencing custom package in system.config (Phase2)
 ```yaml
 policies:
   - package: 'plugin-test'
@@ -196,21 +194,35 @@ if property `package` is used instead of `name` EG will try to install exactly w
 
 `package` accepts any variant supported by [npm install](https://docs.npmjs.com/cli/install), e.g. git url, github, tarball etc.
 
-See custom policy development manual
+See custom plugin development guideline (TBD)
 
 Pipelines
 ---------
+Pipeline is a list of policies that will be executed for requests from specified apiEndpoints
 
-Represented as a
-  mapping of endpoint name to an object with the following keys:
-  - `url`: the URL to forward requests to
-- `pipelines`: a list of objects with the following keys:
-  - `name`: the name of the pipeline
-  - `Policies`: the set of policies that should take place when a request is
-    received on one of the public endpoints. Each policy is represented as a list of objects
-    with the following keys (see below for more information):
-    - `condition`. This condition must be satisfied to trigger the action.
-    - `action`. The name of the action to carry out.
+Pipelines are registered as properties for pipelines section\object in the gateway.config
+
+##### General structure
+```yaml
+pipelines:
+  name_of_pipeline:
+    apiEdnpoints:
+      - api1
+      - api2
+    policies:
+      policy_name_1:
+        - 
+          #condition/action
+        - 
+          #condition/action
+      policy_name_2:
+        - 
+          #condition/action
+```
+
+##### Example
+This gateway.config will start EG on port 3000 and proxy all requests to http://example.com
+And requests that have url started with `/v1` will be logged
 
 ```yaml
 http:
@@ -243,6 +255,10 @@ pipelines:
 
 ```
 
+Each policy in the policies can have a list of condition\action objects: 
+
+- `condition`. Optional. This condition is a check rule that must be satisfied to trigger the action.
+- `action`. The name of the action to execute.
 
 ### Policy conditions
 
@@ -310,6 +326,21 @@ Example:
       }
     ]
 }
+```
+```yml
+name: allOf
+conditions:
+    - 
+        name: pathExact
+        path: /foo/bar
+    - 
+        name: not
+        condition:
+            name: method
+            methods:
+                - POST
+                - HEAD
+
 ```
 
 The above will match only if the exact request path is "/foo/bar" and the
@@ -428,7 +459,7 @@ pipeline1:
 
 #####Supported options:
 
-* `rateLimitBy`: JS template string to generate key based. default is "${req.ip}"
+* `rateLimitBy`: JS template string to generate key. Requests will be counted based on this key. default is "${req.ip}"
 * `windowMs`: milliseconds - how long to keep records of requests in memory. Defaults to 60000 (1 minute).
 * `max`: max number of connections during windowMs milliseconds before sending a 429 response. Defaults to 5. Set to 0 to disable.
 * `message`: Error message returned when max is exceeded. Defaults to 'Too many requests, please try again later.'
@@ -457,8 +488,70 @@ policies:
 Implementation is based on [express-rate-limit](https://www.npmjs.com/package/express-rate-limit)
 Please check for advanced information
 
+#### Key Auth
+Key auth is efficient way of securing your API. 
+Keys are generated for apps or users using CLI tool.
+API key has format of a key pair separated by colon: `1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA` 
 
-#### Proxying (TODO:Update doc, non relevant)
+EG supports several ways to authenticate with api key:
+##### Using header (recommended)
+By default Authorization header is used 
+Example:
+'Authorization':'Bearer 1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'
+
+Since api key scheme is not standardised, EG does not enforse it
+This examples will also work:
+'Authorization':'apikey 1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'
+'Authorization':'1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'
+
+Header is recommended way to pass your API key to the EG
+
+##### Using query paramter (common approach for browser apps to avoid CORS Options request)
+add `?apikey=key:secret` to query params in url and it will be read by EG
+
+`https://example.com?q=search&apikey=1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA` 
+
+##### Using in JSON body
+```json
+{
+  "name":"eg-customer",
+  "apikey":"1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA"
+}
+
+```
+
+By default, the property EG is looking in query params or url is called `apikey`
+And for expected header - `Authorization`
+
+For now, the way to change the names is to change in lib/config/models/credentials.js `key-auth` credential definition
+
+Config Example
+```yaml
+serviceEndpoints:
+  example: # will be referenced in proxy policy
+    url: 'http://example.com'
+
+apiEndpoints:
+  api:
+    path: '*'
+
+pipelines:
+  example-pipeline:
+    apiEndpoints:   # process all request matching "api" apiEndpoint
+      - api
+    policies:
+      keyauth: # secure API with key auth
+        -
+          action:
+            name: keyauth
+      proxy: # name of the policy
+        -   # list of actions
+          action:
+            name: proxy # proxy policy has one action - "proxy"
+            serviceEndpoint: example # reference to serviceEndpoints Section
+```
+
+#### Proxying
 
 Forwards the request to a service endpoint.
 Accepts serviceEndpoint parameter that can be one of the names of serviceEndpoints section
@@ -493,9 +586,7 @@ pipelines:
 #### CORS
 
 Provides [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
-support via the [cors](https://www.npmjs.com/package/cors) node package. The
-parameters are passed through to the `cors`. See the module's documentation for
-details.
+
 
 Example:
 
@@ -510,6 +601,9 @@ policies:
           credentials: true
 }
 ```
+Implemented using [cors](https://www.npmjs.com/package/cors) node package. The
+parameters are passed through to the `cors`. See the module's documentation for
+details.
 
 #### Expression
 Execute JS code against EGContext.
@@ -700,7 +794,7 @@ Providing Configuration
 Express-Gateway requires application configuration to be passed during start.
 YML and JSON formats are supported.
 
-There are 2 config files to take care of:
+There are 2 main config files for main setup. And model configurations for fine-tuning:
 #### Gateway Config
 The config file where you define endpoints, pipelines, port settings for gateway
 
@@ -708,28 +802,15 @@ The config file where you define endpoints, pipelines, port settings for gateway
 Here you can define dabase connections, custom schemes for user\application entities
 For the most cases default settings are good enough
 
-There are several options how to do this:
+The config files must be in one directory and this is how to point EG to it:
 
 ##### Default
-If nothing is provided EG will try to find config in **$HOME/.express-gateway/gateway.config.yml**
-**$HOME/.express-gateway/system.config.yml**
+If nothing is provided EG will use config in local config /lib/config
 
-You can put your config file there or somehow map it to real location
+use `npm start` to start Express-gateway
 
-Docker example: docker run -v <source_path>:<dest_path> ...
-
-##### Location to file in env variable EG\_GATEWAY\_CONFIG\_PATH
+##### Location to config folder in env variable EG\_CONFIG\_DIR
 example:
-EG\_GATEWAY\_CONFIG\_PATH=/some/path/config.yml EG\_SYSTEM\_CONFIG\_PATH=/some/path/config.yml npm start
+EG\_CONFIG\_DIR=/some/path/config  npm start
 
-##### Entire JSON serialized config env variable EG\_APP\_CONFIG
-example:
 
-EG\_GATEWAY\_CONFIG='{"apiEndpoints": ....}'  EG\_SYSTEM\_CONFIG='{"apiEndpoints": ....}' npm start
-
-more grannular control over configs through env variables will arrive later
-
-EG\_SYSTEM\_CONFIG\_db\_redis\_url='redis connection string'
-
-##### Path as command line argument
-npm start /path/here
