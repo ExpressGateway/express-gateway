@@ -27,7 +27,7 @@
   "license": "Apache-2.0",
   "main": "src/index.js",
   "engines": {
-    "node" : ">= 6.0.0"
+    "node": ">= 6.0.0"
   },
   "scripts": {
     "start": "node src/index.js",
@@ -41,8 +41,6 @@
   "bin": {
     "eg": "./bin/eg.js"
   },
-  "author": "Roman Lisagor <roman@lunchbadger.com>",
-  "license": "UNLICENSED",
   "dependencies": {
     "bcrypt": "1.0.0",
     "bluebird": "3.5.0",
