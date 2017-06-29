@@ -38,19 +38,19 @@ module.exports = class extends eg.Generator {
   }
 
   initializing () {
-    if (this.env.argv.stdin) {
+    if (this.argv.stdin) {
       return this._createFromStdin();
     }
   }
 
   prompting () {
-    if (!this.env.argv.stdin) {
+    if (!this.argv.stdin) {
       return this._createFromCommandLine();
     }
   }
 
   _createFromCommandLine () {
-    const argv = this.env.argv;
+    const argv = this.argv;
     let propertyValues = [];
 
     if (argv.p) {
@@ -88,7 +88,7 @@ module.exports = class extends eg.Generator {
         this.log(newApp.id);
       }
 
-      eg.exit();
+      this.eg.exit();
     })
     .catch(err => {
       this.log.error(err.message);
@@ -97,7 +97,7 @@ module.exports = class extends eg.Generator {
   };
 
   _createFromStdin () {
-    const argv = this.env.argv;
+    const argv = this.argv;
     process.stdin.setEncoding('utf8');
 
     let bufs = [];
@@ -157,7 +157,7 @@ module.exports = class extends eg.Generator {
               }
 
               if (promisesCompleted === promisesCount) {
-                eg.exit();
+                this.eg.exit();
                 resolve(); // don't propagate rejections
               }
             })
@@ -167,7 +167,7 @@ module.exports = class extends eg.Generator {
               this.log.error(err.message);
 
               if (promisesCompleted === promisesCount) {
-                eg.exit();
+                this.eg.exit();
                 resolve(); // don't propagate rejections
               }
             });
@@ -177,8 +177,8 @@ module.exports = class extends eg.Generator {
   };
 
   _insert (app, options) {
-    const models = eg.config.models;
-    const services = eg.services;
+    const models = this.eg.config.models;
+    const services = this.eg.services;
     const applicationService = services.application;
     const userService = services.user;
 
@@ -223,7 +223,7 @@ module.exports = class extends eg.Generator {
       // handle CTRL-C
       process.stdin.on('data', key => {
         if (key.toString('utf8') === '\u0003') {
-          eg.exit();
+          this.eg.exit();
         }
       });
     }

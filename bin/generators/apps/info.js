@@ -15,8 +15,8 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    const argv = this.options.env.argv;
-    const appService = eg.services.application;
+    const argv = this.argv;
+    const appService = this.eg.services.application;
 
     return appService
       .get(argv.app_id)
@@ -25,11 +25,11 @@ module.exports = class extends eg.Generator {
           this.log(JSON.stringify(app, null, 2));
         }
 
-        eg.exit();
+        this.eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        eg.exit();
+        this.eg.exit();
       });
   }
 };

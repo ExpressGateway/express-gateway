@@ -18,8 +18,8 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    const argv = this.options.env.argv;
-    const appService = eg.services.application;
+    const argv = this.argv;
+    const appService = this.eg.services.application;
 
     const appIds = Array.isArray(argv.app_id)
       ? argv.app_id
@@ -51,7 +51,7 @@ module.exports = class extends eg.Generator {
             }
 
             if (removalsCompleted === removalCount) {
-              eg.exit();
+              self.eg.exit();
               if (errors.length === 0) {
                 resolve();
               } else {
@@ -66,7 +66,7 @@ module.exports = class extends eg.Generator {
             errors.push(err);
 
             if (removalsCompleted === removalCount) {
-              eg.exit();
+              self.eg.exit();
               reject(errors);
             }
           });

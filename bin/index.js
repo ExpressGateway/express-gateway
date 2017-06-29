@@ -119,6 +119,19 @@ Object.keys(subCommands).forEach(key => {
 
 env.commandAliases = [commandAliases, subCommandAliases];
 
+env.eg = {
+  exit () {
+    const db = require('../lib/db')();
+    db.quit();
+  },
+  get config () {
+    return require('../lib/config');
+  },
+  get services () {
+    return require('../lib/services');
+  }
+};
+
 program
   .usage('Usage: $0 <command> [options]')
   .demandCommand()

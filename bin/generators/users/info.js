@@ -17,8 +17,8 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    const userService = eg.services.user;
-    const argv = this.env.argv;
+    const userService = this.eg.services.user;
+    const argv = this.argv;
 
     return userService
       .find(argv.user_id)
@@ -38,11 +38,11 @@ module.exports = class extends eg.Generator {
           }
         }
 
-        eg.exit();
+        this.eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        eg.exit();
+        this.eg.exit();
       });
   }
 };

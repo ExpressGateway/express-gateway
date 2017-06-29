@@ -22,8 +22,8 @@ module.exports = class extends eg.Generator {
   }
 
   _remove () {
-    const argv = this.env.argv;
-    const userService = eg.services.user;
+    const argv = this.argv;
+    const userService = this.eg.services.user;
     const userIds = Array.isArray(argv.user_id)
       ? argv.user_id
       : [argv.user_id];
@@ -60,7 +60,7 @@ module.exports = class extends eg.Generator {
             }
 
             if (removalsCompleted === removalCount) {
-              eg.exit();
+              self.eg.exit();
               resolve(); // don't propagate errors
             }
           })
@@ -70,7 +70,7 @@ module.exports = class extends eg.Generator {
             self.log.error(err.message);
 
             if (removalsCompleted === removalCount) {
-              eg.exit();
+              self.eg.exit();
               resolve(); // don't propagate errors
             }
           });

@@ -28,9 +28,9 @@ module.exports = class extends eg.Generator {
   }
 
   _update () {
-    const argv = this.env.argv;
-    const config = eg.config.models;
-    const userService = eg.services.user;
+    const argv = this.argv;
+    const config = this.eg.config.models;
+    const userService = this.eg.services.user;
 
     let propertyValues = [];
 
@@ -58,7 +58,7 @@ module.exports = class extends eg.Generator {
     });
 
     if (hasInvalidProperty) {
-      eg.exit();
+      this.eg.exit();
       return;
     }
 
@@ -76,7 +76,7 @@ module.exports = class extends eg.Generator {
           if (!argv.q) {
             this.log.error(`User not found: ${argv.user_id}`);
           }
-          eg.exit();
+          this.eg.exit();
           return;
         }
 
@@ -104,7 +104,7 @@ module.exports = class extends eg.Generator {
           // handle CTRL-C
           process.stdin.on('data', key => {
             if (key.toString('utf8') === '\u0003') {
-              eg.exit();
+              this.eg.exit();
             }
           });
         }
@@ -125,11 +125,11 @@ module.exports = class extends eg.Generator {
           }
         }
 
-        eg.exit();
+        this.eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        eg.exit();
+        this.eg.exit();
       });
   }
 };

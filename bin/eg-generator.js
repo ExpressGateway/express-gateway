@@ -5,7 +5,8 @@ module.exports = class EgGenerator extends Generator {
     super(args, opts);
 
     this._configuration = null;
-    this.commandAliases = [];
+    this.eg = this.env.eg;
+    this.argv = this.env.argv;
   }
 
   configureCommand (configuration) {

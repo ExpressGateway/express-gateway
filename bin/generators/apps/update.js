@@ -27,9 +27,9 @@ module.exports = class extends eg.Generator {
   }
 
   _update () {
-    const argv = this.env.argv;
-    const models = eg.config.models;
-    const applicationService = eg.services.application;
+    const argv = this.argv;
+    const models = this.eg.config.models;
+    const applicationService = this.eg.services.application;
 
     let propertyValues = [];
 
@@ -67,7 +67,7 @@ module.exports = class extends eg.Generator {
           if (!argv.q) {
             this.log.error(`App not found: ${argv.app_id}`);
           }
-          eg.exit();
+          this.eg.exit();
           return;
         }
 
@@ -107,7 +107,7 @@ module.exports = class extends eg.Generator {
           // handle CTRL-C
           process.stdin.on('data', key => {
             if (key.toString('utf8') === '\u0003') {
-              eg.exit();
+              this.eg.exit();
             }
           });
         }
@@ -125,11 +125,11 @@ module.exports = class extends eg.Generator {
               this.log(argv.app_id);
             }
 
-            eg.exit();
+            this.eg.exit();
           })
           .catch(err => {
             this.log.error(err.message);
-            eg.exit();
+            this.eg.exit();
           });
       });
   }
