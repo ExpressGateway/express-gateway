@@ -27,7 +27,7 @@
   "license": "Apache-2.0",
   "main": "src/index.js",
   "engines": {
-    "node" : ">= 6.0.0"
+    "node": ">= 6.0.0"
   },
   "scripts": {
     "start": "node src/index.js",
@@ -38,10 +38,14 @@
     "pretest": "eslint .",
     "test": "EG_CONFIG_DIR=test/config mocha --recursive test/*"
   },
+  "bin": {
+    "eg": "./bin/index.js"
+  },
   "dependencies": {
     "bcrypt": "1.0.0",
     "bluebird": "3.5.0",
     "body-parser": "1.17.2",
+    "chalk": "1.1.3",
     "connect-ensure-login": "0.1.1",
     "cookie-parser": "1.4.3",
     "cors": "2.8.3",
@@ -68,7 +72,10 @@
     "passport-oauth2-client-password": "0.1.2",
     "redis": "2.7.1",
     "vhost": "3.0.2",
-    "winston": "2.3.1"
+    "winston": "2.3.1",
+    "yargs": "8.0.2",
+    "yeoman-environment": "2.0.0",
+    "yeoman-generator": "1.1.1"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
@@ -95,5 +102,8 @@
     "supertest": "3.0.0",
     "supertest-session": "3.0.0",
     "tmp": "0.0.31"
+  },
+  "yargs": {
+    "boolean-negation": false
   }
 }

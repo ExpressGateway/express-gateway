@@ -1,0 +1,136 @@
+const chalk = require('chalk');
+const eg = require('../../eg');
+
+module.exports = class extends eg.Generator {
+  constructor (args, opts) {
+    super(args, opts);
+
+    this.configureCommand({
+      command: 'update <app_id> [options]',
+      desc: 'Update an application',
+      builder: yargs =>
+        yargs
+          .usage('Usage: $0 apps update <app_id> [options]')
+          .string('p')
+          .boolean(['q', 'no-color'])
+          .describe('p', 'App property in the form [-p \'foo=bar\']')
+          .describe('q', 'Only show app ID')
+          .describe('no-color', 'Disable color in prompts')
+          .alias('p', 'property')
+          .alias('q', 'quiet')
+          .group(['p', 'q', 'no-color', 'h'], 'Options:')
+    });
+  }
+
+  prompting () {
+    return this._update();
+  }
+
+  _update () {
+    const argv = this.argv;
+    const models = this.eg.config.models;
+    const applicationService = this.eg.services.application;
+
+    let propertyValues = [];
+
+    if (argv.p) {
+      propertyValues = Array.isArray(argv.p) ? argv.p : [argv.p];
+    }
+
+    let app = {};
+
+    let hasInvalidProperty = false;
+
+    propertyValues.forEach(p => {
+      const equalIndex = p.indexOf('=');
+
+      if (equalIndex === -1 || equalIndex === p.length - 1) {
+        this.log.error('invalid property option:', p);
+        hasInvalidProperty = true;
+        return;
+      }
+
+      const key = p.substring(0, equalIndex);
+      const value = p.substring(equalIndex + 1);
+
+      app[key] = value;
+    });
+
+    if (hasInvalidProperty) {
+      return;
+    }
+
+    return applicationService
+      .get(argv.app_id)
+      .then(foundApp => {
+        if (!foundApp) {
+          if (!argv.q) {
+            this.log.error(`App not found: ${argv.app_id}`);
+          }
+          this.eg.exit();
+          return;
+        }
+
+        let questions = [];
+
+        let shouldPrompt = false;
+        let missingProperties = [];
+
+        let configProperties = models.applications.properties;
+        for (const [prop, descriptor] of Object.entries(configProperties)) {
+          if (!app[prop]) {
+            if (!shouldPrompt && descriptor.isRequired) {
+              shouldPrompt = true;
+            }
+
+            missingProperties.push({ name: prop, descriptor: descriptor });
+          }
+        }
+
+        if (shouldPrompt) {
+          questions = missingProperties.map(p => {
+            const required = p.descriptor.isRequired
+                        ? ' [required]'
+                        : '';
+
+            return {
+              name: p.name,
+              message: `Enter ${chalk.yellow(p.name)}${chalk.green(required)}:`,
+              default: foundApp[p.name] || p.defaultValue,
+              validate: input => !p.descriptor.isRequired ||
+                    (!!input && p.descriptor.isRequired)
+            };
+          });
+        }
+
+        if (questions.length > 0) {
+          // handle CTRL-C
+          process.stdin.on('data', key => {
+            if (key.toString('utf8') === '\u0003') {
+              this.eg.exit();
+            }
+          });
+        }
+
+        const appId = argv.app_id;
+        return this.prompt(questions)
+          .then(answers => {
+            app = Object.assign(app, answers);
+            return applicationService.update(appId, app);
+          })
+          .then(newApp => {
+            if (!argv.q) {
+              this.log.ok(`Updated ${argv.app_id}`);
+            } else {
+              this.log(argv.app_id);
+            }
+
+            this.eg.exit();
+          })
+          .catch(err => {
+            this.log.error(err.message);
+            this.eg.exit();
+          });
+      });
+  }
+};
