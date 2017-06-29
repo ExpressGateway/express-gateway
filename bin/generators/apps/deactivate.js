@@ -1,21 +1,19 @@
-const common = require('../../common');
-const EgGenerator = require('../../eg_generator');
-const util = require('../../util');
+const eg = require('../../eg');
 
-module.exports = class extends EgGenerator {
+module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
 
     this.configureCommand({
       command: 'deactivate [options] <app_id..>',
       desc: 'Deactivate an application',
-      builder: yargs => common(
+      builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} deactivate [options] <app_id..>`)
           .boolean('q')
           .describe('q', 'Only show app ID')
           .alias('q', 'quiet')
-          .group(['q', 'h'], 'Options:'))
+          .group(['q', 'h'], 'Options:')
     });
   }
 
@@ -25,7 +23,7 @@ module.exports = class extends EgGenerator {
 
   _deactivate () {
     const argv = this.env.argv;
-    const appService = require('../../../services').application;
+    const appService = eg.services.application;
 
     const appIds = Array.isArray(argv.app_id)
       ? argv.app_id
@@ -56,7 +54,7 @@ module.exports = class extends EgGenerator {
             }
 
             if (deactivationsCompleted === deactivateCount) {
-              util.exit();
+              eg.exit();
               resolve(); // don't propagate errors
             }
           })
@@ -66,7 +64,7 @@ module.exports = class extends EgGenerator {
             self.log.error(err.message);
 
             if (deactivationsCompleted === deactivateCount) {
-              util.exit();
+              eg.exit();
               resolve(); // don't propagate errors
             }
           });

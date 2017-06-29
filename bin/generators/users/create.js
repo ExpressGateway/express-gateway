@@ -1,17 +1,14 @@
 const chalk = require('chalk');
+const eg = require('../../eg');
 
-const common = require('../../common');
-const EgGenerator = require('../../eg_generator');
-const util = require('../../util');
-
-module.exports = class extends EgGenerator {
+module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
 
     this.configureCommand({
       command: 'create [options]',
       description: 'Create a user',
-      builder: yargs => common(
+      builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} create [options]`)
           .example(`$0 ${process.argv[2]} create`)
@@ -28,7 +25,7 @@ module.exports = class extends EgGenerator {
           .describe('no-color', 'Disable color in prompts')
           .alias('p', 'property')
           .alias('q', 'quiet')
-          .group(['p', 'stdin', 'q', 'no-color', 'h'], 'Options:'))
+          .group(['p', 'stdin', 'q', 'no-color', 'h'], 'Options:')
     });
   }
 
@@ -96,7 +93,7 @@ module.exports = class extends EgGenerator {
                 }
 
                 if (promisesCompleted === promisesCount) {
-                  util.exit();
+                  eg.exit();
                   resolve(); // don't propagate rejections
                 }
               })
@@ -106,7 +103,7 @@ module.exports = class extends EgGenerator {
                 this.log.error(err.message);
 
                 if (promisesCompleted === promisesCount) {
-                  util.exit();
+                  eg.exit();
                   resolve(); // don't propagate rejections
                 }
               });
@@ -143,7 +140,7 @@ module.exports = class extends EgGenerator {
     });
 
     if (hasInvalidProperty) {
-      util.exit();
+      eg.exit();
       return;
     }
 
@@ -154,16 +151,16 @@ module.exports = class extends EgGenerator {
         } else {
           this.log(newUser.id);
         }
-        util.exit();
+        eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        util.exit();
+        eg.exit();
       });
   }
   _insert (user, options) {
-    const models = require('../../../config').models;
-    const userService = require('../../../services').user;
+    const models = eg.config.models;
+    const userService = eg.services.user;
 
     options = options || {};
     options.skipPrompt = options.skipPrompt || false;
@@ -207,7 +204,7 @@ module.exports = class extends EgGenerator {
       // handle CTRL-C
       process.stdin.on('data', key => {
         if (key.toString('utf8') === '\u0003') {
-          util.exit();
+          eg.exit();
         }
       });
     }

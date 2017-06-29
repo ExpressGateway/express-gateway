@@ -1,6 +1,6 @@
-const EgGenerator = require('../../eg_generator.js');
+const eg = require('../../eg');
 
-module.exports = class extends EgGenerator {
+module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
 

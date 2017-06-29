@@ -39,7 +39,7 @@
     "test": "EG_CONFIG_DIR=test/config mocha --recursive test/*"
   },
   "bin": {
-    "eg": "./bin/eg.js"
+    "eg": "./bin/index.js"
   },
   "dependencies": {
     "bcrypt": "1.0.0",

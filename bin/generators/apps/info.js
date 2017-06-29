@@ -1,24 +1,22 @@
-const common = require('../../common');
-const EgGenerator = require('../../eg_generator');
-const util = require('../../util');
+const eg = require('../../eg');
 
-module.exports = class extends EgGenerator {
+module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
 
     this.configureCommand({
       command: 'info [options] <app_id>',
       desc: 'Show details for a single application',
-      builder: yargs => common(
+      builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} info [options] <app_id>`)
-          .group(['h'], 'Options:'))
+          .group(['h'], 'Options:')
     });
   }
 
   prompting () {
     const argv = this.options.env.argv;
-    const appService = require('../../../services').application;
+    const appService = eg.services.application;
 
     return appService
       .get(argv.app_id)
@@ -27,11 +25,11 @@ module.exports = class extends EgGenerator {
           this.log(JSON.stringify(app, null, 2));
         }
 
-        util.exit();
+        eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        util.exit();
+        eg.exit();
       });
   }
 };

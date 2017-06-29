@@ -1,17 +1,14 @@
 const chalk = require('chalk');
+const eg = require('../../eg');
 
-const common = require('../../common');
-const EgGenerator = require('../../eg_generator');
-const util = require('../../util');
-
-module.exports = class extends EgGenerator {
+module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
 
     this.configureCommand({
       command: 'create [options]',
       desc: 'Create an application',
-      builder: yargs => common(
+      builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} create [options]`)
           .example(`$0 ${process.argv[2]} create -u jdoe`)
@@ -36,7 +33,7 @@ module.exports = class extends EgGenerator {
               throw new Error('must include --stdin or -u, --user');
             }
             return true;
-          }))
+          })
     });
   }
 
@@ -91,11 +88,11 @@ module.exports = class extends EgGenerator {
         this.log(newApp.id);
       }
 
-      util.exit();
+      eg.exit();
     })
     .catch(err => {
       this.log.error(err.message);
-      util.exit();
+      eg.exit();
     });
   };
 
@@ -160,7 +157,7 @@ module.exports = class extends EgGenerator {
               }
 
               if (promisesCompleted === promisesCount) {
-                util.exit();
+                eg.exit();
                 resolve(); // don't propagate rejections
               }
             })
@@ -170,7 +167,7 @@ module.exports = class extends EgGenerator {
               this.log.error(err.message);
 
               if (promisesCompleted === promisesCount) {
-                util.exit();
+                eg.exit();
                 resolve(); // don't propagate rejections
               }
             });
@@ -180,8 +177,8 @@ module.exports = class extends EgGenerator {
   };
 
   _insert (app, options) {
-    const models = require('../../../config').models;
-    const services = require('../../../services');
+    const models = eg.config.models;
+    const services = eg.services;
     const applicationService = services.application;
     const userService = services.user;
 
@@ -226,7 +223,7 @@ module.exports = class extends EgGenerator {
       // handle CTRL-C
       process.stdin.on('data', key => {
         if (key.toString('utf8') === '\u0003') {
-          util.exit();
+          eg.exit();
         }
       });
     }

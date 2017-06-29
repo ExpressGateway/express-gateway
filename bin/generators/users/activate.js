@@ -1,21 +1,19 @@
-const common = require('../../common');
-const EgGenerator = require('../../eg_generator');
-const util = require('../../util');
+const eg = require('../../eg');
 
-module.exports = class extends EgGenerator {
+module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
 
     this.configureCommand({
       command: 'activate [options] <user_id|user_name..>',
       desc: 'Activate a user',
-      builder: yargs => common(
+      builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} activate [options] <user_id|user_name..>`)
           .boolean('q')
           .describe('q', 'Only show user ID')
           .alias('q', 'quiet')
-          .group(['q', 'h'], 'Options:'))
+          .group(['q', 'h'], 'Options:')
     });
   }
 
@@ -25,7 +23,7 @@ module.exports = class extends EgGenerator {
 
   _activate () {
     const argv = this.env.argv;
-    const userService = require('../../../services').user;
+    const userService = eg.services.user;
 
     const userIds = Array.isArray(argv.user_id)
       ? argv.user_id
@@ -66,7 +64,7 @@ module.exports = class extends EgGenerator {
             }
 
             if (activationsCompleted === activateCount) {
-              util.exit();
+              eg.exit();
               resolve(); // don't propagate rejections
             }
           })
@@ -76,7 +74,7 @@ module.exports = class extends EgGenerator {
             self.log.error(err.message);
 
             if (activationsCompleted === activateCount) {
-              util.exit();
+              eg.exit();
               resolve(); // don't propagate rejections
             }
           });

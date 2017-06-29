@@ -1,16 +1,14 @@
-const common = require('../../common');
-const EgGenerator = require('../../eg_generator');
-const util = require('../../util');
 const chalk = require('chalk');
+const eg = require('../../eg');
 
-module.exports = class extends EgGenerator {
+module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
 
     this.configureCommand({
       command: 'update <user_id|user_name> [options]',
       desc: 'Update a user',
-      builder: yargs => common(
+      builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} update <user_id|user_name> [options]`)
           .example(`$0 ${process.argv[2]} update jdoe -p 'firstname=John'`)
@@ -21,7 +19,7 @@ module.exports = class extends EgGenerator {
           .describe('no-color', 'Disable color in prompts')
           .alias('p', 'property')
           .alias('q', 'quiet')
-          .group(['p', 'q', 'no-color', 'h'], 'Options:'))
+          .group(['p', 'q', 'no-color', 'h'], 'Options:')
     });
   }
 
@@ -31,8 +29,8 @@ module.exports = class extends EgGenerator {
 
   _update () {
     const argv = this.env.argv;
-    const config = require('../../../config').models;
-    const userService = require('../../../services').user;
+    const config = eg.config.models;
+    const userService = eg.services.user;
 
     let propertyValues = [];
 
@@ -60,7 +58,7 @@ module.exports = class extends EgGenerator {
     });
 
     if (hasInvalidProperty) {
-      util.exit();
+      eg.exit();
       return;
     }
 
@@ -78,7 +76,7 @@ module.exports = class extends EgGenerator {
           if (!argv.q) {
             this.log.error(`User not found: ${argv.user_id}`);
           }
-          util.exit();
+          eg.exit();
           return;
         }
 
@@ -106,7 +104,7 @@ module.exports = class extends EgGenerator {
           // handle CTRL-C
           process.stdin.on('data', key => {
             if (key.toString('utf8') === '\u0003') {
-              util.exit();
+              eg.exit();
             }
           });
         }
@@ -127,11 +125,11 @@ module.exports = class extends EgGenerator {
           }
         }
 
-        util.exit();
+        eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        util.exit();
+        eg.exit();
       });
   }
 };
