@@ -234,7 +234,7 @@ describe('Functional Test Implicit grant', function () {
       });
   });
 
-  it('should grant access token with requesting with scopes and scopes are authorized', function (done) {
+  it('should not grant access token with requesting with scopes and scopes are unauthorized', function (done) {
     let request = session(app);
     request
       .get('/oauth2/authorize')

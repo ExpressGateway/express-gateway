@@ -182,7 +182,7 @@ describe('Auth tests', function () {
   });
 
   describe('Token Auth', function () {
-    let userToken, tokenId, tokenDecrypted;
+    let userAccessToken, tokenId, tokenDecrypted;
     before(function (done) {
       let tokenObj = {
         consumerId: userFromDb.id,
@@ -192,15 +192,15 @@ describe('Auth tests', function () {
 
       tokenService.save(tokenObj)
       .then((token) => {
-        should.exist(token);
-        userToken = token;
-        [tokenId, tokenDecrypted] = token.split('|');
+        should.exist(token.access_token);
+        userAccessToken = token.access_token;
+        [tokenId, tokenDecrypted] = token.access_token.split('|');
         done();
       });
     });
 
     it('should authenticate token', function (done) {
-      authService.authenticateToken(userToken, 'oauth')
+      authService.authenticateToken(userAccessToken, 'oauth')
       .then(authResponse => {
         let expectedTokenProps = [ 'consumerId', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted' ];
         let expectedConsumerProps = [ 'type', 'createdAt', 'email', 'firstname', 'id', 'isActive', 'lastname', 'updatedAt', 'username' ];
@@ -251,7 +251,7 @@ describe('Auth tests', function () {
     });
 
     it('should authorize Token', function (done) {
-      authService.authorizeToken(userToken, 'oauth', [ 'someScope1', 'someScope2' ])
+      authService.authorizeToken(userAccessToken, 'oauth', [ 'someScope1', 'someScope2' ])
       .then((authResponse) => {
         should.exist(authResponse);
         authResponse.should.eql(true);
@@ -264,7 +264,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authorize Token with invalid scopes', function (done) {
-      authService.authorizeToken(userToken, 'oauth', [ 'otherScope', 'someScope2' ])
+      authService.authorizeToken(userAccessToken, 'oauth', [ 'otherScope', 'someScope2' ])
       .then((authResponse) => {
         should.exist(authResponse);
         authResponse.should.eql(false);
