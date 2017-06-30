@@ -77,7 +77,8 @@ module.exports = class extends eg.Generator {
         let missingProperties = [];
 
         let configProperties = models.applications.properties;
-        for (const [prop, descriptor] of Object.entries(configProperties)) {
+        Object.keys(configProperties).forEach(prop => {
+          const descriptor = configProperties[prop];
           if (!app[prop]) {
             if (!shouldPrompt && descriptor.isRequired) {
               shouldPrompt = true;
@@ -85,7 +86,7 @@ module.exports = class extends eg.Generator {
 
             missingProperties.push({ name: prop, descriptor: descriptor });
           }
-        }
+        });
 
         if (shouldPrompt) {
           questions = missingProperties.map(p => {

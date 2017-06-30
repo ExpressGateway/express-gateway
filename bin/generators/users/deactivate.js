@@ -65,6 +65,7 @@ module.exports = class extends eg.Generator {
 
             if (deactivationsCompleted === deactivateCount) {
               self.eg.exit();
+              resolve(); // don't propagate rejections
             }
           })
           .catch(err => {
@@ -74,6 +75,7 @@ module.exports = class extends eg.Generator {
 
             if (deactivationsCompleted === deactivateCount) {
               self.eg.exit();
+              resolve(); // don't propagate rejections
             }
           });
       });

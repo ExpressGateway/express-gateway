@@ -103,7 +103,8 @@
     "sinon": "2.1.0",
     "supertest": "3.0.0",
     "supertest-session": "3.0.0",
-    "tmp": "0.0.31"
+    "tmp": "0.0.31",
+    "yeoman-test": "1.6.0"
   },
   "yargs": {
     "boolean-negation": false
