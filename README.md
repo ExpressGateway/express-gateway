@@ -448,9 +448,11 @@ Limit access by host name in order to provide different service plans for custom
 
 #### Usage Example
 
-#####Consider example to rate-limit based on passed host to 10 requests per 2 minutes interval:
+#####Consider full example to rate-limit based on passed host to 10 requests per 2 minutes interval:
 
 ```yml
+http:
+  port: 9090
 apiEndpoints:
   example:
     host: '*'
@@ -467,7 +469,7 @@ pipeline1:
             name: 'rate-limit'
             max: 10
             windowMs: 120000 
-            rateLimitBy: "${req.host}"
+            rateLimitBy: "${req.hostname}"
       - proxy:
         -
           action:
@@ -476,33 +478,39 @@ pipeline1:
 
 ```
 
-###### Limit only for specific domain to 500 requests per minute
+###### Here is policy configuration only for specific domain to allow up to 500 requests per minute
 ```yml
 policies:
   -
     rate-limiter:
       -
-        condition:
-          name: hostMatch,
+        condition: # will execute action only for host matching example.com
+          name: hostMatch, 
           pattern: example.com
         action:
           name: rate-limit
-          max: 500
+          max: 500 # limit to 500 req per default period windowMs=60000 (1 minute)
 ```
+
 
 
 #### Key Auth
 Key auth is efficient way of securing your API. 
 Keys are generated for apps or users using CLI tool.
-API key has format of a key pair separated by colon: `1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA` 
+
+##### Example Use case:
+Restricting access to api endpoints for applications
+
+
+EG API key has format of a key pair separated by colon: `1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA` 
 
 EG supports several ways to authenticate with api key:
 ##### Using header (recommended)
-By default Authorization header is used 
+By default Authorization header is used and enforsed Schema is `apiKey`
 Example:
-'Authorization':'apiKey 1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'
+`'Authorization':'apiKey 1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'`
 
-Since api key scheme is not standardised by default EG suggests to use enforse apiKey scheme
+Since api key scheme and header is not standardised you can override them
 
 You can define another Scheme name using `apiKeyHeaderScheme`  
 'Authorization':'my-scheme 1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'
@@ -513,7 +521,8 @@ and to disable set
 This will make EG accept that format:
 'Authorization':'1fa4Y52SWEhii7CmYiMOcv:4ToXczFz0ZyCgLpgKIkyxA'
 
-Header is recommended way to pass your API key to the EG
+You And to change header name use `apiKeyHeader:'MY-KEY-HEADER'`  
+
 
 ##### Using query paramter (common approach for browser apps to avoid CORS Options request)
 add `?apiKey=key:secret` to query params in url and it will be read by EG
@@ -529,19 +538,22 @@ add `?apiKey=key:secret` to query params in url and it will be read by EG
 
 ```
 
-By default, the property EG is looking in query params or url is called `apiKey`
-And for expected header - `Authorization`
-
-This can be cahnged in lib/config/models/credentials.js, see `key-auth` credential definition
-```js
-apiKeyHeader: 'Authorization',
-apiKeyHeaderScheme: 'apiKey',
-apiKeyField: 'apiKey',
+##### Reference 
+```yml
+apiKeyHeader: 'Authorization', # name of the header that should contain api key 
+apiKeyHeaderScheme: 'apiKey', # Enforce schema in header.
+disableHeaders: false # disable apikey lookup in headers 
+disableHeadersScheme: false # disable verification of Scheme in header 
+apiKeyField: 'apiKey', # name of field to check in query param or body
+disableQueryParam: false # set to true to disable api key lookup in query string
+disableBody: false # set to true to disable api key lookup in body
 ```
 
 
 Config Example
 ```yaml
+http:
+  port: 8790
 serviceEndpoints:
   example: # will be referenced in proxy policy
     url: 'http://example.com'
@@ -559,6 +571,9 @@ pipelines:
         -
           action:
             name: keyauth
+            disableBody: true # do not look for api key in body
+            apiKeyHeader: COMPANY-CUSTOM-API-KEY-HEADER # custom header name 
+            disableHeadersScheme: true # will accept "key:secret" format instead of "scheme key:secret"
       proxy: # name of the policy
         -   # list of actions
           action:
