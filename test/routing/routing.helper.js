@@ -9,6 +9,23 @@ let config = require('../../lib/config');
 module.exports = function () {
   let app, httpsApp, originalGatewayConfig;
   let actions = require('../../lib/actions').init();
+  function prepareScenario (testCase) {
+    let testScenario = request(app);
+    if (testCase.setup.putData) {
+      testScenario = testScenario.put(testCase.setup.url, testCase.setup.putData);
+    } else if (testCase.setup.postData) {
+      testScenario = testScenario.post(testCase.setup.url, testCase.setup.postData);
+    } else {
+      testScenario = testScenario.get(testCase.setup.url);
+    }
+
+    testScenario.set('Content-Type', 'application/json');
+
+    if (testCase.setup.host) {
+      testScenario.set('Host', testCase.setup.host);
+    }
+    return testScenario;
+  }
   return {
     registerAction: ({name, handler}) => {
       actions.register(name, (params) => {
@@ -49,17 +66,8 @@ module.exports = function () {
     },
     validateError: (testCase) => {
       return (done) => {
-        let testScenario = request(app);
-        if (testCase.setup.postData) {
-          testScenario = testScenario.post(testCase.setup.url, testCase.setup.postData);
-        } else {
-          testScenario = testScenario.get(testCase.setup.url);
-        }
-
-        if (testCase.setup.host) {
-          testScenario.set('Host', testCase.setup.host);
-        }
-        testScenario.set('Content-Type', 'application/json')
+        let testScenario = prepareScenario(testCase);
+        testScenario
           .expect(testCase.test.errorCode)
           .expect('Content-Type', /text\/html/)
           .end((err, res) => {
@@ -91,16 +99,8 @@ module.exports = function () {
     },
     validateSuccess: (testCase) => {
       return (done) => {
-        let testScenario = request(app);
-        if (testCase.setup.postData) {
-          testScenario = testScenario.post(testCase.setup.url, testCase.setup.postData);
-        } else {
-          testScenario = testScenario.get(testCase.setup.url);
-        }
-        if (testCase.setup.host) {
-          testScenario.set('Host', testCase.setup.host);
-        }
-        testScenario.set('Content-Type', 'application/json')
+        let testScenario = prepareScenario(testCase);
+        testScenario
           .expect(200)
           .expect('Content-Type', /json/)
           .expect((res) => {
