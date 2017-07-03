@@ -427,12 +427,29 @@ Several Policies are available. Please note that the order of Policies
 is important.
 
 #### Rate-limit
+The rate limiter policy is used to limit the number of requests received and processed by the API endpoint. Limits are useful to prevent your system from being overwhelmed in both benign and malevolent situations where the number of requests processed can overwhelm your underlying APIs and supporting services. Rate limits are also useful to control the amount of API consumption to a known capacity of quantity.
+
+##### Example use case:
 Use to limit repeated requests to public APIs and/or endpoints such as password reset.
+Limit access by host name in order to provide different service plans for customers. 
 
-By default it will limit based on client IP address (req.ip).
-option `rateLimitBy` can be used to override the behaviour.
+#### Reference
 
-Consider example to rate-limit based on passed host:
+* `rateLimitBy`: The criteria that is used to limit the number of requests by. By default will limit based on IP address. Use JS template string to configure. Example "${req.ip}", "${req.hostname}" etc.
+* `windowMs`: milliseconds - how long to keep records of requests in memory. Defaults to 60000 (1 minute).
+* `max`: max number of connections during windowMs milliseconds before sending a 429 response. Defaults to 5. Set to 0 to disable.
+* `message`: Error message returned when max is exceeded. Defaults to 'Too many requests, please try again later.'
+* `statusCode`: HTTP status code returned when max is exceeded. Defaults to 429.
+* `headers`: Enable header to show request limit and current usage
+* `delayAfter`: max number of connections during windowMs before starting to delay responses. Defaults to 1. Set to 0 to disable delaying.
+* `delayMs`: milliseconds - how long to delay the response, multiplied by (number of recent hits - delayAfter). Defaults to 1000 (1 second). Set to 0 to disable delaying.
+
+
+
+#### Usage Example
+
+#####Consider example to rate-limit based on passed host to 10 requests per 2 minutes interval:
+
 ```yml
 apiEndpoints:
   example:
@@ -449,6 +466,7 @@ pipeline1:
           action:
             name: 'rate-limit'
             max: 10
+            windowMs: 120000 
             rateLimitBy: "${req.host}"
       - proxy:
         -
@@ -458,20 +476,7 @@ pipeline1:
 
 ```
 
-#####Supported options:
-
-* `rateLimitBy`: JS template string to generate key. Requests will be counted based on this key. default is "${req.ip}"
-* `windowMs`: milliseconds - how long to keep records of requests in memory. Defaults to 60000 (1 minute).
-* `max`: max number of connections during windowMs milliseconds before sending a 429 response. Defaults to 5. Set to 0 to disable.
-* `message`: Error message returned when max is exceeded. Defaults to 'Too many requests, please try again later.'
-* `statusCode`: HTTP status code returned when max is exceeded. Defaults to 429.
-* `headers`: Enable header to show request limit and current usage
-* `delayAfter`: max number of connections during windowMs before starting to delay responses. Defaults to 1. Set to 0 to disable delaying.
-* `delayMs`: milliseconds - how long to delay the response, multiplied by (number of recent hits - delayAfter). Defaults to 1000 (1 second). Set to 0 to disable delaying.
-
-#####Here are some additional scenarious:
-
-###### Limit only for specific domain
+###### Limit only for specific domain to 500 requests per minute
 ```yml
 policies:
   -
@@ -485,9 +490,6 @@ policies:
           max: 500
 ```
 
-
-Implementation is based on [express-rate-limit](https://www.npmjs.com/package/express-rate-limit)
-Please check for advanced information
 
 #### Key Auth
 Key auth is efficient way of securing your API. 
