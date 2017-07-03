@@ -8,9 +8,14 @@ let config = require('../../lib/config');
 
 module.exports = function () {
   let app, httpsApp, originalGatewayConfig;
+  let actions = require('../../lib/actions').init();
   return {
+    registerAction: ({name, handler}) => {
+      actions.register(name, (params) => {
+        return handler;
+      }, 'test');
+    },
     setup: testSuite => () => {
-      let actions = require('../../lib/actions').init();
       if (testSuite && testSuite.gatewayConfig) {
         originalGatewayConfig = config.gatewayConfig;
         config.gatewayConfig = testSuite.gatewayConfig;
