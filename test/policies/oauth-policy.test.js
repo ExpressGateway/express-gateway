@@ -35,16 +35,12 @@ describe('Functional Tests oAuth2.0 Policy', () => {
         authorizedEndpoint: {
           host: '*',
           paths: ['/authorizedPath'],
-          scopes: [
-            { scope: 'authorizedScope', verbs: '*' }
-          ]
+          scopes: [ 'authorizedScope' ]
         },
         unauthorizedEndpoint: {
           host: '*',
           paths: ['/unauthorizedPath'],
-          scopes: [
-            { scope: 'unauthorizedScope', verbs: '*' }
-          ]
+          scopes: ['unauthorizedScope']
         }
       },
       pipelines: {
