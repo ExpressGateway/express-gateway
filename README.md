@@ -172,11 +172,35 @@ serviceEndpoints: # urls to downstream services
 Use name of properties (`cats_service` etc.) to reference in pipelines
 
 
-policies (PHASE 2)
+policies 
 --------
 White-list Array of enabled policies with settings (if needed)
 
-#### Referencing well-known policies (Phase2)
+#### General structure
+```yml
+pipelines:
+  pipelineName:
+    policies: # array of policies
+      -   # policy #1 start
+        policyName:
+          -   # condition\action object #1
+            condition: # optional
+              name: always
+            action:
+              name: nameOfAction # typically has the same name as policy and can be ommmited 
+              param1: val1 # actual parameters depend on policy and action see documentation for available parameters
+              param2: val2
+            -   # condition\action object #2
+            action:
+              name: nameOfAction2 # typically has the same name as policy and can be ommmited 
+      -   # policy #2 start
+        policyName2:
+          -
+            # condition / action pairs with params 
+
+
+```
+#### Referencing well-known policies (Comming soon)
 ```yaml
 policies:
   - name: 'name-test'
@@ -185,7 +209,7 @@ EG will try to find and load package with prefix `express-gateway-policy-`
 
 in this case  `express-gateway-policy-name-test` npm package
 
-#### Referencing custom package in system.config (Phase2)
+#### Referencing custom package in system.config (Comming soon)
 ```yaml
 policies:
   - package: 'plugin-test'
@@ -211,14 +235,16 @@ pipelines:
       - api1
       - api2
     policies:
-      policy_name_1:
-        - 
-          #condition/action
-        - 
-          #condition/action
-      policy_name_2:
-        - 
-          #condition/action
+      - 
+        policy_name_1:
+          - 
+            #condition/action
+          - 
+            #condition/action
+      -  
+        policy_name_2:
+          - 
+            #condition/action
 ```
 
 ##### Example
@@ -240,19 +266,21 @@ pipelines:
     apiEndpoints:
       - api
     policies:
-      simple-logger: # policy name
-        -   # array of objects with condition\action properties
-          condition: #optional,; defaults to always execute
-            name: pathExact
-            paths: /v1
-          action:
-            name: log
-            message: "${method} ${originalUrl}"
-      proxy: # policy name
-        -    # array of objects with condition\action properties
-          action:
-            name: proxy
-            serviceEndpoint: example # see declaration above
+      -
+        simple-logger: # policy name
+          -   # array of objects with condition\action properties
+            condition: #optional,; defaults to always execute
+              name: pathExact
+              paths: /v1
+            action:
+              name: log
+              message: "${method} ${originalUrl}"
+      -  
+        proxy: # policy name
+          -    # array of objects with condition\action properties
+            action:
+              name: proxy
+              serviceEndpoint: example # see declaration above
 
 ```
 
@@ -368,21 +396,22 @@ pipelines:
     apiEndpoints:
       - api
     policies:
-      proxy:
-        -
-          condition:
-            name: pathExact
-            paths: /admin
-          action:
-            name: proxy
-            serviceEndpoint: admin # see declaration above
-        -
-          condition:
-            name: pathExact
-            paths: /staff
-          action:
-            name: proxy
-            serviceEndpoint: staff # see declaration above
+      -
+        proxy:
+          -
+            condition:
+              name: pathExact
+              paths: /admin
+            action:
+              name: proxy
+              serviceEndpoint: admin # see declaration above
+          -
+            condition:
+              name: pathExact
+              paths: /staff
+            action:
+              name: proxy
+              serviceEndpoint: staff # see declaration above
 ```
 
 ##### Api Endpoint based config (variant B)
@@ -413,11 +442,12 @@ pipelines:
     apiEndpoints:
       - staff
     policies:
-      proxy:
-        -   # note: no condition at all
-          action:
-            name: proxy
-            serviceEndpoint: staff
+      -
+        proxy:
+          -   # note: no condition at all
+            action:
+              name: proxy
+              serviceEndpoint: staff
 ```
 
 
