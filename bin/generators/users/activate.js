@@ -1,5 +1,5 @@
 const eg = require('../../eg');
-
+const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -23,7 +23,6 @@ module.exports = class extends eg.Generator {
 
   _activate () {
     const argv = this.argv;
-    const userService = this.eg.services.user;
 
     const userIds = Array.isArray(argv.user_id)
       ? argv.user_id
@@ -35,32 +34,15 @@ module.exports = class extends eg.Generator {
       let activationsCompleted = 0;
 
       userIds.forEach(function (userId) {
-        userService
-          .find(userId)
-          .then(user => {
-            if (!user) {
-              return userService.get(userId);
-            }
-
-            return user;
-          })
-          .then(user => {
-            if (user) {
-              return userService.activate(user.id)
-                .then(() => {
-                  return userService.get(user.id);
-                });
-            }
-          })
-          .then(user => {
+        return request
+          .put('http://localhost:' + self.eg.config.gatewayConfig.admin.port + '/users/' + argv.user_id + '/status')
+          .send({status: true})
+          .then(res => {
+            let status = res.body;
             activationsCompleted++;
 
-            if (user) {
-              if (!argv.q) {
-                self.log.ok(`Activated ${userId}`);
-              } else {
-                self.log(user.id);
-              }
+            if (status) {
+              self.log.ok(`Activated ${userId}`);
             }
 
             if (activationsCompleted === activateCount) {

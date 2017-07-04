@@ -6,6 +6,9 @@ apiEndpoints:
 http:
   port: 8080
 
+admin:
+  port: 9876
+
 https:
   port: 9999
   tls: {}
