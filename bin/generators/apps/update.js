@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 const eg = require('../../eg');
-
+const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -29,7 +29,6 @@ module.exports = class extends eg.Generator {
   _update () {
     const argv = this.argv;
     const models = this.eg.config.models;
-    const applicationService = this.eg.services.application;
 
     let propertyValues = [];
 
@@ -60,9 +59,10 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return applicationService
-      .get(argv.app_id)
-      .then(foundApp => {
+    return request
+      .get(this.adminApiBaseUrl + '/apps/' + argv.app_id)
+      .then(res => {
+        let foundApp = res.body;
         if (!foundApp) {
           if (!argv.q) {
             this.log.error(`App not found: ${argv.app_id}`);
@@ -113,13 +113,14 @@ module.exports = class extends eg.Generator {
           });
         }
 
-        const appId = argv.app_id;
         return this.prompt(questions)
           .then(answers => {
             app = Object.assign(app, answers);
-            return applicationService.update(appId, app);
+            return request
+              .put(this.adminApiBaseUrl + '/apps/' + argv.app_id)
+              .send(app);
           })
-          .then(newApp => {
+          .then(res => {
             if (!argv.q) {
               this.log.ok(`Updated ${argv.app_id}`);
             } else {
