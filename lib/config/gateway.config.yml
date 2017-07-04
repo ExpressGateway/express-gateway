@@ -5,6 +5,10 @@ apiEndpoints:
       - /users/*
 http:
   port: 8080
+admin:
+  port: 9876
+  hostname: localhost
+
 https:
   port: 9999
   tls: {}

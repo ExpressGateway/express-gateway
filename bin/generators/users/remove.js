@@ -1,5 +1,4 @@
 const eg = require('../../eg');
-
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -23,58 +22,24 @@ module.exports = class extends eg.Generator {
 
   _remove () {
     const argv = this.argv;
-    const userService = this.eg.services.user;
     const userIds = Array.isArray(argv.user_id)
       ? argv.user_id
       : [argv.user_id];
 
-    const removalCount = userIds.length;
-    let removalsCompleted = 0;
-
-    const self = this;
-    return new Promise(resolve => {
-      userIds.forEach(function (userId) {
-        userService
-          .find(userId)
+    return Promise.all(userIds.map((userId) => {
+      return this.sdk.users.remove(userId)
           .then(user => {
-            if (!user) {
-              return userService.get(userId);
-            }
-
-            return user;
-          })
-          .then(user => {
-            if (user) {
-              return userService.remove(user.id).then(() => user);
-            }
-          })
-          .then(user => {
-            removalsCompleted++;
-
             if (user) {
               if (!argv.q) {
-                self.log.ok(`Removed ${userId}`);
+                this.log.ok(`Removed ${userId}`);
               } else {
-                self.log(user.id);
+                this.log(userId);
               }
-            }
-
-            if (removalsCompleted === removalCount) {
-              self.eg.exit();
-              resolve(); // don't propagate errors
             }
           })
           .catch(err => {
-            removalsCompleted++;
-
-            self.log.error(err.message);
-
-            if (removalsCompleted === removalCount) {
-              self.eg.exit();
-              resolve(); // don't propagate errors
-            }
+            this.log.error(err.message);
           });
-      });
-    });
+    })).then(() => this.eg.exit());
   }
 };

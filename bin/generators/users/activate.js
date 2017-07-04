@@ -1,5 +1,4 @@
 const eg = require('../../eg');
-
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -23,62 +22,29 @@ module.exports = class extends eg.Generator {
 
   _activate () {
     const argv = this.argv;
-    const userService = this.eg.services.user;
 
     const userIds = Array.isArray(argv.user_id)
       ? argv.user_id
       : [argv.user_id];
 
-    const self = this;
-    return new Promise(resolve => {
-      const activateCount = userIds.length;
-      let activationsCompleted = 0;
+    return Promise.all(userIds.map((userId) => {
+      return this.sdk.users.activate(userId)
+          .then(res => {
+            let status = res.status;
 
-      userIds.forEach(function (userId) {
-        userService
-          .find(userId)
-          .then(user => {
-            if (!user) {
-              return userService.get(userId);
-            }
-
-            return user;
-          })
-          .then(user => {
-            if (user) {
-              return userService.activate(user.id)
-                .then(() => {
-                  return userService.get(user.id);
-                });
-            }
-          })
-          .then(user => {
-            activationsCompleted++;
-
-            if (user) {
-              if (!argv.q) {
-                self.log.ok(`Activated ${userId}`);
+            if (status) {
+              if (argv.q) {
+                this.log.ok(userId);
               } else {
-                self.log(user.id);
+                this.log.ok(`${status} ${userId}`);
               }
-            }
-
-            if (activationsCompleted === activateCount) {
-              self.eg.exit();
-              resolve(); // don't propagate rejections
             }
           })
           .catch(err => {
-            activationsCompleted++;
-
-            self.log.error(err.message);
-
-            if (activationsCompleted === activateCount) {
-              self.eg.exit();
-              resolve(); // don't propagate rejections
-            }
+            this.log.error(err.message);
           });
-      });
+    })).then(() => {
+      this.eg.exit();
     });
   }
 };

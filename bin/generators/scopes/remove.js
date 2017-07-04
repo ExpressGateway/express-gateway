@@ -5,48 +5,44 @@ module.exports = class extends eg.Generator {
     super(args, opts);
 
     this.configureCommand({
-      command: ['remove [options] <app_id..>', 'rm'],
-      desc: 'Remove an application',
+      command: ['remove [options] <scope..>', 'rm'],
+      desc: 'Remove a scope',
       builder: yargs =>
         yargs
-          .usage(`Usage: $0 ${process.argv[2]} remove [options] <app_id..>`)
-          .boolean('q')
-          .describe('q', 'Only show app ID')
-          .alias('q', 'quiet')
-          .group(['q', 'h'], 'Options:')
+          .usage(`Usage: $0 ${process.argv[2]} remove [options] <scope..>`)
+          .group(['h'], 'Options:')
     });
   }
 
   prompting () {
     const argv = this.argv;
 
-    const appIds = Array.isArray(argv.app_id)
-      ? argv.app_id
-      : [argv.app_id];
+    const scopes = Array.isArray(argv.scope)
+      ? argv.scope
+      : [argv.scope];
 
     return new Promise((resolve, reject) => {
-      const removalCount = appIds.length;
+      const removalCount = scopes.length;
       let removalsCompleted = 0;
 
-      let self = this;
       let errors = [];
-      appIds.forEach(function (appId) {
+      scopes.forEach((scope) => {
         request
-          .del(self.adminApiBaseUrl + '/apps/' + appId)
+          .del(this.adminApiBaseUrl + '/scopes/' + scope)
           .then(res => {
             let app = res.body;
             removalsCompleted++;
 
             if (app) {
               if (!argv.q) {
-                self.log.ok(`Removed ${appId}`);
+                this.log.ok(`Removed ${scope}`);
               } else {
-                self.log(app.id);
+                this.log(app.id);
               }
             }
 
             if (removalsCompleted === removalCount) {
-              self.eg.exit();
+              this.eg.exit();
               if (errors.length === 0) {
                 resolve();
               } else {
@@ -57,11 +53,11 @@ module.exports = class extends eg.Generator {
           .catch(err => {
             removalsCompleted++;
 
-            self.log.error(err.message);
+            this.log.error(err.message);
             errors.push(err);
 
             if (removalsCompleted === removalCount) {
-              self.eg.exit();
+              this.eg.exit();
               reject(errors);
             }
           });

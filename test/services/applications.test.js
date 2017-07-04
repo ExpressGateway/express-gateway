@@ -196,6 +196,28 @@ describe('Application service tests', function () {
       });
     });
 
+    it('should get all apps', function (done) {
+      applicationService
+      .findAll()
+      .then(function (data) {
+        should.exist(data.apps);
+        data.apps.length.should.eql(1);
+        let app = data.apps[0];
+        should.exist(app);
+        should.exist(app.id);
+        app.id.should.eql(app.id);
+        should.exist(app.name);
+        app.name.should.eql(app.name);
+        should.exist(app.createdAt);
+        should.exist(app.updatedAt);
+        done();
+      })
+      .catch(function (err) {
+        should.not.exist(err);
+        done();
+      });
+    });
+
     it('should not get app by invalid id', function (done) {
       applicationService.get('invalid_id')
         .then(function (_app) {

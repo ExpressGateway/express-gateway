@@ -5,11 +5,11 @@ module.exports = class extends eg.Generator {
     super(args, opts);
 
     this.configureCommand({
-      command: 'info [options] <app_id>',
+      command: 'info [options] <scope>',
       desc: 'Show details for a single application',
       builder: yargs =>
         yargs
-          .usage(`Usage: $0 ${process.argv[2]} info [options] <app_id>`)
+          .usage(`Usage: $0 ${process.argv[2]} info [options] <scope>`)
           .group(['h'], 'Options:')
     });
   }
@@ -18,11 +18,11 @@ module.exports = class extends eg.Generator {
     const argv = this.argv;
 
     return request
-      .get(this.adminApiBaseUrl + '/apps/' + argv.app_id)
+      .get(this.adminApiBaseUrl + '/scopes/' + argv.scope)
       .then(res => {
-        let app = res.body;
-        if (app) {
-          this.log(JSON.stringify(app, null, 2));
+        let scope = res.body.scope;
+        if (scope) {
+          this.log(scope);
         }
 
         this.eg.exit();

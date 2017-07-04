@@ -147,6 +147,27 @@ describe('User service tests', function () {
           done();
         });
     });
+    it('should get user all users', function () {
+      return userService.findAll()
+        .then(function (data) {
+          should.exist(data.users);
+          should.exist(data.nextKey);
+          data.users.length.should.be.eql(1);
+          let user = data.users[0];
+          let expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
+          let expectedPartialObj = {
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            isActive: 'true',
+            username: user.username
+          };
+          should.exist(user);
+          expectedUserProps.sort().should.eql(Object.keys(user).sort());
+          should.deepEqual(_.omit(user, [ 'id', 'createdAt', 'updatedAt' ]), expectedPartialObj);
+          user.id.length.should.be.greaterThan(10);
+        });
+    });
 
     it('should not get user by invalid userId', function (done) {
       userService.get(uuid.v4())

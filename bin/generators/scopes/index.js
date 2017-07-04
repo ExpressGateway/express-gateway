@@ -5,17 +5,14 @@ module.exports = class extends eg.Generator {
     super(args, opts);
 
     this.configureCommand({
-      command: ['users <command> [options]', 'user'],
-      desc: 'Manage users',
+      command: ['scopes <command> [options]', 'scope'],
+      desc: 'Manage scopes',
       builder: yargs => yargs
         .reset()
         .usage('Usage: $0 ' + process.argv[2] + ' <command> [options]')
         .command(this.createSubCommand('create'))
         .command(this.createSubCommand('info'))
         .command(this.createSubCommand('remove'))
-        .command(this.createSubCommand('activate'))
-        .command(this.createSubCommand('deactivate'))
-        .command(this.createSubCommand('update'))
         .command(this.createSubCommand('list'))
         .demandCommand()
     });

@@ -2,6 +2,7 @@ db:
   redis:
     host: localhost
     port: 5555
+    emulate: true
     namespace: EG-TEST
 crypto:
   cipherKey: sensitiveKey

@@ -2,80 +2,59 @@ const assert = require('assert');
 const PassThrough = require('stream').PassThrough;
 const util = require('util');
 const helpers = require('yeoman-test');
-
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
-const db = require('../../../lib/db')();
+const adminHelper = require('../../common/admin-helper')();
+const idGen = require('uuid-base62');
 const environment = require('../../fixtures/cli/environment');
-const redisConfig = require('../../../lib/config').systemConfig.db.redis;
-
 const namespace = 'express-gateway:users:create';
 
 describe('eg users create', () => {
-  let program, env;
+  let program, env, username;
 
   before(() => {
     ({ program, env } = environment.bootstrap());
+    return adminHelper.start();
   });
+  after(() => adminHelper.stop());
 
   beforeEach(() => {
     env.prepareHijack();
+    username = idGen.v4();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     env.resetHijack();
-
-    db.flushdbAsync()
-    .then(didSucceed => {
-      if (!didSucceed) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to flush the database');
-      }
-
-      done();
-    })
-    .catch(err => {
-      assert(!err);
-      done();
-    });
   });
 
   it('creates a user from prompts', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          assert.fail(message);
         };
         generator.log.ok = message => {
           output = message;
         };
 
         helpers.mockPrompt(generator, {
-          username: 'lala',
+          username,
           firstname: 'La',
           lastname: 'Deeda'
         });
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
+        return adminHelper.sdk.users.info(username)
               .then(user => {
-                assert.equal(user.username, 'lala');
+                assert.equal(user.username, username);
                 assert.equal(user.firstname, 'La');
                 assert.equal(user.lastname, 'Deeda');
 
-                assert.equal(output, 'Created lala');
-                assert.equal(error, null);
+                assert.equal(output, 'Created ' + username);
 
                 done();
               });
-          });
       });
     });
 
@@ -97,29 +76,26 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.username, 'lala');
-                assert.equal(user.firstname, 'La');
-                assert.equal(user.lastname, 'Deeda');
+        return adminHelper.sdk.users.info(username)
+          .then(user => {
+            assert.equal(user.username, username);
+            assert.equal(user.firstname, 'La');
+            assert.equal(user.lastname, 'Deeda');
 
-                assert.equal(output, 'Created lala');
-                assert.equal(error, null);
+            assert.equal(output, 'Created ' + username);
+            assert.equal(error, null);
 
-                done();
-              });
+            done();
           });
       });
     });
 
-    env.argv = program.parse('users create -p "username=lala" ' +
+    env.argv = program.parse('users create -p "username=' + username + '" ' +
       '-p "firstname=La" -p "lastname=Deeda"');
   });
 
   it('creates a user from stdin', done => {
-    const user = { username: 'lala', firstname: 'La', lastname: 'Deeda' };
+    const user = { username, firstname: 'La', lastname: 'Deeda' };
 
     env.hijack(namespace, generator => {
       let output = null;
@@ -142,20 +118,16 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
+        return adminHelper.sdk.users.info(username)
               .then(user => {
-                assert.equal(user.username, 'lala');
+                assert.equal(user.username, username);
                 assert.equal(user.firstname, 'La');
                 assert.equal(user.lastname, 'Deeda');
 
-                assert.equal(output, 'Created lala');
+                assert.equal(output, 'Created ' + username);
                 assert.equal(error, null);
-
                 done();
-              });
-          });
+              }).catch(done);
       });
     });
 
@@ -177,24 +149,21 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
+        return adminHelper.sdk.users.info(username)
               .then(user => {
-                assert.equal(user.username, 'lala');
+                assert.equal(user.username, username);
                 assert.equal(user.firstname, 'La');
                 assert.equal(user.lastname, 'Deeda');
 
-                assert.equal(output, userId[0]);
+                assert.equal(output, user.id);
                 assert.equal(error, null);
 
                 done();
               });
-          });
       });
     });
 
-    env.argv = program.parse('users create -p "username=lala" ' +
+    env.argv = program.parse('users create -p "username=' + username + '" ' +
       '-p "firstname=La" -p "lastname=Deeda" -q');
   });
 

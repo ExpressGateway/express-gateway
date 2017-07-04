@@ -1,5 +1,5 @@
 const Generator = require('yeoman-generator');
-
+const config = require('../lib/config');
 module.exports = class EgGenerator extends Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -7,6 +7,9 @@ module.exports = class EgGenerator extends Generator {
     this._configuration = null;
     this.eg = this.env.eg;
     this.argv = this.env.argv;
+    let host = config.gatewayConfig.admin.hostname || 'localhost';
+    this.adminApiBaseUrl = `http://${host}:${config.gatewayConfig.admin.port}`;
+    this.sdk = require('../lib/sdk')(config.gatewayConfig.admin);
   }
 
   configureCommand (configuration) {

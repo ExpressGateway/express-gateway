@@ -30,15 +30,11 @@ module.exports = class extends eg.Generator {
     });
   }
 
-  initializing () {
-    if (this.argv.stdin) {
-      return this._createFromStdin();
-    }
-  }
-
   prompting () {
     if (!this.argv.stdin) {
       return this._createFromCommandLine();
+    } else {
+      return this._createFromStdin();
     }
   }
 
@@ -50,16 +46,14 @@ module.exports = class extends eg.Generator {
 
     this.stdin.on('readable', () => {
       const chunk = this.stdin.read();
-
       if (chunk) {
         bufs.push(chunk);
       }
     });
-
-    this.stdin.on('end', () => {
-      let lines = bufs.join('').split('\n');
-
-      let promises = lines
+    return new Promise((resolve, reject) => {
+      this.stdin.on('end', () => {
+        let lines = bufs.join('').split('\n');
+        let promises = lines
             .filter(line => line.length > 0)
             .map((line, index) => {
               let user = JSON.parse(line);
@@ -69,22 +63,7 @@ module.exports = class extends eg.Generator {
                 isLast: index === lines.length - 1
               };
 
-              return this._insert(user, options);
-            });
-
-      if (!promises.length) {
-        return;
-      }
-
-      let promisesCount = promises.length;
-      let promisesCompleted = 0;
-
-      const p = new Promise(resolve => {
-        promises.forEach(promise => {
-          promise
-              .then(newUser => {
-                promisesCompleted++;
-
+              return this._insert(user, options).then(newUser => {
                 if (newUser) {
                   if (!argv.q) {
                     this.log.ok(`Created ${newUser.username}`);
@@ -92,31 +71,14 @@ module.exports = class extends eg.Generator {
                     this.log(newUser.id);
                   }
                 }
-
-                if (promisesCompleted === promisesCount) {
-                  this.eg.exit();
-                  resolve(); // don't propagate rejections
-                }
               })
               .catch(err => {
-                promisesCompleted++;
-
-                this.log.error(err.message);
-
-                if (promisesCompleted === promisesCount) {
-                  this.eg.exit();
-                  resolve(); // don't propagate rejections
-                }
+                this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
               });
-        });
-      });
+            });
 
-      this.emit('create-input', p);
-    });
-
-    return new Promise((resolve, reject) => {
-      this.on('create-input', promise => {
-        promise.then(resolve).catch(reject);
+        let p = Promise.all(promises);
+        resolve(p);
       });
     });
   }
@@ -152,7 +114,6 @@ module.exports = class extends eg.Generator {
       this.eg.exit();
       return;
     }
-
     return this._insert(user)
       .then(newUser => {
         if (!argv.q) {
@@ -163,13 +124,12 @@ module.exports = class extends eg.Generator {
         this.eg.exit();
       })
       .catch(err => {
-        this.log.error(err.message);
+        this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
         this.eg.exit();
       });
   }
   _insert (user, options) {
     const models = this.eg.config.models;
-    const userService = this.eg.services.user;
 
     options = options || {};
     options.skipPrompt = options.skipPrompt || false;
@@ -219,11 +179,10 @@ module.exports = class extends eg.Generator {
         }
       });
     }
-
     return this.prompt(questions)
       .then(answers => {
         user = Object.assign(user, answers);
-        return userService.insert(user);
+        return this.sdk.users.create(user);
       });
   }
 };

@@ -1,6 +1,5 @@
 const chalk = require('chalk');
 const eg = require('../../eg');
-
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -30,7 +29,6 @@ module.exports = class extends eg.Generator {
   _update () {
     const argv = this.argv;
     const config = this.eg.config.models;
-    const userService = this.eg.services.user;
 
     let propertyValues = [];
 
@@ -62,24 +60,8 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return userService
-      .get(argv.user_id)
+    return this.sdk.users.info(argv.user_id)
       .then(foundUser => {
-        if (foundUser) {
-          return foundUser;
-        }
-
-        return userService.find(argv.user_id);
-      })
-      .then(foundUser => {
-        if (!foundUser) {
-          if (!argv.q) {
-            this.log.error(`User not found: ${argv.user_id}`);
-          }
-          this.eg.exit();
-          return;
-        }
-
         const configProperties = config.users.properties;
         let missingProperties = Object.keys(configProperties).map(prop => {
           return { name: prop, descriptor: configProperties[prop] };
@@ -111,8 +93,7 @@ module.exports = class extends eg.Generator {
         return this.prompt(questions)
           .then(answers => {
             user = Object.assign(user, answers);
-            return userService.update(foundUser.id, user)
-              .then(() => userService.get(foundUser.id));
+            return this.sdk.users.update(argv.user_id, user);
           });
       })
       .then(updatedUser => {
@@ -127,7 +108,13 @@ module.exports = class extends eg.Generator {
         this.eg.exit();
       })
       .catch(err => {
-        this.log.error(err.message);
+        if (err.status === 404) {
+          if (!argv.q) {
+            this.log.error(`User not found: ${argv.user_id}`);
+          }
+        } else {
+          this.log.error(err.message);
+        }
         this.eg.exit();
       });
   }

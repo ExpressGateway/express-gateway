@@ -1,5 +1,4 @@
 const eg = require('../../eg');
-
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -17,18 +16,9 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    const userService = this.eg.services.user;
     const argv = this.argv;
 
-    return userService
-      .find(argv.user_id)
-      .then(user => {
-        if (!user) {
-          return userService.get(argv.user_id);
-        }
-
-        return user;
-      })
+    return this.sdk.users.info(argv.user_id)
       .then(user => {
         if (user) {
           if (!argv.q) {
