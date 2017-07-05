@@ -1,5 +1,5 @@
 const eg = require('../../eg');
-
+const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -16,11 +16,11 @@ module.exports = class extends eg.Generator {
 
   prompting () {
     const argv = this.argv;
-    const appService = this.eg.services.application;
 
-    return appService
-      .get(argv.app_id)
-      .then(app => {
+    return request
+      .get('http://localhost:' + this.eg.config.gatewayConfig.admin.port + '/apps/' + argv.app_id)
+      .then(res => {
+        let app = res.body;
         if (app) {
           this.log(JSON.stringify(app, null, 2));
         }

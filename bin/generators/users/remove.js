@@ -1,5 +1,5 @@
 const eg = require('../../eg');
-
+const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -23,7 +23,6 @@ module.exports = class extends eg.Generator {
 
   _remove () {
     const argv = this.argv;
-    const userService = this.eg.services.user;
     const userIds = Array.isArray(argv.user_id)
       ? argv.user_id
       : [argv.user_id];
@@ -34,21 +33,10 @@ module.exports = class extends eg.Generator {
     const self = this;
     return new Promise(resolve => {
       userIds.forEach(function (userId) {
-        userService
-          .find(userId)
-          .then(user => {
-            if (!user) {
-              return userService.get(userId);
-            }
-
-            return user;
-          })
-          .then(user => {
-            if (user) {
-              return userService.remove(user.id).then(() => user);
-            }
-          })
-          .then(user => {
+        request
+          .del('http://localhost:' + self.eg.config.gatewayConfig.admin.port + '/users/' + argv.user_id)
+          .then(res => {
+            let user = res.body;
             removalsCompleted++;
 
             if (user) {

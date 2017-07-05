@@ -1,0 +1,1 @@
+{"apiEndpoints":{"api":{"host":"*.com"}},"serviceEndpoints":{"backend":{"url":"http://localhost:5998"}},"pipelines":{"apiPipeline":{"apiEndpoints":["api"],"policies":[{"test":[{"action":{"name":"proxy","serviceEndpoint":"backend"}}]}]}},"http":{"port":5997}}

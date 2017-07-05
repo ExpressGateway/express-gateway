@@ -1,5 +1,6 @@
 const chalk = require('chalk');
 const eg = require('../../eg');
+const request = require('superagent');
 
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
@@ -160,7 +161,6 @@ module.exports = class extends eg.Generator {
   }
   _insert (user, options) {
     const models = this.eg.config.models;
-    const userService = this.eg.services.user;
 
     options = options || {};
     options.skipPrompt = options.skipPrompt || false;
@@ -212,7 +212,13 @@ module.exports = class extends eg.Generator {
     return this.prompt(questions)
       .then(answers => {
         user = Object.assign(user, answers);
-        return userService.insert(user);
+        return request
+          .post('http://localhost:' + this.eg.config.gatewayConfig.admin.port + '/users')
+          .send(user)
+          .then(res => {
+            this.log(res.body);
+            return res.body;
+          });
       });
   }
 };
