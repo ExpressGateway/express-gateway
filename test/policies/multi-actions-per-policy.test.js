@@ -27,16 +27,17 @@ describe('multi step policy ', () => {
           url: 'http://localhost:' + port2
         }
       },
+      policies: ['proxy'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test'],
           policies: [{
             proxy: [{
               condition: { name: 'pathExact', path: '/admin' },
-              action: { name: 'proxy', serviceEndpoint: 'admin' }
+              action: { serviceEndpoint: 'admin' }
             }, {
               condition: { name: 'pathExact', path: '/staff' },
-              action: { name: 'proxy', serviceEndpoint: 'staff' }
+              action: { serviceEndpoint: 'staff' }
             }]
           }]
         }

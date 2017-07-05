@@ -43,37 +43,20 @@ describe('Functional Tests oAuth2.0 Policy', () => {
           scopes: ['unauthorizedScope']
         }
       },
+      policies: ['oauth2', 'proxy'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['authorizedEndpoint'],
           policies: [
-            { oauth: [{ action: { name: 'oauth' } }] },
-            {
-              proxy: [
-                {
-                  action: {
-                    name: 'proxy',
-                    serviceEndpoint: 'backend'
-                  }
-                }
-              ]
-            }
+            { oauth2: {} },
+            { proxy: [ { action: { serviceEndpoint: 'backend' } } ] }
           ]
         },
         pipeline2: {
           apiEndpoints: ['unauthorizedEndpoint'],
           policies: [
-            { oauth: [{ action: { name: 'oauth' } }] },
-            {
-              proxy: [
-                {
-                  action: {
-                    name: 'proxy',
-                    serviceEndpoint: 'backend'
-                  }
-                }
-              ]
-            }
+            { oauth2: {} },
+            { proxy: [ { action: { serviceEndpoint: 'backend' } } ] }
           ]
         }
       }
@@ -132,7 +115,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
                       .then(res => {
                         should.exist(res);
 
-                        helper.setup()()
+                        helper.setup()
                           .then(apps => {
                             app = apps.app;
                             let request = session(app);

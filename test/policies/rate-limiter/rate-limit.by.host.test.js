@@ -7,6 +7,9 @@ let originalGatewayConfig = config.gatewayConfig;
 
 describe('rate-limit by host', () => {
   let helper = testHelper();
+  helper.addPolicy('test', () => (req, res) => {
+    res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+  });
   const hosts = ['test.com', 'example.com', 'zu.io'];
 
   before('setup', () => {
@@ -15,31 +18,32 @@ describe('rate-limit by host', () => {
       apiEndpoints: {
         test_default: {}
       },
+      policies: ['rate-limit', 'test'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test_default'],
-          policies: [{
-            'rate-limit': [{
-              action: {
-                name: 'rate-limit',
-                max: 1,
-                // eslint-disable-next-line no-template-curly-in-string
-                rateLimitBy: '${req.host}'
+          policies: [
+            {
+              'rate-limit': {
+                action: {
+                  max: 1,
+                  // eslint-disable-next-line no-template-curly-in-string
+                  rateLimitBy: '${req.host}'
+                }
               }
-            }]
-          }, {
-            test: [{ action: { name: 'test_policy' } }]
-          }]
+            },
+            { test: {} }
+          ]
         }
       }
     };
 
-    helper.setup({ fakeActions: ['test_policy'] })();
+    helper.setup();
   });
 
   after('cleanup', (done) => {
-    config.gatewayConfig = originalGatewayConfig;
     helper.cleanup();
+    config.gatewayConfig = originalGatewayConfig;
     done();
   });
 

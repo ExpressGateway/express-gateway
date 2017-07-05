@@ -1,14 +1,14 @@
 // const path = require('path');
 const request = require('supertest');
 const assert = require('chai').assert;
-const logger = require('../../lib/log').test;
+const logger = require('../../lib/logger').test;
 let gateway = require('../../lib/gateway');
 const _ = require('lodash');
 let config = require('../../lib/config');
+let policies = require('../../lib/policies');
 
 module.exports = function () {
-  let app, httpsApp, originalGatewayConfig;
-  let actions = require('../../lib/actions').init();
+  let app, httpsApp, originalGatewayConfig, originalPolicies;
   function prepareScenario (testCase) {
     let testScenario = request(app);
     if (testCase.setup.putData) {
@@ -27,23 +27,12 @@ module.exports = function () {
     return testScenario;
   }
   return {
-    registerAction: ({name, handler}) => {
-      actions.register(name, (params) => {
-        return handler;
-      }, 'test');
+    addPolicy: (name, handler) => {
+      policies[name] = { policy: handler };
     },
-    setup: testSuite => () => {
-      if (testSuite && testSuite.gatewayConfig) {
-        originalGatewayConfig = config.gatewayConfig;
-        config.gatewayConfig = testSuite.gatewayConfig;
-      }
-      testSuite && testSuite.fakeActions && testSuite.fakeActions.forEach((key) => {
-        actions.register(key, (params) => {
-          return (req, res) => {
-            res.json({ result: key, params, hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
-          };
-        }, 'test');
-      });
+    setup: () => {
+      originalPolicies = policies;
+      originalGatewayConfig = config.gatewayConfig;
 
       return gateway()
         .then(apps => {
@@ -56,6 +45,7 @@ module.exports = function () {
       if (originalGatewayConfig) {
         config.gatewayConfig = originalGatewayConfig;
       }
+      policies = originalPolicies;
       app && app.close();
       httpsApp && httpsApp.close();
     },

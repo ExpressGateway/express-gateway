@@ -3,6 +3,10 @@ let config = require('../../lib/config');
 
 describe('exact host name configuration host:acme.com paths:default(*)', () => {
   let helper = testHelper();
+  helper.addPolicy('test', () => (req, res) => {
+    res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+  });
+
   let originalGatewayConfig;
   before('setup', () => {
     originalGatewayConfig = config.gatewayConfig;
@@ -12,20 +16,21 @@ describe('exact host name configuration host:acme.com paths:default(*)', () => {
       apiEndpoints: {
         'test_domain': { 'host': 'acme.com' } // path defaults to *
       },
+      policies: ['test'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test_domain'],
-          policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+          policies: { test: [] }
         }
       }
     };
 
-    helper.setup({ fakeActions: ['test_policy'] })();
+    helper.setup();
   });
 
   after('cleanup', (done) => {
-    config.gatewayConfig = originalGatewayConfig;
     helper.cleanup();
+    config.gatewayConfig = originalGatewayConfig;
     done();
   });
 
@@ -37,7 +42,7 @@ describe('exact host name configuration host:acme.com paths:default(*)', () => {
     test: {
       host: 'acme.com',
       url: '/',
-      result: 'test_policy'
+      result: 'test'
     }
   }));
   it('should serve acme.com', helper.validateSuccess({
@@ -48,7 +53,7 @@ describe('exact host name configuration host:acme.com paths:default(*)', () => {
     test: {
       host: 'acme.com',
       url: '/',
-      result: 'test_policy'
+      result: 'test'
     }
   }));
   it('should serve acme.com/pretty', helper.validateSuccess({
@@ -59,7 +64,7 @@ describe('exact host name configuration host:acme.com paths:default(*)', () => {
     test: {
       host: 'acme.com',
       url: '/pretty',
-      result: 'test_policy'
+      result: 'test'
     }
   }));
   it('should not load deep domain zx.abc.acme.com/', helper.validate404({

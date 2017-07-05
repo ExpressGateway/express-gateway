@@ -1,35 +1,49 @@
 let testHelper = require('../../routing/routing.helper');
-let gatewayConfig = {
-  http: { port: 9089 },
-  apiEndpoints: {
-    test_default: {}
-  },
-  pipelines: {
-    pipeline1: {
-      apiEndpoints: ['test_default'],
-      policies: [{
-        'cors': [{
-          action: {
-            name: 'cors',
-            origin: 'http://www.example.com',
-            methods: 'HEAD,PUT,PATCH,POST,DELETE',
-            allowedHeaders: 'X-TEST'
-          }
-        }]
-      }, {
-        test: [{ action: { name: 'test_policy' } }]
-      }]
-    }
-  }
-};
+let config = require('../../../lib/config');
+let originalGatewayConfig = config.gatewayConfig;
 
 describe('cors', () => {
   let helper = testHelper();
-  before('setup', helper.setup({
-    fakeActions: ['test_policy'],
-    gatewayConfig
-  }));
-  after('cleanup', helper.cleanup);
+  helper.addPolicy('test', () => (req, res) => {
+    res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+  });
+
+  before('setup', () => {
+    config.gatewayConfig = {
+      http: { port: 9089 },
+      apiEndpoints: {
+        test_default: {}
+      },
+      policies: ['cors', 'test'],
+      pipelines: {
+        pipeline1: {
+          apiEndpoints: ['test_default'],
+          policies: [
+            {
+              cors: {
+                action: {
+                  origin: 'http://www.example.com',
+                  methods: 'HEAD,PUT,PATCH,POST,DELETE',
+                  allowedHeaders: 'X-TEST'
+                }
+              }
+            },
+            {
+              test: []
+            }
+          ]
+        }
+      }
+    };
+
+    helper.setup();
+  });
+
+  after('cleanup', () => {
+    helper.cleanup();
+    config.gatewayConfig = originalGatewayConfig;
+  });
+
   it('should allow first request for host', helper.validateOptions({
     setup: {
       url: '/',

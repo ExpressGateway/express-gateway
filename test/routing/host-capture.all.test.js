@@ -4,12 +4,17 @@ let config = require('../../lib/config');
 // there are several configuration ways to listen to all hosts
 ['*', '', undefined].forEach(hostBind => {
   describe('When configured to capture all hosts with config host:' + hostBind, () => {
-    let helper = testHelper();
     let originalGatewayConfig = config.gatewayConfig;
+
+    let helper = testHelper();
+    helper.addPolicy('test', () => (req, res) => {
+      res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+    });
 
     before('setup', () => {
       config.gatewayConfig = {
         http: { port: 9081 },
+        policies: ['test'],
         apiEndpoints: {
           test_regex: { pathRegex: '/wild-cats$' },
           test_path: { paths: '/admin' }
@@ -17,7 +22,7 @@ let config = require('../../lib/config');
         pipelines: {
           pipeline1: {
             apiEndpoints: ['test_regex', 'test_path'],
-            policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+            policies: { test: [] }
           }
         }
       };
@@ -25,12 +30,12 @@ let config = require('../../lib/config');
       config.gatewayConfig.apiEndpoints.test_regex.host = hostBind;
       config.gatewayConfig.apiEndpoints.test_path.host = hostBind;
 
-      helper.setup({ fakeActions: ['test_policy'] })();
+      helper.setup();
     });
 
     after('cleanup', (done) => {
-      config.gatewayConfig = originalGatewayConfig;
       helper.cleanup();
+      config.gatewayConfig = originalGatewayConfig;
       done();
     });
 
@@ -42,7 +47,7 @@ let config = require('../../lib/config');
       test: {
         host: 'zu.io',
         url: '/wild-cats',
-        result: 'test_policy'
+        result: 'test'
       }
     }));
 
@@ -54,7 +59,7 @@ let config = require('../../lib/config');
       test: {
         host: '127.0.0.1',
         url: '/wild-cats',
-        result: 'test_policy'
+        result: 'test'
       }
     }));
     it('should 404 for default host + regexPath not matched', helper.validate404({
@@ -70,7 +75,7 @@ let config = require('../../lib/config');
       test: {
         host: '127.0.0.1',
         url: '/admin',
-        result: 'test_policy'
+        result: 'test'
       }
     }));
     it('should 404 for default host and path not matched', helper.validate404({

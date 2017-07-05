@@ -1,33 +1,41 @@
+let mock = require('mock-require');
+mock('redis', require('fakeredis'));
+
 const testHelper = require('./routing.helper');
 let config = require('../../lib/config');
 
 describe('path resolution for specific and general domains', () => {
   let originalGatewayConfig = config.gatewayConfig;
   [undefined, 'example.com', 'sub.demo.com'].forEach(host => {
+    let helper = testHelper();
+
     let configTemplate = {
       http: { port: 9085 },
       apiEndpoints: {
         test: { paths: undefined, host }
       },
+      policies: ['test'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test'],
-          policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+          policies: { test: {} }
         }
       }
     };
-    describe('paths configuration without wildcards paths:/admin host:' + host, () => {
-      let helper = testHelper();
 
+    describe('paths configuration without wildcards paths:/admin host:' + host, () => {
       before('setup', () => {
+        helper.addPolicy('test', () => (req, res) => {
+          res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+        });
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin';
-        helper.setup({ fakeActions: ['test_policy'] })();
+        helper.setup();
       });
 
       after('cleanup', (done) => {
-        config.gatewayConfig = originalGatewayConfig;
         helper.cleanup();
+        config.gatewayConfig = originalGatewayConfig;
         done();
       });
 
@@ -40,7 +48,7 @@ describe('path resolution for specific and general domains', () => {
           test: {
             host,
             url,
-            result: 'test_policy'
+            result: 'test'
           }
         }));
       });
@@ -57,16 +65,19 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths configuration with  /admin/*', () => {
       let helper = testHelper();
+      helper.addPolicy('test', () => (req, res) => {
+        res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+      });
 
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/*';
-        helper.setup({ fakeActions: ['test_policy'] })();
+        helper.setup();
       });
 
       after('cleanup', (done) => {
-        config.gatewayConfig = originalGatewayConfig;
         helper.cleanup();
+        config.gatewayConfig = originalGatewayConfig;
         done();
       });
 
@@ -79,7 +90,7 @@ describe('path resolution for specific and general domains', () => {
           test: {
             host,
             url,
-            result: 'test_policy'
+            result: 'test'
           }
         }));
       });
@@ -96,16 +107,19 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths with one named parameter /admin/:id', () => {
       let helper = testHelper();
+      helper.addPolicy('test', () => (req, res) => {
+        res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+      });
 
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/:id';
-        helper.setup({ fakeActions: ['test_policy'] })();
+        helper.setup();
       });
 
       after('cleanup', (done) => {
-        config.gatewayConfig = originalGatewayConfig;
         helper.cleanup();
+        config.gatewayConfig = originalGatewayConfig;
         done();
       });
 
@@ -118,7 +132,7 @@ describe('path resolution for specific and general domains', () => {
           test: {
             host,
             url,
-            result: 'test_policy'
+            result: 'test'
           }
         }));
       });
@@ -135,16 +149,19 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths with one named parameter /admin/:group/:id', () => {
       let helper = testHelper();
+      helper.addPolicy('test', () => (req, res) => {
+        res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+      });
 
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/:group/:id';
-        helper.setup({ fakeActions: ['test_policy'] })();
+        helper.setup();
       });
 
       after('cleanup', (done) => {
-        config.gatewayConfig = originalGatewayConfig;
         helper.cleanup();
+        config.gatewayConfig = originalGatewayConfig;
         done();
       });
 
@@ -157,7 +174,7 @@ describe('path resolution for specific and general domains', () => {
           test: {
             host,
             url,
-            result: 'test_policy'
+            result: 'test'
           }
         }));
       });
@@ -174,16 +191,19 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths configuration with wildcard after slash or directory ["/admin","/admin/*"]', () => {
       let helper = testHelper();
+      helper.addPolicy('test', () => (req, res) => {
+        res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+      });
 
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = ['/admin', '/admin/*'];
-        helper.setup({ fakeActions: ['test_policy'] })();
+        helper.setup();
       });
 
       after('cleanup', (done) => {
-        config.gatewayConfig = originalGatewayConfig;
         helper.cleanup();
+        config.gatewayConfig = originalGatewayConfig;
         done();
       });
 
@@ -196,7 +216,7 @@ describe('path resolution for specific and general domains', () => {
           test: {
             host,
             url,
-            result: 'test_policy'
+            result: 'test'
           }
         }));
       });

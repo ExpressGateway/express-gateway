@@ -5,23 +5,19 @@
     }
   },
   "serviceEndpoints": {
-    "backend": {
-      "url": "http://localhost"
-    }
+    "backend": { "url": "http://localhost" }
   },
+  "policies": ["proxy"],
   "pipelines": {
     "apiPipeline": {
-      "apiEndpoints": [
-        "api"
-      ],
-      "policies": [{
-        "test": [{
-          "action": {
-            "name": "proxy",
-            "serviceEndpoint": "backend"
-          }
-        }]
-      }]
+      "apiEndpoints": [ "api" ],
+      "policies": [
+        {
+          "proxy": [
+            { "action": { "serviceEndpoint": "backend" } }
+          ]
+        }
+      ]
     }
   },
   "http": {

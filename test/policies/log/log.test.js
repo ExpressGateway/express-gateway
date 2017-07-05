@@ -1,6 +1,6 @@
-const logAction = require('../../../lib/actions/log').log;
-const {EgContextBase} = require('../../../lib/gateway/context');
-const logger = require('../../../lib/log').logPolicy;
+const logPolicy = require('../../../lib/policies/log').policy;
+const EgContextBase = require('../../../lib/gateway/context');
+const logger = require('../../../lib/policies/log/winston-logger');
 const sinon = require('sinon');
 const assert = require('assert');
 
@@ -21,7 +21,7 @@ describe('logging policy', () => {
   });
   it('should log url', () => {
     let next = sinon.spy();
-    let logMiddleware = logAction({
+    let logMiddleware = logPolicy({
       // eslint-disable-next-line no-template-curly-in-string
       message: '${req.url} ${egContext.req.method} ${res.test}'
     });
@@ -32,7 +32,7 @@ describe('logging policy', () => {
   });
   it('should fail to access global context', () => {
     let next = sinon.spy();
-    let logMiddleware = logAction({
+    let logMiddleware = logPolicy({
       // eslint-disable-next-line no-template-curly-in-string
       message: '${process.exit(1)}'
     });

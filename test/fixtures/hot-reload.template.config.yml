@@ -6,16 +6,16 @@ serviceEndpoints:
   backend:
       url: 'http://localhost:5998'
 
+policies:
+  - proxy
+
 pipelines:
   apiPipeline:
     apiEndpoints:
       - api
     policies:
-      -
-        test:
-          -
-            action:
-              name: proxy
-              serviceEndpoint: backend
+      - proxy:
+        - action:
+            serviceEndpoint: backend
 http:
   port: 5997

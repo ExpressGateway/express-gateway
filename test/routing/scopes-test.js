@@ -16,15 +16,16 @@ describe('When scopes defined for apiEndpoint', () => {
           ]
         }
       },
+      policies: ['test'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test_default'],
-          policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+          policies: { test: {} }
         }
       }
     };
 
-    helper.setup({ fakeActions: ['test_policy'] })();
+    helper.setup();
   });
 
   after('cleanup', (done) => {

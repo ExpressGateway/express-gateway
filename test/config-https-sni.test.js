@@ -77,6 +77,12 @@ describe('sni', () => {
   let servers, helper, originalGatewayConfig;
   before('setup', (done) => {
     originalGatewayConfig = config.gatewayConfig;
+
+    helper = testHelper();
+    helper.addPolicy('test', () => (req, res) => {
+      res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+    });
+
     config.gatewayConfig = {
       https: {
         port: 10441,
@@ -97,19 +103,16 @@ describe('sni', () => {
         }
       },
       apiEndpoints: { test: {} },
+      policies: ['test'],
       pipelines: {
         pipeline1: {
-          apiEndpoints: ['test'],
-          policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+          apiEndpoint: 'test',
+          policies: { test: {} }
         }
       }
     };
 
-    helper = testHelper();
-
-    helper.setup({
-      fakeActions: ['test_policy']
-    })()
+    helper.setup()
       .then(_servers => {
         servers = _servers;
 
@@ -158,8 +161,8 @@ describe('sni', () => {
       assert.equal(tc.actual.clientError, tc.expected.clientError);
       assert.equal(tc.actual.serverError, tc.expected.serverError);
     });
-    config.gatewayConfig = originalGatewayConfig;
     helper.cleanup();
+    config.gatewayConfig = originalGatewayConfig;
     done();
   });
 });

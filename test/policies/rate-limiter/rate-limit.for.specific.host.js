@@ -7,6 +7,9 @@ let originalGatewayConfig = config.gatewayConfig;
 
 describe('rate-limit policy only for example.com host', () => {
   let helper = testHelper();
+  helper.addPolicy('test', () => (req, res) => {
+    res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+  });
 
   before('setup', () => {
     config.gatewayConfig = {
@@ -14,25 +17,27 @@ describe('rate-limit policy only for example.com host', () => {
       apiEndpoints: {
         test_default: {}
       },
+      policies: ['rate-limit', 'test'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test_default'],
-          policies: [{
-            'rate-limit': [{
-              condition: {
-                name: 'hostMatch',
-                pattern: 'example.com'
-              },
-              action: { name: 'rate-limit', max: 1 }
-            }]
-          },
-            { test: [{ action: { name: 'test_policy' } }] }
+          policies: [
+            {
+              'rate-limit': {
+                condition: {
+                  name: 'hostMatch',
+                  pattern: 'example.com'
+                },
+                action: { max: 1 }
+              }
+            },
+            { test: [] }
           ]
         }
       }
     };
 
-    helper.setup({ fakeActions: ['test_policy'] })();
+    helper.setup();
   });
 
   after('cleanup', (done) => {

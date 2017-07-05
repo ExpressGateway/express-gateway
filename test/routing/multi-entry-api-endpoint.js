@@ -4,6 +4,9 @@ let config = require('../../lib/config');
 describe('Multi entry api endpoint with default host', () => {
   let helper = testHelper();
   let originalGatewayConfig = config.gatewayConfig;
+  helper.addPolicy('test', () => (req, res) => {
+    res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+  });
 
   before('setup', () => {
     config.gatewayConfig = {
@@ -15,15 +18,16 @@ describe('Multi entry api endpoint with default host', () => {
           paths: '/admin'
         }]
       },
+      policies: ['test'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['api'],
-          policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+          policies: { test: {} }
         }
       }
     };
 
-    helper.setup({ fakeActions: ['test_policy'] })();
+    helper.setup();
   });
 
   after('cleanup', (done) => {
@@ -40,7 +44,7 @@ describe('Multi entry api endpoint with default host', () => {
     test: {
       host: 'zu.io',
       url: '/wild-cats',
-      result: 'test_policy'
+      result: 'test'
     }
   }));
 
@@ -52,7 +56,7 @@ describe('Multi entry api endpoint with default host', () => {
     test: {
       host: '127.0.0.1',
       url: '/wild-cats',
-      result: 'test_policy'
+      result: 'test'
     }
   }));
   it('should 404 for default host + regexPath not matched', helper.validate404({
@@ -68,7 +72,7 @@ describe('Multi entry api endpoint with default host', () => {
     test: {
       host: '127.0.0.1',
       url: '/admin',
-      result: 'test_policy'
+      result: 'test'
     }
   }));
   it('should 404 for default host and path not matched', helper.validate404({

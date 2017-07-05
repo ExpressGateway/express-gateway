@@ -11,6 +11,8 @@ https:
 serviceEndpoints:
   backend:
     url: 'http://www.example.com'
+policies:
+  - proxy
 pipelines:
   - name: ecommerce
     apiEndpoints:
@@ -20,6 +22,4 @@ pipelines:
           - condition:
               name: always
             action:
-              name: proxy
               serviceEndpoint: backend
-              param2: test

@@ -13,16 +13,16 @@ let db = require('../../../lib/db')();
 let testHelper = require('../../routing/routing.helper');
 let config = require('../../../lib/config');
 let originalGatewayConfig = config.gatewayConfig;
+
 describe('Functional Tests keyAuth Policy', () => {
   let helper = testHelper();
+  helper.addPolicy('test', () => (req, res) => {
+    res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+  });
+
   let user, app;
   let proxyPolicy = {
-    proxy: [{
-      action: {
-        name: 'proxy',
-        serviceEndpoint: 'backend'
-      }
-    }]
+    proxy: { action: { serviceEndpoint: 'backend' } }
   };
   before('setup', () => {
     config.gatewayConfig = {
@@ -50,17 +50,17 @@ describe('Functional Tests keyAuth Policy', () => {
           scopes: ['unauthorizedScope']
         }
       },
+      policies: ['key-auth', 'proxy'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['authorizedEndpoint'],
           policies: [{
-            keyauth: [{
+            'key-auth': {
               action: {
-                name: 'keyauth',
                 apiKeyHeader: 'TEST_HEADER',
                 apiKeyHeaderScheme: 'SCHEME1'
               }
-            }]
+            }
           },
             proxyPolicy
           ]
@@ -68,7 +68,7 @@ describe('Functional Tests keyAuth Policy', () => {
         pipeline2: {
           apiEndpoints: ['unauthorizedEndpoint'],
           policies: [{
-            keyauth: [{
+            'key-auth': [{
               action: {
                 name: 'keyauth'
               }
@@ -80,7 +80,7 @@ describe('Functional Tests keyAuth Policy', () => {
         pipeline_by_query: {
           apiEndpoints: ['onlyQueryParamEndpoint'],
           policies: [{
-            keyauth: [{
+            'key-auth': [{
               action: {
                 name: 'keyauth',
                 apiKeyField: 'customApiKeyParam',
@@ -119,7 +119,7 @@ describe('Functional Tests keyAuth Policy', () => {
                 user = userRes;
                 return serverHelper.generateBackendServer(6057);
               }).then(() => {
-                helper.setup()()
+                helper.setup()
                   .then(apps => {
                     app = apps.app;
                   });

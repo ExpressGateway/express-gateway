@@ -1,8 +1,12 @@
-let helper = require('./routing.helper')();
+let testHelper = require('./routing.helper');
 let config = require('../../lib/config');
 
 describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
   let originalGatewayConfig;
+  let helper = testHelper();
+  helper.addPolicy('test', () => (req, res) => {
+    res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+  });
 
   before('setup', () => {
     originalGatewayConfig = config.gatewayConfig;
@@ -12,20 +16,21 @@ describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
       apiEndpoints: {
         'parrots': { hostRegex: '[a-z]{3}.parrots.com' }
       },
+      policies: ['test'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['parrots'],
-          policies: [{ test: [{ action: { name: 'parrot_policy' } }] }]
+          policies: { test: [] }
         }
       }
     };
 
-    helper.setup({ fakeActions: ['parrot_policy'] })();
+    helper.setup();
   });
 
   after('cleanup', (done) => {
-    config.gatewayConfig = originalGatewayConfig;
     helper.cleanup();
+    config.gatewayConfig = originalGatewayConfig;
     done();
   });
 
@@ -80,7 +85,7 @@ describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
         test: {
           host: 'abc.parrots.com',
           url: '/',
-          result: 'parrot_policy'
+          result: 'test'
         }
       }));
       it('abc.parrots.com', helper.validateSuccess({
@@ -91,7 +96,7 @@ describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
         test: {
           host: 'abc.parrots.com',
           url: '/',
-          result: 'parrot_policy'
+          result: 'test'
         }
       }));
       it('abc.parrots.com/pretty', helper.validateSuccess({
@@ -102,7 +107,7 @@ describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
         test: {
           host: 'abc.parrots.com',
           url: '/pretty',
-          result: 'parrot_policy'
+          result: 'test'
         }
       }));
     });

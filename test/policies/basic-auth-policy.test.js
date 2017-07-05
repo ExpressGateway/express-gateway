@@ -17,7 +17,7 @@ let testHelper = require('../routing/routing.helper');
 let config = require('../../lib/config');
 let originalGatewayConfig = config.gatewayConfig;
 
-describe('Functional Tests oAuth2.0 Policy', () => {
+describe('Functional Tests basic auth Policy', () => {
   let helper = testHelper();
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let user, app;
@@ -42,36 +42,23 @@ describe('Functional Tests oAuth2.0 Policy', () => {
           scopes: ['unauthorizedScope']
         }
       },
+      policies: ['basic-auth', 'proxy'],
       pipelines: {
         pipeline1: {
-          apiEndpoints: ['authorizedEndpoint'],
+          apiEndpoint: 'authorizedEndpoint',
           policies: [
-            { oauth: [{ action: { name: 'basic-auth' } }] },
+            { 'basic-auth': {} },
             {
-              proxy: [
-                {
-                  action: {
-                    name: 'proxy',
-                    serviceEndpoint: 'backend'
-                  }
-                }
-              ]
+              proxy: { action: { serviceEndpoint: 'backend' } }
             }
           ]
         },
         pipeline2: {
-          apiEndpoints: ['unauthorizedEndpoint'],
+          apiEndpoint: 'unauthorizedEndpoint',
           policies: [
-            { oauth: [{ action: { name: 'oauth' } }] },
+            { 'basic-auth': {} },
             {
-              proxy: [
-                {
-                  action: {
-                    name: 'proxy',
-                    serviceEndpoint: 'backend'
-                  }
-                }
-              ]
+              proxy: { action: { serviceEndpoint: 'backend' } }
             }
           ]
         }
@@ -122,7 +109,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
                     should.exist(userRes);
                     return serverHelper.generateBackendServer(6067)
                       .then(() => {
-                        helper.setup()()
+                        helper.setup()
                           .then(apps => {
                             app = apps.app;
                             done();
