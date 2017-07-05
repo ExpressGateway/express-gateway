@@ -88,6 +88,84 @@ apiEndpoints:
     paths: /v2/* # string or array of strings
 
 ```
+#### Segregation by HTTP methods
+```yml
+apiEndpoints:
+  help: # name, used as reference in pipeline
+    host: '*' # optional, by default accepts all hosts, same as '*'
+    paths: /help #optional, by default will serve all requests - same as '*'
+    methods: GET,POST # (comma separated string) will process only GET and POST requests, other type will 404
+  example: # name, used as reference in pipeline
+    host: '*.example.com'
+    paths: /help #optional, by default will serve all requests - same as '*'
+    methods:  # array syntax
+      - GET
+      - POST # will process only "GET /help" and "POST /help" requests, other type will 404
+```
+
+#### Multi entity api Endpoint
+```yml
+apiEndpoints:
+  help: # name, used as reference in pipeline
+    -     # this is now array not object
+      paths: /help 
+      methods: GET,POST # will process only GET and POST requests, other type will 404
+
+    -   # it is still help endpoint, just different entity
+      paths: /admin
+      methods: GET
+
+```
+
+#### Security restriction with scopes
+If you have basic-auth, oauth or key-auth policy you can restrict access to API endpoints using scopes. 
+
+scope is a string that represents permission.
+scope are defined using CLI 
+scopes are assigned to users or app using CLI
+If apiEndpoint is tagged with scopes and pipeline contains one of auth policies secutiry will be enforsed
+
+```yml
+apiEndpoints:
+  help: # name, used as reference in pipeline
+    -     # this is now array not object
+      paths: /help 
+      scopes: 
+        - support
+        - admin
+
+    -   # it is still help endpoint, just different entity
+      paths: /admin
+      scopes: 
+        - admin
+
+serviceEndpoints:
+  backend:
+    url: 'http://www.example.com'
+
+pipelines:
+  api: # name of pipeline
+    apiEndpoints: 
+      - help
+    policies:
+      -
+        key-auth:
+          -
+            action: # key-auth action of key-auth policy will enforce scopes
+              name: key-auth
+            # for /help only users or apps that have 'admin' or 'support' scope will be allowed 
+            # for /admin only users/apps with admin scopes will be allowed
+            # for other usets system will return 403
+            # for urls that do not match api endpoint 404 will be returned   
+      -
+        proxy:
+          -
+            action:
+              name: proxy
+              serviceEndpoint: backend
+```
+
+
 
 #### Host
 host - string that will be matched against the 'HOST' header of request
