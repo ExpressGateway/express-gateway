@@ -30,7 +30,7 @@
     "node": ">= 6.0.0"
   },
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node lib/index.js",
     "start-dev": "LOG_LEVEL=debug node src/index.js",
     "start:dist": "node dist/index.js",
     "lint": "eslint --fix .",
