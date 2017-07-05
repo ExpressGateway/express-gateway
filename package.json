@@ -36,7 +36,8 @@
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "pretest": "eslint .",
-    "test": "EG_CONFIG_DIR=test/config mocha --recursive test/*"
+    "test": "EG_CONFIG_DIR=test/config mocha --recursive test/*",
+    "dev-test": "EG_CONFIG_DIR=test/config mocha --recursive test/*"
   },
   "bin": {
     "eg": "./bin/index.js"
@@ -71,6 +72,7 @@
     "passport-local": "1.0.0",
     "passport-oauth2-client-password": "0.1.2",
     "redis": "2.7.1",
+    "uuid-base62": "^0.1.0",
     "vhost": "3.0.2",
     "winston": "2.3.1",
     "yargs": "8.0.2",
