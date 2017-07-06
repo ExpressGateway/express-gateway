@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 const eg = require('../../eg');
-
+const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -30,7 +30,6 @@ module.exports = class extends eg.Generator {
   _update () {
     const argv = this.argv;
     const config = this.eg.config.models;
-    const userService = this.eg.services.user;
 
     let propertyValues = [];
 
@@ -62,16 +61,10 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return userService
-      .get(argv.user_id)
-      .then(foundUser => {
-        if (foundUser) {
-          return foundUser;
-        }
-
-        return userService.find(argv.user_id);
-      })
-      .then(foundUser => {
+    return request
+      .get(this.adminApiBaseUrl + '/users/' + argv.user_id)
+      .then(res => {
+        let foundUser = res.body;
         if (!foundUser) {
           if (!argv.q) {
             this.log.error(`User not found: ${argv.user_id}`);
@@ -111,8 +104,13 @@ module.exports = class extends eg.Generator {
         return this.prompt(questions)
           .then(answers => {
             user = Object.assign(user, answers);
-            return userService.update(foundUser.id, user)
-              .then(() => userService.get(foundUser.id));
+            return request
+              .put(this.adminApiBaseUrl + '/users/' + argv.user_id)
+              .send(user)
+              .then(res => {
+                let updatedUser = res.body;
+                return updatedUser;
+              });
           });
       })
       .then(updatedUser => {

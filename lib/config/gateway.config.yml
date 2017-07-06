@@ -6,6 +6,11 @@ apiEndpoints:
 http:
   port: 8080
 
+admin:
+  port: 9876
+  hostname: localhost
+# backlog: 511  #   https://nodejs.org/api/http.html#http_server_listen_port_hostname_backlog_callback
+
 https:
   port: 9999
   tls: {}
