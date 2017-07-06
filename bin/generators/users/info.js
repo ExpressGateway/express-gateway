@@ -5,7 +5,7 @@ module.exports = class extends eg.Generator {
     super(args, opts);
 
     this.configureCommand({
-      command: 'info <user_id> [options]',
+      command: 'info <user_id|user_name> [options]',
       desc: 'Show details for a single user',
       builder: yargs =>
         yargs

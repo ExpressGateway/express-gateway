@@ -5,6 +5,7 @@ module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
 
+    this.stdin = process.stdin;
     this.configureCommand({
       command: 'create [options]',
       description: 'Create a user',
@@ -43,19 +44,19 @@ module.exports = class extends eg.Generator {
 
   _createFromStdin () {
     const argv = this.argv;
-    process.stdin.setEncoding('utf8');
+    this.stdin.setEncoding('utf8');
 
     let bufs = [];
 
-    process.stdin.on('readable', () => {
-      const chunk = process.stdin.read();
+    this.stdin.on('readable', () => {
+      const chunk = this.stdin.read();
 
       if (chunk) {
         bufs.push(chunk);
       }
     });
 
-    process.stdin.on('end', () => {
+    this.stdin.on('end', () => {
       let lines = bufs.join('').split('\n');
 
       let promises = lines
@@ -78,7 +79,7 @@ module.exports = class extends eg.Generator {
       let promisesCount = promises.length;
       let promisesCompleted = 0;
 
-      return new Promise(resolve => {
+      const p = new Promise(resolve => {
         promises.forEach(promise => {
           promise
               .then(newUser => {
@@ -108,6 +109,14 @@ module.exports = class extends eg.Generator {
                 }
               });
         });
+      });
+
+      this.emit('create-input', p);
+    });
+
+    return new Promise((resolve, reject) => {
+      this.on('create-input', promise => {
+        promise.then(resolve).catch(reject);
       });
     });
   }
@@ -173,7 +182,9 @@ module.exports = class extends eg.Generator {
 
       let configProperties = Object.assign({ username: { isRequired: true } },
                 models.users.properties);
-      for (const [prop, descriptor] of Object.entries(configProperties)) {
+
+      Object.keys(configProperties).forEach(prop => {
+        const descriptor = configProperties[prop];
         if (!user[prop]) {
           if (!shouldPrompt && descriptor.isRequired) {
             shouldPrompt = true;
@@ -181,7 +192,7 @@ module.exports = class extends eg.Generator {
 
           missingProperties.push({ name: prop, descriptor: descriptor });
         }
-      }
+      });
 
       if (shouldPrompt) {
         questions = missingProperties.map(p => {
@@ -202,7 +213,7 @@ module.exports = class extends eg.Generator {
 
     if (questions.length > 0) {
       // handle CTRL-C
-      process.stdin.on('data', key => {
+      this.stdin.on('data', key => {
         if (key.toString('utf8') === '\u0003') {
           this.eg.exit();
         }
