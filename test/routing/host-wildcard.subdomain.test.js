@@ -4,30 +4,33 @@
  describe('exact host name configuration', () => {
    let helper = testHelper();
    let originalGatewayConfig;
+   originalGatewayConfig = config.gatewayConfig;
+   helper.addPolicy('test', () => (req, res) => {
+     res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+   });
 
    before('setup', () => {
-     originalGatewayConfig = config.gatewayConfig;
-
      config.gatewayConfig = {
        http: { port: 9084 },
        apiEndpoints: {
          'test_domain': { 'host': '*.acme.com' }, // path defaults to *
          'test_second_level_domain': { 'host': '*.*.example.com' } // path defaults to *
        },
+       policies: ['test'],
        pipelines: {
          pipeline1: {
            apiEndpoints: ['test_domain', 'test_second_level_domain'],
-           policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+           policies: { test: {} }
          }
        }
      };
 
-     helper.setup({ fakeActions: ['test_policy'] })();
+     helper.setup();
    });
 
    after('cleanup', (done) => {
-     config.gatewayConfig = originalGatewayConfig;
      helper.cleanup();
+     config.gatewayConfig = originalGatewayConfig;
      done();
    });
 
@@ -39,7 +42,7 @@
      test: {
        host: 'abc.acme.com',
        url: '/',
-       result: 'test_policy'
+       result: 'test'
      }
    }));
 
@@ -51,7 +54,7 @@
      test: {
        host: 'abc.acme.com',
        url: '/',
-       result: 'test_policy'
+       result: 'test'
      }
    }));
    it('sub.abc.example.com', helper.validateSuccess({
@@ -62,7 +65,7 @@
      test: {
        host: 'sub.abc.example.com',
        url: '/',
-       result: 'test_policy'
+       result: 'test'
      }
    }));
    it('should not serve sub.abc.acme.com ', helper.validate404({
@@ -85,7 +88,7 @@
      test: {
        host: 'abc.acme.com',
        url: '/pretty',
-       result: 'test_policy'
+       result: 'test'
      }
    }));
    it('should not load root domain acme.com/', helper.validate404({

@@ -10,7 +10,7 @@ const port2 = 5999;
 let config = require('../lib/config');
 
 ['json', 'yml'].forEach(function (configType) {
-  let configDirectory, app1, app2, appTarget;
+  let configDirectory, app1, app2, appTarget, httpsApp;
   let originalGatewayConfig = config.gatewayConfig;
   let configTemplate = fileHelper.read(path.join(__dirname, 'fixtures/hot-reload.template.config.' + configType), configType);
   describe('hot-reload ' + configType, () => {
@@ -36,7 +36,17 @@ let config = require('../lib/config');
         })
         .then(apps => {
           appTarget = apps.app;
+          httpsApp = apps.httpsApp;
         });
+    });
+
+    after(() => {
+      config.gatewayConfig = originalGatewayConfig;
+      fileHelper.save(originalGatewayConfig, path.join(__dirname, 'config/gateway.config.yml'), 'yml');
+      app1.close();
+      app2.close();
+      appTarget.close();
+      httpsApp && httpsApp.close();
     });
 
     it('should proxy to server on ' + port1, (done) => {
@@ -67,13 +77,6 @@ let config = require('../lib/config');
           assert.ok(res.text.indexOf(port2) >= 0);
           done();
         });
-    });
-
-    after(() => {
-      fileHelper.save(originalGatewayConfig, path.join(__dirname, 'config/gateway.config.yml'), 'yml');
-      app1.close();
-      app2.close();
-      appTarget.close();
     });
   });
 });

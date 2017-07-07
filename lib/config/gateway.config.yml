@@ -1,30 +1,25 @@
 apiEndpoints:
   users:
     host: '*'
-    paths: ['/users/*']
-
+    paths:
+      - /users/*
 http:
   port: 8080
-
 https:
   port: 9999
   tls: {}
-
 serviceEndpoints:
   backend:
     url: 'http://www.example.com'
+policies:
+  - proxy
 pipelines:
-  -
-    name: ecommerce
+  - name: ecommerce
     apiEndpoints:
       - users
     policies:
-      -     # this is array of policies
-        proxy:    # this is policy name
-          -       # policy can multiple condition/action steps
-            condition:    # optional condition, will not execution of actions if not matched
+      - proxy:
+          - condition:
               name: always
-            action:       #
-              name: proxy   # action name
-              serviceEndpoint: backend  # action parameters
-              param2: test  # action parameters
+            action:
+              serviceEndpoint: backend

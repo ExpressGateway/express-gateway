@@ -1,7 +1,7 @@
 let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-const {EgContextBase} = require('../lib/gateway/context');
+const EgContextBase = require('../lib/gateway/context');
 require('../lib/conditions').init();
 const express = require('express');
 const assert = require('chai').assert;

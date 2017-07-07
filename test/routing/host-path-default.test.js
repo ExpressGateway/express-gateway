@@ -4,6 +4,9 @@ let config = require('../../lib/config');
 // there are several configuration ways to listen to all hosts
 describe('When uses defaults (capture all hosts and paths)', () => {
   let helper = testHelper();
+  helper.addPolicy('test', () => (req, res) => {
+    res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+  });
   let originalGatewayConfig;
 
   before('setup', () => {
@@ -14,20 +17,21 @@ describe('When uses defaults (capture all hosts and paths)', () => {
       apiEndpoints: {
         test_default: {}
       },
+      policies: ['test'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test_default'],
-          policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+          policies: { test: [] }
         }
       }
     };
 
-    helper.setup({ fakeActions: ['test_policy'] })();
+    helper.setup();
   });
 
   after('cleanup', (done) => {
-    config.gatewayConfig = originalGatewayConfig;
     helper.cleanup();
+    config.gatewayConfig = originalGatewayConfig;
     done();
   });
 
@@ -40,7 +44,7 @@ describe('When uses defaults (capture all hosts and paths)', () => {
       test: {
         host: 'zu.io',
         url,
-        result: 'test_policy'
+        result: 'test'
       }
     }));
 
@@ -52,7 +56,7 @@ describe('When uses defaults (capture all hosts and paths)', () => {
       test: {
         host: '127.0.0.1',
         url,
-        result: 'test_policy'
+        result: 'test'
       }
     }));
   });

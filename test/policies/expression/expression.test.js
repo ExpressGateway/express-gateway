@@ -1,5 +1,5 @@
-const expressionAction = require('../../../lib/actions/expression').expression;
-const {EgContextBase} = require('../../../lib/gateway/context');
+const expressionPolicy = require('../../../lib/policies/expression').policy;
+const EgContextBase = require('../../../lib/gateway/context');
 const assert = require('assert');
 
 describe('expression action', () => {
@@ -14,7 +14,7 @@ describe('expression action', () => {
   req.egContext.req = req;
   req.egContext.res = res;
   it('should execute code against eg context', (done) => {
-    let expressionMiddleware = expressionAction({
+    let expressionMiddleware = expressionPolicy({
       jscode: 'req.url = req.url + "/67" ; res.test = res.test + 68;'
     });
 

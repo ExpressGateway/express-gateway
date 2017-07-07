@@ -1,6 +1,6 @@
 'use strict';
 const express = require('express');
-const logger = require('../../lib/log').test;
+const logger = require('../../lib/logger').test;
 
 function generateBackendServer (port) {
   let app = express();

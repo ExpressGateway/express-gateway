@@ -5,6 +5,9 @@ let originalGatewayConfig = config.gatewayConfig;
 [undefined, 'sample.com', 'sub.acme.com'].forEach(host => {
   describe('pathRegex resolution for host:' + host, () => {
     let helper = testHelper();
+    helper.addPolicy('test', () => (req, res) => {
+      res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+    });
 
     before('setup', () => {
       config.gatewayConfig = {
@@ -12,20 +15,21 @@ let originalGatewayConfig = config.gatewayConfig;
         apiEndpoints: {
           test: { pathRegex: '/id-[0-9]{3}', host }
         },
+        policies: ['test'],
         pipelines: {
           pipeline1: {
             apiEndpoints: ['test'],
-            policies: [{ test: [{ action: { name: 'test_policy' } }] }]
+            policies: { test: {} }
           }
         }
       };
 
-      helper.setup({ fakeActions: ['test_policy'] })();
+      helper.setup();
     });
 
     after('cleanup', (done) => {
-      config.gatewayConfig = originalGatewayConfig;
       helper.cleanup();
+      config.gatewayConfig = originalGatewayConfig;
       done();
     });
 
@@ -37,7 +41,7 @@ let originalGatewayConfig = config.gatewayConfig;
       test: {
         host,
         url: '/id-123',
-        result: 'test_policy'
+        result: 'test'
       }
     }));
     it('mathing regex animals.com/id-123/', helper.validateSuccess({
@@ -48,7 +52,7 @@ let originalGatewayConfig = config.gatewayConfig;
       test: {
         host,
         url: '/id-123/',
-        result: 'test_policy'
+        result: 'test'
       }
     }));
     it('mathing regex animals.com/id-123/cat', helper.validateSuccess({
@@ -59,7 +63,7 @@ let originalGatewayConfig = config.gatewayConfig;
       test: {
         host,
         url: '/id-123/cat',
-        result: 'test_policy'
+        result: 'test'
       }
     }));
   });
