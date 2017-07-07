@@ -1,5 +1,4 @@
 const eg = require('../../eg');
-const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -31,10 +30,8 @@ module.exports = class extends eg.Generator {
       let self = this;
       let errors = [];
       appIds.forEach(function (appId) {
-        request
-          .del(self.adminApiBaseUrl + '/apps/' + appId)
-          .then(res => {
-            let app = res.body;
+        return this.sdk.apps.remove(appId)
+          .then(app => {
             removalsCompleted++;
 
             if (app) {

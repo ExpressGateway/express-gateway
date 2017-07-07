@@ -1,5 +1,4 @@
 const eg = require('../../eg');
-const request = require('superagent');
 
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
@@ -45,11 +44,6 @@ module.exports = class extends eg.Generator {
   }
   _list (options) {
     options = options || {};
-
-    return request
-          .get(this.adminApiBaseUrl + '/apps')
-          .then(res => {
-            return res.body && res.body.apps;
-          });
+    return this.sdk.users.list();
   }
 };

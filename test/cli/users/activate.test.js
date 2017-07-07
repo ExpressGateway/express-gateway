@@ -45,7 +45,7 @@ describe('eg users activate', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(message);
         };
         generator.log.ok = message => {
           output = message;

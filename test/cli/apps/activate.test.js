@@ -1,75 +1,62 @@
 const assert = require('assert');
-
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
-const db = require('../../../lib/db')();
 const environment = require('../../fixtures/cli/environment');
-const redisConfig = require('../../../lib/config').systemConfig.db.redis;
-const userService = require('../../../lib/services').user;
-const appService = require('../../../lib/services').application;
-
+const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:activate';
+const idGen = require('uuid-base62');
 
 describe('eg apps activate', () => {
-  let program, env, userId, appId, appId2;
-
+  let program, env, user, app1, app2;
   before(() => {
     ({ program, env } = environment.bootstrap());
+    return adminHelper.start();
   });
+  after(() => adminHelper.stop());
 
   beforeEach(() => {
     env.prepareHijack();
-    return userService.insert({
-      username: 'lala',
+    return adminHelper.sdk.users.create({
+      username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(user => {
-      userId = user.id;
-      return appService.insert({
-        name: 'appy',
+    .then(createdUser => {
+      user = createdUser;
+
+      return adminHelper.sdk.apps.create(user.id, {
+        name: 'appy1',
         redirectUri: 'http://localhost:3000/cb'
-      }, userId);
+      });
     })
-    .then(app => {
-      appId = app.id;
-      return appService.insert({
+    .then(createdApp => {
+      app1 = createdApp;
+      return adminHelper.sdk.apps.create(user.id, {
         name: 'appy2',
-        redirectUri: 'http://localhost:3002/cb'
-      }, userId);
+        redirectUri: 'http://localhost:3000/cb'
+      });
     })
-    .then(app => {
-      appId2 = app.id;
-    });
+    .then(createdApp => {
+      app2 = createdApp;
+      return adminHelper.sdk.apps.create(user.id, {
+        name: 'appy2',
+        redirectUri: 'http://localhost:3000/cb'
+      });
+    })
+    .then(() => adminHelper.sdk.apps.deactivate(app1.id))
+    .then(() => adminHelper.sdk.apps.deactivate(app2.id));
   });
 
-  afterEach(done => {
+  afterEach(() => {
     env.resetHijack();
-
-    db.flushdbAsync()
-    .then(didSucceed => {
-      if (!didSucceed) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to flush the database');
-      }
-
-      done();
-    })
-    .catch(err => {
-      assert(!err);
-      done();
-    });
+    return adminHelper.reset();
   });
 
   it('activates an app', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(message);
         };
         generator.log.ok = message => {
           output = message;
@@ -77,85 +64,71 @@ describe('eg apps activate', () => {
       });
 
       generator.once('end', () => {
-        db.hgetallAsync(`${redisConfig.namespace}-application:${appId}`)
+        return adminHelper.sdk.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.isActive, 'true');
-            assert.equal(output, `Activated ${appId}`);
-
-            assert.equal(error, null);
-
+            assert.equal(app.isActive, true);
+            assert.equal(output, 'Activated ' + app1.id);
             done();
-          });
+          }).catch(done);
       });
     });
 
-    env.argv = program.parse(`apps activate ${appId}`);
+    env.argv = program.parse(`apps activate ${app1.id}`);
   });
 
   it('activates multiple apps', done => {
     env.hijack(namespace, generator => {
-      let output = [];
-      let error = null;
+      let output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(message);
         };
         generator.log.ok = message => {
-          output.push(message);
+          output[message] = true;
         };
       });
 
       generator.once('end', () => {
-        db.hgetallAsync(`${redisConfig.namespace}-application:${appId}`)
-          .then(app => {
-            assert.equal(app.isActive, 'true');
-            assert.equal(output[0], `Activated ${appId}`);
+        return adminHelper.sdk.apps.list()
+          .then(data => {
+            let apps = data.apps;
+            assert.equal(apps[0].isActive, true);
+            assert.equal(apps[1].isActive, true);
 
-            assert.equal(error, null);
-
-            return db.hgetallAsync(`${redisConfig.namespace}-application:${appId2}`);
-          })
-          .then(app => {
-            assert.equal(app.isActive, 'true');
-            assert.equal(output[1], `Activated ${appId2}`);
-
-            assert.equal(error, null);
+            assert.ok(output['Activated ' + app1.id]);
+            assert.ok(output['Activated ' + app2.id]);
+            assert.equal(Object.keys(output).length, 2);
             done();
           });
       });
     });
-
-    env.argv = program.parse(`apps activate ${appId} ${appId2}`);
+    env.argv = program.parse(`apps activate ${app1.id} ${app2.id}`);
   });
 
   it('prints only the app id when using the --quiet flag', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(message);
         };
-        generator.log = message => {
+        generator.log.ok = message => {
           output = message;
         };
       });
 
       generator.once('end', () => {
-        db.hgetallAsync(`${redisConfig.namespace}-application:${appId}`)
+        return adminHelper.sdk.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.isActive, 'true');
-            assert.equal(output, appId);
-
-            assert.equal(error, null);
-
+            assert.equal(app.isActive, true);
+            assert.equal(output, app1.id);
             done();
           });
       });
     });
 
-    env.argv = program.parse(`apps activate ${appId} -q`);
+    env.argv = program.parse(`apps activate ${app1.id} -q`);
   });
 });

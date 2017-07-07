@@ -1,6 +1,5 @@
 const chalk = require('chalk');
 const eg = require('../../eg');
-const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -93,7 +92,7 @@ module.exports = class extends eg.Generator {
       this.eg.exit();
     })
     .catch(err => {
-      this.log.error(err.message);
+      this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
       this.eg.exit();
     });
   };
@@ -240,14 +239,7 @@ module.exports = class extends eg.Generator {
     return this.prompt(questions)
         .then(answers => {
           app = Object.assign(app, answers);
-          app.userId = options.user;
-
-          return request
-          .post(this.adminApiBaseUrl + '/apps')
-          .send(app)
-          .then(res => {
-            return res.body;
-          });
+          return this.sdk.apps.create(options.user, app);
         });
   };
 };

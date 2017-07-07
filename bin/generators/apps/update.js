@@ -1,6 +1,5 @@
 const chalk = require('chalk');
 const eg = require('../../eg');
-const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -59,18 +58,8 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return request
-      .get(this.adminApiBaseUrl + '/apps/' + argv.app_id)
-      .then(res => {
-        let foundApp = res.body;
-        if (!foundApp) {
-          if (!argv.q) {
-            this.log.error(`App not found: ${argv.app_id}`);
-          }
-          this.eg.exit();
-          return;
-        }
-
+    return this.sdk.users.info(argv.app_id)
+      .then(foundApp => {
         let questions = [];
 
         let shouldPrompt = false;
@@ -116,9 +105,7 @@ module.exports = class extends eg.Generator {
         return this.prompt(questions)
           .then(answers => {
             app = Object.assign(app, answers);
-            return request
-              .put(this.adminApiBaseUrl + '/apps/' + argv.app_id)
-              .send(app);
+            return this.sdk.apps.update(argv.app_id, app);
           })
           .then(res => {
             if (!argv.q) {
@@ -133,6 +120,11 @@ module.exports = class extends eg.Generator {
             this.log.error(err.message);
             this.eg.exit();
           });
+      }).catch(() => {
+        if (!argv.q) {
+          this.log.error(`App not found: ${argv.app_id}`);
+        }
+        this.eg.exit();
       });
   }
 };

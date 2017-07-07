@@ -1,5 +1,4 @@
 const eg = require('../../eg');
-const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -28,39 +27,24 @@ module.exports = class extends eg.Generator {
       ? argv.app_id
       : [argv.app_id];
 
-    const self = this;
-    return new Promise(resolve => {
-      const activateCount = appIds.length;
-      let activationsCompleted = 0;
+    return Promise.all(appIds.map((appId) => {
+      return this.sdk.apps.activate(appId)
+        .then(res => {
+          let status = res.status;
 
-      appIds.forEach(function (appId) {
-        request
-          .put(self.adminApiBaseUrl + '/apps/' + appId + '/status')
-          .send({status: true})
-          .then(res => {
-            let status = res.body.status;
-            activationsCompleted++;
-
-            if (status) {
-              self.log.ok(`${status} ${appId}`);
+          if (status) {
+            if (argv.q) {
+              this.log.ok(appId);
+            } else {
+              this.log.ok(`${status} ${appId}`);
             }
-
-            if (activationsCompleted === activateCount) {
-              self.eg.exit();
-              resolve(); // don't propagate errors
-            }
-          })
-          .catch(err => {
-            activationsCompleted++;
-
-            self.log.error(err.message);
-
-            if (activationsCompleted === activateCount) {
-              self.eg.exit();
-              resolve(); // don't propagate errors
-            }
-          });
-      });
+          }
+        })
+        .catch(err => {
+          this.log.error(err.message);
+        });
+    })).then(() => {
+      this.eg.exit();
     });
   }
 };
