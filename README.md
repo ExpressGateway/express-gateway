@@ -54,7 +54,9 @@ Need help or have a question?
 
 #### License
 
-[Apache-2.0 License](https://github.com/expressgateway/express-gateway/blob/master/LICENSE.md)  Copyright © LunchBadger, Inc.
+[Apache-2.0 License](https://github.com/expressgateway/express-gateway/blob/master/LICENSE.md)  
+
+Copyright © LunchBadger, Inc.
 
 [comment]: <> (Links Section)
 [npm-version-badge]: https://img.shields.io/npm/v/express-gateway.svg
