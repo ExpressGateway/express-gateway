@@ -9,10 +9,6 @@ module.exports = class extends eg.Generator {
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} activate [options] <app_id..>`)
-          .boolean('q')
-          .describe('q', 'Only show app ID')
-          .alias('q', 'quiet')
-          .group(['q', 'h'], 'Options:')
     });
   }
 

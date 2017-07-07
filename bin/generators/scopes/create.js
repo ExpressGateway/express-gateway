@@ -1,5 +1,4 @@
 const eg = require('../../eg');
-const request = require('superagent');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -11,10 +10,6 @@ module.exports = class extends eg.Generator {
         yargs
         .usage(`Usage: $0 ${process.argv[2]} create [options] <scope..>`)
         .example(`$0 ${process.argv[2]} create scope_name`)
-        .group(['h'], 'Options:')
-        .check((args, opts) => {
-          return true;
-        })
     });
   }
 
@@ -24,40 +19,14 @@ module.exports = class extends eg.Generator {
       ? argv.scope
       : [argv.scope];
 
-    return new Promise((resolve, reject) => {
-      const removalCount = scopes.length;
-      let removalsCompleted = 0;
-
-      let errors = [];
-      scopes.forEach((scope) => {
-        return request
-          .post(this.adminApiBaseUrl + '/scopes')
-          .send({
-            scope: argv.scope
-          })
-          .then(res => {
-            removalsCompleted++;
-            this.log.ok(`Created scope ${scope}`);
-            if (removalsCompleted === removalCount) {
-              this.eg.exit();
-              if (errors.length === 0) {
-                resolve();
-              } else {
-                reject(errors);
-              }
-            }
-            return res.body;
-          })
-          .catch(err => {
-            removalsCompleted++;
-            this.log.error(err.message);
-            errors.push(err);
-            if (removalsCompleted === removalCount) {
-              this.eg.exit();
-              reject(errors);
-            }
-          });
-      });
-    });
+    return Promise.all(scopes.map((scope) => {
+      return this.sdk.scopes.create(argv.scope)
+        .then(res => {
+          this.log.ok(`Created scope ${scope}`);
+        })
+        .catch(err => {
+          this.log.error(err.message);
+        });
+    }));
   };
 };

@@ -13,7 +13,7 @@ let config = require('../lib/config');
   let configDirectory, app1, app2, appTarget, httpsApp;
   let originalGatewayConfig = config.gatewayConfig;
   let configTemplate = fileHelper.read(path.join(__dirname, 'fixtures/hot-reload.template.config.' + configType), configType);
-  describe.skip('hot-reload ' + configType, () => {
+  describe('hot-reload ' + configType, () => {
     before('start servers', () => {
       serverHelper.generateBackendServer(port1)
         .then(apps => {

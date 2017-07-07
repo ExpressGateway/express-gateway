@@ -159,7 +159,7 @@ describe('User service tests', function () {
             firstname: user.firstname,
             lastname: user.lastname,
             email: user.email,
-            isActive: 'true',
+            isActive: true,
             username: user.username
           };
           should.exist(user);

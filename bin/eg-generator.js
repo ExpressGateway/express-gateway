@@ -7,8 +7,6 @@ module.exports = class EgGenerator extends Generator {
     this._configuration = null;
     this.eg = this.env.eg;
     this.argv = this.env.argv;
-    let host = config.gatewayConfig.admin.hostname || 'localhost';
-    this.adminApiBaseUrl = `http://${host}:${config.gatewayConfig.admin.port}`;
     this.sdk = require('../lib/sdk')(config.gatewayConfig.admin);
   }
 
@@ -38,10 +36,15 @@ module.exports = class EgGenerator extends Generator {
   // configuration defaults
   _wrapConfig (yargs) {
     return yargs
+      .boolean(['no-color', 'q'])
+      .describe('no-color', 'Disable color in prompts')
       .string('config-dir')
       .describe('config-dir', 'Directory for express-gateway configuration')
       .nargs('config-dir', 1)
+      .describe('q', 'Only show ID')
       .group(['config-dir'], 'Configure:')
+      .group(['no-color', 'q'], 'Options:')
+      .alias('q', 'quiet')
       .help('h');
   }
 };

@@ -9,10 +9,6 @@ module.exports = class extends eg.Generator {
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} remove [options] <app_id..>`)
-          .boolean('q')
-          .describe('q', 'Only show app ID')
-          .alias('q', 'quiet')
-          .group(['q', 'h'], 'Options:')
     });
   }
 
@@ -23,46 +19,20 @@ module.exports = class extends eg.Generator {
       ? argv.app_id
       : [argv.app_id];
 
-    return new Promise((resolve, reject) => {
-      const removalCount = appIds.length;
-      let removalsCompleted = 0;
-
-      let self = this;
-      let errors = [];
-      appIds.forEach(function (appId) {
-        return this.sdk.apps.remove(appId)
+    return Promise.all(appIds.map((appId) => {
+      return this.sdk.apps.remove(appId)
           .then(app => {
-            removalsCompleted++;
-
             if (app) {
               if (!argv.q) {
-                self.log.ok(`Removed ${appId}`);
+                this.log.ok(`Removed ${appId}`);
               } else {
-                self.log(app.id);
-              }
-            }
-
-            if (removalsCompleted === removalCount) {
-              self.eg.exit();
-              if (errors.length === 0) {
-                resolve();
-              } else {
-                reject(errors);
+                this.log(appId);
               }
             }
           })
           .catch(err => {
-            removalsCompleted++;
-
-            self.log.error(err.message);
-            errors.push(err);
-
-            if (removalsCompleted === removalCount) {
-              self.eg.exit();
-              reject(errors);
-            }
+            this.log.error(err.message);
           });
-      });
-    });
+    })).then(() => this.eg.exit());
   }
 };

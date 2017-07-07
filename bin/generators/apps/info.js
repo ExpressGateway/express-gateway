@@ -9,20 +9,15 @@ module.exports = class extends eg.Generator {
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} info [options] <app_id>`)
-          .group(['h'], 'Options:')
     });
   }
 
   prompting () {
-    const argv = this.argv;
-
-    return this.sdk.apps.info(argv.user_id)
-      .then(res => {
-        let app = res.body;
+    return this.sdk.apps.info(this.argv.app_id)
+      .then(app => {
         if (app) {
           this.log(JSON.stringify(app, null, 2));
         }
-
         this.eg.exit();
       })
       .catch(err => {

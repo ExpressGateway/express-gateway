@@ -39,7 +39,7 @@ describe('eg apps create', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          done(message);
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -73,7 +73,7 @@ describe('eg apps create', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          done(message);
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -107,7 +107,7 @@ describe('eg apps create', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          done(message);
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -137,7 +137,7 @@ describe('eg apps create', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          done(message);
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -172,7 +172,7 @@ describe('eg apps create', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          done(message);
+          done(new Error(message));
         };
         generator.log = message => {
           output = message;
@@ -208,7 +208,7 @@ describe('eg apps create', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          done(message);
+          done(new Error(message));
         };
         generator.log = message => {
           output = message;
@@ -275,19 +275,16 @@ describe('eg apps create', () => {
 
   it('prints error on invalid user', done => {
     const app = {};
-    let error;
     env.hijack(namespace, generator => {
-      let output = null;
-
       generator.once('run', () => {
         generator.log = message => {
-          output = message;
+          done(new Error(message));
         };
         generator.log.error = message => {
-          done(message);
+          assert.equal(message, 'Failed to insert application: name is required');
         };
         generator.log.ok = message => {
-          output = message;
+          done(new Error(message));
         };
 
         generator.stdin = new PassThrough();
@@ -296,9 +293,6 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(error, 'Failed to insert application: invalid application properties');
-        assert.equal(output, null);
-
         done();
       });
     });

@@ -9,18 +9,10 @@ module.exports = class extends eg.Generator {
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} deactivate [options] <app_id..>`)
-          .boolean('q')
-          .describe('q', 'Only show app ID')
-          .alias('q', 'quiet')
-          .group(['q', 'h'], 'Options:')
     });
   }
 
   prompting () {
-    return this._deactivate();
-  }
-
-  _deactivate () {
     const argv = this.argv;
 
     const appIds = Array.isArray(argv.app_id)

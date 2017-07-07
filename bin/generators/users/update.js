@@ -12,13 +12,9 @@ module.exports = class extends eg.Generator {
           .usage(`Usage: $0 ${process.argv[2]} update <user_id|user_name> [options]`)
           .example(`$0 ${process.argv[2]} update jdoe -p 'firstname=John'`)
           .string('p')
-          .boolean(['q', 'no-color'])
           .describe('p', 'User property in the form [-p \'foo=bar\']')
-          .describe('q', 'Only show user ID')
-          .describe('no-color', 'Disable color in prompts')
           .alias('p', 'property')
-          .alias('q', 'quiet')
-          .group(['p', 'q', 'no-color', 'h'], 'Options:')
+          .group(['p'], 'Options:')
     });
   }
 

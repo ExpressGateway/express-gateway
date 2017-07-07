@@ -6,16 +6,11 @@ module.exports = class extends eg.Generator {
 
     this.configureCommand({
       command: 'list [options]',
-      description: 'list users',
+      description: 'List users',
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} list [options]`)
           .example(`$0 ${process.argv[2]} list`)
-          .string('p')
-          .boolean(['q'])
-          .describe('q', 'Only show IDs of users')
-          .alias('q', 'quiet')
-          .group(['q', 'no-color', 'h'], 'Options:')
     });
   }
 

@@ -19,14 +19,11 @@ module.exports = class extends eg.Generator {
             ` | $0 ${process.argv[2]} create --stdin`)
           .example(`cat all_users.jsonl | $0 ${process.argv[2]} create --stdin`)
           .string('p')
-          .boolean(['q', 'stdin', 'no-color'])
+          .boolean(['stdin'])
           .describe('p', 'User property in the form [-p \'foo=bar\']')
-          .describe('q', 'Only show user ID')
           .describe('stdin', 'Import newline-delimited JSON via standard input')
-          .describe('no-color', 'Disable color in prompts')
           .alias('p', 'property')
-          .alias('q', 'quiet')
-          .group(['p', 'stdin', 'q', 'no-color', 'h'], 'Options:')
+          .group(['p', 'stdin'], 'Options:')
     });
   }
 
@@ -54,28 +51,28 @@ module.exports = class extends eg.Generator {
       this.stdin.on('end', () => {
         let lines = bufs.join('').split('\n');
         let promises = lines
-            .filter(line => line.length > 0)
-            .map((line, index) => {
-              let user = JSON.parse(line);
+          .filter(line => line.length > 0)
+          .map((line, index) => {
+            let user = JSON.parse(line);
 
-              const options = {
-                skipPrompt: true,
-                isLast: index === lines.length - 1
-              };
+            const options = {
+              skipPrompt: true,
+              isLast: index === lines.length - 1
+            };
 
-              return this._insert(user, options).then(newUser => {
-                if (newUser) {
-                  if (!argv.q) {
-                    this.log.ok(`Created ${newUser.username}`);
-                  } else {
-                    this.log(newUser.id);
-                  }
+            return this._insert(user, options).then(newUser => {
+              if (newUser) {
+                if (!argv.q) {
+                  this.log.ok(`Created ${newUser.username}`);
+                } else {
+                  this.log(newUser.id);
                 }
-              })
-              .catch(err => {
-                this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-              });
+              }
+            })
+            .catch(err => {
+              this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
             });
+          });
 
         let p = Promise.all(promises);
         resolve(p);

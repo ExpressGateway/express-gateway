@@ -19,16 +19,13 @@ module.exports = class extends eg.Generator {
             ` | $0 ${process.argv[2]} create --stdin`)
           .example(`cat all_apps.jsonl | $0 ${process.argv[2]} create --stdin`)
           .string(['p', 'u'])
-          .boolean(['q', 'stdin', 'no-color'])
+          .boolean(['stdin'])
           .describe('u', 'User ID or username associated with the app')
           .describe('p', 'App property in the form [-p \'foo=bar\']')
-          .describe('q', 'Only show app ID')
           .describe('stdin', 'Import newline-delimited JSON via standard input')
-          .describe('no-color', 'Disable color in prompts')
           .alias('u', 'user').nargs('u', 1)
           .alias('p', 'property')
-          .alias('q', 'quiet')
-          .group(['u', 'p', 'stdin', 'q', 'no-color', 'h'], 'Options:')
+          .group(['u', 'p', 'stdin'], 'Options:')
           .check((args, opts) => {
             if (!args.stdin && !args.user) {
               throw new Error('must include --stdin or -u, --user');
@@ -110,11 +107,10 @@ module.exports = class extends eg.Generator {
         bufs.push(chunk);
       }
     });
-
-    this.stdin.on('end', () => {
-      let lines = bufs.join('').split('\n');
-
-      let promises = lines
+    return new Promise((resolve, reject) => {
+      this.stdin.on('end', () => {
+        let lines = bufs.join('').split('\n');
+        let promises = lines
           .filter(line => line.length > 0)
           .map((line, index) => {
             let app = JSON.parse(line);
@@ -133,22 +129,7 @@ module.exports = class extends eg.Generator {
               user: user
             };
 
-            return this._insert(app, options);
-          });
-
-      if (!promises.length) {
-        return;
-      }
-
-      let promisesCount = promises.length;
-      let promisesCompleted = 0;
-
-      const p = new Promise(resolve => {
-        promises.forEach(promise => {
-          promise
-            .then(newApp => {
-              promisesCompleted++;
-
+            return this._insert(app, options).then(newApp => {
               if (newApp) {
                 if (!argv.q) {
                   this.log.ok(`Created ${newApp.id}`);
@@ -156,31 +137,14 @@ module.exports = class extends eg.Generator {
                   this.log(newApp.id);
                 }
               }
-
-              if (promisesCompleted === promisesCount) {
-                this.eg.exit();
-                resolve(); // don't propagate rejections
-              }
             })
             .catch(err => {
-              promisesCompleted++;
-
-              this.log.error(err.message);
-
-              if (promisesCompleted === promisesCount) {
-                this.eg.exit();
-                resolve(); // don't propagate rejections
-              }
+              this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
             });
-        });
-      });
+          });
 
-      this.emit('create-input', p);
-    });
-
-    return new Promise((resolve, reject) => {
-      this.on('create-input', promise => {
-        promise.then(resolve).catch(reject);
+        let p = Promise.all(promises);
+        resolve(p);
       });
     });
   };

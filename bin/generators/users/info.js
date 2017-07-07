@@ -9,9 +9,6 @@ module.exports = class extends eg.Generator {
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} info <user_id|user_name> [options]`)
-          .describe('q', 'Only show user ID')
-          .alias('q', 'quiet')
-          .group(['q', 'h'], 'Options:')
     });
   }
 

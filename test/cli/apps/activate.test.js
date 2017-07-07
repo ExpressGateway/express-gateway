@@ -56,7 +56,7 @@ describe('eg apps activate', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          done(message);
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -82,7 +82,7 @@ describe('eg apps activate', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          done(message);
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output[message] = true;
@@ -112,7 +112,7 @@ describe('eg apps activate', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          done(message);
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;

@@ -11,13 +11,9 @@ module.exports = class extends eg.Generator {
         yargs
           .usage('Usage: $0 apps update <app_id> [options]')
           .string('p')
-          .boolean(['q', 'no-color'])
           .describe('p', 'App property in the form [-p \'foo=bar\']')
-          .describe('q', 'Only show app ID')
-          .describe('no-color', 'Disable color in prompts')
           .alias('p', 'property')
-          .alias('q', 'quiet')
-          .group(['p', 'q', 'no-color', 'h'], 'Options:')
+          .group(['p'], 'Options:')
     });
   }
 
@@ -58,7 +54,7 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return this.sdk.users.info(argv.app_id)
+    return this.sdk.apps.info(argv.app_id)
       .then(foundApp => {
         let questions = [];
 

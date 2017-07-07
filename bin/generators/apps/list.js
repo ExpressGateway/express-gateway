@@ -11,24 +11,11 @@ module.exports = class extends eg.Generator {
         yargs
           .usage(`Usage: $0 ${process.argv[2]} list [options]`)
           .example(`$0 ${process.argv[2]} list`)
-          .string('p')
-          .boolean(['q'])
-          .describe('q', 'Only show IDs of apps')
-          .alias('q', 'quiet')
-          .group(['q', 'no-color', 'h'], 'Options:')
     });
   }
 
-  initializing () {
-  }
-
   prompting () {
-    if (!this.argv.stdin) {
-      return this._listFromCommandLine();
-    }
-  }
-  _listFromCommandLine () {
-    return this._list()
+    return this.sdk.users.list()
       .then(apps => {
         if (this.argv.q) {
           this.log(apps.map(u => u.id));
@@ -41,9 +28,5 @@ module.exports = class extends eg.Generator {
         this.log.error(err.message);
         this.eg.exit();
       });
-  }
-  _list (options) {
-    options = options || {};
-    return this.sdk.users.list();
   }
 };
