@@ -50,7 +50,7 @@ Need help or have a question?
 - [Roadmap](https://waffle.io/ExpressGateway/express-gateway)
 - [Twitter (@xpressgateway)](https://twitter.com/xpress-gateway)
 - [Newsgroup](https://groups.google.com/forum/#!forum/express-gateway)
-- [Facebook](https://www.facebook.com/express-gateway)
+- [Facebook](https://www.facebook.com/expressjsgateway)
 
 #### License
 
