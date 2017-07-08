@@ -31,7 +31,7 @@ describe('eg users create', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          assert.fail(message);
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -64,11 +64,10 @@ describe('eg users create', () => {
   it('creates a user from properties', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -81,10 +80,7 @@ describe('eg users create', () => {
             assert.equal(user.username, username);
             assert.equal(user.firstname, 'La');
             assert.equal(user.lastname, 'Deeda');
-
             assert.equal(output, 'Created ' + username);
-            assert.equal(error, null);
-
             done();
           });
       });
@@ -99,11 +95,10 @@ describe('eg users create', () => {
 
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log = message => {
           output = message;
@@ -123,9 +118,7 @@ describe('eg users create', () => {
                 assert.equal(user.username, username);
                 assert.equal(user.firstname, 'La');
                 assert.equal(user.lastname, 'Deeda');
-
                 assert.equal(output, 'Created ' + username);
-                assert.equal(error, null);
                 done();
               }).catch(done);
       });
@@ -137,11 +130,10 @@ describe('eg users create', () => {
   it('prints only the user id when using the --quiet flag', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log = message => {
           output = message;
@@ -156,8 +148,6 @@ describe('eg users create', () => {
                 assert.equal(user.lastname, 'Deeda');
 
                 assert.equal(output, user.id);
-                assert.equal(error, null);
-
                 done();
               });
       });

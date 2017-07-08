@@ -13,10 +13,6 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    return this._remove();
-  }
-
-  _remove () {
     const argv = this.argv;
     const userIds = Array.isArray(argv.user_id)
       ? argv.user_id

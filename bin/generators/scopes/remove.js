@@ -14,16 +14,18 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    const argv = this.argv;
-
-    const scopes = Array.isArray(argv.scope)
-      ? argv.scope
-      : [argv.scope];
+    const scopes = Array.isArray(this.argv.scope)
+      ? this.argv.scope
+      : [this.argv.scope];
 
     return Promise.all(scopes.map((scope) => {
-      return this.sdk.scopes.remove(argv.scope)
+      return this.sdk.scopes.remove(this.argv.scope)
         .then(res => {
-          this.log.ok(`Removed scope ${scope}`);
+          if (this.argv.q) {
+            this.log(`${scope}`);
+          } else {
+            this.log.ok(`Removed ${scope}`);
+          }
         })
         .catch(err => {
           this.log.error(err.message);

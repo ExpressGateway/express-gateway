@@ -13,17 +13,8 @@ module.exports = class extends eg.Generator {
           .example(`$0 ${process.argv[2]} list`)
     });
   }
-
-  initializing () {
-  }
-
   prompting () {
-    if (!this.argv.stdin) {
-      return this._listFromCommandLine();
-    }
-  }
-  _listFromCommandLine () {
-    return this._list()
+    return this.sdk.users.list()
       .then(data => {
         let users = data.users;
         if (this.argv.q) {
@@ -37,10 +28,5 @@ module.exports = class extends eg.Generator {
         this.log.error(err.message);
         this.eg.exit();
       });
-  }
-  _list (options) {
-    options = options || {};
-
-    return this.sdk.users.list();
   }
 };

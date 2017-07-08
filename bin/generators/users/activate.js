@@ -13,10 +13,6 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    return this._activate();
-  }
-
-  _activate () {
     const argv = this.argv;
 
     const userIds = Array.isArray(argv.user_id)

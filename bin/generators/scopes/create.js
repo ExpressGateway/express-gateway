@@ -22,7 +22,11 @@ module.exports = class extends eg.Generator {
     return Promise.all(scopes.map((scope) => {
       return this.sdk.scopes.create(argv.scope)
         .then(res => {
-          this.log.ok(`Created scope ${scope}`);
+          if (argv.q) {
+            this.log.ok(`${scope}`);
+          } else {
+            this.log.ok(`Created ${scope}`);
+          }
         })
         .catch(err => {
           this.log.error(err.message);

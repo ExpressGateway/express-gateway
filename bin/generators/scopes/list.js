@@ -16,7 +16,7 @@ module.exports = class extends eg.Generator {
   prompting () {
     return this.sdk.scopes.list()
       .then(res => {
-        this.log(res.scopes);
+        res.scopes.forEach(scope => this.log(scope));
         this.eg.exit();
       })
       .catch(err => {

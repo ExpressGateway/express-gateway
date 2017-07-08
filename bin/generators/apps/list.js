@@ -6,7 +6,7 @@ module.exports = class extends eg.Generator {
 
     this.configureCommand({
       command: 'list [options]',
-      description: 'list apps',
+      description: 'List apps',
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} list [options]`)
