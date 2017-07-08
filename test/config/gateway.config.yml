@@ -10,6 +10,7 @@ https:
   tls: {}
 admin:
   port: 9876
+  baseUrl: 'http://localhost:9876/'
 serviceEndpoints:
   backend:
     url: 'http://www.example.com'
