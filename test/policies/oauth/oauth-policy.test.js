@@ -4,18 +4,18 @@ mock('redis', require('fakeredis'));
 let session = require('supertest-session');
 let should = require('should');
 
-let credentialModelConfig = require('../../lib/config/models/credentials');
-let userModelConfig = require('../../lib/config/models/users');
-let appModelConfig = require('../../lib/config/models/applications');
-let services = require('../../lib/services');
+let credentialModelConfig = require('../../../lib/config/models/credentials');
+let userModelConfig = require('../../../lib/config/models/users');
+let appModelConfig = require('../../../lib/config/models/applications');
+let services = require('../../../lib/services/index');
 let credentialService = services.credential;
 let userService = services.user;
 let applicationService = services.application;
-let serverHelper = require('../common/server-helper');
-let db = require('../../lib/db')();
+let serverHelper = require('../../common/server-helper');
+let db = require('../../../lib/db')();
 
-let testHelper = require('../common/routing.helper');
-let config = require('../../lib/config');
+let testHelper = require('../../common/routing.helper');
+let config = require('../../../lib/config');
 let originalGatewayConfig = config.gatewayConfig;
 
 describe('Functional Tests oAuth2.0 Policy', () => {
@@ -83,10 +83,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
     };
 
     db.flushdbAsync()
-      .then(function (didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
+      .then(function () {
         let user1 = {
           username: 'irfanbaqui',
           firstname: 'irfan',
