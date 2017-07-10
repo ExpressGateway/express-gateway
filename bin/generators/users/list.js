@@ -17,11 +17,14 @@ module.exports = class extends eg.Generator {
     return this.admin.users.list()
       .then(data => {
         let users = data.users;
-        if (this.argv.q) {
-          this.log(users.map(u => u.id));
-        } else {
-          this.log(users);
-        }
+        users.forEach(u => {
+          if (this.argv.q) {
+            this.log(u.username);
+          } else {
+            this.log(JSON.stringify(u, null, 2));
+          }
+        });
+
         this.eg.exit();
       })
       .catch(err => {

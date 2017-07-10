@@ -16,12 +16,15 @@ module.exports = class extends eg.Generator {
 
   prompting () {
     return this.admin.apps.list()
-      .then(apps => {
-        if (this.argv.q) {
-          this.log(apps.map(u => u.id));
-        } else {
-          this.log(apps);
-        }
+      .then(data => {
+        let apps = data.apps;
+        apps.forEach(app => {
+          if (this.argv.q) {
+            this.log(app.id);
+          } else {
+            this.log(JSON.stringify(app, null, 2));
+          }
+        });
         this.eg.exit();
       })
       .catch(err => {
