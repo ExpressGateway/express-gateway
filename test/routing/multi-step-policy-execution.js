@@ -40,7 +40,7 @@ describe('default config with multi step (multi action) policy', () => {
                 action: { param: 3 }
               }]
             },
-            { 'test-return': {} }
+            { 'test-return': null }
           ]
         }
       }
