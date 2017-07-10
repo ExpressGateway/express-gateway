@@ -6,7 +6,7 @@ const fs = require('fs');
 const tls = require('tls');
 const path = require('path');
 let config = require('../lib/config');
-let testHelper = require('./routing/routing.helper');
+let testHelper = require('./common/routing.helper');
 
 const testCases = [{
   clientOptions: {

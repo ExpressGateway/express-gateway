@@ -1,4 +1,4 @@
-let testHelper = require('./routing.helper');
+let testHelper = require('../common/routing.helper');
 let config = require('../../lib/config');
 
 // there are several configuration ways to listen to all hosts

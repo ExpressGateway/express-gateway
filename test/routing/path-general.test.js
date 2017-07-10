@@ -1,7 +1,7 @@
 let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-const testHelper = require('./routing.helper');
+const testHelper = require('../common/routing.helper');
 let config = require('../../lib/config');
 
 describe('path resolution for specific and general domains', () => {

@@ -2,10 +2,10 @@
 const request = require('supertest');
 const assert = require('chai').assert;
 const logger = require('../../lib/logger').test;
-let gateway = require('../../lib/gateway');
+let gateway = require('../../lib/gateway/index');
 const _ = require('lodash');
-let config = require('../../lib/config');
-let policies = require('../../lib/policies');
+let config = require('../../lib/config/index');
+let policies = require('../../lib/policies/index');
 
 module.exports = function () {
   let app, httpsApp, originalGatewayConfig, originalPolicies;
