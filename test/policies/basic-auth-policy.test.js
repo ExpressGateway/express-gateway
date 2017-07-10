@@ -13,7 +13,7 @@ let userService = services.user;
 let serverHelper = require('../common/server-helper');
 let db = require('../../lib/db')();
 
-let testHelper = require('../routing/routing.helper');
+let testHelper = require('../common/routing.helper');
 let config = require('../../lib/config');
 let originalGatewayConfig = config.gatewayConfig;
 

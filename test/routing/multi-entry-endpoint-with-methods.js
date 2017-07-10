@@ -1,4 +1,4 @@
-let testHelper = require('./routing.helper');
+let testHelper = require('../common/routing.helper');
 let config = require('../../lib/config');
 
 describe('Multi entry api endpoint with methods', () => {

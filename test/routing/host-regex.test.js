@@ -1,4 +1,4 @@
-let testHelper = require('./routing.helper');
+let testHelper = require('../common/routing.helper');
 let config = require('../../lib/config');
 
 describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {

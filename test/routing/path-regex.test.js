@@ -1,4 +1,4 @@
-const testHelper = require('./routing.helper');
+const testHelper = require('../common/routing.helper');
 let config = require('../../lib/config');
 let originalGatewayConfig = config.gatewayConfig;
 
