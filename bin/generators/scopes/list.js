@@ -16,6 +16,9 @@ module.exports = class extends eg.Generator {
   prompting () {
     return this.admin.scopes.list()
       .then(res => {
+        if (!res.scopes || !res.scopes.length) {
+          return this.log('You have no scopes');
+        }
         res.scopes.forEach(scope => this.log(scope));
         this.eg.exit();
       })

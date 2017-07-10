@@ -18,6 +18,9 @@ module.exports = class extends eg.Generator {
     return this.admin.apps.list()
       .then(data => {
         let apps = data.apps;
+        if (!apps || !apps.length) {
+          return this.log('You have no apps');
+        }
         apps.forEach(app => {
           if (this.argv.q) {
             this.log(app.id);

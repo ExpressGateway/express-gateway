@@ -17,6 +17,9 @@ module.exports = class extends eg.Generator {
     return this.admin.users.list()
       .then(data => {
         let users = data.users;
+        if (!users || !users.length) {
+          return this.log('You have no users');
+        }
         users.forEach(u => {
           if (this.argv.q) {
             this.log(u.username);
