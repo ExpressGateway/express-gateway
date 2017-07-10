@@ -13,7 +13,7 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    return this.sdk.scopes.info(this.argv.scope)
+    return this.admin.scopes.info(this.argv.scope)
       .then(res => {
         this.log(res.scope);
         this.eg.exit();

@@ -13,7 +13,7 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    return this.sdk.apps.info(this.argv.app_id)
+    return this.admin.apps.info(this.argv.app_id)
       .then(app => {
         if (app) {
           this.log(JSON.stringify(app, null, 2));

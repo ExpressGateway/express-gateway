@@ -24,7 +24,7 @@ module.exports = class extends eg.Generator {
       : [argv.app_id];
 
     return Promise.all(appIds.map((appId) => {
-      return this.sdk.apps.activate(appId)
+      return this.admin.apps.activate(appId)
         .then(res => {
           let status = res.status;
 

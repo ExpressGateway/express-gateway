@@ -20,7 +20,7 @@ module.exports = class extends eg.Generator {
       : [argv.user_id];
 
     return Promise.all(userIds.map((userId) => {
-      return this.sdk.users.deactivate(userId)
+      return this.admin.users.deactivate(userId)
           .then(res => {
             let status = res.status;
 

@@ -17,7 +17,7 @@ describe('eg users info', () => {
     env.prepareHijack();
     username = idGen.v4();
 
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: username,
       firstname: 'La',
       lastname: 'Deeda'

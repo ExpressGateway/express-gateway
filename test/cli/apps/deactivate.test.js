@@ -14,7 +14,7 @@ describe('eg apps deactivate', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
@@ -22,21 +22,21 @@ describe('eg apps deactivate', () => {
     .then(createdUser => {
       user = createdUser;
 
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy1',
         redirectUri: 'http://localhost:3000/cb'
       });
     })
     .then(createdApp => {
       app1 = createdApp;
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy2',
         redirectUri: 'http://localhost:3000/cb'
       });
     })
     .then(createdApp => {
       app2 = createdApp;
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy2',
         redirectUri: 'http://localhost:3000/cb'
       });
@@ -62,7 +62,7 @@ describe('eg apps deactivate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.info(app1.id)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(app.isActive, false);
             assert.equal(output, 'Deactivated ' + app1.id);
@@ -88,7 +88,7 @@ describe('eg apps deactivate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.list()
+        return adminHelper.admin.apps.list()
           .then(data => {
             let apps = data.apps;
             assert.equal(apps[0].isActive, false);
@@ -118,7 +118,7 @@ describe('eg apps deactivate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.info(app1.id)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(app.isActive, false);
             assert.equal(output, app1.id);

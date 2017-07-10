@@ -18,7 +18,7 @@ describe('eg apps remove', () => {
   });
   beforeEach(() => {
     env.prepareHijack();
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
@@ -26,14 +26,14 @@ describe('eg apps remove', () => {
     .then(createdUser => {
       user = createdUser;
 
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy1',
         redirectUri: 'http://localhost:3000/cb'
       });
     })
     .then(createdApp => {
       app1 = createdApp;
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy2',
         redirectUri: 'http://localhost:3000/cb'
       });
@@ -56,7 +56,7 @@ describe('eg apps remove', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.info(app1.id)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(output, 'Removed ' + app1.id);
             done(new Error(app));
@@ -84,7 +84,7 @@ describe('eg apps remove', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.list()
+        return adminHelper.admin.apps.list()
           .then(res => {
             assert.equal(res.apps.length, 0);
             assert.ok(output['Removed ' + app1.id]);
@@ -111,7 +111,7 @@ describe('eg apps remove', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.info(app1.id)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(output, app1.id);
             done(new Error(app));

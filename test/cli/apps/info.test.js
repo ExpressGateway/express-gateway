@@ -14,7 +14,7 @@ describe('eg apps info', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
@@ -22,7 +22,7 @@ describe('eg apps info', () => {
     .then(createdUser => {
       user = createdUser;
 
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy',
         redirectUri: 'http://localhost:3000/cb'
       });

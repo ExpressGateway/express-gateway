@@ -1,12 +1,12 @@
-let admin = require('../../lib/admin');
-let adminSdk = require('../../lib/sdk');
+let rest = require('../../lib/rest');
+let adminClient = require('../../lib/admin');
 module.exports = function () {
   return {
     start () {
-      return admin().then((srv) => {
+      return rest().then((srv) => {
         this.adminSrv = srv;
         let srvInfo = srv.address();
-        this.sdk = adminSdk({
+        this.admin = adminClient({
           hostname: srvInfo.address,
           port: srvInfo.port
         });

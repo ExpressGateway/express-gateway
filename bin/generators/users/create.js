@@ -179,7 +179,7 @@ module.exports = class extends eg.Generator {
     return this.prompt(questions)
       .then(answers => {
         user = Object.assign(user, answers);
-        return this.sdk.users.create(user);
+        return this.admin.users.create(user);
       });
   }
 };

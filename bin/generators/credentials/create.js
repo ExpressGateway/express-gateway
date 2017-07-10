@@ -85,11 +85,7 @@ module.exports = class extends eg.Generator {
 
     return this._insert(credential, { consumer: argv.consumer, type: argv.type })
     .then(newCredential => {
-      if (!argv.q) {
-        this.log.ok(`Created \n ${JSON.stringify(newCredential, null, 2)}`);
-      } else {
-        this.log(`${newCredential.keyId}:${newCredential.keySecret}`);
-      }
+      this._output(newCredential);
 
       this.eg.exit();
     })
@@ -143,11 +139,7 @@ module.exports = class extends eg.Generator {
 
             return this._insert(credential, options)
               .then(newCredential => {
-                if (!argv.q) {
-                  this.log.ok(`Created \n ${JSON.stringify(newCredential, null, 2)}`);
-                } else {
-                  this.log(`${newCredential.keyId}:${newCredential.keySecret}`);
-                }
+                this._output(credential);
 
                 this.eg.exit();
               })
@@ -161,6 +153,19 @@ module.exports = class extends eg.Generator {
       });
     });
   };
+
+  _output (credential, options) {
+    let argv = this.argv;
+    if (!argv.q) {
+      this.log.ok(`Created \n ${JSON.stringify(credential, null, 2)}`);
+    } else {
+      if (argv.type === 'key-auth') {
+        this.log(`${credential.keyId}:${credential.keySecret}`);
+      } else if (argv.type === 'basic-auth') {
+        this.log(`${credential.id}:${credential.password}`);
+      }
+    }
+  }
 
   _insert (credential, options) {
     const models = this.eg.config.models;
@@ -216,7 +221,7 @@ module.exports = class extends eg.Generator {
     return this.prompt(questions)
         .then(answers => {
           credential = Object.assign(credential, answers);
-          return this.sdk.credentials.create(options.consumer, options.type, credential);
+          return this.admin.credentials.create(options.consumer, options.type, credential);
         });
   };
 };

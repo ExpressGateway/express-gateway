@@ -14,7 +14,7 @@ describe('eg apps activate', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
@@ -22,27 +22,27 @@ describe('eg apps activate', () => {
     .then(createdUser => {
       user = createdUser;
 
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy1',
         redirectUri: 'http://localhost:3000/cb'
       });
     })
     .then(createdApp => {
       app1 = createdApp;
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy2',
         redirectUri: 'http://localhost:3000/cb'
       });
     })
     .then(createdApp => {
       app2 = createdApp;
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy2',
         redirectUri: 'http://localhost:3000/cb'
       });
     })
-    .then(() => adminHelper.sdk.apps.deactivate(app1.id))
-    .then(() => adminHelper.sdk.apps.deactivate(app2.id));
+    .then(() => adminHelper.admin.apps.deactivate(app1.id))
+    .then(() => adminHelper.admin.apps.deactivate(app2.id));
   });
 
   afterEach(() => {
@@ -64,7 +64,7 @@ describe('eg apps activate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.info(app1.id)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(app.isActive, true);
             assert.equal(output, 'Activated ' + app1.id);
@@ -90,7 +90,7 @@ describe('eg apps activate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.list()
+        return adminHelper.admin.apps.list()
           .then(data => {
             let apps = data.apps;
             assert.equal(apps[0].isActive, true);
@@ -120,7 +120,7 @@ describe('eg apps activate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.info(app1.id)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(app.isActive, true);
             assert.equal(output, app1.id);

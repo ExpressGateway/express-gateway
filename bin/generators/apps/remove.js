@@ -20,7 +20,7 @@ module.exports = class extends eg.Generator {
       : [argv.app_id];
 
     return Promise.all(appIds.map((appId) => {
-      return this.sdk.apps.remove(appId)
+      return this.admin.apps.remove(appId)
           .then(app => {
             if (app) {
               if (!argv.q) {

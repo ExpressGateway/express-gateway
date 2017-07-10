@@ -20,7 +20,7 @@ describe('eg apps update', () => {
   });
   beforeEach(() => {
     env.prepareHijack();
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
@@ -28,7 +28,7 @@ describe('eg apps update', () => {
     .then(createdUser => {
       user = createdUser;
 
-      return adminHelper.sdk.apps.create(user.id, {
+      return adminHelper.admin.apps.create(user.id, {
         name: 'appy1',
         redirectUri: 'http://localhost:3000/cb'
       });
@@ -56,7 +56,7 @@ describe('eg apps update', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.info(app1.id)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(app.name, 'AppName');
             assert.equal(app.redirectUri, 'http://example.com/cb');
@@ -83,7 +83,7 @@ describe('eg apps update', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.info(app1.id)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(app.name, 'AppName1');
             assert.equal(app.redirectUri, 'http://example.com/cb');
@@ -111,7 +111,7 @@ describe('eg apps update', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.info(app1.id)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(app.name, 'AppName2');
             assert.equal(app.redirectUri, 'http://example.com/cb');

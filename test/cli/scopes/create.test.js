@@ -37,7 +37,7 @@ describe('eg scopes create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.scopes.info(scopeName)
+        return adminHelper.admin.scopes.info(scopeName)
           .then(res => {
             assert.equal(res.scope, scopeName);
             assert.equal(output, 'Created ' + scopeName);
@@ -64,7 +64,7 @@ describe('eg scopes create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.scopes.info(scopeName)
+        return adminHelper.admin.scopes.info(scopeName)
               .then(res => {
                 assert.equal(res.scope, scopeName);
                 assert.equal(output, res.scope);

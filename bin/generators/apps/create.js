@@ -203,7 +203,7 @@ module.exports = class extends eg.Generator {
     return this.prompt(questions)
         .then(answers => {
           app = Object.assign(app, answers);
-          return this.sdk.apps.create(options.user, app);
+          return this.admin.apps.create(options.user, app);
         });
   };
 };

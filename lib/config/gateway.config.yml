@@ -1,8 +1,7 @@
 apiEndpoints:
-  users:
+  api:
     host: '*'
-    paths:
-      - /users/*
+
 http:
   port: 8080
 admin:
@@ -12,18 +11,21 @@ admin:
 https:
   port: 9999
   tls: {}
+
 serviceEndpoints:
   backend:
-    url: 'http://www.example.com'
+    url: 'http://localhost:9876' # btw this is EG admin API
 policies:
   - proxy
+  - key-auth
 pipelines:
-  - name: ecommerce
+  - name: adminAPI
     apiEndpoints:
-      - users
+      - api
     policies:
-      - proxy:
-          - condition:
-              name: always
+      - key-auth:
+          -
             action:
+      - proxy:
+          - action:
               serviceEndpoint: backend

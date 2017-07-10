@@ -45,7 +45,7 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(username)
+        return adminHelper.admin.users.info(username)
               .then(user => {
                 assert.equal(user.username, username);
                 assert.equal(user.firstname, 'La');
@@ -75,7 +75,7 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(username)
+        return adminHelper.admin.users.info(username)
           .then(user => {
             assert.equal(user.username, username);
             assert.equal(user.firstname, 'La');
@@ -113,7 +113,7 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(username)
+        return adminHelper.admin.users.info(username)
               .then(user => {
                 assert.equal(user.username, username);
                 assert.equal(user.firstname, 'La');
@@ -141,7 +141,7 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(username)
+        return adminHelper.admin.users.info(username)
               .then(user => {
                 assert.equal(user.username, username);
                 assert.equal(user.firstname, 'La');

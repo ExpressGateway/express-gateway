@@ -20,7 +20,7 @@ module.exports = class extends eg.Generator {
       : [argv.scope];
 
     return Promise.all(scopes.map((scope) => {
-      return this.sdk.scopes.create(argv.scope)
+      return this.admin.scopes.create(argv.scope)
         .then(res => {
           if (argv.q) {
             this.log.ok(`${scope}`);

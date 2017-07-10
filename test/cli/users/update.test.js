@@ -18,7 +18,7 @@ describe('eg users update', () => {
   beforeEach(() => {
     env.prepareHijack();
 
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
@@ -58,7 +58,7 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(user.username)
+        return adminHelper.admin.users.info(user.username)
           .then(user => {
             assert.equal(user.firstname, 'FirstName');
             assert.equal(user.lastname, 'LastName');
@@ -96,7 +96,7 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(user.username)
+        return adminHelper.admin.users.info(user.username)
           .then(user => {
             assert.equal(user.firstname, 'X1');
             assert.equal(user.lastname, 'L1');
@@ -127,7 +127,7 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(user.username)
+        return adminHelper.admin.users.info(user.username)
           .then(user => {
             assert.equal(user.firstname, 'C1');
             assert.equal(user.lastname, 'D1');
@@ -159,7 +159,7 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(user.id)
+        return adminHelper.admin.users.info(user.id)
           .then(user => {
             assert.equal(user.firstname, 'T1');
             assert.equal(user.lastname, 'T2');
@@ -191,7 +191,7 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(user.id)
+        return adminHelper.admin.users.info(user.id)
           .then(user => {
             assert.equal(user.firstname, 'H1');
             assert.equal(user.lastname, 'H2');

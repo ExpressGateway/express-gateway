@@ -17,13 +17,13 @@ describe('eg users deactivate', () => {
     username = idGen.v4();
     username2 = idGen.v4();
 
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: username,
       firstname: 'La',
       lastname: 'Deeda'
     }).then((createdUser) => {
       userId = createdUser.id;
-      return adminHelper.sdk.users.create({
+      return adminHelper.admin.users.create({
         username: username2,
         firstname: 'La2',
         lastname: 'Deeda2'
@@ -50,7 +50,7 @@ describe('eg users deactivate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(username)
+        return adminHelper.admin.users.info(username)
           .then(user => {
             assert.equal(user.isActive, false);
             assert.equal(output, 'Deactivated ' + username);
@@ -76,7 +76,7 @@ describe('eg users deactivate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(userId)
+        return adminHelper.admin.users.info(userId)
           .then(user => {
             assert.equal(user.isActive, false);
             assert.equal(output, 'Deactivated ' + userId);
@@ -102,7 +102,7 @@ describe('eg users deactivate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.list()
+        return adminHelper.admin.users.list()
           .then(data => {
             let users = data.users;
             assert.equal(users[0].isActive, false);
@@ -133,7 +133,7 @@ describe('eg users deactivate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(username)
+        return adminHelper.admin.users.info(username)
             .then(user => {
               assert.equal(user.isActive, false);
               assert.equal(output, username);

@@ -54,7 +54,7 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return this.sdk.apps.info(argv.app_id)
+    return this.admin.apps.info(argv.app_id)
       .then(foundApp => {
         let questions = [];
 
@@ -101,7 +101,7 @@ module.exports = class extends eg.Generator {
         return this.prompt(questions)
           .then(answers => {
             app = Object.assign(app, answers);
-            return this.sdk.apps.update(argv.app_id, app);
+            return this.admin.apps.update(argv.app_id, app);
           })
           .then(res => {
             if (!argv.q) {

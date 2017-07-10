@@ -15,7 +15,7 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
-    return this.sdk.users.list()
+    return this.admin.users.list()
       .then(apps => {
         if (this.argv.q) {
           this.log(apps.map(u => u.id));

@@ -16,21 +16,21 @@ describe('eg users activate', () => {
     env.prepareHijack();
     userName = idGen.v4();
     userName2 = idGen.v4();
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: userName,
       firstname: 'La',
       lastname: 'Deeda'
     })
     .then(user => {
       userId = user.id;
-      return adminHelper.sdk.users.create({
+      return adminHelper.admin.users.create({
         username: userName2,
         firstname: 'La2',
         lastname: 'Deeda2'
       });
     })
-    .then(() => adminHelper.sdk.users.deactivate(userName))
-    .then(() => adminHelper.sdk.users.deactivate(userName2));
+    .then(() => adminHelper.admin.users.deactivate(userName))
+    .then(() => adminHelper.admin.users.deactivate(userName2));
   });
 
   afterEach(() => {
@@ -53,7 +53,7 @@ describe('eg users activate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(userName)
+        return adminHelper.admin.users.info(userName)
           .then(user => {
             assert.equal(user.isActive, true);
             assert.equal(output, 'Activated ' + userName);
@@ -81,7 +81,7 @@ describe('eg users activate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(userId)
+        return adminHelper.admin.users.info(userId)
           .then(user => {
             assert.equal(user.isActive, true);
             assert.equal(output, 'Activated ' + userId);
@@ -108,7 +108,7 @@ describe('eg users activate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.list()
+        return adminHelper.admin.users.list()
           .then(data => {
             let users = data.users;
             assert.equal(users[0].isActive, true);
@@ -138,7 +138,7 @@ describe('eg users activate', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(userName)
+        return adminHelper.admin.users.info(userName)
             .then(user => {
               assert.equal(user.isActive, true);
               assert.equal(output, userName);

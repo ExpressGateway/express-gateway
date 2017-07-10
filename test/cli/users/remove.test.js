@@ -18,7 +18,7 @@ describe('eg users remove', () => {
     env.prepareHijack();
     let promises = [];
     for (let i = 0; i < 5; i++) {
-      promises.push(adminHelper.sdk.users.create({
+      promises.push(adminHelper.admin.users.create({
         username: idGen.v4(),
         firstname: 'La',
         lastname: 'Deeda'
@@ -49,7 +49,7 @@ describe('eg users remove', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(users[0].username)
+        return adminHelper.admin.users.info(users[0].username)
           .catch(err => {
             assert.ok(err);
             assert.equal(output, 'Removed ' + users[0].username);
@@ -76,7 +76,7 @@ describe('eg users remove', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(users[1].id)
+        return adminHelper.admin.users.info(users[1].id)
           .catch(err => {
             assert.ok(err);
             assert.equal(output, 'Removed ' + users[1].id);
@@ -102,10 +102,10 @@ describe('eg users remove', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(users[3].username)
+        return adminHelper.admin.users.info(users[3].username)
           .catch(err => {
             assert.ok(err);
-            return adminHelper.sdk.users.info(users[4].username)
+            return adminHelper.admin.users.info(users[4].username)
               .catch(err => {
                 assert.ok(err);
                 assert.ok(output['Removed ' + users[3].username]);
@@ -133,7 +133,7 @@ describe('eg users remove', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.users.info(users[2].id)
+        return adminHelper.admin.users.info(users[2].id)
           .catch(err => {
             assert.ok(err);
             assert.equal(output, users[2].id);

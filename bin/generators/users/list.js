@@ -14,7 +14,7 @@ module.exports = class extends eg.Generator {
     });
   }
   prompting () {
-    return this.sdk.users.list()
+    return this.admin.users.list()
       .then(data => {
         let users = data.users;
         if (this.argv.q) {

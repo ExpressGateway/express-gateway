@@ -56,7 +56,7 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return this.sdk.users.info(argv.user_id)
+    return this.admin.users.info(argv.user_id)
       .then(foundUser => {
         const configProperties = config.users.properties;
         let missingProperties = Object.keys(configProperties).map(prop => {
@@ -89,7 +89,7 @@ module.exports = class extends eg.Generator {
         return this.prompt(questions)
           .then(answers => {
             user = Object.assign(user, answers);
-            return this.sdk.users.update(argv.user_id, user);
+            return this.admin.users.update(argv.user_id, user);
           });
       })
       .then(updatedUser => {

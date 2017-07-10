@@ -19,7 +19,7 @@ module.exports = class extends eg.Generator {
       : [argv.user_id];
 
     return Promise.all(userIds.map((userId) => {
-      return this.sdk.users.remove(userId)
+      return this.admin.users.remove(userId)
           .then(user => {
             if (user) {
               if (!argv.q) {

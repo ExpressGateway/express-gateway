@@ -16,7 +16,7 @@ describe('eg scopes remove', () => {
   beforeEach(() => {
     env.prepareHijack();
     scopeName = idGen.v4();
-    return adminHelper.sdk.scopes.create(scopeName);
+    return adminHelper.admin.scopes.create(scopeName);
   });
 
   afterEach(() => {
@@ -39,7 +39,7 @@ describe('eg scopes remove', () => {
 
       generator.once('end', () => {
         assert.equal(output, 'Removed ' + scopeName);
-        return adminHelper.sdk.scopes.info(scopeName).catch(() => {
+        return adminHelper.admin.scopes.info(scopeName).catch(() => {
           done();
         });
       });
@@ -63,7 +63,7 @@ describe('eg scopes remove', () => {
 
       generator.once('end', () => {
         assert.equal(output, scopeName);
-        return adminHelper.sdk.scopes.info(scopeName).catch(() => {
+        return adminHelper.admin.scopes.info(scopeName).catch(() => {
           done();
         });
       });

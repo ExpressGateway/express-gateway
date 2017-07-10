@@ -18,7 +18,7 @@ describe('eg apps create', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    return adminHelper.sdk.users.create({
+    return adminHelper.admin.users.create({
       username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
@@ -52,7 +52,7 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.list()
+        return adminHelper.admin.apps.list()
           .then(data => {
             let app = data.apps[0];
             assert.equal(app.name, 'appy');
@@ -86,7 +86,7 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.list()
+        return adminHelper.admin.apps.list()
           .then(data => {
             let app = data.apps[0];
             assert.equal(app.name, 'appy');
@@ -115,7 +115,7 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.list()
+        return adminHelper.admin.apps.list()
           .then(data => {
             let app = data.apps[0];
             assert.equal(app.name, 'appy');
@@ -145,7 +145,7 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.list()
+        return adminHelper.admin.apps.list()
           .then(data => {
             let app = data.apps[0];
             assert.equal(app.name, 'appy');
@@ -187,7 +187,7 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.list()
+        return adminHelper.admin.apps.list()
           .then(data => {
             let app = data.apps[0];
             assert.equal(app.name, 'appy');
@@ -216,7 +216,7 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        return adminHelper.sdk.apps.list()
+        return adminHelper.admin.apps.list()
           .then(data => {
             let app = data.apps[0];
             assert.equal(app.name, 'appy');

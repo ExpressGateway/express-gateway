@@ -15,7 +15,7 @@ module.exports = class extends eg.Generator {
   prompting () {
     const argv = this.argv;
 
-    return this.sdk.users.info(argv.user_id)
+    return this.admin.users.info(argv.user_id)
       .then(user => {
         if (user) {
           if (!argv.q) {
