@@ -1,52 +1,39 @@
 const assert = require('assert');
 const util = require('util');
 const helpers = require('yeoman-test');
-
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
-const db = require('../../../lib/db')();
+const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
-const redisConfig = require('../../../lib/config').systemConfig.db.redis;
-const userService = require('../../../lib/services').user;
-
+const idGen = require('uuid-base62');
 const namespace = 'express-gateway:users:update';
 
 describe('eg users update', () => {
-  let program, env, userId;
+  let program, env, user;
 
   before(() => {
     ({ program, env } = environment.bootstrap());
+    return adminHelper.start();
   });
+  after(() => adminHelper.stop());
 
   beforeEach(() => {
     env.prepareHijack();
-    return userService.insert({
-      username: 'lala',
+
+    return adminHelper.admin.users.create({
+      username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(user => {
-      userId = user.id;
+    .then(createdUser => {
+      user = createdUser;
     });
   });
 
-  afterEach(done => {
+  afterEach(() => {
     env.resetHijack();
+  });
 
-    db.flushdbAsync()
-    .then(didSucceed => {
-      if (!didSucceed) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to flush the database');
-      }
-
-      done();
-    })
-    .catch(err => {
-      assert(!err);
-      done();
-    });
+  afterEach(() => {
+    env.resetHijack();
   });
 
   it('updates a user from prompts by username', done => {
@@ -71,23 +58,20 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.firstname, 'FirstName');
-                assert.equal(user.lastname, 'LastName');
+        return adminHelper.admin.users.info(user.username)
+          .then(user => {
+            assert.equal(user.firstname, 'FirstName');
+            assert.equal(user.lastname, 'LastName');
 
-                assert.equal(output, 'Updated lala');
-                assert.equal(error, null);
+            assert.equal(output, 'Updated ' + user.username);
+            assert.equal(error, null);
 
-                done();
-              });
+            done();
           });
       });
     });
 
-    env.argv = program.parse('users update lala');
+    env.argv = program.parse('users update ' + user.username);
   });
 
   it('updates a user from prompts by user ID', done => {
@@ -104,31 +88,28 @@ describe('eg users update', () => {
         };
 
         helpers.mockPrompt(generator, {
-          firstname: 'FirstName',
-          lastname: 'LastName',
+          firstname: 'X1',
+          lastname: 'L1',
           email: '_',      // can't have empty values,
           redirectUri: '_' // limitation of yeoman-test.DummyPrompt
         });
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.firstname, 'FirstName');
-                assert.equal(user.lastname, 'LastName');
+        return adminHelper.admin.users.info(user.username)
+          .then(user => {
+            assert.equal(user.firstname, 'X1');
+            assert.equal(user.lastname, 'L1');
 
-                assert.equal(output, `Updated ${userId}`);
-                assert.equal(error, null);
+            assert.equal(output, 'Updated ' + user.id);
+            assert.equal(error, null);
 
-                done();
-              });
+            done();
           });
       });
     });
 
-    env.argv = program.parse(`users update ${userId}`);
+    env.argv = program.parse(`users update ${user.id}`);
   });
 
   it('updates a user from properties by username', done => {
@@ -146,24 +127,21 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.firstname, 'FirstName');
-                assert.equal(user.lastname, 'LastName');
+        return adminHelper.admin.users.info(user.username)
+          .then(user => {
+            assert.equal(user.firstname, 'C1');
+            assert.equal(user.lastname, 'D1');
 
-                assert.equal(output, 'Updated lala');
-                assert.equal(error, null);
+            assert.equal(output, 'Updated ' + user.username);
+            assert.equal(error, null);
 
-                done();
-              });
+            done();
           });
       });
     });
 
-    env.argv = program.parse('users update lala ' +
-      '-p "firstname=FirstName" -p "lastname=LastName"');
+    env.argv = program.parse('users update ' + user.username +
+      ' -p "firstname=C1" -p "lastname=D1"');
   });
 
   it('updates a user from properties by user ID', done => {
@@ -181,24 +159,21 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.firstname, 'FirstName');
-                assert.equal(user.lastname, 'LastName');
+        return adminHelper.admin.users.info(user.id)
+          .then(user => {
+            assert.equal(user.firstname, 'T1');
+            assert.equal(user.lastname, 'T2');
 
-                assert.equal(output, `Updated ${userId}`);
-                assert.equal(error, null);
+            assert.equal(output, 'Updated ' + user.id);
+            assert.equal(error, null);
 
-                done();
-              });
+            done();
           });
       });
     });
 
-    env.argv = program.parse(`users update ${userId} ` +
-      '-p "firstname=FirstName" -p "lastname=LastName"');
+    env.argv = program.parse(`users update ${user.id} ` +
+      '-p "firstname=T1" -p "lastname=T2"');
   });
 
   it('prints only the user id when using the --quiet flag', done => {
@@ -216,24 +191,21 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.firstname, 'FirstName');
-                assert.equal(user.lastname, 'LastName');
+        return adminHelper.admin.users.info(user.id)
+          .then(user => {
+            assert.equal(user.firstname, 'H1');
+            assert.equal(user.lastname, 'H2');
 
-                assert.equal(output, userId[0]);
-                assert.equal(error, null);
+            assert.equal(output, user.id);
+            assert.equal(error, null);
 
-                done();
-              });
+            done();
           });
       });
     });
 
-    env.argv = program.parse('users update lala ' +
-      '-p "firstname=FirstName" -p "lastname=LastName" -q');
+    env.argv = program.parse('users update ' + user.id +
+      ' -p "firstname=H1" -p "lastname=H2" -q');
   });
 
   it('errors on unknown user', done => {

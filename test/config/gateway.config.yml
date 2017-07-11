@@ -8,6 +8,9 @@ http:
 https:
   port: 9999
   tls: {}
+admin:
+  port: 9876
+  baseUrl: 'http://localhost:9876/'
 serviceEndpoints:
   backend:
     url: 'http://www.example.com'

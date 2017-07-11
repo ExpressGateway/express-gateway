@@ -1,6 +1,5 @@
 const chalk = require('chalk');
 const eg = require('../../eg');
-
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -13,13 +12,9 @@ module.exports = class extends eg.Generator {
           .usage(`Usage: $0 ${process.argv[2]} update <user_id|user_name> [options]`)
           .example(`$0 ${process.argv[2]} update jdoe -p 'firstname=John'`)
           .string('p')
-          .boolean(['q', 'no-color'])
           .describe('p', 'User property in the form [-p \'foo=bar\']')
-          .describe('q', 'Only show user ID')
-          .describe('no-color', 'Disable color in prompts')
           .alias('p', 'property')
-          .alias('q', 'quiet')
-          .group(['p', 'q', 'no-color', 'h'], 'Options:')
+          .group(['p'], 'Options:')
     });
   }
 
@@ -30,7 +25,6 @@ module.exports = class extends eg.Generator {
   _update () {
     const argv = this.argv;
     const config = this.eg.config.models;
-    const userService = this.eg.services.user;
 
     let propertyValues = [];
 
@@ -62,24 +56,8 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return userService
-      .get(argv.user_id)
+    return this.admin.users.info(argv.user_id)
       .then(foundUser => {
-        if (foundUser) {
-          return foundUser;
-        }
-
-        return userService.find(argv.user_id);
-      })
-      .then(foundUser => {
-        if (!foundUser) {
-          if (!argv.q) {
-            this.log.error(`User not found: ${argv.user_id}`);
-          }
-          this.eg.exit();
-          return;
-        }
-
         const configProperties = config.users.properties;
         let missingProperties = Object.keys(configProperties).map(prop => {
           return { name: prop, descriptor: configProperties[prop] };
@@ -111,8 +89,7 @@ module.exports = class extends eg.Generator {
         return this.prompt(questions)
           .then(answers => {
             user = Object.assign(user, answers);
-            return userService.update(foundUser.id, user)
-              .then(() => userService.get(foundUser.id));
+            return this.admin.users.update(argv.user_id, user);
           });
       })
       .then(updatedUser => {
@@ -127,7 +104,13 @@ module.exports = class extends eg.Generator {
         this.eg.exit();
       })
       .catch(err => {
-        this.log.error(err.message);
+        if (err.status === 404) {
+          if (!argv.q) {
+            this.log.error(`User not found: ${argv.user_id}`);
+          }
+        } else {
+          this.log.error(err.message);
+        }
         this.eg.exit();
       });
   }

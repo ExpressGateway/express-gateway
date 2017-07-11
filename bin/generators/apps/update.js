@@ -1,6 +1,5 @@
 const chalk = require('chalk');
 const eg = require('../../eg');
-
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -12,13 +11,9 @@ module.exports = class extends eg.Generator {
         yargs
           .usage('Usage: $0 apps update <app_id> [options]')
           .string('p')
-          .boolean(['q', 'no-color'])
           .describe('p', 'App property in the form [-p \'foo=bar\']')
-          .describe('q', 'Only show app ID')
-          .describe('no-color', 'Disable color in prompts')
           .alias('p', 'property')
-          .alias('q', 'quiet')
-          .group(['p', 'q', 'no-color', 'h'], 'Options:')
+          .group(['p'], 'Options:')
     });
   }
 
@@ -29,7 +24,6 @@ module.exports = class extends eg.Generator {
   _update () {
     const argv = this.argv;
     const models = this.eg.config.models;
-    const applicationService = this.eg.services.application;
 
     let propertyValues = [];
 
@@ -60,17 +54,8 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return applicationService
-      .get(argv.app_id)
+    return this.admin.apps.info(argv.app_id)
       .then(foundApp => {
-        if (!foundApp) {
-          if (!argv.q) {
-            this.log.error(`App not found: ${argv.app_id}`);
-          }
-          this.eg.exit();
-          return;
-        }
-
         let questions = [];
 
         let shouldPrompt = false;
@@ -113,13 +98,12 @@ module.exports = class extends eg.Generator {
           });
         }
 
-        const appId = argv.app_id;
         return this.prompt(questions)
           .then(answers => {
             app = Object.assign(app, answers);
-            return applicationService.update(appId, app);
+            return this.admin.apps.update(argv.app_id, app);
           })
-          .then(newApp => {
+          .then(res => {
             if (!argv.q) {
               this.log.ok(`Updated ${argv.app_id}`);
             } else {
@@ -132,6 +116,11 @@ module.exports = class extends eg.Generator {
             this.log.error(err.message);
             this.eg.exit();
           });
+      }).catch(() => {
+        if (!argv.q) {
+          this.log.error(`App not found: ${argv.app_id}`);
+        }
+        this.eg.exit();
       });
   }
 };

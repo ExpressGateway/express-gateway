@@ -1,5 +1,4 @@
 const eg = require('../../eg');
-
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -10,21 +9,15 @@ module.exports = class extends eg.Generator {
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} info [options] <app_id>`)
-          .group(['h'], 'Options:')
     });
   }
 
   prompting () {
-    const argv = this.argv;
-    const appService = this.eg.services.application;
-
-    return appService
-      .get(argv.app_id)
+    return this.admin.apps.info(this.argv.app_id)
       .then(app => {
         if (app) {
           this.log(JSON.stringify(app, null, 2));
         }
-
         this.eg.exit();
       })
       .catch(err => {

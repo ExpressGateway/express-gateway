@@ -1,25 +1,24 @@
 const assert = require('assert');
-
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
-const db = require('../../../lib/db')();
+const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
-const userService = require('../../../lib/services').user;
-
 const namespace = 'express-gateway:users:info';
+const idGen = require('uuid-base62');
 
 describe('eg users info', () => {
-  let program, env, userId;
+  let program, env, userId, username;
 
   before(() => {
     ({ program, env } = environment.bootstrap());
+    return adminHelper.start();
   });
+  after(() => adminHelper.stop());
 
   beforeEach(() => {
     env.prepareHijack();
-    return userService.insert({
-      username: 'lala',
+    username = idGen.v4();
+
+    return adminHelper.admin.users.create({
+      username: username,
       firstname: 'La',
       lastname: 'Deeda'
     })
@@ -28,22 +27,8 @@ describe('eg users info', () => {
     });
   });
 
-  afterEach(done => {
+  afterEach(() => {
     env.resetHijack();
-
-    db.flushdbAsync()
-    .then(didSucceed => {
-      if (!didSucceed) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to flush the database');
-      }
-
-      done();
-    })
-    .catch(err => {
-      assert(!err);
-      done();
-    });
   });
 
   it('returns user info', done => {
@@ -73,7 +58,7 @@ describe('eg users info', () => {
       });
     });
 
-    env.argv = program.parse('users info lala');
+    env.argv = program.parse('users info ' + username);
   });
 
   it('prints only the user id when using the --quiet flag', done => {
@@ -98,6 +83,6 @@ describe('eg users info', () => {
       });
     });
 
-    env.argv = program.parse('users info lala -q');
+    env.argv = program.parse('users info ' + username + ' -q');
   });
 });

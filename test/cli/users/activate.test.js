@@ -1,55 +1,41 @@
 const assert = require('assert');
-
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
-const db = require('../../../lib/db')();
 const environment = require('../../fixtures/cli/environment');
-const redisConfig = require('../../../lib/config').systemConfig.db.redis;
-const userService = require('../../../lib/services').user;
-
+const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:users:activate';
+const idGen = require('uuid-base62');
 
 describe('eg users activate', () => {
-  let program, env, userId;
-
+  let program, env, userId, userName, userName2;
   before(() => {
     ({ program, env } = environment.bootstrap());
+    return adminHelper.start();
   });
+  after(() => adminHelper.stop());
 
   beforeEach(() => {
     env.prepareHijack();
-    return userService.insert({
-      username: 'lala',
+    userName = idGen.v4();
+    userName2 = idGen.v4();
+    return adminHelper.admin.users.create({
+      username: userName,
       firstname: 'La',
       lastname: 'Deeda'
     })
     .then(user => {
       userId = user.id;
-      return userService.insert({
-        username: 'lala2',
+      return adminHelper.admin.users.create({
+        username: userName2,
         firstname: 'La2',
         lastname: 'Deeda2'
       });
-    });
+    })
+    .then(() => adminHelper.admin.users.deactivate(userName))
+    .then(() => adminHelper.admin.users.deactivate(userName2));
   });
 
-  afterEach(done => {
+  afterEach(() => {
     env.resetHijack();
-
-    db.flushdbAsync()
-    .then(didSucceed => {
-      if (!didSucceed) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to flush the database');
-      }
-
-      done();
-    })
-    .catch(err => {
-      assert(!err);
-      done();
-    });
+    return adminHelper.reset();
   });
 
   it('activates a user by username', done => {
@@ -59,7 +45,7 @@ describe('eg users activate', () => {
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -67,22 +53,17 @@ describe('eg users activate', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.isActive, 'true');
-                assert.equal(output, 'Activated lala');
-
-                assert.equal(error, null);
-
-                done();
-              });
+        return adminHelper.admin.users.info(userName)
+          .then(user => {
+            assert.equal(user.isActive, true);
+            assert.equal(output, 'Activated ' + userName);
+            assert.equal(error, null);
+            done();
           });
       });
     });
 
-    env.argv = program.parse('users activate lala');
+    env.argv = program.parse('users activate ' + userName);
   });
 
   it('activates a user by user ID', done => {
@@ -100,17 +81,12 @@ describe('eg users activate', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.isActive, 'true');
-                assert.equal(output, `Activated ${userId}`);
-
-                assert.equal(error, null);
-
-                done();
-              });
+        return adminHelper.admin.users.info(userId)
+          .then(user => {
+            assert.equal(user.isActive, true);
+            assert.equal(output, 'Activated ' + userId);
+            assert.equal(error, null);
+            done();
           });
       });
     });
@@ -120,78 +96,57 @@ describe('eg users activate', () => {
 
   it('activates multiple users', done => {
     env.hijack(namespace, generator => {
-      let output = [];
-      let error = null;
+      let output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          assert.fail(message);
         };
         generator.log.ok = message => {
-          output.push(message);
+          output[message] = true; // order is not garanteed, capture as object
         };
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.isActive, 'true');
-                assert.equal(output[0], 'Activated lala');
+        return adminHelper.admin.users.list()
+          .then(data => {
+            let users = data.users;
+            assert.equal(users[0].isActive, true);
+            assert.equal(users[1].isActive, true);
 
-                assert.equal(error, null);
-              });
-          })
-          .then(() => {
-            db.smembersAsync(redisConfig.namespace + '-username:lala2')
-              .then(userId => {
-                return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-                  .then(user => {
-                    assert.equal(user.isActive, 'true');
-                    assert.equal(output[1], 'Activated lala2');
-
-                    assert.equal(error, null);
-
-                    done();
-                  });
-              });
+            assert.ok(output['Activated ' + userName]);
+            assert.ok(output['Activated ' + userName2]);
+            assert.equal(Object.keys(output).length, 2);
+            done();
           });
       });
     });
 
-    env.argv = program.parse('users activate lala lala2');
+    env.argv = program.parse('users activate ' + userName + ' ' + userName2);
   });
-
   it('prints only the user id when using the --quiet flag', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          assert.fail(message);
         };
-        generator.log = message => {
+        generator.log.ok = message => {
           output = message;
         };
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user.isActive, 'true');
-                assert.equal(output, userId[0]);
-                assert.equal(error, null);
-
-                done();
-              });
-          });
+        return adminHelper.admin.users.info(userName)
+            .then(user => {
+              assert.equal(user.isActive, true);
+              assert.equal(output, userName);
+              done();
+            });
       });
     });
 
-    env.argv = program.parse('users activate lala -q');
+    env.argv = program.parse('users activate ' + userName + ' -q');
   });
 });

@@ -19,26 +19,19 @@ module.exports = class extends eg.Generator {
             ` | $0 ${process.argv[2]} create --stdin`)
           .example(`cat all_users.jsonl | $0 ${process.argv[2]} create --stdin`)
           .string('p')
-          .boolean(['q', 'stdin', 'no-color'])
+          .boolean(['stdin'])
           .describe('p', 'User property in the form [-p \'foo=bar\']')
-          .describe('q', 'Only show user ID')
           .describe('stdin', 'Import newline-delimited JSON via standard input')
-          .describe('no-color', 'Disable color in prompts')
           .alias('p', 'property')
-          .alias('q', 'quiet')
-          .group(['p', 'stdin', 'q', 'no-color', 'h'], 'Options:')
+          .group(['p', 'stdin'], 'Options:')
     });
-  }
-
-  initializing () {
-    if (this.argv.stdin) {
-      return this._createFromStdin();
-    }
   }
 
   prompting () {
     if (!this.argv.stdin) {
       return this._createFromCommandLine();
+    } else {
+      return this._createFromStdin();
     }
   }
 
@@ -50,73 +43,39 @@ module.exports = class extends eg.Generator {
 
     this.stdin.on('readable', () => {
       const chunk = this.stdin.read();
-
       if (chunk) {
         bufs.push(chunk);
       }
     });
-
-    this.stdin.on('end', () => {
-      let lines = bufs.join('').split('\n');
-
-      let promises = lines
-            .filter(line => line.length > 0)
-            .map((line, index) => {
-              let user = JSON.parse(line);
-
-              const options = {
-                skipPrompt: true,
-                isLast: index === lines.length - 1
-              };
-
-              return this._insert(user, options);
-            });
-
-      if (!promises.length) {
-        return;
-      }
-
-      let promisesCount = promises.length;
-      let promisesCompleted = 0;
-
-      const p = new Promise(resolve => {
-        promises.forEach(promise => {
-          promise
-              .then(newUser => {
-                promisesCompleted++;
-
-                if (newUser) {
-                  if (!argv.q) {
-                    this.log.ok(`Created ${newUser.username}`);
-                  } else {
-                    this.log(newUser.id);
-                  }
-                }
-
-                if (promisesCompleted === promisesCount) {
-                  this.eg.exit();
-                  resolve(); // don't propagate rejections
-                }
-              })
-              .catch(err => {
-                promisesCompleted++;
-
-                this.log.error(err.message);
-
-                if (promisesCompleted === promisesCount) {
-                  this.eg.exit();
-                  resolve(); // don't propagate rejections
-                }
-              });
-        });
-      });
-
-      this.emit('create-input', p);
-    });
-
     return new Promise((resolve, reject) => {
-      this.on('create-input', promise => {
-        promise.then(resolve).catch(reject);
+      this.stdin.on('end', () => {
+        let lines = bufs.join('').split('\n');
+        let promises = lines
+          .filter(line => line.length > 0)
+          .map((line, index) => {
+            let user = JSON.parse(line);
+
+            const options = {
+              skipPrompt: true,
+              isLast: index === lines.length - 1
+            };
+
+            return this._insert(user, options).then(newUser => {
+              if (newUser) {
+                if (!argv.q) {
+                  this.log.ok(`Created ${newUser.username}`);
+                } else {
+                  this.log(newUser.id);
+                }
+              }
+            })
+            .catch(err => {
+              this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
+            });
+          });
+
+        let p = Promise.all(promises);
+        resolve(p);
       });
     });
   }
@@ -152,7 +111,6 @@ module.exports = class extends eg.Generator {
       this.eg.exit();
       return;
     }
-
     return this._insert(user)
       .then(newUser => {
         if (!argv.q) {
@@ -163,13 +121,12 @@ module.exports = class extends eg.Generator {
         this.eg.exit();
       })
       .catch(err => {
-        this.log.error(err.message);
+        this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
         this.eg.exit();
       });
   }
   _insert (user, options) {
     const models = this.eg.config.models;
-    const userService = this.eg.services.user;
 
     options = options || {};
     options.skipPrompt = options.skipPrompt || false;
@@ -219,11 +176,10 @@ module.exports = class extends eg.Generator {
         }
       });
     }
-
     return this.prompt(questions)
       .then(answers => {
         user = Object.assign(user, answers);
-        return userService.insert(user);
+        return this.admin.users.create(user);
       });
   }
 };

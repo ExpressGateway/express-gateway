@@ -31,8 +31,8 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "start-dev": "LOG_LEVEL=debug node src/index.js",
-    "start:dist": "node dist/index.js",
+    "getting-started": "node lib/index.js emulate",
+    "start-dev": "LOG_LEVEL=debug node lib/index.js",
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "pretest": "eslint .",
@@ -73,6 +73,7 @@
     "passport-oauth2-client-password": "0.1.2",
     "redis": "2.7.1",
     "uuid-base62": "0.1.0",
+    "superagent": "^3.5.2",
     "vhost": "3.0.2",
     "winston": "2.3.1",
     "yargs": "8.0.2",

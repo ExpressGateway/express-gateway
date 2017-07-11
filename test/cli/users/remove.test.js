@@ -1,55 +1,37 @@
 const assert = require('assert');
-
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
-const db = require('../../../lib/db')();
+const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
-const redisConfig = require('../../../lib/config').systemConfig.db.redis;
-const userService = require('../../../lib/services').user;
-
+const idGen = require('uuid-base62');
 const namespace = 'express-gateway:users:remove';
 
 describe('eg users remove', () => {
-  let program, env, userId;
+  let program, env;
+  let users;
 
   before(() => {
     ({ program, env } = environment.bootstrap());
+    return adminHelper.start();
   });
+  after(() => adminHelper.stop());
 
   beforeEach(() => {
     env.prepareHijack();
-    return userService.insert({
-      username: 'lala',
-      firstname: 'La',
-      lastname: 'Deeda'
-    })
-    .then(user => {
-      userId = user.id;
-      return userService.insert({
-        username: 'lala2',
-        firstname: 'La2',
-        lastname: 'Deeda2'
+    let promises = [];
+    for (let i = 0; i < 5; i++) {
+      promises.push(adminHelper.admin.users.create({
+        username: idGen.v4(),
+        firstname: 'La',
+        lastname: 'Deeda'
+      }));
+    }
+    return Promise.all(promises)
+      .then(createdUsers => {
+        users = createdUsers;
       });
-    });
   });
 
-  afterEach(done => {
+  afterEach(() => {
     env.resetHijack();
-
-    db.flushdbAsync()
-    .then(didSucceed => {
-      if (!didSucceed) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to flush the database');
-      }
-
-      done();
-    })
-    .catch(err => {
-      assert(!err);
-      done();
-    });
   });
 
   it('removes a user by username', done => {
@@ -67,32 +49,26 @@ describe('eg users remove', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user, null);
-                assert.equal(output, 'Removed lala');
-
-                assert.equal(error, null);
-
-                done();
-              });
+        return adminHelper.admin.users.info(users[0].username)
+          .catch(err => {
+            assert.ok(err);
+            assert.equal(output, 'Removed ' + users[0].username);
+            assert.equal(error, null);
+            done();
           });
       });
     });
 
-    env.argv = program.parse('users remove lala');
+    env.argv = program.parse('users remove ' + users[0].username);
   });
 
   it('removes a user by user ID', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -100,77 +76,56 @@ describe('eg users remove', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userIds => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userIds[0])
-              .then(user => {
-                assert.equal(user, null);
-                assert.equal(output, `Removed ${userId}`);
+        return adminHelper.admin.users.info(users[1].id)
+          .catch(err => {
+            assert.ok(err);
+            assert.equal(output, 'Removed ' + users[1].id);
+            done();
+          });
+      });
+    });
 
-                assert.equal(error, null);
+    env.argv = program.parse(`users remove ${users[1].id}`);
+  });
 
+  it('removes multiple users', done => {
+    env.hijack(namespace, generator => {
+      let output = {};
+
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.log.ok = message => {
+          output[message] = true;
+        };
+      });
+
+      generator.once('end', () => {
+        return adminHelper.admin.users.info(users[3].username)
+          .catch(err => {
+            assert.ok(err);
+            return adminHelper.admin.users.info(users[4].username)
+              .catch(err => {
+                assert.ok(err);
+                assert.ok(output['Removed ' + users[3].username]);
+                assert.ok(output['Removed ' + users[4].username]);
                 done();
               });
           });
       });
     });
 
-    env.argv = program.parse(`users remove ${userId}`);
-  });
-
-  it('removes multiple users', done => {
-    env.hijack(namespace, generator => {
-      let output = [];
-      let error = null;
-
-      generator.once('run', () => {
-        generator.log.error = message => {
-          error = message;
-        };
-        generator.log.ok = message => {
-          output.push(message);
-        };
-      });
-
-      generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user, null);
-                assert.equal(output[0], 'Removed lala');
-
-                assert.equal(error, null);
-              });
-          })
-          .then(() => {
-            db.smembersAsync(redisConfig.namespace + '-username:lala2')
-              .then(userId => {
-                return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-                  .then(user => {
-                    assert.equal(user, null);
-                    assert.equal(output[1], 'Removed lala2');
-
-                    assert.equal(error, null);
-
-                    done();
-                  });
-              });
-          });
-      });
-    });
-
-    env.argv = program.parse('users remove lala lala2');
+    env.argv = program.parse(`users remove ${users[3].username} ${users[4].username}`);
   });
 
   it('prints only the user id when using the --quiet flag', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log = message => {
           output = message;
@@ -178,20 +133,15 @@ describe('eg users remove', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(redisConfig.namespace + '-username:lala')
-          .then(userId => {
-            return db.hgetallAsync(redisConfig.namespace + '-user:' + userId[0])
-              .then(user => {
-                assert.equal(user, null);
-                assert(!!output);
-                assert.equal(error, null);
-
-                done();
-              });
+        return adminHelper.admin.users.info(users[2].id)
+          .catch(err => {
+            assert.ok(err);
+            assert.equal(output, users[2].id);
+            done();
           });
       });
     });
 
-    env.argv = program.parse('users remove lala -q');
+    env.argv = program.parse('users remove ' + users[2].id + ' -q');
   });
 });

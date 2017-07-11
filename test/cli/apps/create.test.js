@@ -1,64 +1,45 @@
 const assert = require('assert');
+const environment = require('../../fixtures/cli/environment');
+const adminHelper = require('../../common/admin-helper')();
+const namespace = 'express-gateway:apps:create';
 const PassThrough = require('stream').PassThrough;
 const util = require('util');
+const idGen = require('uuid-base62');
 const helpers = require('yeoman-test');
 const { checkOutput } = require('../../common/output-helper');
 
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
-const db = require('../../../lib/db')();
-const environment = require('../../fixtures/cli/environment');
-const redisConfig = require('../../../lib/config').systemConfig.db.redis;
-const userService = require('../../../lib/services').user;
-
-const namespace = 'express-gateway:apps:create';
-
 describe('eg apps create', () => {
-  let program, env, userId;
-
+  let program, env, user;
   before(() => {
     ({ program, env } = environment.bootstrap());
+    return adminHelper.start();
   });
+  after(() => adminHelper.stop());
 
   beforeEach(() => {
     env.prepareHijack();
-    return userService.insert({
-      username: 'lala',
+    return adminHelper.admin.users.create({
+      username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(user => {
-      userId = user.id;
+    .then(createdUser => {
+      user = createdUser;
     });
   });
 
-  afterEach(done => {
+  afterEach(() => {
     env.resetHijack();
-
-    db.flushdbAsync()
-    .then(didSucceed => {
-      if (!didSucceed) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to flush the database');
-      }
-
-      done();
-    })
-    .catch(err => {
-      assert(!err);
-      done();
-    });
+    return adminHelper.reset();
   });
 
   it('creates an app from prompts with username', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -71,33 +52,28 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(`${redisConfig.namespace}-user-applications:${userId}`)
-          .then(appId => {
-            return db.hgetallAsync(`${redisConfig.namespace}-application:${appId[0]}`)
-              .then(app => {
-                assert.equal(app.name, 'appy');
-                assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+        return adminHelper.admin.apps.list()
+          .then(data => {
+            let app = data.apps[0];
+            assert.equal(app.name, 'appy');
+            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
-                assert.equal(output, `Created ${appId[0]}`);
-                assert.equal(error, null);
-
-                done();
-              });
+            assert.equal(output, `Created ${app.id}`);
+            done();
           });
       });
     });
 
-    env.argv = program.parse('apps create -u lala');
+    env.argv = program.parse('apps create -u ' + user.username);
   });
 
   it('creates an app from prompts with user ID', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -110,33 +86,28 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(`${redisConfig.namespace}-user-applications:${userId}`)
-          .then(appId => {
-            return db.hgetallAsync(`${redisConfig.namespace}-application:${appId[0]}`)
-              .then(app => {
-                assert.equal(app.name, 'appy');
-                assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+        return adminHelper.admin.apps.list()
+          .then(data => {
+            let app = data.apps[0];
+            assert.equal(app.name, 'appy');
+            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
-                assert.equal(output, `Created ${appId[0]}`);
-                assert.equal(error, null);
-
-                done();
-              });
+            assert.equal(output, `Created ${app.id}`);
+            done();
           });
       });
     });
 
-    env.argv = program.parse('apps create -u ' + userId);
+    env.argv = program.parse('apps create -u ' + user.id);
   });
 
   it('creates an app from properties with username', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -144,18 +115,14 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(`${redisConfig.namespace}-user-applications:${userId}`)
-          .then(appId => {
-            return db.hgetallAsync(`${redisConfig.namespace}-application:${appId[0]}`)
-              .then(app => {
-                assert.equal(app.name, 'appy');
-                assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+        return adminHelper.admin.apps.list()
+          .then(data => {
+            let app = data.apps[0];
+            assert.equal(app.name, 'appy');
+            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
-                assert.equal(output, `Created ${appId[0]}`);
-                assert.equal(error, null);
-
-                done();
-              });
+            assert.equal(output, `Created ${app.id}`);
+            done();
           });
       });
     });
@@ -167,11 +134,10 @@ describe('eg apps create', () => {
   it('creates an app from properties with user ID', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -179,23 +145,19 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(`${redisConfig.namespace}-user-applications:${userId}`)
-          .then(appId => {
-            return db.hgetallAsync(`${redisConfig.namespace}-application:${appId[0]}`)
-              .then(app => {
-                assert.equal(app.name, 'appy');
-                assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+        return adminHelper.admin.apps.list()
+          .then(data => {
+            let app = data.apps[0];
+            assert.equal(app.name, 'appy');
+            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
-                assert.equal(output, `Created ${appId[0]}`);
-                assert.equal(error, null);
-
-                done();
-              });
+            assert.equal(output, `Created ${app.id}`);
+            done();
           });
       });
     });
 
-    env.argv = program.parse(`apps create -u ${userId} -p "name=appy" ` +
+    env.argv = program.parse(`apps create -u ${user.id} -p "name=appy" ` +
       '-p "redirectUri=http://localhost:3000/cb"');
   });
 
@@ -207,11 +169,10 @@ describe('eg apps create', () => {
 
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log = message => {
           output = message;
@@ -226,18 +187,14 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(`${redisConfig.namespace}-user-applications:${userId}`)
-          .then(appId => {
-            return db.hgetallAsync(`${redisConfig.namespace}-application:${appId[0]}`)
-              .then(app => {
-                assert.equal(app.name, 'appy');
-                assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+        return adminHelper.admin.apps.list()
+          .then(data => {
+            let app = data.apps[0];
+            assert.equal(app.name, 'appy');
+            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
-                assert.equal(output, `Created ${appId[0]}`);
-                assert.equal(error, null);
-
-                done();
-              });
+            assert.equal(output, `Created ${app.id}`);
+            done();
           });
       });
     });
@@ -248,11 +205,10 @@ describe('eg apps create', () => {
   it('prints only the app id when using the --quiet flag', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log = message => {
           output = message;
@@ -260,23 +216,19 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        db.smembersAsync(`${redisConfig.namespace}-user-applications:${userId}`)
-          .then(appId => {
-            return db.hgetallAsync(`${redisConfig.namespace}-application:${appId[0]}`)
-              .then(app => {
-                assert.equal(app.name, 'appy');
-                assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+        return adminHelper.admin.apps.list()
+          .then(data => {
+            let app = data.apps[0];
+            assert.equal(app.name, 'appy');
+            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
-                assert.equal(output, appId[0]);
-                assert.equal(error, null);
-
-                done();
-              });
+            assert.equal(output, `${app.id}`);
+            done();
           });
       });
     });
 
-    env.argv = program.parse('apps create -u lala -p "name=appy" ' +
+    env.argv = program.parse('apps create -u ' + user.id + ' -p "name=appy" ' +
       '-p "redirectUri=http://localhost:3000/cb" -q');
   });
 
@@ -295,14 +247,13 @@ describe('eg apps create', () => {
 
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log = message => {
           output = message;
         };
         generator.log.error = message => {
-          error = message;
+          assert.equal(message, 'Failed to insert application: name is required');
         };
         generator.log.ok = message => {
           output = message;
@@ -314,32 +265,26 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(error, 'Failed to insert application: name is required');
         assert.equal(output, null);
-
         done();
       });
     });
 
-    env.argv = program.parse('apps create -u lala --stdin');
+    env.argv = program.parse('apps create -u ' + user.username + ' --stdin');
   });
 
   it('prints error on invalid user', done => {
     const app = {};
-
     env.hijack(namespace, generator => {
-      let output = null;
-      let error = null;
-
       generator.once('run', () => {
         generator.log = message => {
-          output = message;
+          done(new Error(message));
         };
         generator.log.error = message => {
-          error = message;
+          assert.equal(message, 'Failed to insert application: name is required');
         };
         generator.log.ok = message => {
-          output = message;
+          done(new Error(message));
         };
 
         generator.stdin = new PassThrough();
@@ -348,9 +293,6 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(error, 'Failed to insert application: invalid application properties');
-        assert.equal(output, null);
-
         done();
       });
     });
@@ -360,8 +302,7 @@ describe('eg apps create', () => {
 
   it('prints an error on invalid property syntax', done => {
     env.hijack(namespace, generator => {
-      let error = null;
-
+      let error;
       generator.once('run', () => {
         generator.log.error = (format, ...args) => {
           error = util.format(format, ...args);

@@ -1,70 +1,49 @@
 const assert = require('assert');
+const environment = require('../../fixtures/cli/environment');
+const adminHelper = require('../../common/admin-helper')();
+const namespace = 'express-gateway:apps:update';
+const idGen = require('uuid-base62');
 const util = require('util');
 const helpers = require('yeoman-test');
 
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
-const db = require('../../../lib/db')();
-const environment = require('../../fixtures/cli/environment');
-const redisConfig = require('../../../lib/config').systemConfig.db.redis;
-const userService = require('../../../lib/services').user;
-const appService = require('../../../lib/services').application;
-
-const namespace = 'express-gateway:apps:update';
-
 describe('eg apps update', () => {
-  let program, env, userId, appId;
-
+  let program, env, user, app1;
   before(() => {
     ({ program, env } = environment.bootstrap());
+    return adminHelper.start();
   });
+  after(() => adminHelper.stop());
 
+  afterEach(() => {
+    env.resetHijack();
+    return adminHelper.reset();
+  });
   beforeEach(() => {
     env.prepareHijack();
-    return userService.insert({
-      username: 'lala',
+    return adminHelper.admin.users.create({
+      username: idGen.v4(),
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(user => {
-      userId = user.id;
-      return appService.insert({
-        name: 'appy',
+    .then(createdUser => {
+      user = createdUser;
+
+      return adminHelper.admin.apps.create(user.id, {
+        name: 'appy1',
         redirectUri: 'http://localhost:3000/cb'
-      }, userId);
+      });
     })
-    .then(app => {
-      appId = app.id;
+    .then(createdApp => {
+      app1 = createdApp;
     });
   });
-
-  afterEach(done => {
-    env.resetHijack();
-
-    db.flushdbAsync()
-    .then(didSucceed => {
-      if (!didSucceed) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to flush the database');
-      }
-
-      done();
-    })
-    .catch(err => {
-      assert(!err);
-      done();
-    });
-  });
-
   it('updates an app from prompts', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -77,30 +56,26 @@ describe('eg apps update', () => {
       });
 
       generator.once('end', () => {
-        db.hgetallAsync(`${redisConfig.namespace}-application:${appId}`)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
             assert.equal(app.name, 'AppName');
             assert.equal(app.redirectUri, 'http://example.com/cb');
-
-            assert.equal(output, `Updated ${appId}`);
-            assert.equal(error, null);
-
+            assert.equal(output, `Updated ${app1.id}`);
             done();
           });
       });
     });
 
-    env.argv = program.parse(`apps update ${appId}`);
+    env.argv = program.parse(`apps update ${app1.id}`);
   });
 
   it('updates an app from properties', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
         generator.log.ok = message => {
           output = message;
@@ -108,59 +83,51 @@ describe('eg apps update', () => {
       });
 
       generator.once('end', () => {
-        db.hgetallAsync(`${redisConfig.namespace}-application:${appId}`)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.name, 'AppName');
+            assert.equal(app.name, 'AppName1');
             assert.equal(app.redirectUri, 'http://example.com/cb');
-
-            assert.equal(output, `Updated ${appId}`);
-            assert.equal(error, null);
-
+            assert.equal(output, `Updated ${app1.id}`);
             done();
           });
       });
     });
 
-    env.argv = program.parse(`apps update ${appId} ` +
-      '-p "name=AppName" -p "redirectUri=http://example.com/cb"');
+    env.argv = program.parse(`apps update ${app1.id} ` +
+      '-p "name=AppName1" -p "redirectUri=http://example.com/cb"');
   });
 
   it('prints only the app id when using the --quiet flag', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log = message => {
           output = message;
         };
         generator.log.error = message => {
-          error = message;
+          done(new Error(message));
         };
       });
 
       generator.once('end', () => {
-        db.hgetallAsync(`${redisConfig.namespace}-application:${appId}`)
+        return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.name, 'AppName');
+            assert.equal(app.name, 'AppName2');
             assert.equal(app.redirectUri, 'http://example.com/cb');
-
-            assert.equal(output, appId);
-            assert.equal(error, null);
-
+            assert.equal(output, `${app1.id}`);
             done();
           });
       });
     });
 
-    env.argv = program.parse(`apps update ${appId} ` +
-      '-p "name=AppName" -p "redirectUri=http://example.com/cb" -q');
+    env.argv = program.parse(`apps update ${app1.id} ` +
+      '-p "name=AppName2" -p "redirectUri=http://example.com/cb" -q');
   });
 
   it('errors on unknown app ID', done => {
     env.hijack(namespace, generator => {
       let output = null;
-      let error = null;
 
       generator.once('run', () => {
         generator.log = message => {
@@ -170,13 +137,12 @@ describe('eg apps update', () => {
           output = message;
         };
         generator.log.error = message => {
-          error = message;
+          assert.equal(message, 'App not found: asdf');
         };
       });
 
       generator.once('end', () => {
         assert.equal(output, null);
-        assert.equal(error, 'App not found: asdf');
 
         done();
       });
@@ -202,7 +168,7 @@ describe('eg apps update', () => {
       });
     });
 
-    env.argv = program.parse(`apps update ${appId} -p "name=" ` +
+    env.argv = program.parse(`apps update ${app1.id} -p "name=" ` +
       '-p "redirectUri=http://example.com/cb"');
   });
 });
