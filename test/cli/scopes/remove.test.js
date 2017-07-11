@@ -5,7 +5,7 @@ const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:scopes:remove';
 
 describe('eg scopes remove', () => {
-  let program, env, scopeName;
+  let program, env, scopeName, scopeName2;
 
   before(() => {
     ({ program, env } = environment.bootstrap());
@@ -16,7 +16,9 @@ describe('eg scopes remove', () => {
   beforeEach(() => {
     env.prepareHijack();
     scopeName = idGen.v4();
-    return adminHelper.admin.scopes.create(scopeName);
+    scopeName2 = idGen.v4();
+    return adminHelper.admin.scopes.create(scopeName)
+    .then(() => adminHelper.admin.scopes.create(scopeName2));
   });
 
   afterEach(() => {
@@ -46,6 +48,33 @@ describe('eg scopes remove', () => {
     });
 
     env.argv = program.parse('scopes remove ' + scopeName);
+  });
+
+  it('should rm multi scope', done => {
+    env.hijack(namespace, generator => {
+      let output = {};
+
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.log.ok = message => {
+          output[message] = true;
+        };
+      });
+
+      generator.once('end', () => {
+        assert.ok(output['Removed ' + scopeName]);
+        assert.ok(output['Removed ' + scopeName2]);
+        return adminHelper.admin.scopes.info(scopeName).catch(() => {
+          return adminHelper.admin.scopes.info(scopeName2).catch(() => {
+            done();
+          });
+        });
+      });
+    });
+
+    env.argv = program.parse('scopes remove ' + scopeName + ' ' + scopeName2);
   });
 
   it('prints only the scope name when using the --quiet flag', done => {
