@@ -111,13 +111,10 @@ describe('Credential service tests', function () {
       .insertCredential(username, 'basic-auth', _credential)
       .then(function (newCredential) {
         should.exist(newCredential);
-        newCredential.isActive.should.eql('true');
+        newCredential.isActive.should.eql(true);
         done();
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .catch(done);
     });
 
     it('should get a credential', function (done) {
@@ -126,13 +123,10 @@ describe('Credential service tests', function () {
       .then(function (cred) {
         should.exist(cred);
         should.not.exist(cred.secret);
-        credential.isActive.should.eql('true');
+        credential.isActive.should.eql(true);
         done();
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .catch(done);
     });
 
     it('should deactivate a credential', function (done) {
@@ -147,14 +141,11 @@ describe('Credential service tests', function () {
         .then(function (cred) {
           should.exist(cred);
           should.not.exist(cred.secret);
-          cred.isActive.should.eql('false');
+          cred.isActive.should.eql(false);
           done();
         });
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .catch(done);
     });
 
     it('should reactivate a credential', function (done) {
@@ -169,7 +160,7 @@ describe('Credential service tests', function () {
         .then(function (cred) {
           should.exist(cred);
           should.not.exist(cred.secret);
-          cred.isActive.should.eql('true');
+          cred.isActive.should.eql(true);
           done();
         });
       })
@@ -337,7 +328,7 @@ describe('Credential service tests', function () {
         .insertCredential(username, 'oauth', _credential)
         .then(function (newCredential) {
           should.exist(newCredential);
-          newCredential.isActive.should.eql('true');
+          newCredential.isActive.should.eql(true);
           should.exist(newCredential.scopes);
           newCredential.scopes.should.eql(['someScope']);
           newCredential.someProperty.should.eql('propVal');
@@ -370,7 +361,7 @@ describe('Credential service tests', function () {
             cred.scopes.should.containEql('someScope2');
             cred.scopes.should.containEql('someScope3');
             cred.scopes.should.containEql('someOtherOne');
-            cred.isActive.should.eql('true');
+            cred.isActive.should.eql(true);
             done();
           });
         })
@@ -396,7 +387,7 @@ describe('Credential service tests', function () {
           cred.scopes.should.containEql('someScope1');
           cred.scopes.should.not.containEql('someScope2');
           cred.scopes.should.not.containEql('someScope3');
-          cred.isActive.should.eql('true');
+          cred.isActive.should.eql(true);
           done();
         });
       })
@@ -420,7 +411,7 @@ describe('Credential service tests', function () {
           cred.scopes.should.containEql('someOtherOne');
           cred.scopes.should.not.containEql('someScope1');
           cred.scopes.should.not.containEql('someScope');
-          cred.isActive.should.eql('true');
+          cred.isActive.should.eql(true);
           done();
         });
       })
@@ -456,7 +447,7 @@ describe('Credential service tests', function () {
       .insertCredential(username2, 'oauth', cred)
       .then(function (newCredential) {
         should.exist(newCredential);
-        newCredential.isActive.should.eql('true');
+        newCredential.isActive.should.eql(true);
         should.exist(newCredential.scopes);
         newCredential.scopes.should.eql(['someOtherOne']);
         newCredential.someProperty.should.eql('propVal');
@@ -464,10 +455,7 @@ describe('Credential service tests', function () {
         newCredential.otherProperty.should.eql('someDefaultValue');
         done();
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .catch(done);
     });
 
     it('should not create credential if a required property is not passed in', function (done) {

@@ -32,6 +32,6 @@ module.exports = class extends eg.Generator {
           .catch(err => {
             this.log.error(err.message);
           });
-    })).then(() => this.eg.exit());
+    }));
   }
 };

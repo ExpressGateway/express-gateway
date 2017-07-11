@@ -108,7 +108,6 @@ module.exports = class extends eg.Generator {
     });
 
     if (hasInvalidProperty) {
-      this.eg.exit();
       return;
     }
     return this._insert(user)
@@ -118,11 +117,9 @@ module.exports = class extends eg.Generator {
         } else {
           this.log(newUser.id);
         }
-        this.eg.exit();
       })
       .catch(err => {
         this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-        this.eg.exit();
       });
   }
   _insert (user, options) {
@@ -168,14 +165,6 @@ module.exports = class extends eg.Generator {
       }
     }
 
-    if (questions.length > 0) {
-      // handle CTRL-C
-      this.stdin.on('data', key => {
-        if (key.toString('utf8') === '\u0003') {
-          this.eg.exit();
-        }
-      });
-    }
     return this.prompt(questions)
       .then(answers => {
         user = Object.assign(user, answers);

@@ -16,11 +16,9 @@ module.exports = class extends eg.Generator {
     return this.admin.scopes.info(this.argv.scope)
       .then(res => {
         this.log(res.scope);
-        this.eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        this.eg.exit();
       });
   }
 };

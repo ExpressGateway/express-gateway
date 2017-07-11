@@ -89,15 +89,6 @@ module.exports = class extends eg.Generator {
           });
         }
 
-        if (questions.length > 0) {
-          // handle CTRL-C
-          process.stdin.on('data', key => {
-            if (key.toString('utf8') === '\u0003') {
-              this.eg.exit();
-            }
-          });
-        }
-
         return this.prompt(questions)
           .then(answers => {
             app = Object.assign(app, answers);
@@ -109,18 +100,14 @@ module.exports = class extends eg.Generator {
             } else {
               this.log(argv.app_id);
             }
-
-            this.eg.exit();
           })
           .catch(err => {
             this.log.error(err.message);
-            this.eg.exit();
           });
       }).catch(() => {
         if (!argv.q) {
           this.log.error(`App not found: ${argv.app_id}`);
         }
-        this.eg.exit();
       });
   }
 };

@@ -11,9 +11,13 @@ module.exports = class extends eg.Generator {
         .reset()
         .usage('Usage: $0 ' + process.argv[2] + ' <command> [options]')
         .command(this.createSubCommand('create'))
-        // .command(this.createSubCommand('info'))
+        .command(this.createSubCommand('activate'))
+        .command(this.createSubCommand('deactivate'))
+        .command(this.createSubCommand('info'))
+        .command(this.createSubCommand('add-scopes'))
+        .command(this.createSubCommand('remove-scopes'))
+        .command(this.createSubCommand('set-scopes'))
         // .command(this.createSubCommand('remove'))
-        // .command(this.createSubCommand('list'))
         .demandCommand()
     });
   }

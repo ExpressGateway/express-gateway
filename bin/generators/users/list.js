@@ -27,12 +27,9 @@ module.exports = class extends eg.Generator {
             this.log(JSON.stringify(u, null, 2));
           }
         });
-
-        this.eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        this.eg.exit();
       });
   }
 };

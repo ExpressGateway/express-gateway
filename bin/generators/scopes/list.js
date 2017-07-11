@@ -20,11 +20,9 @@ module.exports = class extends eg.Generator {
           return this.log('You have no scopes');
         }
         res.scopes.forEach(scope => this.log(scope));
-        this.eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        this.eg.exit();
       });
   }
 };
