@@ -19,7 +19,7 @@ module.exports = class extends eg.Generator {
       : [this.argv.scope];
 
     return Promise.all(scopes.map((scope) => {
-      return this.admin.scopes.remove(this.argv.scope)
+      return this.admin.scopes.remove(scopes)
         .then(res => {
           if (this.argv.q) {
             this.log(`${scope}`);
