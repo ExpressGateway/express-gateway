@@ -3,8 +3,12 @@ const path = require('path');
 const yargs = require('yargs');
 const yeoman = require('yeoman-environment');
 
+const { executeInScope } = require('./execution-scope');
+
 exports.bootstrap = (eg, adapter) => {
   const env = yeoman.createEnv();
+
+  executeInScope(env);
 
   env.eg = eg;
 
