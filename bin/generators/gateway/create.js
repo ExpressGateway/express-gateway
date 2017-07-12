@@ -78,7 +78,7 @@ module.exports = class extends eg.Generator {
         ]
     };
 
-    return new Promise(resolve => resolve())
+    return Promise.resolve()
       .then(() => {
         if (!this.name) {
           return this.prompt([nameQuestion])
