@@ -14,8 +14,14 @@ exports.executeInScope = env => {
     return;
   }
 
+  const configPath = path.join(rootPath, 'config');
+
+  if (!fs.existsSync(configPath)) {
+    return;
+  }
+
   if (!process.env.EG_CONFIG_DIR) {
-    process.env.EG_CONFIG_DIR = path.join(rootPath, 'config');
+    process.env.EG_CONFIG_DIR = configPath;
   }
 
   const localBin = path.join(rootPath, 'node_modules', '.bin', 'eg');
