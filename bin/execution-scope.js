@@ -10,32 +10,31 @@ exports.executeInScope = env => {
 
   rootPath = rootPath ? path.dirname(rootPath) : env.cwd;
 
+  if (!rootPath) {
+    return;
+  }
+
   if (!process.env.EG_CONFIG_DIR) {
     process.env.EG_CONFIG_DIR = path.join(rootPath, 'config');
   }
 
   const localBin = path.join(rootPath, 'node_modules', '.bin', 'eg');
 
-  if (!process.env.EG_LOCAL_EXEC) {
+  // intercept CLI command and forward to local installation
+  if (!process.env.EG_LOCAL_EXEC && fs.existsSync(localBin)) {
+    const childEnv = process.env;
+    childEnv.EG_LOCAL_EXEC = true;
+
     try {
-      if (fs.statSync(localBin)) {
-        let childEnv = process.env;
-        childEnv.EG_LOCAL_EXEC = true;
-
-        try {
-          execFileSync(localBin, process.argv.slice(2), {
-            cwd: env.cwd,
-            env: childEnv,
-            stdio: 'inherit'
-          });
-        } catch (err) {
-          process.exit(err.status);
-        }
-
-        process.exit();
-      }
+      execFileSync(localBin, process.argv.slice(2), {
+        cwd: env.cwd,
+        env: childEnv,
+        stdio: 'inherit'
+      });
     } catch (err) {
-      // swallow error, go global
+      process.exit(err.status);
     }
+
+    process.exit();
   }
 };
