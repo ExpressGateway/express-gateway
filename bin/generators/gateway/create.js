@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const chalk = require('chalk');
 const path = require('path');
 const eg = require('../../eg');
@@ -20,7 +22,7 @@ module.exports = class extends eg.Generator {
             alias: 'name',
             describe: 'Name of the gateway',
             demandOption: false,
-            type: 'string',
+            type: 'string'
           })
           .option('t', {
             alias: 'type',
@@ -44,14 +46,12 @@ module.exports = class extends eg.Generator {
     }
 
     if (this.argv.name) {
-      this.name = this.argv.name
+      this.name = this.argv.name;
     }
 
     if (this.argv.directory) {
       this.directory = this.argv.directory;
     }
-
-    const questions = [];
 
     const nameQuestion = {
       type: 'string',
@@ -61,21 +61,21 @@ module.exports = class extends eg.Generator {
     };
 
     const directoryQuestion = {
-        type: 'string',
-        name: 'directory',
-        message: 'Where would you like to install your gateway?',
+      type: 'string',
+      name: 'directory',
+      message: 'Where would you like to install your gateway?'
     };
 
     const typeQuestion = {
-        type: 'list',
-        name: 'type',
-        message: 'What type of gateway do you want to create?',
-        choices: [
-          {
-            name: 'Basic Gateway Configuration',
-            value: 'basic'
-          }
-        ]
+      type: 'list',
+      name: 'type',
+      message: 'What type of gateway do you want to create?',
+      choices: [
+        {
+          name: 'Basic Gateway Configuration',
+          value: 'basic'
+        }
+      ]
     };
 
     return Promise.resolve()
