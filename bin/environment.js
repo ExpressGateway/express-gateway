@@ -44,7 +44,7 @@ exports.bootstrap = (eg, adapter) => {
 
         const stat = fs.statSync(path.join(directoryPath, file));
         return stat.isFile();
-      })
+      });
 
     files.forEach(file => {
       if (file === 'index.js') {
