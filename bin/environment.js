@@ -21,25 +21,36 @@ exports.bootstrap = (eg, adapter) => {
   let commands = [];
   let subCommands = {};
 
-  const dirs = fs.readdirSync(generatorsPath);
+  const dirs = fs
+    .readdirSync(generatorsPath)
+    .filter(dir => {
+      if (dir[0] === '.') {
+        return false;
+      }
+
+      const stat = fs.statSync(path.join(generatorsPath, dir));
+      return stat.isDirectory();
+    });
 
   dirs.forEach(dir => {
-    if (dir[0] === '.') {
-      return;
-    }
-
     const directoryPath = path.join(generatorsPath, dir);
-    const files = fs.readdirSync(directoryPath);
+
+    const files = fs
+      .readdirSync(directoryPath)
+      .filter(file => {
+        if (file[0] === '.') {
+          return false;
+        }
+
+        const stat = fs.statSync(path.join(directoryPath, file));
+        return stat.isFile();
+      })
 
     files.forEach(file => {
       if (file === 'index.js') {
         const namespace = `${prefix}:${dir}`;
         commands.push({ namespace: namespace, path: directoryPath });
         env.register(directoryPath, namespace);
-        return;
-      }
-
-      if (file[0] === '.') {
         return;
       }
 
@@ -54,6 +65,7 @@ exports.bootstrap = (eg, adapter) => {
         namespace: namespace,
         path: filePath
       });
+
       env.register(filePath, namespace);
     });
   });
