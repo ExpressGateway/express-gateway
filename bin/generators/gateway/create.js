@@ -9,7 +9,6 @@ module.exports = class extends eg.Generator {
     this.name = null;
     this.directory = null;
     this.type = null;
-    this.originalWorkingDirectory = process.cwd();
 
     this.configureCommand({
       command: 'create [options]',
@@ -58,6 +57,7 @@ module.exports = class extends eg.Generator {
       type: 'string',
       name: 'name',
       message: 'What\'s the name of your gateway?',
+      validate: input => !!input
     };
 
     const directoryQuestion = {
@@ -90,7 +90,7 @@ module.exports = class extends eg.Generator {
       .then(() => {
         if (!this.directory) {
           directoryQuestion.default =
-            path.relative(this.originalWorkingDirectory, this.name);
+            path.relative(process.cwd(), this.name);
 
           return this.prompt([directoryQuestion])
             .then(props => {
@@ -128,7 +128,7 @@ module.exports = class extends eg.Generator {
   }
 
   end () {
-    const relativePath = path.relative(this.originalWorkingDirectory, this.directory);
+    const relativePath = path.relative(process.cwd(), this.directory);
 
     console.log('');
     console.log(`To start ${chalk.green(this.name)}, run the following commands:`);
