@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const chalk = require('chalk');
 const path = require('path');
 const eg = require('../../eg');
@@ -6,56 +8,112 @@ module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
 
+    this.name = null;
+    this.directory = null;
     this.type = null;
 
     this.configureCommand({
-      command: 'create <name> [options]',
-      description: 'Create a gateway',
+      command: 'create [options]',
+      description: 'Create an Express Gateway',
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} create [options]`)
+          .option('n', {
+            alias: 'name',
+            describe: 'Name of the Express Gateway',
+            demandOption: false,
+            type: 'string'
+          })
           .option('t', {
             alias: 'type',
-            describe: 'Type of gateway template to generate',
+            describe: 'Type of Express Gateway template to generate',
+            demandOption: false,
+            type: 'string'
+          })
+          .option('d', {
+            alias: 'dir',
+            describe: 'Directory where the Express Gateway will be installed',
             demandOption: false,
             choices: ['basic', undefined]
           })
-          .group('t', 'Options:')
+          .group(['n', 'd', 't'], 'Options:')
     });
   }
 
   prompting () {
     if (this.argv.type) {
       this.type = this.argv.type;
-      return;
     }
 
-    const questions = [
-      {
-        type: 'list',
-        name: 'type',
-        message: 'What type of gateway do you want to create?',
-        choices: [
-          {
-            name: 'Basic Gateway Configuration',
-            value: 'basic'
-          }
-        ]
-      }
-    ];
+    if (this.argv.name) {
+      this.name = this.argv.name;
+    }
 
-    return this.prompt(questions)
-      .then(props => {
-        this.type = props.type;
+    if (this.argv.directory) {
+      this.directory = this.argv.directory;
+    }
+
+    const nameQuestion = {
+      type: 'string',
+      name: 'name',
+      message: 'What\'s the name of your Express Gateway?',
+      validate: input => !!input
+    };
+
+    const directoryQuestion = {
+      type: 'string',
+      name: 'directory',
+      message: 'Where would you like to install your Express Gateway?'
+    };
+
+    const typeQuestion = {
+      type: 'list',
+      name: 'type',
+      message: 'What type of Express Gateway do you want to create?',
+      choices: [
+        {
+          name: 'Basic Gateway Configuration',
+          value: 'basic'
+        }
+      ]
+    };
+
+    return Promise.resolve()
+      .then(() => {
+        if (!this.name) {
+          return this.prompt([nameQuestion])
+            .then(props => {
+              this.name = props.name;
+            });
+        }
+      })
+      .then(() => {
+        if (!this.directory) {
+          directoryQuestion.default =
+            path.relative(process.cwd(), this.name);
+
+          return this.prompt([directoryQuestion])
+            .then(props => {
+              this.directory = props.directory;
+            });
+        }
+      })
+      .then(() => {
+        if (!this.type) {
+          return this.prompt([typeQuestion])
+            .then(props => {
+              this.type = props.type;
+            });
+        }
       });
   }
 
   writing () {
     this.sourceRoot(path.join(this.sourceRoot(), this.type));
-    this.destinationRoot(this.argv.name);
+    this.destinationRoot(this.directory);
 
     let packageJSON = this.fs.readJSON(this.templatePath('./package.json'));
-    packageJSON.name = this.argv.name;
+    packageJSON.name = this.name;
 
     this.fs.writeJSON(this.destinationPath('./package.json'), packageJSON);
     this.fs.writeJSON(this.destinationPath('./.yo-rc.json'), {});
@@ -70,8 +128,10 @@ module.exports = class extends eg.Generator {
   }
 
   end () {
+    const relativePath = path.relative(process.cwd(), this.directory);
+
     console.log('');
-    console.log(`To start ${chalk.green(this.argv.name)}, run the following commands:`);
-    console.log(`    cd ${this.argv.name} && npm start`);
+    console.log(`To start ${chalk.green(this.name)}, run the following commands:`);
+    console.log(`    cd ${relativePath} && npm start`);
   }
 };
