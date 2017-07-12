@@ -33,7 +33,6 @@ exports.executeInScope = env => {
         }
 
         process.exit();
-        return;
       }
     } catch (err) {
       // swallow error, go global
