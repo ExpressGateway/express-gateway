@@ -14,25 +14,25 @@ module.exports = class extends eg.Generator {
 
     this.configureCommand({
       command: 'create [options]',
-      description: 'Create a gateway',
+      description: 'Create an Express Gateway',
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} create [options]`)
           .option('n', {
             alias: 'name',
-            describe: 'Name of the gateway',
+            describe: 'Name of the Express Gateway',
             demandOption: false,
             type: 'string'
           })
           .option('t', {
             alias: 'type',
-            describe: 'Type of gateway template to generate',
+            describe: 'Type of Express Gateway template to generate',
             demandOption: false,
             type: 'string'
           })
           .option('d', {
             alias: 'dir',
-            describe: 'Directory where the gateway will be installed',
+            describe: 'Directory where the Express Gateway will be installed',
             demandOption: false,
             choices: ['basic', undefined]
           })
@@ -56,20 +56,20 @@ module.exports = class extends eg.Generator {
     const nameQuestion = {
       type: 'string',
       name: 'name',
-      message: 'What\'s the name of your gateway?',
+      message: 'What\'s the name of your Express Gateway?',
       validate: input => !!input
     };
 
     const directoryQuestion = {
       type: 'string',
       name: 'directory',
-      message: 'Where would you like to install your gateway?'
+      message: 'Where would you like to install your Express Gateway?'
     };
 
     const typeQuestion = {
       type: 'list',
       name: 'type',
-      message: 'What type of gateway do you want to create?',
+      message: 'What type of Express Gateway do you want to create?',
       choices: [
         {
           name: 'Basic Gateway Configuration',
