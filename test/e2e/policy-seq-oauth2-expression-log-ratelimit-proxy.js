@@ -215,7 +215,7 @@ describe('End to End tests with oauth2, proxy, log, expression, rate-limit polic
     helper.cleanup();
     config.gatewayConfig = originalGatewayConfig;
     appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth2 = originalCredentialConfig.oauth;
+    credentialModelConfig.oauth2 = originalCredentialConfig.oauth2;
     userModelConfig.properties = originalUserConfig.properties;
     logger.info.restore();
     backendServer.close();

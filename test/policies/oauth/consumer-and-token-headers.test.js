@@ -173,7 +173,7 @@ describe('Request Headers with consumer and token information as part of auth po
     helper.cleanup();
     config.gatewayConfig = originalGatewayConfig;
     appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth2 = originalCredentialConfig.oauth;
+    credentialModelConfig = originalCredentialConfig;
     userModelConfig.properties = originalUserConfig.properties;
     backendServer.close();
     done();

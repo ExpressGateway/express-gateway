@@ -150,7 +150,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
   after('cleanup', (done) => {
     config.gatewayConfig = originalGatewayConfig;
     appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth2 = originalCredentialConfig.oauth;
+    credentialModelConfig.oauth2 = originalCredentialConfig.oauth2;
     userModelConfig.properties = originalUserConfig.properties;
     helper.cleanup();
     done();

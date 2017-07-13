@@ -129,7 +129,7 @@ describe('Functional Tests basic auth Policy', () => {
     app.close();
     config.gatewayConfig = originalGatewayConfig;
     appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth2 = originalCredentialConfig.oauth;
+    credentialModelConfig.oauth2 = originalCredentialConfig.oauth2;
     userModelConfig.properties = originalUserConfig.properties;
     helper.cleanup();
     done();

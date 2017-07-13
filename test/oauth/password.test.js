@@ -96,7 +96,7 @@ describe('Functional Test Client Password grant', function () {
 
   after((done) => {
     config.models.applications.properties = originalAppConfig.properties;
-    config.models.credentials.oauth2 = originalCredentialConfig.oauth;
+    config.models.credentials.oauth2 = originalCredentialConfig.oauth2;
     config.models.users.properties = originalUserConfig.properties;
     done();
   });

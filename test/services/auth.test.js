@@ -36,10 +36,6 @@ describe('Auth tests', function () {
 
     db.flushdbAsync()
     .then(function (didSucceed) {
-      if (!didSucceed) {
-        console.log('Failed to flush the database');
-      }
-
       user = {
         username: 'irfanbaqui',
         firstname: 'irfan',
@@ -74,7 +70,7 @@ describe('Auth tests', function () {
   });
 
   after(function (done) {
-    credentialModelConfig.oauth2 = originalModelConfig.oauth;
+    credentialModelConfig.oauth2 = originalModelConfig.oauth2;
     userModelConfig.properties = originalUserModelConfig;
     done();
   });
