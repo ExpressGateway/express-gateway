@@ -74,7 +74,7 @@ describe('Functional Tests basic auth Policy', () => {
       redirectUri: { isRequired: true, isMutable: true }
     };
 
-    credentialModelConfig.oauth = {
+    credentialModelConfig.oauth2 = {
       passwordKey: 'secret',
       properties: { scopes: { isRequired: false } }
     };
@@ -129,7 +129,7 @@ describe('Functional Tests basic auth Policy', () => {
     app.close();
     config.gatewayConfig = originalGatewayConfig;
     appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth = originalCredentialConfig.oauth;
+    credentialModelConfig.oauth2 = originalCredentialConfig.oauth;
     userModelConfig.properties = originalUserConfig.properties;
     helper.cleanup();
     done();

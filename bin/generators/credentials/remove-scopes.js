@@ -13,7 +13,7 @@ module.exports = class extends eg.Generator {
           .alias('t', 'type')
           .demandOption(['t', 'id'])
           .nargs('t', 1)
-          .describe('t', 'Type of credential: can be one of: oauth, basic-auth, key-auth')
+          .describe('t', 'Type of credential: can be one of: oauth2, basic-auth, key-auth')
           .alias('id', 'keyid')
           .describe('id', 'Id or keyId of credential to remove scopes from')
     });

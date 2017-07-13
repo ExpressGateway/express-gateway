@@ -22,7 +22,7 @@ module.exports = class extends eg.Generator {
           .string(['p', 'c', 't'])
           .boolean(['stdin'])
           .describe('c', 'Consumer ID: can be User ID or username or app ID')
-          .describe('t', 'Type of credential: can be one of: oauth, basic-auth, key-auth')
+          .describe('t', 'Type of credential: can be one of: oauth2, basic-auth, key-auth')
           .describe('p', 'App property in the form [-p \'foo=bar\']')
           .describe('stdin', 'Import newline-delimited JSON via standard input')
           .alias('c', 'consumer').nargs('c', 1)

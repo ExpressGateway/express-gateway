@@ -13,7 +13,7 @@ module.exports = class extends eg.Generator {
           .alias('t', 'type')
           .nargs('t', 1)
           .demandOption(['t'])
-          .describe('t', 'Type of credential: can be one of: oauth, basic-auth, key-auth')
+          .describe('t', 'Type of credential: can be one of: oauth2, basic-auth, key-auth')
     });
   }
 
