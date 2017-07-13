@@ -1,0 +1,24 @@
+apiEndpoints:
+  api:
+    host: '*'
+http:
+  port: 8080
+admin:
+  port: 9876
+  hostname: localhost
+# serviceEndpoints:
+#   backend:
+#     url: 'http://httpbin.org'
+# policies:
+#   - proxy
+#   - key-auth
+# pipelines:
+#   - name: httpbin
+#     apiEndpoints:
+#       - api
+#     policies:
+#       - key-auth: {}
+#       - proxy:
+#           - action:
+#               serviceEndpoint: backend
+#               changeOrigin: true

@@ -34,7 +34,7 @@ module.exports = class extends eg.Generator {
             alias: 'dir',
             describe: 'Directory where the Express Gateway will be installed',
             demandOption: false,
-            choices: ['basic', undefined]
+            choices: ['basic', 'getting-started', undefined]
           })
           .group(['n', 'd', 't'], 'Options:')
     });
@@ -71,6 +71,10 @@ module.exports = class extends eg.Generator {
       name: 'type',
       message: 'What type of Express Gateway do you want to create?',
       choices: [
+        {
+          name: 'Getting Started with Express Gateway',
+          value: 'getting-started'
+        },
         {
           name: 'Basic Gateway Configuration',
           value: 'basic'
