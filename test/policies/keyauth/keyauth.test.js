@@ -166,6 +166,15 @@ describe('Functional Tests keyAuth Policy', () => {
       .expect(200)
       .end(done);
   });
+  it('should authenticate key with scheme ignoring case in headers for requests with scopes if requester is authorized', function (done) {
+    let apikey = 'scheME1 ' + user.keyId + ':' + user.keySecret;
+
+    request(app)
+      .get('/authorizedPath')
+      .set('TEST_HEADER', apikey)
+      .expect(200)
+      .end(done);
+  });
   it('should authenticate key in query for requests with scopes if requester is authorized ', function (done) {
     let apikey = user.keyId + ':' + user.keySecret;
 
