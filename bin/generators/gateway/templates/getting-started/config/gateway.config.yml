@@ -6,19 +6,19 @@ http:
 admin:
   port: 9876
   hostname: localhost
-# serviceEndpoints:
-#   backend:
-#     url: 'http://httpbin.org'
-# policies:
-#   - proxy
-#   - key-auth
-# pipelines:
-#   - name: httpbin
-#     apiEndpoints:
-#       - api
-#     policies:
-#       - key-auth: {}
-#       - proxy:
-#           - action:
-#               serviceEndpoint: backend
-#               changeOrigin: true
+serviceEndpoints:
+  backend:
+    url: 'https://httpbin.org'
+policies:
+  - proxy
+  - key-auth
+pipelines:
+  - name: httpbin
+    apiEndpoints:
+      - api
+    policies:
+    # - key-auth: {}
+      - proxy:
+          - action:
+              serviceEndpoint: backend
+              changeOrigin: true
