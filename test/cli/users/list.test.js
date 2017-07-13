@@ -44,7 +44,7 @@ describe('eg users list', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           let usr = JSON.parse(message);
           output[usr.username] = true;
         };
@@ -69,7 +69,7 @@ describe('eg users list', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output[message] = true;
         };
       });

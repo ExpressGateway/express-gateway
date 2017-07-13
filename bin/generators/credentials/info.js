@@ -25,9 +25,9 @@ module.exports = class extends eg.Generator {
       .then(cred => {
         if (cred) {
           if (!argv.q) {
-            this.log(JSON.stringify(cred, null, 2));
+            this.stdout(JSON.stringify(cred, null, 2));
           } else {
-            this.log(cred.id);
+            this.stdout(cred.id);
           }
         }
       })

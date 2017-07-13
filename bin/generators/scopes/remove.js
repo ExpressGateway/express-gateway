@@ -22,7 +22,7 @@ module.exports = class extends eg.Generator {
       return this.admin.scopes.remove(scope)
         .then(res => {
           if (this.argv.q) {
-            this.log(`${scope}`);
+            this.stdout(`${scope}`);
           } else {
             this.log.ok(`Removed ${scope}`);
           }

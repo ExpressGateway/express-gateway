@@ -19,13 +19,13 @@ module.exports = class extends eg.Generator {
       .then(data => {
         let apps = data.apps;
         if (!apps || !apps.length) {
-          return this.log('You have no apps');
+          return this.stdout('You have no apps');
         }
         apps.forEach(app => {
           if (this.argv.q) {
-            this.log(app.id);
+            this.stdout(app.id);
           } else {
-            this.log(JSON.stringify(app, null, 2));
+            this.stdout(JSON.stringify(app, null, 2));
           }
         });
       })

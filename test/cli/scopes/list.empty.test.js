@@ -27,7 +27,7 @@ describe('eg scopes list [no scopes]', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           assert.equal(message, 'You have no scopes');
         };
       });

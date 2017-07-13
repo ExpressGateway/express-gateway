@@ -102,7 +102,7 @@ describe('eg apps update', () => {
       let output = null;
 
       generator.once('run', () => {
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
         generator.log.error = message => {

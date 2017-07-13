@@ -98,7 +98,7 @@ module.exports = class extends eg.Generator {
             if (!argv.q) {
               this.log.ok(`Updated ${argv.app_id}`);
             } else {
-              this.log(argv.app_id);
+              this.stdout(argv.app_id);
             }
           })
           .catch(err => {

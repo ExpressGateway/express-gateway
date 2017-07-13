@@ -132,7 +132,7 @@ describe('eg users activate', () => {
         generator.log.error = message => {
           assert.fail(message);
         };
-        generator.log.ok = message => {
+        generator.stdout = message => {
           output = message;
         };
       });

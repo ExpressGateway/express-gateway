@@ -127,7 +127,7 @@ describe('eg users deactivate', () => {
         generator.log.error = message => {
           assert.fail(message);
         };
-        generator.log.ok = message => {
+        generator.stdout = message => {
           output = message;
         };
       });

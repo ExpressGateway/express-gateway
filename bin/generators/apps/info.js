@@ -16,7 +16,7 @@ module.exports = class extends eg.Generator {
     return this.admin.apps.info(this.argv.app_id)
       .then(app => {
         if (app) {
-          this.log(JSON.stringify(app, null, 2));
+          this.stdout(JSON.stringify(app, null, 2));
         }
       })
       .catch(err => {

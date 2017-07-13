@@ -68,7 +68,7 @@ describe('eg credentials activate', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log.ok = message => {
+        generator.stdout = message => {
           output = message;
         };
       });

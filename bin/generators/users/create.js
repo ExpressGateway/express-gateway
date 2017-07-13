@@ -65,7 +65,7 @@ module.exports = class extends eg.Generator {
                 if (!argv.q) {
                   this.log.ok(`Created ${newUser.username}`);
                 } else {
-                  this.log(newUser.id);
+                  this.stdout(newUser.id);
                 }
               }
             })
@@ -115,7 +115,7 @@ module.exports = class extends eg.Generator {
         if (!argv.q) {
           this.log.ok(`Created ${newUser.username}`);
         } else {
-          this.log(newUser.id);
+          this.stdout(newUser.id);
         }
       })
       .catch(err => {

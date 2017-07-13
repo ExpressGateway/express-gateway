@@ -85,7 +85,7 @@ module.exports = class extends eg.Generator {
       .then(updatedUser => {
         if (updatedUser) {
           if (argv.q) {
-            this.log(updatedUser.id);
+            this.stdout(updatedUser.id);
           } else {
             this.log.ok(`Updated ${argv.user_id}`);
           }

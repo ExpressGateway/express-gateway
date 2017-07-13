@@ -25,7 +25,7 @@ module.exports = class extends eg.Generator {
               if (!argv.q) {
                 this.log.ok(`Removed ${userId}`);
               } else {
-                this.log(userId);
+                this.stdout(userId);
               }
             }
           })

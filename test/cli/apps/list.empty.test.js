@@ -27,7 +27,7 @@ describe('eg apps list [no apps]', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           assert.equal(message, 'You have no apps');
         };
       });

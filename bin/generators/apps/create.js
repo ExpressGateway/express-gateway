@@ -83,7 +83,7 @@ module.exports = class extends eg.Generator {
       if (!argv.q) {
         this.log.ok(`Created ${newApp.id}`);
       } else {
-        this.log(newApp.id);
+        this.stdout(newApp.id);
       }
     })
     .catch(err => {
@@ -131,7 +131,7 @@ module.exports = class extends eg.Generator {
                 if (!argv.q) {
                   this.log.ok(`Created ${newApp.id}`);
                 } else {
-                  this.log(newApp.id);
+                  this.stdout(newApp.id);
                 }
               }
             })
