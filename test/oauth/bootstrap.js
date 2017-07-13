@@ -1,8 +1,5 @@
 'use strict';
 
-let mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
