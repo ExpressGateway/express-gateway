@@ -76,7 +76,7 @@ module.exports = class extends eg.Generator {
           value: 'getting-started'
         },
         {
-          name: 'Basic Gateway Configuration',
+          name: 'Basic (default pipeline with proxy)',
           value: 'basic'
         }
       ]
