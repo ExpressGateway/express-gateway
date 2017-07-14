@@ -19,11 +19,12 @@ policies:
   - proxy
   - rate-limit
 pipelines:
-  - name: basic
+  - name: getting-started 
     apiEndpoints:
       - api
     policies:
+    # - key-auth:
       - proxy:
           - action:
-              serviceEndpoint: httpbin
+              serviceEndpoint: httpbin 
               changeOrigin: true
