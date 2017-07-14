@@ -77,7 +77,11 @@ module.exports = class extends eg.Generator {
       const value = p.substring(equalIndex + 1);
 
       // this is for values like [], {}
-      credential[key] = JSON.parse(value);
+      try {
+        credential[key] = JSON.parse(value);
+      } catch (err) {
+        credential[key] = value;
+      }
     });
 
     if (hasInvalidProperty) {
