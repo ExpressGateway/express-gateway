@@ -1,4 +1,5 @@
 const eg = require('../../eg');
+const chalk = require('chalk');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -22,7 +23,6 @@ module.exports = class extends eg.Generator {
   prompting () {
     const argv = this.argv;
     let p = Promise.resolve();
-
     argv.scopes.forEach(scope => {
       // executing in sequence to avoid race
       p = p.then(() => {
@@ -32,6 +32,9 @@ module.exports = class extends eg.Generator {
             this.log.ok(`Scope ${scope} added to ${argv.id}`);
           }
           return res;
+        })
+        .catch(err => {
+          this.log.error(chalk.red('Error adding scope ') + chalk.yellow(scope) + ' : ' + ((err.response && err.response.error && err.response.error.text) || err.message));
         });
       });
     });
