@@ -23,7 +23,7 @@ module.exports = class extends eg.Generator {
       return this.admin.scopes.create(argv.scope)
         .then(res => {
           if (argv.q) {
-            this.log.ok(`${scope}`);
+            this.stdout(`${scope}`);
           } else {
             this.log.ok(`Created ${scope}`);
           }

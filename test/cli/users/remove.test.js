@@ -127,7 +127,7 @@ describe('eg users remove', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
       });

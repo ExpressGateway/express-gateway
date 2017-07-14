@@ -71,7 +71,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
       redirectUri: { isRequired: true, isMutable: true }
     };
 
-    credentialModelConfig.oauth = {
+    credentialModelConfig.oauth2 = {
       passwordKey: 'secret',
       properties: { scopes: { isRequired: false } }
     };
@@ -108,7 +108,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
 
                 return credentialService.insertScopes(['authorizedScope', 'unauthorizedScope'])
                   .then(() => {
-                    credentialService.insertCredential(application.id, 'oauth', { secret: 'app-secret', scopes: ['authorizedScope'] })
+                    credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['authorizedScope'] })
                       .then(res => {
                         should.exist(res);
 
@@ -150,7 +150,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
   after('cleanup', (done) => {
     config.gatewayConfig = originalGatewayConfig;
     appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth = originalCredentialConfig.oauth;
+    credentialModelConfig.oauth2 = originalCredentialConfig.oauth2;
     userModelConfig.properties = originalUserConfig.properties;
     helper.cleanup();
     done();

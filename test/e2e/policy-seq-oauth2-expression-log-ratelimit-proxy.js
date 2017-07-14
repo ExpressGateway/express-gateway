@@ -106,7 +106,7 @@ describe('End to End tests with oauth2, proxy, log, expression, rate-limit polic
       redirectUri: { isRequired: true, isMutable: true }
     };
 
-    credentialModelConfig.oauth = {
+    credentialModelConfig.oauth2 = {
       passwordKey: 'secret',
       properties: { scopes: { isRequired: false } }
     };
@@ -143,7 +143,7 @@ describe('End to End tests with oauth2, proxy, log, expression, rate-limit polic
 
                 return credentialService.insertScopes(['authorizedScope'])
                   .then(() => {
-                    Promise.all([ credentialService.insertCredential(application.id, 'oauth', { secret: 'app-secret', scopes: ['authorizedScope'] }),
+                    Promise.all([ credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['authorizedScope'] }),
                       credentialService.insertCredential(user.username, 'basic-auth', { password: 'password', scopes: ['authorizedScope'] }) ])
                       .then(res => {
                         should.exist(res);
@@ -215,7 +215,7 @@ describe('End to End tests with oauth2, proxy, log, expression, rate-limit polic
     helper.cleanup();
     config.gatewayConfig = originalGatewayConfig;
     appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth = originalCredentialConfig.oauth;
+    credentialModelConfig.oauth2 = originalCredentialConfig.oauth2;
     userModelConfig.properties = originalUserConfig.properties;
     logger.info.restore();
     backendServer.close();

@@ -26,13 +26,13 @@ module.exports = class extends eg.Generator {
               if (!argv.q) {
                 this.log.ok(`Removed ${appId}`);
               } else {
-                this.log(appId);
+                this.stdout(appId);
               }
             }
           })
           .catch(err => {
             this.log.error(err.message);
           });
-    })).then(() => this.eg.exit());
+    }));
   }
 };

@@ -17,14 +17,12 @@ module.exports = class extends eg.Generator {
     return this.admin.scopes.list()
       .then(res => {
         if (!res.scopes || !res.scopes.length) {
-          return this.log('You have no scopes');
+          return this.stdout('You have no scopes');
         }
-        res.scopes.forEach(scope => this.log(scope));
-        this.eg.exit();
+        res.scopes.forEach(scope => this.stdout(scope));
       })
       .catch(err => {
         this.log.error(err.message);
-        this.eg.exit();
       });
   }
 };

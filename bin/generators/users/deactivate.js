@@ -26,7 +26,7 @@ module.exports = class extends eg.Generator {
 
             if (status) {
               if (argv.q) {
-                this.log.ok(userId);
+                this.stdout(userId);
               } else {
                 this.log.ok(`${status} ${userId}`);
               }
@@ -35,8 +35,6 @@ module.exports = class extends eg.Generator {
           .catch(err => {
             this.log.error(err.message);
           });
-    })).then(() => {
-      this.eg.exit();
-    });
+    }));
   }
 };

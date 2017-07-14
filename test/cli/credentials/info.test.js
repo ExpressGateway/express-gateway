@@ -1,11 +1,11 @@
 const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
-const namespace = 'express-gateway:apps:info';
+const namespace = 'express-gateway:credentials:info';
 const idGen = require('uuid-base62');
 
-describe('eg apps info', () => {
-  let program, env, user, app;
+describe('eg credentials info', () => {
+  let program, env, user, cred;
   before(() => {
     ({ program, env } = environment.bootstrap());
     return adminHelper.start();
@@ -22,14 +22,11 @@ describe('eg apps info', () => {
     .then(createdUser => {
       user = createdUser;
 
-      return adminHelper.admin.apps.create(user.id, {
-        name: 'appy',
-        redirectUri: 'http://localhost:3000/cb'
-      });
+      return adminHelper.admin.credentials.create(user.id, 'key-auth', {});
     })
-    .then(createdApp => {
-      app = createdApp;
-      return app;
+    .then(createdCred => {
+      cred = createdCred;
+      return cred;
     });
   });
 
@@ -38,7 +35,7 @@ describe('eg apps info', () => {
     return adminHelper.reset();
   });
 
-  it('returns app info', done => {
+  it('returns cred info', done => {
     env.hijack(namespace, generator => {
       let output = null;
 
@@ -52,17 +49,14 @@ describe('eg apps info', () => {
       });
 
       generator.once('end', () => {
-        const app = JSON.parse(output);
-        assert.equal(app.id, app.id);
-        assert.equal(app.name, 'appy');
-        assert.equal(app.redirectUri, 'http://localhost:3000/cb');
-        assert.equal(app.isActive, true);
-        assert.equal(app.userId, user.id);
+        const c = JSON.parse(output);
+        assert.equal(c.keyId, cred.keyId);
+        assert.equal(c.isActive, true);
 
         done();
       });
     });
 
-    env.argv = program.parse(`apps info ${app.id}`);
+    env.argv = program.parse(`credentials info -t key-auth ${cred.keyId}`);
   });
 });

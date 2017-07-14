@@ -50,7 +50,7 @@ describe('eg apps list', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           let app = JSON.parse(message);
           output[app.name] = true;
           output[app.id] = true;
@@ -78,7 +78,7 @@ describe('eg apps list', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output[message] = true;
         };
       });

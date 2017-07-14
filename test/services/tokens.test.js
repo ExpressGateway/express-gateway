@@ -29,7 +29,7 @@ describe('Access Token tests', function () {
     it('should save an access token', function (done) {
       newToken = {
         consumerId: '1234',
-        authType: 'oauth'
+        authType: 'oauth2'
       };
       tokenService.save(newToken)
       .then((token) => {
@@ -91,7 +91,7 @@ describe('Access Token tests', function () {
     it('should save an access token with scopes', function (done) {
       newTokenWithScopes = {
         consumerId: '1234',
-        authType: 'oauth',
+        authType: 'oauth2',
         scopes: ['scope1', 'scope2', 'scope3']
       };
       tokenService.save(newTokenWithScopes)
@@ -184,7 +184,7 @@ describe('Access Token tests', function () {
     it('should save an access token', function (done) {
       newToken = {
         consumerId: '1234',
-        authType: 'oauth'
+        authType: 'oauth2'
       };
       tokenService.save(newToken)
       .then((token) => {
@@ -248,22 +248,22 @@ describe('Access Token tests', function () {
       tokenObjs = [
         {
           consumerId: '1234',
-          authType: 'oauth',
+          authType: 'oauth2',
           prop: '1'
         },
         {
           consumerId: '1234',
-          authType: 'oauth',
+          authType: 'oauth2',
           prop: '2'
         },
         {
           consumerId: '1234',
-          authType: 'oauth',
+          authType: 'oauth2',
           prop: '3'
         },
         {
           consumerId: '1234',
-          authType: 'oauth',
+          authType: 'oauth2',
           prop: '4'
         }
       ];
@@ -363,7 +363,7 @@ describe('Refresh Token tests', function () {
     it('should save a refresh token along with access token', function (done) {
       newToken = {
         consumerId: '1234',
-        authType: 'oauth'
+        authType: 'oauth2'
       };
       tokenService.save(newToken, { includeRefreshToken: true })
         .then((token) => {
@@ -440,7 +440,7 @@ describe('Refresh Token tests', function () {
     it('should save a refresh token with scopes, along with an access token', function (done) {
       newTokenWithScopes = {
         consumerId: '1234',
-        authType: 'oauth',
+        authType: 'oauth2',
         scopes: ['scope1', 'scope2', 'scope3']
       };
       tokenService.save(newTokenWithScopes, { includeRefreshToken: true })
@@ -535,7 +535,7 @@ describe('Refresh Token tests', function () {
     it('should save a refresh token', function (done) {
       newToken = {
         consumerId: '1234',
-        authType: 'oauth'
+        authType: 'oauth2'
       };
       tokenService.save(newToken, { includeRefreshToken: true })
         .then((token) => {
@@ -595,7 +595,7 @@ describe('Refresh Token tests', function () {
     it('should create a new refresh token if one does not exist, even if the access token is exists', function (done) {
       let tokenObj = {
         consumerId: '555555',
-        authType: 'oauth'
+        authType: 'oauth2'
       };
       let accessToken;
       config.systemConfig.access_tokens.timeToExpiry = 9999999;
@@ -644,22 +644,22 @@ describe('Refresh Token tests', function () {
       tokenObjs = [
         {
           consumerId: '1234',
-          authType: 'oauth',
+          authType: 'oauth2',
           prop: '1'
         },
         {
           consumerId: '1234',
-          authType: 'oauth',
+          authType: 'oauth2',
           prop: '2'
         },
         {
           consumerId: '1234',
-          authType: 'oauth',
+          authType: 'oauth2',
           prop: '3'
         },
         {
           consumerId: '1234',
-          authType: 'oauth',
+          authType: 'oauth2',
           prop: '4'
         }
       ];

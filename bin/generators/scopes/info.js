@@ -15,12 +15,10 @@ module.exports = class extends eg.Generator {
   prompting () {
     return this.admin.scopes.info(this.argv.scope)
       .then(res => {
-        this.log(res.scope);
-        this.eg.exit();
+        this.stdout(res.scope);
       })
       .catch(err => {
         this.log.error(err.message);
-        this.eg.exit();
       });
   }
 };

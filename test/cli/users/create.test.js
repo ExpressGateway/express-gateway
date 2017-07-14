@@ -100,7 +100,7 @@ describe('eg users create', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
         generator.log.ok = message => {
@@ -135,7 +135,7 @@ describe('eg users create', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
       });
@@ -165,7 +165,7 @@ describe('eg users create', () => {
       let error = null;
 
       generator.once('run', () => {
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
         generator.log.error = message => {

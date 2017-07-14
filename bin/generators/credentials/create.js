@@ -22,6 +22,7 @@ module.exports = class extends eg.Generator {
           .string(['p', 'c', 't'])
           .boolean(['stdin'])
           .describe('c', 'Consumer ID: can be User ID or username or app ID')
+          .describe('t', 'Type of credential: can be one of: oauth2, basic-auth, key-auth')
           .describe('p', 'App property in the form [-p \'foo=bar\']')
           .describe('stdin', 'Import newline-delimited JSON via standard input')
           .alias('c', 'consumer').nargs('c', 1)
@@ -76,7 +77,11 @@ module.exports = class extends eg.Generator {
       const value = p.substring(equalIndex + 1);
 
       // this is for values like [], {}
-      credential[key] = JSON.parse(value);
+      try {
+        credential[key] = JSON.parse(value);
+      } catch (err) {
+        credential[key] = value;
+      }
     });
 
     if (hasInvalidProperty) {
@@ -86,12 +91,9 @@ module.exports = class extends eg.Generator {
     return this._insert(credential, { consumer: argv.consumer, type: argv.type })
     .then(newCredential => {
       this._output(newCredential);
-
-      this.eg.exit();
     })
     .catch(err => {
       this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-      this.eg.exit();
     });
   };
 
@@ -139,9 +141,7 @@ module.exports = class extends eg.Generator {
 
             return this._insert(credential, options)
               .then(newCredential => {
-                this._output(credential);
-
-                this.eg.exit();
+                this._output(newCredential);
               })
             .catch(err => {
               this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
@@ -160,9 +160,9 @@ module.exports = class extends eg.Generator {
       this.log.ok(`Created \n ${JSON.stringify(credential, null, 2)}`);
     } else {
       if (argv.type === 'key-auth') {
-        this.log(`${credential.keyId}:${credential.keySecret}`);
+        this.stdout(`${credential.keyId}:${credential.keySecret}`);
       } else if (argv.type === 'basic-auth') {
-        this.log(`${credential.id}:${credential.password}`);
+        this.stdout(`${credential.id}:${credential.password}`);
       }
     }
   }
@@ -208,16 +208,6 @@ module.exports = class extends eg.Generator {
         });
       }
     }
-
-    if (questions.length > 0) {
-      // handle CTRL-C
-      this.stdin.on('data', key => {
-        if (key.toString('utf8') === '\u0003') {
-          this.eg.exit();
-        }
-      });
-    }
-
     return this.prompt(questions)
         .then(answers => {
           credential = Object.assign(credential, answers);

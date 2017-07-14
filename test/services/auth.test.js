@@ -19,7 +19,7 @@ describe('Auth tests', function () {
   let originalUserModelConfig;
 
   before(function (done) {
-    credentialModelConfig.oauth = {
+    credentialModelConfig.oauth2 = {
       passwordKey: 'secret',
       autoGeneratePassword: true,
       properties: {
@@ -36,10 +36,6 @@ describe('Auth tests', function () {
 
     db.flushdbAsync()
     .then(function (didSucceed) {
-      if (!didSucceed) {
-        console.log('Failed to flush the database');
-      }
-
       user = {
         username: 'irfanbaqui',
         firstname: 'irfan',
@@ -60,7 +56,7 @@ describe('Auth tests', function () {
         return credentialService.insertScopes([ 'someScope1', 'someScope2', 'someScope3' ]);
       })
       .then(() => {
-        return credentialService.insertCredential(user.username, 'oauth', _credential)
+        return credentialService.insertCredential(user.username, 'oauth2', _credential)
         .then(function (res) {
           should.exist(res);
           done();
@@ -74,14 +70,14 @@ describe('Auth tests', function () {
   });
 
   after(function (done) {
-    credentialModelConfig.oauth = originalModelConfig.oauth;
+    credentialModelConfig.oauth2 = originalModelConfig.oauth2;
     userModelConfig.properties = originalUserModelConfig;
     done();
   });
 
   describe('Credential Auth', function () {
     it('should authenticate user', function (done) {
-      authService.authenticateCredential(user.username, _credential.secret, 'oauth')
+      authService.authenticateCredential(user.username, _credential.secret, 'oauth2')
       .then(authResponse => {
         let expectedResponse = Object.assign({
           type: 'user',
@@ -100,7 +96,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authenticate invalid user with credentials', function (done) {
-      authService.authenticateCredential('invalidUsername', _credential.secret, 'oauth')
+      authService.authenticateCredential('invalidUsername', _credential.secret, 'oauth2')
       .then(authResponse => {
         should.exist(authResponse);
         authResponse.should.eql(false);
@@ -113,7 +109,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authenticate valid user with invalid credentials', function (done) {
-      authService.authenticateCredential(user.username, 'invalidSecret', 'oauth')
+      authService.authenticateCredential(user.username, 'invalidSecret', 'oauth2')
       .then(authResponse => {
         should.exist(authResponse);
         authResponse.should.eql(false);
@@ -126,7 +122,7 @@ describe('Auth tests', function () {
     });
 
     it('should authorize Credential with scopes', function (done) {
-      authService.authorizeCredential(user.username, 'oauth', [ 'someScope1', 'someScope2' ])
+      authService.authorizeCredential(user.username, 'oauth2', [ 'someScope1', 'someScope2' ])
       .then((authResponse) => {
         should.exist(authResponse);
         authResponse.should.eql(true);
@@ -139,7 +135,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authorize Credential with invalid scopes', function (done) {
-      authService.authorizeCredential(user.username, 'oauth', [ 'otherScope', 'someScope2' ])
+      authService.authorizeCredential(user.username, 'oauth2', [ 'otherScope', 'someScope2' ])
       .then((authResponse) => {
         should.exist(authResponse);
         authResponse.should.eql(false);
@@ -153,20 +149,20 @@ describe('Auth tests', function () {
 
     it('should not authorize Credential that is inActive', function (done) {
       credentialService
-      .deactivateCredential(user.username, 'oauth')
+      .deactivateCredential(user.username, 'oauth2')
       .then(function (res) {
         should.exist(res);
         res.should.eql(true);
       })
       .then(() => {
-        authService.authorizeCredential(user.username, 'oauth', [ 'otherScope', 'someScope2' ])
+        authService.authorizeCredential(user.username, 'oauth2', [ 'otherScope', 'someScope2' ])
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(false);
 
           // reset credential back to active status
           credentialService
-          .activateCredential(user.username, 'oauth')
+          .activateCredential(user.username, 'oauth2')
           .then(function (res) {
             should.exist(res);
             res.should.eql(true);
@@ -186,7 +182,7 @@ describe('Auth tests', function () {
     before(function (done) {
       let tokenObj = {
         consumerId: userFromDb.id,
-        authType: 'oauth',
+        authType: 'oauth2',
         scopes: [ 'someScope1', 'someScope2', 'someScope3' ]
       };
 
@@ -200,7 +196,7 @@ describe('Auth tests', function () {
     });
 
     it('should authenticate token', function (done) {
-      authService.authenticateToken(userAccessToken, 'oauth')
+      authService.authenticateToken(userAccessToken, 'oauth2')
       .then(authResponse => {
         let expectedTokenProps = [ 'consumerId', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted' ];
         let expectedConsumerProps = [ 'type', 'createdAt', 'email', 'firstname', 'id', 'isActive', 'lastname', 'updatedAt', 'username' ];
@@ -208,7 +204,7 @@ describe('Auth tests', function () {
         let expectedResponse = {
           token: {
             consumerId: userFromDb.id,
-            authType: 'oauth',
+            authType: 'oauth2',
             tokenDecrypted: tokenDecrypted,
             id: tokenId,
             scopes: [ 'someScope1', 'someScope2', 'someScope3' ]
@@ -238,7 +234,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authenticate invalid token', function (done) {
-      authService.authenticateToken('invalidToken', 'oauth')
+      authService.authenticateToken('invalidToken', 'oauth2')
       .then(authResponse => {
         should.exist(authResponse);
         authResponse.should.eql(false);
@@ -251,7 +247,7 @@ describe('Auth tests', function () {
     });
 
     it('should authorize Token', function (done) {
-      authService.authorizeToken(userAccessToken, 'oauth', [ 'someScope1', 'someScope2' ])
+      authService.authorizeToken(userAccessToken, 'oauth2', [ 'someScope1', 'someScope2' ])
       .then((authResponse) => {
         should.exist(authResponse);
         authResponse.should.eql(true);
@@ -264,7 +260,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authorize Token with invalid scopes', function (done) {
-      authService.authorizeToken(userAccessToken, 'oauth', [ 'otherScope', 'someScope2' ])
+      authService.authorizeToken(userAccessToken, 'oauth2', [ 'otherScope', 'someScope2' ])
       .then((authResponse) => {
         should.exist(authResponse);
         authResponse.should.eql(false);

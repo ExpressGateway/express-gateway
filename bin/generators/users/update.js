@@ -52,7 +52,6 @@ module.exports = class extends eg.Generator {
     });
 
     if (hasInvalidProperty) {
-      this.eg.exit();
       return;
     }
 
@@ -77,15 +76,6 @@ module.exports = class extends eg.Generator {
           });
         }
 
-        if (questions.length > 0) {
-          // handle CTRL-C
-          process.stdin.on('data', key => {
-            if (key.toString('utf8') === '\u0003') {
-              this.eg.exit();
-            }
-          });
-        }
-
         return this.prompt(questions)
           .then(answers => {
             user = Object.assign(user, answers);
@@ -95,13 +85,11 @@ module.exports = class extends eg.Generator {
       .then(updatedUser => {
         if (updatedUser) {
           if (argv.q) {
-            this.log(updatedUser.id);
+            this.stdout(updatedUser.id);
           } else {
             this.log.ok(`Updated ${argv.user_id}`);
           }
         }
-
-        this.eg.exit();
       })
       .catch(err => {
         if (err.status === 404) {
@@ -111,7 +99,6 @@ module.exports = class extends eg.Generator {
         } else {
           this.log.error(err.message);
         }
-        this.eg.exit();
       });
   }
 };

@@ -18,21 +18,18 @@ module.exports = class extends eg.Generator {
       .then(data => {
         let users = data.users;
         if (!users || !users.length) {
-          return this.log('You have no users');
+          return this.stdout('You have no users');
         }
         users.forEach(u => {
           if (this.argv.q) {
-            this.log(u.username);
+            this.stdout(u.username);
           } else {
-            this.log(JSON.stringify(u, null, 2));
+            this.stdout(JSON.stringify(u, null, 2));
           }
         });
-
-        this.eg.exit();
       })
       .catch(err => {
         this.log.error(err.message);
-        this.eg.exit();
       });
   }
 };

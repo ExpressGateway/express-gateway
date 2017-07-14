@@ -32,7 +32,7 @@ describe('eg scopes info', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
       });
@@ -55,7 +55,7 @@ describe('eg scopes info', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
       });

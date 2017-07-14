@@ -10,7 +10,7 @@ const session = require('express-session');
 const passport = require('passport');
 let config = require('../../lib/config');
 
-let oauth = require('../../lib/policies/oauth2/oauth2-routes');
+let oauth2 = require('../../lib/policies/oauth2/oauth2-routes');
 let app = express();
 
 app.use(bodyParser.json({ extended: true }));
@@ -20,4 +20,4 @@ app.use(session(config.systemConfig.session));
 app.use(passport.initialize());
 app.use(passport.session());
 
-module.exports = oauth(app, config);
+module.exports = oauth2(app, config);

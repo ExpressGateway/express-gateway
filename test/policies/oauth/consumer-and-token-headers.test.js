@@ -64,7 +64,7 @@ describe('Request Headers with consumer and token information as part of auth po
       redirectUri: { isRequired: true, isMutable: true }
     };
 
-    credentialModelConfig.oauth = {
+    credentialModelConfig.oauth2 = {
       passwordKey: 'secret',
       properties: { scopes: { isRequired: false } }
     };
@@ -101,7 +101,7 @@ describe('Request Headers with consumer and token information as part of auth po
 
                 return credentialService.insertScopes(['authorizedScope'])
                   .then(() => {
-                    Promise.all([ credentialService.insertCredential(application.id, 'oauth', { secret: 'app-secret', scopes: ['authorizedScope'] }),
+                    Promise.all([ credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['authorizedScope'] }),
                       credentialService.insertCredential(user.username, 'basic-auth', { password: 'password', scopes: ['authorizedScope'] }) ])
                       .then(res => {
                         should.exist(res);
@@ -173,7 +173,7 @@ describe('Request Headers with consumer and token information as part of auth po
     helper.cleanup();
     config.gatewayConfig = originalGatewayConfig;
     appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth = originalCredentialConfig.oauth;
+    credentialModelConfig = originalCredentialConfig;
     userModelConfig.properties = originalUserConfig.properties;
     backendServer.close();
     done();

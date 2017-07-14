@@ -185,7 +185,7 @@ describe('eg users update', () => {
         generator.log.error = message => {
           error = message;
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
       });

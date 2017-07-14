@@ -13,7 +13,7 @@ module.exports = {
       scopes: { isRequired: false }
     }
   },
-  oauth: {
+  oauth2: {
     passwordKey: 'secret',
     autoGeneratePassword: true,
     properties: {

@@ -28,7 +28,7 @@ describe('Functional Test Client Password grant', function () {
       redirectUri: { isRequired: true, isMutable: true }
     };
 
-    config.models.credentials.oauth = {
+    config.models.credentials.oauth2 = {
       passwordKey: 'secret',
       properties: { scopes: { isRequired: false } }
     };
@@ -77,8 +77,8 @@ describe('Functional Test Client Password grant', function () {
 
           credentialService.insertScopes('someScope')
           .then(() => {
-            Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth', { secret: 'user-secret' }),
-              credentialService.insertCredential(fromDbApp.id, 'oauth', { secret: 'app-secret', scopes: [ 'someScope' ] }) ])
+            Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth2', { secret: 'user-secret' }),
+              credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: [ 'someScope' ] }) ])
             .spread((userRes, appRes) => {
               should.exist(userRes);
               should.exist(appRes);
@@ -96,7 +96,7 @@ describe('Functional Test Client Password grant', function () {
 
   after((done) => {
     config.models.applications.properties = originalAppConfig.properties;
-    config.models.credentials.oauth = originalCredentialConfig.oauth;
+    config.models.credentials.oauth2 = originalCredentialConfig.oauth2;
     config.models.users.properties = originalUserConfig.properties;
     done();
   });

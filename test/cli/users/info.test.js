@@ -40,7 +40,7 @@ describe('eg users info', () => {
         generator.log.error = message => {
           error = message;
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
       });
@@ -70,7 +70,7 @@ describe('eg users info', () => {
         generator.log.error = message => {
           error = message;
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
       });

@@ -83,14 +83,11 @@ module.exports = class extends eg.Generator {
       if (!argv.q) {
         this.log.ok(`Created ${newApp.id}`);
       } else {
-        this.log(newApp.id);
+        this.stdout(newApp.id);
       }
-
-      this.eg.exit();
     })
     .catch(err => {
       this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-      this.eg.exit();
     });
   };
 
@@ -134,7 +131,7 @@ module.exports = class extends eg.Generator {
                 if (!argv.q) {
                   this.log.ok(`Created ${newApp.id}`);
                 } else {
-                  this.log(newApp.id);
+                  this.stdout(newApp.id);
                 }
               }
             })
@@ -189,15 +186,6 @@ module.exports = class extends eg.Generator {
           };
         });
       }
-    }
-
-    if (questions.length > 0) {
-      // handle CTRL-C
-      this.stdin.on('data', key => {
-        if (key.toString('utf8') === '\u0003') {
-          this.eg.exit();
-        }
-      });
     }
 
     return this.prompt(questions)
