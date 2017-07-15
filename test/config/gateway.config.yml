@@ -1,28 +1,27 @@
 apiEndpoints:
-  users:
+  api:
     host: '*'
-    paths:
-      - /users/*
 http:
   port: 8080
+admin:
+  port: 9876
+  hostname: localhost
 https:
   port: 9999
   tls: {}
-admin:
-  port: 9876
-  baseUrl: 'http://localhost:9876/'
 serviceEndpoints:
   backend:
-    url: 'http://www.example.com'
+    url: 'http://localhost:9876'
 policies:
   - proxy
+  - key-auth
 pipelines:
-  - name: ecommerce
+  - name: adminAPI
     apiEndpoints:
-      - users
+      - api
     policies:
+      - key-auth:
+          - action: null
       - proxy:
-          - condition:
-              name: always
-            action:
+          - action:
               serviceEndpoint: backend

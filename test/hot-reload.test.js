@@ -1,82 +1,165 @@
-const serverHelper = require('./common/server-helper');
-const assert = require('chai').assert;
+const { fork } = require('child_process');
 const fs = require('fs');
-const gateway = require('../lib/gateway');
+const net = require('net');
 const path = require('path');
-const fileHelper = require('./common/file-helper');
-const request = require('supertest');
-const port1 = 5998;
-const port2 = 5999;
-let config = require('../lib/config');
 
-['json', 'yml'].forEach(function (configType) {
-  let configDirectory, app1, app2, appTarget, httpsApp;
-  let originalGatewayConfig = config.gatewayConfig;
-  let configTemplate = fileHelper.read(path.join(__dirname, 'fixtures/hot-reload.template.config.' + configType), configType);
-  describe('hot-reload ' + configType, () => {
-    before('start servers', () => {
-      serverHelper.generateBackendServer(port1)
-        .then(apps => {
-          app1 = apps.app;
-          return serverHelper.generateBackendServer(port2);
-        })
-        .then(apps => {
-          app2 = apps.app;
+const assert = require('chai').assert;
+const chokidar = require('chokidar');
+const cpr = require('cpr');
+const request = require('request');
+const rimraf = require('rimraf');
+const tmp = require('tmp');
+const yaml = require('js-yaml');
 
-          if (configType === 'yml') {
-            fs.renameSync(path.join(__dirname, 'config/gateway.config.json'), path.join(__dirname, 'config/gateway.config.yml'));
-          } else fs.renameSync(path.join(__dirname, 'config/gateway.config.yml'), path.join(__dirname, 'config/gateway.config.json'));
+/*
+    1) Copy config to a temp directory.
+    2) Execute a child process with `process.env.EG_CONFIG_DIR` set to the temp directory.
+    3) Watch the temp directory config file from the test.
+    4) Do a baseline request to make sure the original gateway config is working.
+    5) Write a new gateway config
+    6) When the test watcher fires, make another HTTP request to confirm the new config is working.
+    7) Clean up the temp directory.
+*/
 
-          configDirectory = path.join(__dirname, 'config/gateway.config.' + configType);
+const baseConfigDirectory = process.env.EG_CONFIG_DIR ||
+  path.join(__dirname, 'config');
 
-          configTemplate.serviceEndpoints.backend.url = 'http://localhost:' + port1;
-          fileHelper.save(configTemplate, configDirectory, configType);
+const findOpenPortNumbers = (count, cb) => {
+  let completeCount = 0;
+  const ports = [];
 
-          return gateway();
-        })
-        .then(apps => {
-          appTarget = apps.app;
-          httpsApp = apps.httpsApp;
-        });
+  for (let i = 0; i < count; i++) {
+    const server = net.createServer();
+
+    server.listen(0);
+
+    server.on('listening', () => {
+      ports.push(server.address().port);
+
+      server.once('close', () => {
+        completeCount++;
+
+        if (completeCount === count) {
+          cb(null, ports);
+        }
+      });
+      server.close();
     });
 
-    after(() => {
-      config.gatewayConfig = originalGatewayConfig;
-      fileHelper.save(originalGatewayConfig, path.join(__dirname, 'config/gateway.config.yml'), 'yml');
-      app1.close();
-      app2.close();
-      appTarget.close();
-      httpsApp && httpsApp.close();
+    server.on('error', (err) => {
+      cb(err);
     });
+  }
+};
 
-    it('should proxy to server on ' + port1, (done) => {
-      request(appTarget).get('/')
-        .set('Host', 'test.com')
-        .expect(200)
-        .expect('Content-Type', /text/)
-        .end(function (error, res) {
-          if (error) {
-            done(error);
-          }
-          assert.ok(res.text.indexOf(port1) >= 0);
-          done();
-        });
-    });
+describe('hot-reload', () => {
+  describe('gateway config', () => {
+    let testGatewayConfigPath = null;
+    let testGatewayConfigData = null;
+    let childProcess = null;
+    let originalGatewayPort = null;
 
-    it('should proxy to server on ' + port2, (done) => {
-      configTemplate.serviceEndpoints.backend.url = 'http://localhost:' + port2;
-      fileHelper.save(configTemplate, configDirectory, configType);
-      request(appTarget).get('/')
-        .set('Host', 'test.com')
-        .expect(200)
-        .expect('Content-Type', /text/)
-        .end(function (err, res) {
+    before(done => {
+      tmp.dir((err, tempPath) => {
+        if (err) {
+          throw err;
+        }
+
+        cpr(baseConfigDirectory, tempPath, (err, files) => {
           if (err) {
-            done(err);
+            throw err;
           }
-          assert.ok(res.text.indexOf(port2) >= 0);
-          done();
+
+          testGatewayConfigPath = path.join(tempPath, 'gateway.config.yml');
+
+          findOpenPortNumbers(3, (err, ports) => {
+            if (err) {
+              throw err;
+            }
+
+            fs.readFile(testGatewayConfigPath, (err, configData) => {
+              if (err) {
+                throw err;
+              }
+
+              testGatewayConfigData = yaml.load(configData);
+
+              testGatewayConfigData.http.port = ports[0];
+              testGatewayConfigData.https.port = ports[1];
+              testGatewayConfigData.admin.port = ports[2];
+              testGatewayConfigData.serviceEndpoints.backend.url =
+                `http://localhost:${ports[2]}`;
+
+              originalGatewayPort = ports[0];
+
+              fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
+                if (err) {
+                  throw err;
+                }
+
+                const childEnv = Object.assign({}, process.env);
+                childEnv.EG_CONFIG_DIR = tempPath;
+
+                const modulePath = path.join(__dirname, '..', 'lib', 'index.js');
+                childProcess = fork(modulePath, [], {
+                  cwd: tempPath,
+                  env: childEnv
+                });
+
+                childProcess.on('error', err => {
+                  throw err;
+                });
+
+                // Not ideal, but we need to make sure the process is running.
+                setTimeout(() => {
+                  request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
+                    if (err) {
+                      throw err;
+                    }
+
+                    assert.equal(res.statusCode, 401);
+                    assert.equal(body, 'Forbidden');
+                    done();
+                  });
+                }, 1000);
+              });
+            });
+          });
         });
+      });
     });
+
+    after(done => {
+      childProcess.kill();
+      rimraf(testGatewayConfigPath, done);
+    });
+
+    it('reloads valid gateway.config.yml', done => {
+      const watchOptions = {
+        awaitWriteFinish: true
+      };
+
+      chokidar
+        .watch(testGatewayConfigPath, watchOptions)
+        .on('change', (evt) => {
+          request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
+            if (err) {
+              throw err;
+            }
+
+            assert.equal(res.statusCode, 404);
+            done();
+          });
+        });
+
+      // remove key-auth policy
+      testGatewayConfigData.pipelines[0].policies.shift();
+
+      fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
+        if (err) {
+          throw err;
+        }
+      });
+    }).timeout(5000);
   });
 });

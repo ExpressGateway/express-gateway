@@ -9,6 +9,12 @@ module.exports = class EgGenerator extends Generator {
     this.eg = this.env.eg;
     this.argv = this.env.argv;
     this.admin = require('../lib/admin')(config.gatewayConfig.admin);
+    this.once('end', () => {
+      if (!process.env.EG_PERSIST_WATCHERS) {
+        config.watchers.system.close();
+        config.watchers.gateway.close();
+      }
+    });
   }
 
   configureCommand (configuration) {
