@@ -141,7 +141,7 @@ describe('hot-reload', () => {
 
       chokidar
         .watch(testGatewayConfigPath, watchOptions)
-        .on('change', (evt) => {
+        .once('change', (evt) => {
           request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
             if (err) {
               throw err;
@@ -154,6 +154,34 @@ describe('hot-reload', () => {
 
       // remove key-auth policy
       testGatewayConfigData.pipelines[0].policies.shift();
+
+      fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
+        if (err) {
+          throw err;
+        }
+      });
+    }).timeout(5000);
+
+    it('uses previous config on reload of invalid gateway.config.yml', done => {
+      const watchOptions = {
+        awaitWriteFinish: true
+      };
+
+      chokidar
+        .watch(testGatewayConfigPath, watchOptions)
+        .once('change', (evt) => {
+          request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
+            if (err) {
+              throw err;
+            }
+
+            assert.equal(res.statusCode, 404);
+            done();
+          });
+        });
+
+      // make config invalid
+      delete testGatewayConfigData.pipelines;
 
       fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
         if (err) {
