@@ -1,10 +1,6 @@
 const Generator = require('yeoman-generator');
 const config = require('../lib/config');
 
-Generator.prototype.stdout = function () {
-  // eslint-disable-next-line no-console
-  console.log.apply(arguments);
-};
 module.exports = class EgGenerator extends Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -31,6 +27,11 @@ module.exports = class EgGenerator extends Generator {
     };
 
     this._configuration = configuration;
+  }
+
+  stdout (...args) {
+    // eslint-disable-next-line no-console
+    console.log.apply(console, args);
   }
 
   createSubCommand (name) {
