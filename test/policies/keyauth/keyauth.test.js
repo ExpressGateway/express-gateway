@@ -84,8 +84,7 @@ describe('Functional Tests keyAuth Policy', () => {
               action: {
                 name: 'keyauth',
                 apiKeyField: 'customApiKeyParam',
-                disableHeaders: true,
-                disableBody: true
+                disableHeaders: true
               }
             }]
           },
@@ -184,16 +183,6 @@ describe('Functional Tests keyAuth Policy', () => {
       .end(done);
   });
 
-  it('should authenticate key in body for requests with scopes if requester is authorized ', function (done) {
-    let apikey = user.keyId + ':' + user.keySecret;
-
-    request(app)
-      .post('/authorizedPath')
-      .send({'apiKey': apikey})
-      .expect(200)
-      .end(done);
-  });
-
   it('should not authorize invalid key', function (done) {
     let apikey = 'apiKey test:wrong';
 
@@ -222,14 +211,5 @@ describe('Functional Tests keyAuth Policy', () => {
       .end(function (err) {
         done(err);
       });
-  });
-  it('should not authenticate with body of EP allows only query', function (done) {
-    let apikey = user.keyId + ':' + user.keySecret;
-
-    request(app)
-      .post('/by_query')
-      .send({'customApiKeyParam': apikey})
-      .expect(401)
-      .end(done);
   });
 });
