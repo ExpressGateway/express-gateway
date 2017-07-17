@@ -5,11 +5,11 @@ module.exports = class extends eg.Generator {
     super(args, opts);
 
     this.configureCommand({
-      command: 'add-scopes [options] <scopes..>',
+      command: 'add [options] <scopes..>',
       desc: 'Add scopes to a credential by id or keyid',
       builder: yargs =>
         yargs
-          .usage(`Usage: $0 ${process.argv[2]} add-scopes [options] <scopes..>`)
+          .usage(`Usage: $0 ${process.argv[2]} add [options] <scopes..>`)
           .string(['t', 'id'])
           .alias('t', 'type')
           .demandOption(['t', 'id'])

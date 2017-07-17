@@ -1,10 +1,10 @@
 const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
-const namespace = 'express-gateway:credentials:add-scopes';
+const namespace = 'express-gateway:credential-scopes:add';
 const idGen = require('uuid-base62');
 
-describe('eg credentials add-scopes', () => {
+describe('eg credential:scopes add', () => {
   let program, env, user, cred1, scope1, scope2;
   before(() => {
     ({ program, env } = environment.bootstrap());
@@ -39,7 +39,7 @@ describe('eg credentials add-scopes', () => {
     return adminHelper.reset();
   });
 
-  it('add-scopes to a credential', done => {
+  it('adds scope to a credential', done => {
     env.hijack(namespace, generator => {
       let output = {};
 
@@ -65,7 +65,7 @@ describe('eg credentials add-scopes', () => {
       });
     });
 
-    env.argv = program.parse(`credentials add-scopes --id ${cred1.keyId} -t key-auth ${scope1} ${scope2}`);
+    env.argv = program.parse(`credential:scopes add --id ${cred1.keyId} -t key-auth ${scope1} ${scope2}`);
   });
 
   it('prints only the credential id when using the --quiet flag', done => {
@@ -90,6 +90,6 @@ describe('eg credentials add-scopes', () => {
       });
     });
 
-    env.argv = program.parse(`credentials add-scopes -t key-auth -q --id ${cred1.keyId} ${scope1} ${scope2}`);
+    env.argv = program.parse(`credential:scopes add -t key-auth -q --id ${cred1.keyId} ${scope1} ${scope2}`);
   });
 });
