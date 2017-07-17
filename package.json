@@ -18,11 +18,11 @@
     "oauth2"
   ],
   "contributors": [
-    "Roman Lisagor <roman@lunchbadger.com>",
-    "Serhii Kuts <serhii@lunchbadger.com>",
-    "Irfan Baqui <irfan@lunchbadger.com>",
-    "Kevin Swiber <kevin@lunchbadger.com>",
-    "Al Tsang <al@lunchbadger.com>"
+    "Roman Lisagor <rlisagor@gmail.com>",
+    "Serhii Kuts <sergeykuc@gmail.com>",
+    "Irfan Baqui <irfan.baqui@gmail.com>",
+    "Kevin Swiber <kswiber@gmail.com>",
+    "Al Tsang <agilecto@gmail.com>"
   ],
   "license": "Apache-2.0",
   "main": "src/index.js",
