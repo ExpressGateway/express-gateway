@@ -1,6 +1,6 @@
 {
   "name": "express-gateway",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A microservices API gateway built on top of ExpressJS",
   "homepage": "https://www.express-gateway.io",
   "repository": "@expressgateway/express-gateway",
