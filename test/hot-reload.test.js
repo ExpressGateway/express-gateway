@@ -21,8 +21,7 @@ const yaml = require('js-yaml');
     7) Clean up the temp directory.
 */
 
-const baseConfigDirectory = process.env.EG_CONFIG_DIR ||
-  path.join(__dirname, 'config');
+const baseConfigDirectory = path.join(__dirname, 'fixtures', 'hot-reload');
 
 const findOpenPortNumbers = (count, cb) => {
   let completeCount = 0;
