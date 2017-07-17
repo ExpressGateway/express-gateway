@@ -50,7 +50,7 @@ Express has a large vibrant community that we hope to extend further with Expres
 - [Facebook][eg-facebook]
 
 #### Roadmap
-Express Gateway publishes and updates its roadmap in real time as a [public scrum board][eg-roadmap] on Waffle.io.
+Express Gateway publishes and updates its roadmap in real time as a [public task board][eg-roadmap] on Waffle.io.
 
 #### Contribution
 All contributions welcome! Please see the [contributor's guide][contributor-guide]
