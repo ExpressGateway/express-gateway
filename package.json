@@ -1,8 +1,34 @@
 {
-  "name": "gateway",
-  "version": "0.0.4",
-  "description": "Proxies HTTP requests with flexible policies",
+  "name": "express-gateway",
+  "version": "0.0.5",
+  "description": "A microservices API gateway built on top of ExpressJS",
+  "homepage": "https://www.express-gateway.io",
+  "repository": "@expressgateway/express-gateway",
+  "keywords": [
+    "microservices",
+    "apis",
+    "api gateway",
+    "rest",
+    "express",
+    "middleware",
+    "endpoints",
+    "policies",
+    "pipelines",
+    "nodejs gateway",
+    "oauth2"
+  ],
+  "contributors": [
+    "Roman Lisagor <roman@lunchbadger.com>",
+    "Serhii Kuts <serhii@lunchbadger.com>",
+    "Irfan Baqui <irfan@lunchbadger.com>",
+    "Kevin Swiber <kevin@lunchbadger.com>",
+    "Al Tsang <al@lunchbadger.com>"
+  ],
+  "license": "Apache-2.0",
   "main": "src/main.js",
+  "engines": {
+    "node" : ">= 6.0.0"
+  },
   "scripts": {
     "dist": "npm run clean && babel -d dist src",
     "start": "DEBUG=gateway:* babel-watch .",
@@ -11,8 +37,6 @@
     "clean": "rimraf dist/",
     "test": "mocha --compilers js:babel-register tests"
   },
-  "author": "Roman Lisagor <roman@lunchbadger.com>",
-  "license": "UNLICENSED",
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "babel-core": "^6.10.4",
