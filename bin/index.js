@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
+const config = require('../lib/config');
+
 const eg = {
   get config () {
-    return require('../lib/config');
+    return config;
   }
 };
 

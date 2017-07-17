@@ -99,6 +99,10 @@ describe('hot-reload', () => {
                 const childEnv = Object.assign({}, process.env);
                 childEnv.EG_CONFIG_DIR = tempPath;
 
+                // Tests, by default have config watch disabled.
+                // Need to remove this paramter in the child process.
+                delete childEnv.EG_DISABLE_CONFIG_WATCH;
+
                 const modulePath = path.join(__dirname, '..', 'lib', 'index.js');
                 childProcess = fork(modulePath, [], {
                   cwd: tempPath,

@@ -36,8 +36,8 @@
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "pretest": "eslint .",
-    "test": "EG_CONFIG_DIR=test/config EG_PERSIST_WATCHERS=true mocha --recursive test/*",
-    "dev-test": "EG_CONFIG_DIR=test/config mocha EG_PERSIST_WATCHERS=true --recursive test/*"
+    "test": "EG_CONFIG_DIR=test/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive test/*",
+    "dev-test": "EG_CONFIG_DIR=test/config mocha EG_DISABLE_CONFIG_WATCH=true --recursive test/*"
   },
   "bin": {
     "eg": "./bin/index.js"
