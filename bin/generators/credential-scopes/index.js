@@ -6,7 +6,7 @@ module.exports = class extends eg.Generator {
 
     this.configureCommand({
       command: ['credential:scopes <command> [options]', 'credential:scope'],
-      desc: 'Manage credentials',
+      desc: 'Manage scopes for credentials',
       builder: yargs => yargs
         .reset()
         .usage('Usage: $0 ' + process.argv[2] + ' <command> [options]')
