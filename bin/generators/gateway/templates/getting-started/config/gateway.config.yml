@@ -1,6 +1,7 @@
 apiEndpoints:
   api:
-    host: '*'
+    host: localhost
+    path: '/ip'
 http:
   port: 8080
 admin:
@@ -19,7 +20,7 @@ policies:
   - proxy
   - rate-limit
 pipelines:
-  - name: getting-started 
+  - name: default
     apiEndpoints:
       - api
     policies:
