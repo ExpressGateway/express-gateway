@@ -45,9 +45,9 @@ Need help or have a question?
 #### Community
 Express has a large vibrant community that we hope to extend further with Express Gateway's API gateway use case for Express and its middleware.
 
-- [Twitter (@express_gateway)][twitter]
-- [Newsgroup][newsgroup]
-- [Facebook][facebook]
+- [Twitter (@express_gateway)][eg-twitter]
+- [Newsgroup][eg-newsgroup]
+- [Facebook][eg-facebook]
 
 #### Roadmap
 Express Gateway publishes and updates its roadmap in real time as a [public scrum board][eg-roadmap] on Waffle.io.
@@ -79,9 +79,9 @@ Copyright © LunchBadger, Inc.
 [eg-docs]: http://www.express-gateway.io/docs
 [eg-roadmap]: https://waffle.io/ExpressGateway/express-gateway
 [eg-faq]: http://www.express-gateway.io/faq
-[twitter]: https://twitter.com/express_gateway
-[newsgroup]: https://groups.google.com/forum/#!forum/express-gateway
-[facebook]: https://www.facebook.com/expressjsgateway
+[eg-twitter]: https://twitter.com/express_gateway
+[eg-newsgroup]: https://groups.google.com/forum/#!forum/express-gateway
+[eg-facebook]: https://www.facebook.com/expressjsgateway
 [contributor-guide]: https://github.com/ExpressGateway/express-gateway/blob/master/Contributing.md
 [lb-url]: https://www.lunchbadger.com
 [joyent-url]: https://www.joyent.com
