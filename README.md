@@ -64,7 +64,7 @@ Express Gateway is proudly sponsored by...
 
 [Apache-2.0 License][apache-license]
 
-Copyright © LunchBadger, Inc.
+Copyright © LunchBadger, Inc. and Express Gateway Contributors
 
 [comment]: <> (Links Section)
 [npm-version-badge]: https://img.shields.io/npm/v/express-gateway.svg
