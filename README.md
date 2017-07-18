@@ -5,20 +5,22 @@
 [![CircleCI][circleci-badge]][circleci-master-url]
 [![Gitter][gitter-badge]][gitter-room-url]
 
-[![Express-Gateway][eg-wordmark-companion]][eg-url]
+[![Express-Gateway][eg-wordmark-companion]][eg-website]
 
-Express Gateway is an API Gateway that sits at the heart of any microservices architecture, regardless of what language or platform you're using. Express Gateway secures your microservices and exposes them through APIs using Node.js, ExpressJS and Express middleware. Developing microservices, orchestrating and managing them now can be done all one one seamless platform without having to introduce additional infrastructure.
-
----
-
-### [Website](http://www.express-gateway.io) &nbsp; [Getting Started](http://www.express-gateway.io/getting-started) &nbsp; [Docs](http://www.express-gateway.io/documentation)
+Express Gateway is an API Gateway that sits at the heart of any microservices architecture, regardless of what language or platform you're using. Express Gateway secures your microservices and exposes them through APIs using Node.js, ExpressJS and Express middleware. Developing microservices, orchestrating and managing them now can be done insanely fast all on one seamless platform without having to introduce additional infrastructure.
 
 ---
-#### Features
-- feature 1
-- feature 2
-- feature 3
-- feature 4
+
+### [Website][eg-website] &nbsp; [Getting Started][eg-getting-started] &nbsp; [Docs][eg-docs]
+
+---
+#### Main Features
+- Built Entirely on Express and Express Middleware
+- Dynamic Centralized Config
+- API Consumer and Credentials Management
+- Plugin Framework
+- Distributed Data Store
+- CLI and REST API
 
 #### Installation
 If you have Node.js already installed:
@@ -37,24 +39,30 @@ $ eg gateway create
 
 #### Support
 Need help or have a question?
-- [Frequently Asked Questions (FAQ)](http://www.express-gateway.io/faq)
-
+- Come chat with us in [Gitter][gitter-room-url]
+- [Frequently Asked Questions (FAQ)][eg-faq]
 
 #### Community
+Express has a large vibrant community that we hope to extend further with Express Gateway's API gateway use case for Express and its middleware.
+
+- [Twitter (@express_gateway)][eg-twitter]
+- [Newsgroup][eg-newsgroup]
+- [Facebook][eg-facebook]
+
+#### Roadmap
+Express Gateway publishes and updates its roadmap in real time as a [public task board][eg-roadmap] on Waffle.io.
 
 #### Contribution
+All contributions welcome! Please see the [contributor's guide][contributor-guide]
 
-#### Links
-- [Website](http://www.express-gateway.io/)
-- [Documentation](http://www.express-gateway.io/documentation)
-- [Roadmap](https://waffle.io/ExpressGateway/express-gateway)
-- [Twitter (@xpressgateway)](https://twitter.com/xpress-gateway)
-- [Newsgroup](https://groups.google.com/forum/#!forum/express-gateway)
-- [Facebook](https://www.facebook.com/expressjsgateway)
+#### Sponsors
+Express Gateway is proudly sponsored by...
+- [LunchBadger][lb-url] - microservices and API empowerment made easy
+- [Joyent][joyent-url] - the cloud for the people
 
 #### License
 
-[Apache-2.0 License](https://github.com/expressgateway/express-gateway/blob/master/LICENSE.md)  
+[Apache-2.0 License][apache-license]
 
 Copyright © LunchBadger, Inc.
 
@@ -66,4 +74,15 @@ Copyright © LunchBadger, Inc.
 [gitter-badge]: https://img.shields.io/gitter/room/expressgateway/express-gateway.svg
 [gitter-room-url]: https://gitter.im/ExpressGateway/express-gateway
 [eg-wordmark-companion]: logo/wordmark-and-companion-graphic/ExpressGateway_Wordmark+Companion.png
-[eg-url]: https://www.express-gateway.io
+[eg-website]: http://www.express-gateway.io
+[eg-getting-started]: http://www.express-gateway.io/getting-started
+[eg-docs]: http://www.express-gateway.io/docs
+[eg-roadmap]: https://waffle.io/ExpressGateway/express-gateway
+[eg-faq]: http://www.express-gateway.io/faq
+[eg-twitter]: https://twitter.com/express_gateway
+[eg-newsgroup]: https://groups.google.com/forum/#!forum/express-gateway
+[eg-facebook]: https://www.facebook.com/expressjsgateway
+[contributor-guide]: https://github.com/ExpressGateway/express-gateway/blob/master/Contributing.md
+[lb-url]: https://www.lunchbadger.com
+[joyent-url]: https://www.joyent.com
+[apache-license]: https://github.com/expressgateway/express-gateway/blob/master/LICENSE.md  

@@ -31,12 +31,24 @@ project's Code of Conduct.
 
 # Contributions
 
+## Pull Requests
 Any change to resources in this repository must be through pull requests. This applies to all changes
 to documentation, code, binary files, etc. Even long term committers and TC members must use
 pull requests.
 
+A pull request should contain:
+- a spec if applicable, e.g. a GitHub gist, public Google Doc, etc. 
+- tests
+- docs (please open a separate pull request in the express-gateway.io repo and reference the pull request #)
+
+Tests for Express Gateway can be found in the `test` directory.
+Docs for Express Gateway are in the [express-gateway.io repo][express-gateway.io-repo] under the `docs` directory.
+
 No pull request can be merged without being reviewed. Pull request reviews can be requested by a specific contributor or group of contributors.
 
+Please make sure that the build passes for your branch.  Express Gateway currently uses [CircleCI][circleci].
+
+## Reviews
 For non-trivial contributions, pull requests should sit for at least 36 hours to ensure that
 contributors in other timezones have time to review. Consideration should also be given to
 weekends and other holiday periods to ensure active committers all have reasonable time to
@@ -46,6 +58,7 @@ The default for each contribution is that it is accepted once no committer has a
 During review committers may also request that a specific contributor who is most versed in a
 particular area gives a "LGTM" before the PR can be merged. Once all issues brought by committers are addressed and all reviews have been completed, the pull request can be landed by any committer.
 
+## Resolutions
 In the case of an objection being raised in a pull request by another committer, all involved
 committers should seek to arrive at a consensus by way of addressing concerns being expressed
 by discussion, compromise on the proposed change, or withdrawal of the proposed change.
@@ -81,3 +94,7 @@ Members can be added to the TC at any time. Any committer can nominate another c
 to the TC and the TC uses its standard consensus seeking process to evaluate whether or
 not to add this new member. Members who do not participate consistently at the level of
 a majority of the other members are expected to resign.
+
+[comment]: <> (Links Section)
+[express-gateway.io-repo]: https://github.com/ExpressGateway/express-gateway.io
+[circleci]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master
