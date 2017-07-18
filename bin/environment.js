@@ -91,13 +91,10 @@ exports.bootstrap = (eg, adapter) => {
       return alias.split(/\s/)[0];
     });
 
-    const original = aliases[0];
-    const rest = aliases.splice(1);
+    const commandName = command.namespace.split(':')[1];
 
-    commandAliases[original] = original;
-
-    rest.forEach(a => {
-      commandAliases[a] = original;
+    aliases.forEach(a => {
+      commandAliases[a] = commandName;
     });
 
     program.command(generator._configuration);
@@ -128,13 +125,10 @@ exports.bootstrap = (eg, adapter) => {
         return alias.split(/\s/)[0];
       });
 
-      const original = aliases[0];
-      const rest = aliases.splice(1);
+      const commandName = s.namespace.split(':')[2];
 
-      subCommandAliases[key][original] = original;
-
-      rest.forEach(a => {
-        subCommandAliases[key][a] = original;
+      aliases.forEach(a => {
+        subCommandAliases[key][a] = commandName;
       });
     });
   });
