@@ -161,7 +161,7 @@ describe('Access Token tests', function () {
 
     before(function (done) {
       originalSystemConfig = config.systemConfig;
-      config.systemConfig.access_tokens.timeToExpiry = 0;
+      config.systemConfig.accessTokens.timeToExpiry = 0;
 
       db.flushdbAsync()
       .then(function (didSucceed) {
@@ -177,7 +177,7 @@ describe('Access Token tests', function () {
     });
 
     after((done) => {
-      config.systemConfig.access_tokens.timeToExpiry = originalSystemConfig.access_tokens.timeToExpiry;
+      config.systemConfig.accessTokens.timeToExpiry = originalSystemConfig.accessTokens.timeToExpiry;
       done();
     });
 
@@ -243,7 +243,7 @@ describe('Access Token tests', function () {
 
     before(function (done) {
       originalSystemConfig = config.systemConfig;
-      config.systemConfig.access_tokens.timeToExpiry = 0;
+      config.systemConfig.accessTokens.timeToExpiry = 0;
 
       tokenObjs = [
         {
@@ -282,7 +282,7 @@ describe('Access Token tests', function () {
 
           Promise.all(expiredTokenPromises)
             .then(() => {
-              config.systemConfig.access_tokens.timeToExpiry = 20000000;
+              config.systemConfig.accessTokens.timeToExpiry = 20000000;
 
               let activeTokenPromises = [];
 
@@ -511,8 +511,8 @@ describe('Refresh Token tests', function () {
 
     before(function (done) {
       originalSystemConfig = config.systemConfig;
-      config.systemConfig.access_tokens.timeToExpiry = 0;
-      config.systemConfig.refresh_tokens.timeToExpiry = 0;
+      config.systemConfig.accessTokens.timeToExpiry = 0;
+      config.systemConfig.refreshTokens.timeToExpiry = 0;
 
       db.flushdbAsync()
         .then(function (didSucceed) {
@@ -565,7 +565,7 @@ describe('Refresh Token tests', function () {
     });
 
     it('should create a new refresh token if one is expired', function (done) {
-      config.systemConfig.refresh_tokens.timeToExpiry = 9999999;
+      config.systemConfig.refreshTokens.timeToExpiry = 9999999;
       tokenService.findOrSave(newToken, { includeRefreshToken: true })
         .then((token) => {
           token.should.not.eql(expiredToken);
@@ -598,7 +598,7 @@ describe('Refresh Token tests', function () {
         authType: 'oauth2'
       };
       let accessToken;
-      config.systemConfig.access_tokens.timeToExpiry = 9999999;
+      config.systemConfig.accessTokens.timeToExpiry = 9999999;
 
       tokenService.findOrSave(tokenObj)
         .then((token) => {
@@ -638,8 +638,8 @@ describe('Refresh Token tests', function () {
 
     before(function (done) {
       originalSystemConfig = config.systemConfig;
-      config.systemConfig.refresh_tokens.timeToExpiry = 0;
-      // config.systemConfig.access_tokens.timeToExpiry = 0;
+      config.systemConfig.refreshTokens.timeToExpiry = 0;
+      // config.systemConfig.accessTokens.timeToExpiry = 0;
 
       tokenObjs = [
         {
@@ -678,8 +678,8 @@ describe('Refresh Token tests', function () {
 
           Promise.all(expiredTokenPromises)
             .then(() => {
-              config.systemConfig.refresh_tokens.timeToExpiry = 20000000;
-              // config.systemConfig.access_tokens.timeToExpiry = 20000000;
+              config.systemConfig.refreshTokens.timeToExpiry = 20000000;
+              // config.systemConfig.accessTokens.timeToExpiry = 20000000;
 
               let activeTokenPromises = [];
 
