@@ -4,11 +4,11 @@ module.exports = class extends eg.Generator {
     super(args, opts);
 
     this.configureCommand({
-      command: 'remove-scopes [options] <scopes..>',
+      command: 'remove [options] <scopes..>',
       desc: 'Remove scopes from a credential by id or keyid',
       builder: yargs =>
         yargs
-          .usage(`Usage: $0 ${process.argv[2]} remove-scopes [options] <scopes..>`)
+          .usage(`Usage: $0 ${process.argv[2]} remove [options] <scopes..>`)
           .string(['t', 'id'])
           .alias('t', 'type')
           .demandOption(['t', 'id'])
