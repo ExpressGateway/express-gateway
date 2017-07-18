@@ -25,7 +25,7 @@
     "Al Tsang <agilecto@gmail.com>"
   ],
   "license": "Apache-2.0",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "engines": {
     "node": ">= 6.0.0"
   },

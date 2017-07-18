@@ -142,55 +142,57 @@ describe('hot-reload', () => {
         awaitWriteFinish: true
       };
 
-      chokidar
-        .watch(testGatewayConfigPath, watchOptions)
-        .once('change', (evt) => {
-          request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
-            if (err) {
-              throw err;
-            }
+      const watcher = chokidar.watch(testGatewayConfigPath, watchOptions);
+      watcher.once('change', (evt) => {
+        request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
+          if (err) {
+            throw err;
+          }
 
-            assert.equal(res.statusCode, 404);
-            done();
-          });
+          assert.equal(res.statusCode, 404);
+          done();
         });
-
-      // remove key-auth policy
-      testGatewayConfigData.pipelines[0].policies.shift();
-
-      fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
-        if (err) {
-          throw err;
-        }
       });
-    }).timeout(5000);
+
+      watcher.on('ready', () => {
+        // remove key-auth policy
+        testGatewayConfigData.pipelines[0].policies.shift();
+
+        fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
+          if (err) {
+            throw err;
+          }
+        });
+      });
+    }).timeout(10000);
 
     it('uses previous config on reload of invalid gateway.config.yml', done => {
       const watchOptions = {
         awaitWriteFinish: true
       };
 
-      chokidar
-        .watch(testGatewayConfigPath, watchOptions)
-        .once('change', (evt) => {
-          request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
-            if (err) {
-              throw err;
-            }
+      const watcher = chokidar.watch(testGatewayConfigPath, watchOptions);
+      watcher.once('change', (evt) => {
+        request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
+          if (err) {
+            throw err;
+          }
 
-            assert.equal(res.statusCode, 404);
-            done();
-          });
+          assert.equal(res.statusCode, 404);
+          done();
         });
-
-      // make config invalid
-      delete testGatewayConfigData.pipelines;
-
-      fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
-        if (err) {
-          throw err;
-        }
       });
-    }).timeout(5000);
+
+      watcher.on('ready', () => {
+        // make config invalid
+        delete testGatewayConfigData.pipelines;
+
+        fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
+          if (err) {
+            throw err;
+          }
+        });
+      });
+    }).timeout(10000);
   });
 });

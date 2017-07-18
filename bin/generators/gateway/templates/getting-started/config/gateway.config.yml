@@ -1,7 +1,7 @@
 apiEndpoints:
   api:
     host: localhost
-    path: '/ip'
+    paths: '/ip'
 http:
   port: 8080
 admin:
