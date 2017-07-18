@@ -16,7 +16,7 @@ describe('Multi entry api endpoint with methods', () => {
           pathRegex: '/wild-cats$',
           methods: 'POST,PUT' // comma separated string syntax
         }, {
-          paths: '/admin',
+          path: '/admin',
           methods: ['PUT'] // array syntax
         }]
       },
