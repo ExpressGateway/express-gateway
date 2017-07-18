@@ -6,7 +6,7 @@ const path = require('path');
 const assert = require('chai').assert;
 const chokidar = require('chokidar');
 const cpr = require('cpr');
-const request = require('request');
+const request = require('superagent');
 const rimraf = require('rimraf');
 const tmp = require('tmp');
 const yaml = require('js-yaml');
@@ -115,15 +115,13 @@ describe('hot-reload', () => {
 
                 // Not ideal, but we need to make sure the process is running.
                 setTimeout(() => {
-                  request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
-                    if (err) {
-                      throw err;
-                    }
-
-                    assert.equal(res.statusCode, 401);
-                    assert.equal(body, 'Forbidden');
-                    done();
-                  });
+                  request
+                    .get(`http://localhost:${originalGatewayPort}`)
+                    .end((err, res) => {
+                      assert(err);
+                      assert(res.unauthorized);
+                      done();
+                    });
                 }, 1000);
               });
             });
@@ -145,14 +143,14 @@ describe('hot-reload', () => {
       chokidar
         .watch(testGatewayConfigPath, watchOptions)
         .once('change', (evt) => {
-          request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
-            if (err) {
-              throw err;
-            }
-
-            assert.equal(res.statusCode, 404);
-            done();
-          });
+          request
+            .get(`http://localhost:${originalGatewayPort}`)
+            .end((err, res) => {
+              assert(err);
+              assert(res.clientError);
+              assert.equal(res.statusCode, 404);
+              done();
+            });
         });
 
       // remove key-auth policy
@@ -173,14 +171,14 @@ describe('hot-reload', () => {
       chokidar
         .watch(testGatewayConfigPath, watchOptions)
         .once('change', (evt) => {
-          request(`http://localhost:${originalGatewayPort}`, (err, res, body) => {
-            if (err) {
-              throw err;
-            }
-
-            assert.equal(res.statusCode, 404);
-            done();
-          });
+          request
+            .get(`http://localhost:${originalGatewayPort}`)
+            .end((err, res) => {
+              assert(err);
+              assert(res.clientError);
+              assert.equal(res.statusCode, 404);
+              done();
+            });
         });
 
       // make config invalid
