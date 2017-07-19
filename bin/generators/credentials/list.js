@@ -23,15 +23,16 @@ module.exports = class extends eg.Generator {
       .then(data => {
         let credentials = data.credentials;
         if (!credentials || !credentials.length) {
-          return this.stdout('You have no credentials');
-        }
-        credentials.forEach(app => {
-          if (this.argv.q) {
-            this.stdout(app.id);
-          } else {
-            this.stdout(JSON.stringify(app, null, 2));
-          }
-        });
+          this.stdout(`Consumer ${this.argv.consumerId} has no credentials`);
+        } else {
+          credentials.forEach(app => {
+            if (this.argv.q) {
+              this.stdout(app.id);
+            } else {
+              this.stdout(JSON.stringify(app, null, 2));
+            }
+          });
+        };
       })
       .catch(err => {
         this.log.error(err.message);
