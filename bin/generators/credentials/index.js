@@ -14,6 +14,7 @@ module.exports = class extends eg.Generator {
         .command(this.createSubCommand('activate'))
         .command(this.createSubCommand('deactivate'))
         .command(this.createSubCommand('info'))
+        .command(this.createSubCommand('list'))
         .demandCommand()
     });
   }
