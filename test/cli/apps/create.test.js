@@ -91,10 +91,10 @@ describe('eg apps create', () => {
             let app = data.apps[0];
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
-            let res = JSON.parse(output.replace('Created ', ''));
-            assert.deepEqual(res, app);
+
+            assert.equal(output, `Created ${app.id}`);
             done();
-          }).catch(done);
+          });
       });
     });
 
