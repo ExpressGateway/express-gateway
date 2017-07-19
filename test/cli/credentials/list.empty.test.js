@@ -29,10 +29,10 @@ describe('eg credentials list -c x [no credentials]', () => {
     let message;
     env.hijack(namespace, generator => {
       generator.once('run', () => {
-        generator.log.error = message => {
+        generator.stdout = message => {
           done(new Error(message));
         };
-        generator.stdout = msg => {
+        generator.log.error = msg => {
           message = msg;
         };
       });
