@@ -126,9 +126,7 @@ module.exports = class extends eg.Generator {
   }
 
   install () {
-    // TODO: Before going live, switch out the NPM install package name.
-    // this.npmInstall(['express-gateway'], { save: true });
-    this.npmInstall(['git+ssh://git@github.com:ExpressGateway/express-gateway.git'], { save: true });
+    this.npmInstall(['express-gateway'], { save: true });
   }
 
   end () {
