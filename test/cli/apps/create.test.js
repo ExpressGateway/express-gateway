@@ -120,10 +120,9 @@ describe('eg apps create', () => {
             let app = data.apps[0];
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
-
             assert.equal(output, `Created ${app.id}`);
             done();
-          });
+          }).catch(done);
       });
     });
 
@@ -150,10 +149,9 @@ describe('eg apps create', () => {
             let app = data.apps[0];
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
-
             assert.equal(output, `Created ${app.id}`);
             done();
-          });
+          }).catch(done);
       });
     });
 

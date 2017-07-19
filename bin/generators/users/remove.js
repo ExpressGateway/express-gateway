@@ -21,12 +21,10 @@ module.exports = class extends eg.Generator {
     return Promise.all(userIds.map((userId) => {
       return this.admin.users.remove(userId)
           .then(user => {
-            if (user) {
-              if (!argv.q) {
-                this.log.ok(`Removed ${userId}`);
-              } else {
-                this.stdout(userId);
-              }
+            if (!argv.q) {
+              this.log.ok(`Removed ${userId}`);
+            } else {
+              this.stdout(userId);
             }
           })
           .catch(err => {
