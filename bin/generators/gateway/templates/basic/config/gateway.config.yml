@@ -1,11 +1,11 @@
-apiEndpoints:
-  api:
-    host: '*'
 http:
   port: 8080
 admin:
   port: 9876
   hostname: localhost
+apiEndpoints:
+  api:
+    host: '*'
 serviceEndpoints:
   httpbin:
     url: 'https://httpbin.org'

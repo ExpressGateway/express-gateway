@@ -1,12 +1,12 @@
-apiEndpoints:
-  api:
-    host: localhost
-    paths: '/ip'
 http:
   port: 8080
 admin:
   port: 9876
   hostname: localhost
+apiEndpoints:
+  api:
+    host: localhost
+    paths: '/ip'
 serviceEndpoints:
   httpbin:
     url: 'https://httpbin.org'

@@ -1,17 +1,14 @@
-apiEndpoints:
-  api:
-    host: '*'
-
 http:
   port: 8080
-admin:
-  port: 9876
-  hostname: localhost
-
 https:
   port: 9999
   tls: {}
-
+admin:
+  port: 9876
+  hostname: localhost
+apiEndpoints:
+  api:
+    host: '*'
 serviceEndpoints:
   backend:
     url: 'http://localhost:9876' # btw this is EG admin API
