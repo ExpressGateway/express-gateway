@@ -28,13 +28,13 @@ module.exports = class extends eg.Generator {
             alias: 'type',
             describe: 'Type of Express Gateway template to generate',
             demandOption: false,
-            type: 'string'
+            choices: ['basic', 'getting-started', undefined]
           })
           .option('d', {
             alias: 'dir',
             describe: 'Directory where the Express Gateway will be installed',
             demandOption: false,
-            choices: ['basic', 'getting-started', undefined]
+            type: 'string'
           })
           .group(['n', 'd', 't'], 'Options:')
     });
