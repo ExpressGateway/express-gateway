@@ -36,11 +36,20 @@
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "pretest": "eslint .",
-    "test": "EG_CONFIG_DIR=test/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive test/*",
-    "dev-test": "EG_CONFIG_DIR=test/config mocha EG_DISABLE_CONFIG_WATCH=true --recursive test/*"
+    "test": "npm run mocha-istanbul",
+    "test-all": "EG_CONFIG_DIR=test/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive test/* --timeout 20000",
+    "dev-test": "EG_CONFIG_DIR=test/config mocha EG_DISABLE_CONFIG_WATCH=true --recursive test/*",
+    "mocha-istanbul": "node_modules/.bin/nyc --reporter=lcov npm run test-all && ./node_modules/.bin/nyc report ./node_modules/.bin/coveralls"
   },
   "bin": {
     "eg": "./bin/index.js"
+  },
+  "nyc": {
+    "exclude": [
+      "logo",
+      "node_modules",
+      "coverage"
+    ]
   },
   "dependencies": {
     "bcrypt": "1.0.2",
@@ -48,6 +57,7 @@
     "body-parser": "1.17.2",
     "chalk": "1.1.3",
     "chokidar": "1.7.0",
+    "color-convert": "1.9.0",
     "connect-ensure-login": "0.1.1",
     "cors": "2.8.3",
     "ejs": "2.5.6",
@@ -57,6 +67,7 @@
     "fakeredis": "2.0.0",
     "find-up": "2.1.0",
     "glob": "7.1.2",
+    "has-flag": "2.0.0",
     "http-proxy": "1.16.2",
     "js-yaml": "3.8.3",
     "lodash": "4.17.4",
@@ -79,6 +90,7 @@
   },
   "devDependencies": {
     "chai": "3.5.0",
+    "coveralls": "2.13.1",
     "cpr": "2.2.0",
     "eslint": "3.19.0",
     "eslint-config-standard": "10.2.1",
@@ -87,8 +99,11 @@
     "eslint-plugin-node": "4.2.2",
     "eslint-plugin-promise": "3.5.0",
     "eslint-plugin-standard": "3.0.1",
+    "istanbul": "0.4.5",
     "mocha": "3.3.0",
+    "mocha-lcov-reporter": "1.3.0",
     "mock-require": "2.0.2",
+    "nyc": "11.0.3",
     "rimraf": "2.6.1",
     "should": "11.2.1",
     "sinon": "2.1.0",

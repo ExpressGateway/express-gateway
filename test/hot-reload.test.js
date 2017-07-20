@@ -122,7 +122,7 @@ describe('hot-reload', () => {
                       assert(res.unauthorized);
                       done();
                     });
-                }, 1000);
+                }, 5000);
               });
             });
           });
