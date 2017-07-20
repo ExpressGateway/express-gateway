@@ -43,7 +43,7 @@
     "eg": "./bin/index.js"
   },
   "dependencies": {
-    "bcrypt": "1.0.0",
+    "bcrypt": "1.0.2",
     "bluebird": "3.5.0",
     "body-parser": "1.17.2",
     "chalk": "1.1.3",
