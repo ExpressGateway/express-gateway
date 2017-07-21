@@ -3,6 +3,7 @@
 
 [![npm][npm-version-badge]][npm-package-url]
 [![CircleCI][circleci-badge]][circleci-master-url]
+[![Coverage Status](https://coveralls.io/repos/github/ExpressGateway/express-gateway/badge.svg?branch=master)](https://coveralls.io/github/ExpressGateway/express-gateway?branch=master)
 [![Gitter][gitter-badge]][gitter-room-url]
 
 [![Express-Gateway][eg-wordmark-companion]][eg-website]
