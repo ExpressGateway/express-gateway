@@ -1,6 +1,5 @@
 const { fork } = require('child_process');
 const fs = require('fs');
-const net = require('net');
 const path = require('path');
 
 const assert = require('chai').assert;
@@ -10,6 +9,8 @@ const request = require('superagent');
 const rimraf = require('rimraf');
 const tmp = require('tmp');
 const yaml = require('js-yaml');
+
+const { findOpenPortNumbers } = require('./common/server-helper');
 
 /*
     1) Copy config to a temp directory.
@@ -23,34 +24,6 @@ const yaml = require('js-yaml');
 
 const baseConfigDirectory = path.join(__dirname, 'fixtures', 'hot-reload');
 
-const findOpenPortNumbers = (count, cb) => {
-  let completeCount = 0;
-  const ports = [];
-
-  for (let i = 0; i < count; i++) {
-    const server = net.createServer();
-
-    server.listen(0);
-
-    server.on('listening', () => {
-      ports.push(server.address().port);
-
-      server.once('close', () => {
-        completeCount++;
-
-        if (completeCount === count) {
-          cb(null, ports);
-        }
-      });
-      server.close();
-    });
-
-    server.on('error', (err) => {
-      cb(err);
-    });
-  }
-};
-
 describe('hot-reload', () => {
   describe('gateway config', () => {
     let testGatewayConfigPath = null;
@@ -58,7 +31,8 @@ describe('hot-reload', () => {
     let childProcess = null;
     let originalGatewayPort = null;
 
-    before(done => {
+    before(function (done) {
+      this.timeout(10000);
       tmp.dir((err, tempPath) => {
         if (err) {
           throw err;
