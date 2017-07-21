@@ -81,6 +81,7 @@
     "passport-oauth2-client-password": "0.1.2",
     "redis": "2.7.1",
     "superagent": "3.5.2",
+    "swagger-ui-express": "^2.0.2",
     "uuid-base62": "0.1.0",
     "vhost": "3.0.2",
     "winston": "2.3.1",
