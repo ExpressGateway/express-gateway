@@ -5,4 +5,4 @@ machine:
     COVERALLS_PARALLEL: true
 notify:
   webhooks:
-    - url: https://coveralls.io/webhook?repo_token=e2zp3sPnAN7yv8OzwntvzW3p6KqfsDL0W
+    - url: https://coveralls.io/webhook?repo_token=COVERALLS_REPO_TOKEN
