@@ -3,7 +3,7 @@
 
 [![npm][npm-version-badge]][npm-package-url]
 [![CircleCI][circleci-badge]][circleci-master-url]
-[![Coverage Status](https://coveralls.io/repos/github/ExpressGateway/express-gateway/badge.svg?branch=master)](https://coveralls.io/github/ExpressGateway/express-gateway?branch=master)
+[![Coveralls][coveralls-badge]][coveralls-master-url]
 [![Gitter][gitter-badge]][gitter-room-url]
 
 [![Express-Gateway][eg-wordmark-companion]][eg-website]
@@ -73,6 +73,8 @@ Copyright © LunchBadger, Inc. and Express Gateway Contributors
 [npm-package-url]: https://www.npmjs.com/package/express-gateway
 [circleci-badge]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master.svg?style=shield&circle-token=ac6b0e86b46220da43a5ae63a267d12e81ccb2d5
 [circleci-master-url]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master
+[coveralls-badge]: https://img.shields.io/coveralls/ExpressGateway/express-gateway/master.svg
+[coveralls-master-url]: https://coveralls.io/github/ExpressGateway/express-gateway?branch=master
 [gitter-badge]: https://img.shields.io/gitter/room/expressgateway/express-gateway.svg
 [gitter-room-url]: https://gitter.im/ExpressGateway/express-gateway
 [eg-wordmark-companion]: logo/wordmark-and-companion-graphic/ExpressGateway_Wordmark+Companion.png
