@@ -1,8 +1,8 @@
 # Test against the latest version of this Node.js version
 environment:
   matrix:
-		- nodejs_version: "6"
-		- nodejs_version: "7"
+		- nodejs_version: '6'
+		- nodejs_version: '7'
 
 # Install scripts. (runs after repo cloning)
 install:
@@ -18,6 +18,9 @@ test_script:
   - npm --version
   # run tests
   - npm test
+
+matrix:
+  fast_finish: true
 
 # Don't actually build.
 build: off
