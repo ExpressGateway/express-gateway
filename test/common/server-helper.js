@@ -1,8 +1,8 @@
-'use strict';
+const net = require('net');
 const express = require('express');
 const logger = require('../../lib/logger').test;
 
-function generateBackendServer (port) {
+const generateBackendServer = port => {
   let app = express();
 
   app.all('*', (req, res) => {
@@ -17,8 +17,37 @@ function generateBackendServer (port) {
       });
     });
   });
-}
+};
+
+const findOpenPortNumbers = (count, cb) => {
+  let completeCount = 0;
+  const ports = [];
+
+  for (let i = 0; i < count; i++) {
+    const server = net.createServer();
+
+    server.listen(0);
+
+    server.on('listening', () => {
+      ports.push(server.address().port);
+
+      server.once('close', () => {
+        completeCount++;
+
+        if (completeCount === count) {
+          cb(null, ports);
+        }
+      });
+      server.close();
+    });
+
+    server.on('error', (err) => {
+      cb(err);
+    });
+  }
+};
 
 module.exports = {
-  generateBackendServer
+  generateBackendServer,
+  findOpenPortNumbers
 };
