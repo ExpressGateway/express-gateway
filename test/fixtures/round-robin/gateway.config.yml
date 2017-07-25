@@ -17,5 +17,6 @@ pipelines:
     policies:
       - proxy:
           - action:
+              strategy: 'round-robin'
               serviceEndpoint: backend
               changeOrigin: true
