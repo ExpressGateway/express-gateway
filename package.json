@@ -37,9 +37,9 @@
     "clean": "rimraf dist/",
     "pretest": "eslint .",
     "test": "npm run mocha-istanbul",
-    "test-all": "EG_CONFIG_DIR=test/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive test/* --timeout 20000",
-    "dev-test": "EG_CONFIG_DIR=test/config mocha EG_DISABLE_CONFIG_WATCH=true --recursive test/*",
-    "mocha-istanbul": "node_modules/.bin/nyc --reporter=lcov npm run test-all && ./node_modules/.bin/nyc report --report=lcov > coverage.lcov && ./node_modules/.bin/codecov"
+    "test-all": "cross-env EG_CONFIG_DIR=test/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive test --timeout 20000",
+    "dev-test": "cross-env EG_CONFIG_DIR=test/config mocha EG_DISABLE_CONFIG_WATCH=true --recursive test",
+    "mocha-istanbul": "nyc --reporter=lcov npm run test-all && nyc report --report=lcov > coverage.lcov && codecov"
   },
   "bin": {
     "eg": "./bin/index.js"
@@ -93,6 +93,7 @@
     "chai": "3.5.0",
     "codecov": "^2.2.0",
     "cpr": "2.2.0",
+    "cross-env": "5.0.1",
     "eslint": "3.19.0",
     "eslint-config-standard": "10.2.1",
     "eslint-plugin-import": "2.3.0",
