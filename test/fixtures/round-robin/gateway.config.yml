@@ -1,0 +1,22 @@
+http:
+  port: 8080
+admin:
+  port: 9876
+apiEndpoints:
+  api:
+    host: 'localhost'
+    path: '/round-robin'
+serviceEndpoints:
+  backend: {}
+policies:
+  - proxy
+pipelines:
+  - name: default 
+    apiEndpoints:
+      - api
+    policies:
+      - proxy:
+          - action:
+              strategy: 'round-robin'
+              serviceEndpoint: backend
+              changeOrigin: true
