@@ -6,6 +6,11 @@ https:
 admin:
   port: 9876
   hostname: localhost
+
+ws:
+  target: 'ws://localhost:10017'
+
+
 apiEndpoints:
   api:
     host: '*'

@@ -110,6 +110,7 @@
     "supertest": "3.0.0",
     "supertest-session": "3.0.0",
     "tmp": "0.0.31",
+    "ws": "^3.0.0",
     "yeoman-test": "1.6.0"
   },
   "yargs": {
