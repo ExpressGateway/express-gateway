@@ -44,11 +44,7 @@ module.exports = class EgGenerator extends Generator {
     return yargs
       .boolean(['no-color', 'q'])
       .describe('no-color', 'Disable color in prompts')
-      .string('config-dir')
-      .describe('config-dir', 'Directory for express-gateway configuration')
-      .nargs('config-dir', 1)
       .describe('q', 'Only show major pieces of output')
-      .group(['config-dir'], 'Configure:')
       .group(['no-color', 'q'], 'Options:')
       .alias('q', 'quiet')
       .help('h');
