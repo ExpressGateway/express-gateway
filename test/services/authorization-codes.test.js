@@ -18,10 +18,7 @@ describe('Authorization Code Tests', function () {
       }
       done();
     })
-    .catch(function (err) {
-      should.not.exist(err);
-      done();
-    });
+    .catch(done);
   });
 
   it('should save a code', function (done) {
@@ -37,14 +34,12 @@ describe('Authorization Code Tests', function () {
       should.exist(code);
       should.exist(code.id);
       code.id.length.should.be.greaterThan(15);
-      _.omit(code, [ 'id', 'createdAt' ]).should.deepEqual(newCode);
+      should.ok(new Date(code.expiresAt) > Date.now());
+      _.omit(code, [ 'id', 'createdAt', 'expiresAt' ]).should.deepEqual(newCode);
       codeFromDb = code;
       done();
     })
-    .catch(function (err) {
-      should.not.exist(err);
-      done();
-    });
+    .catch(done);
   });
 
   it('should find a code', function (done) {
@@ -55,10 +50,7 @@ describe('Authorization Code Tests', function () {
       codeFromDb.should.deepEqual(code);
       done();
     })
-    .catch(function (err) {
-      should.not.exist(err);
-      done();
-    });
+    .catch(done);
   });
 
   it('should not find a code the second time', function (done) {
@@ -69,9 +61,6 @@ describe('Authorization Code Tests', function () {
       should.not.exist(code);
       done();
     })
-    .catch(function (err) {
-      should.not.exist(err);
-      done();
-    });
+    .catch(done);
   });
 });
