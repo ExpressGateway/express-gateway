@@ -27,13 +27,16 @@ describe('eg users create', () => {
 
   it('creates a user from prompts', done => {
     env.hijack(namespace, generator => {
-      let output = null;
+      let output, text;
 
       generator.once('run', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
         generator.log.ok = message => {
+          text = message;
+        };
+        generator.stdout = message => {
           output = message;
         };
 
@@ -45,16 +48,21 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
+        let stdOutUser = JSON.parse(output);
         return adminHelper.admin.users.info(username)
               .then(user => {
                 assert.equal(user.username, username);
                 assert.equal(user.firstname, 'La');
                 assert.equal(user.lastname, 'Deeda');
 
-                assert.equal(output, 'Created ' + username);
+                assert.equal(text, 'Created ' + user.id);
+
+                assert.equal(stdOutUser.username, username);
+                assert.equal(stdOutUser.firstname, 'La');
+                assert.equal(stdOutUser.lastname, 'Deeda');
 
                 done();
-              });
+              }).catch(done);
       });
     });
 
@@ -64,25 +72,35 @@ describe('eg users create', () => {
   it('creates a user from properties', done => {
     env.hijack(namespace, generator => {
       let output = null;
+      let text = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
         generator.log.ok = message => {
+          text = message;
+        };
+        generator.stdout = message => {
           output = message;
         };
       });
 
       generator.once('end', () => {
+        let stdOutUser = JSON.parse(output);
         return adminHelper.admin.users.info(username)
           .then(user => {
             assert.equal(user.username, username);
             assert.equal(user.firstname, 'La');
             assert.equal(user.lastname, 'Deeda');
-            assert.equal(output, 'Created ' + username);
+            assert.equal(text, 'Created ' + user.id);
+
+            assert.equal(stdOutUser.username, username);
+            assert.equal(stdOutUser.firstname, 'La');
+            assert.equal(stdOutUser.lastname, 'Deeda');
+
             done();
-          });
+          }).catch(done);
       });
     });
 
