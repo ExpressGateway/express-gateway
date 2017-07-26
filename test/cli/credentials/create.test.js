@@ -34,12 +34,16 @@ describe('eg credentials create', () => {
   it('creates a credential from prompts', done => {
     env.hijack(namespace, generator => {
       let output = null;
+      let text = null;
 
       generator.once('run', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
         generator.log.ok = message => {
+          text = message;
+        };
+        generator.stdout = message => {
           output = message;
         };
 
@@ -47,8 +51,9 @@ describe('eg credentials create', () => {
       });
 
       generator.once('end', () => {
-        assert.ok(output.indexOf('Created ') === 0);
-        let loggedCred = JSON.parse(output.replace('Created ', ''));
+        let loggedCred = JSON.parse(output);
+        assert.equal(text, 'Created ' + loggedCred.keyId);
+
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
               .then(cred => {
                 assert.ok(cred.keyId);
@@ -68,16 +73,17 @@ describe('eg credentials create', () => {
 
     env.hijack(namespace, generator => {
       let output = null;
-
+      let text = null;
       generator.once('run', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
-        generator.log = message => {
+        generator.stdout = message => {
           output = message;
         };
+
         generator.log.ok = message => {
-          output = message;
+          text = message;
         };
 
         generator.stdin = new PassThrough();
@@ -86,8 +92,8 @@ describe('eg credentials create', () => {
       });
 
       generator.once('end', () => {
-        assert.ok(output.indexOf('Created ') === 0);
-        let loggedCred = JSON.parse(output.replace('Created ', ''));
+        let loggedCred = JSON.parse(output);
+        assert.equal(text, 'Created ' + loggedCred.keyId);
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
               .then(cred => {
                 assert.ok(cred.keyId);

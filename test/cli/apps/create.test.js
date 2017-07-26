@@ -35,13 +35,16 @@ describe('eg apps create', () => {
 
   it('creates an app from prompts with username', done => {
     env.hijack(namespace, generator => {
-      let output = null;
+      let output, text;
 
       generator.once('run', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
         generator.log.ok = message => {
+          text = message;
+        };
+        generator.stdout = message => {
           output = message;
         };
 
@@ -58,7 +61,11 @@ describe('eg apps create', () => {
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
-            assert.equal(output, `Created ${app.id}`);
+            assert.equal(text, `Created ${app.id}`);
+
+            let stdoutApp = JSON.parse(output);
+            assert.equal(stdoutApp.name, 'appy');
+            assert.equal(stdoutApp.redirectUri, 'http://localhost:3000/cb');
             done();
           });
       });
