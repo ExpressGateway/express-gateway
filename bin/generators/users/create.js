@@ -113,7 +113,8 @@ module.exports = class extends eg.Generator {
     return this._insert(user)
       .then(newUser => {
         if (!argv.q) {
-          this.log.ok(`Created ${newUser.username}`);
+          this.log.ok(`Created ${newUser.id}`);
+          this.stdout(JSON.stringify(newUser, null, 2));
         } else {
           this.stdout(newUser.id);
         }

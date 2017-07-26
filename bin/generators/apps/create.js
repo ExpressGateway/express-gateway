@@ -82,6 +82,7 @@ module.exports = class extends eg.Generator {
     .then(newApp => {
       if (!argv.q) {
         this.log.ok(`Created ${newApp.id}`);
+        this.stdout(JSON.stringify(newApp, null, 2));
       } else {
         this.stdout(newApp.id);
       }

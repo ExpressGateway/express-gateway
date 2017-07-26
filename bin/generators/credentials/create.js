@@ -157,7 +157,8 @@ module.exports = class extends eg.Generator {
   _output (credential, options) {
     let argv = this.argv;
     if (!argv.q) {
-      this.log.ok(`Created \n ${JSON.stringify(credential, null, 2)}`);
+      this.log.ok(`Created ${credential.id || credential.keyId}}`);
+      this.stdout(JSON.stringify(credential, null, 2));
     } else {
       if (argv.type === 'key-auth') {
         this.stdout(`${credential.keyId}:${credential.keySecret}`);
