@@ -39,6 +39,28 @@ $ npm install -g express-gateway
 $ eg gateway create
 ```
 
+#### Running Tests
+
+To run the tests you first need to install the following npm packages:
+
+- eslint
+- eslint-plugin-markdown
+- eslint-plugin-promise
+- eslint-plugin-node
+- eslint-plugin-standard
+- eslint-plugin-import
+- eslint-config-standard
+- eslint-config-import
+- nyc
+- cross-env
+
+Then execute:
+
+```bash
+# run the tests
+$ npm test
+```
+
 #### Support
 Need help or have a question?
 - Come chat with us in [Gitter][gitter-room-url]
