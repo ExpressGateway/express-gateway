@@ -22,7 +22,8 @@ Express Gateway is an API Gateway that sits at the heart of any microservices ar
 - API Consumer and Credentials Management
 - Plugins and Plugin Framework
 - Distributed Data Store
-- CLI and REST API
+- CLI
+- REST API
 
 #### Installation
 If you have Node.js already installed:
@@ -41,19 +42,21 @@ $ eg gateway create
 
 #### Support
 Need help or have a question?
-- Come chat with us in [Gitter][gitter-room-url]
 - [Express Gateway Documentation][eg-docs]
 - [Frequently Asked Questions (FAQ)][eg-faq]
+
+Still need help? See below...
 
 #### Community
 Express has a large vibrant community that we hope to extend further with Express Gateway's API gateway use case for Express and its middleware.
 
+- Come chat with us in [Gitter][gitter-room-url]
 - [Twitter (@express_gateway)][eg-twitter]
 - [Google Group][eg-newsgroup]
 - [Facebook][eg-facebook]
 
 #### Roadmap
-Express Gateway publishes and updates its roadmap in real time as a [public task board][eg-roadmap] on Waffle.io.
+Express Gateway publishes and updates its roadmap in real time as a [public task board][eg-taskbaord] on Waffle.io. and as a [roadmap wiki page][gh-roadmap] at the epic level.
 
 #### Contribution
 All contributions welcome! Please see the [contributor's guide][contributor-guide]
@@ -84,11 +87,12 @@ Copyright © LunchBadger, Inc. and Express Gateway Contributors
 [eg-website]: http://www.express-gateway.io
 [eg-getting-started]: http://www.express-gateway.io/getting-started
 [eg-docs]: http://www.express-gateway.io/docs
-[eg-roadmap]: https://waffle.io/ExpressGateway/express-gateway
+[eg-taskboard]: https://waffle.io/ExpressGateway/express-gateway
 [eg-faq]: http://www.express-gateway.io/docs/faq
 [eg-twitter]: https://twitter.com/express_gateway
 [eg-newsgroup]: https://groups.google.com/forum/#!forum/express-gateway
 [eg-facebook]: https://www.facebook.com/expressjsgateway
+[gh-roadmap]: https://github.com/ExpressGateway/express-gateway/wiki/Express-Gateway-Roadmap
 [contributor-guide]: https://github.com/ExpressGateway/express-gateway/blob/master/Contributing.md
 [lb-url]: https://www.lunchbadger.com
 [joyent-url]: https://www.joyent.com
