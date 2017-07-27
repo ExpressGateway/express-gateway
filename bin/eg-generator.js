@@ -8,7 +8,14 @@ module.exports = class EgGenerator extends Generator {
     this._configuration = null;
     this.eg = this.env.eg;
     this.argv = this.env.argv;
-    this.admin = require('../lib/admin')(config.gatewayConfig.admin);
+    if (this.argv) {
+      let cliConfig = config.systemConfig.cli || {};
+      this.admin = require('../lib/admin')({
+        cliConfig,
+        headers: this.argv.H,
+        verbose: this.argv.v || cliConfig.verbose
+      });
+    }
   }
 
   configureCommand (configuration) {
@@ -42,11 +49,15 @@ module.exports = class EgGenerator extends Generator {
   // configuration defaults
   _wrapConfig (yargs) {
     return yargs
-      .boolean(['no-color', 'q'])
+      .boolean(['no-color', 'q', 'v'])
+      .string(['H'])
       .describe('no-color', 'Disable color in prompts')
-      .describe('q', 'Only show major pieces of output')
-      .group(['no-color', 'q'], 'Options:')
       .alias('q', 'quiet')
+      .describe('q', 'Only show major pieces of output')
+      .describe('H', 'Header to send with each request to Express Gateway Admin API KEY:VALUE format')
+      .alias('v', 'verbose')
+      .describe('v', 'Verbose output, will show request to Admin API')
+      .group(['no-color', 'q'], 'Options:')
       .help('h');
   }
 };

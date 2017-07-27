@@ -7,8 +7,10 @@ module.exports = function () {
         this.adminSrv = srv;
         let srvInfo = srv.address();
         this.admin = adminClient({
-          hostname: srvInfo.address,
-          port: srvInfo.port
+          cliConfig: {
+            hostname: srvInfo.address,
+            port: srvInfo.port
+          }
         });
         return this.adminSrv;
       });

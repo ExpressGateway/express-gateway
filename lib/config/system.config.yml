@@ -3,6 +3,11 @@ db:
     host: localhost
     port: 6379
     namespace: EG
+
+cli:
+  port: 8080
+  hostname: localhost
+
 crypto:
   cipherKey: sensitiveKey
   algorithm: aes256
