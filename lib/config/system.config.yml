@@ -5,8 +5,7 @@ db:
     namespace: EG
 
 cli:
-  port: 9876
-  hostname: localhost
+  url: http://localhost:9876
 
 crypto:
   cipherKey: sensitiveKey
