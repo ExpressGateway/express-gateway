@@ -1,5 +1,6 @@
 db:
   redis:
+    emulate: true
     host: localhost
     port: 6379
     namespace: EG
