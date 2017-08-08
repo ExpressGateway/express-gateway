@@ -7,11 +7,11 @@ const util = require('util');
 const assert = require('chai').assert;
 const cpr = require('cpr');
 const express = require('express');
+const phantomjs = require('phantomjs-prebuilt');
 const request = require('superagent');
 const rimraf = require('rimraf');
 const tmp = require('tmp');
 const webdriver = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
 const yaml = require('js-yaml');
 
 require('util.promisify/shim')();
@@ -91,12 +91,6 @@ describe('oauth2 authorization code grant type', () => {
   });
 
   it('authorizes a valid user', () => {
-    // user login
-    // consent to authorization
-    // verify redirect URI endpoint gets auth code
-    // get access token
-    // make call to backend with access token, verify
-
     const authURL = url.format({
       protocol: 'http',
       hostname: 'localhost',
@@ -110,9 +104,11 @@ describe('oauth2 authorization code grant type', () => {
       }
     });
 
+    const phantomCaps = webdriver.Capabilities.phantomjs();
+    phantomCaps.set('phantomjs.binary.path', phantomjs.path);
+
     const driver = new webdriver.Builder()
-      .forBrowser('chrome')
-      .setChromeOptions(new chrome.Options().headless())
+      .withCapabilities(phantomCaps)
       .build();
 
     const By = webdriver.By;
