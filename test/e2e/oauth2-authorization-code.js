@@ -12,6 +12,7 @@ const request = require('superagent');
 const rimraf = require('rimraf');
 const tmp = require('tmp');
 const webdriver = require('selenium-webdriver');
+const chrome = require('selenium-webdriver/chrome');
 const yaml = require('js-yaml');
 
 require('util.promisify/shim')();
@@ -108,6 +109,7 @@ describe('oauth2 authorization code grant type', () => {
 
     const driver = new webdriver.Builder()
       .forBrowser('chrome')
+      .setChromeOptions(new chrome.Options().headless())
       .build();
 
     const By = webdriver.By;
