@@ -1,7 +1,6 @@
-const { fork } = require('child_process');
+const { exec, fork } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const querystring = require('querystring');
 const url = require('url');
 const util = require('util');
 
@@ -98,13 +97,17 @@ describe('oauth2 authorization code grant type', () => {
     // get access token
     // make call to backend with access token, verify
 
-    const authURL = new url.URL('http://localhost:' + gatewayPort);
-    authURL.pathname = '/oauth2/authorize';
-    authURL.search = querystring.stringify({
-      response_type: 'code',
-      client_id: clientID,
-      state: state,
-      redirect_uri: `http://localhost:${redirectPort}/cb`
+    const authURL = url.format({
+      protocol: 'http',
+      hostname: 'localhost',
+      port: gatewayPort,
+      pathname: '/oauth2/authorize',
+      query: {
+        response_type: 'code',
+        client_id: clientID,
+        state: state,
+        redirect_uri: `http://localhost:${redirectPort}/cb`
+      }
     });
 
     const driver = new webdriver.Builder()
@@ -127,7 +130,7 @@ describe('oauth2 authorization code grant type', () => {
     });
 
     return checkUnauthorized
-      .then(() => driver.get(authURL.toString()))
+      .then(() => driver.get(authURL))
       .then(() => driver
         .findElement(By.name('username'))
         .sendKeys(username)
@@ -220,19 +223,15 @@ describe('oauth2 authorization code grant type', () => {
             'lib', 'index.js');
           gatewayProcess = fork(modulePath, [], {
             cwd: tempPath,
-            env: childEnv,
-            stdio: 'pipe'
+            env: childEnv
           });
 
           gatewayProcess.on('error', err => {
             reject(err);
           });
 
-          let checked = false;
-          gatewayProcess.stdout.on('data', chunk => {
-            if (!checked) {
-              checked = true;
-              request
+          setTimeout(() => {
+            request
               .get(`http://localhost:${gatewayPort}/not-found`)
               .end((err, res) => {
                 assert(err);
@@ -240,8 +239,7 @@ describe('oauth2 authorization code grant type', () => {
                 assert(res.statusCode, 404);
                 resolve();
               });
-            }
-          });
+          }, 2000);
         });
       });
   }
@@ -254,33 +252,23 @@ describe('oauth2 authorization code grant type', () => {
 
       const modulePath = path.join(__dirname, '..', '..', 'bin', 'index.js');
 
-      const child = fork(modulePath, args, {
-        env: childEnv,
-        stdio: 'pipe'
-      });
-
-      const buf = [];
-      child.stdout.on('data', chunk => {
-        buf.push(chunk);
-      });
-
-      child.stdout.on('end', () => {
-        const data = Buffer.concat(buf).toString();
+      const command = [process.argv[0], modulePath].concat(args).join(' ');
+      exec(command, { env: childEnv }, (err, stdout) => {
+        if (err) {
+          reject(err);
+          return;
+        }
 
         try {
-          const obj = JSON.parse(data);
+          const obj = JSON.parse(stdout);
           resolve(obj);
         } catch (err) {
           if (err instanceof SyntaxError) {
-            resolve(data);
+            resolve(stdout);
           } else {
             reject(err);
           }
         }
-      });
-
-      child.on('error', err => {
-        reject(err);
       });
     });
   }
