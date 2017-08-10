@@ -8,14 +8,11 @@ module.exports = class EgGenerator extends Generator {
     this._configuration = null;
     this.eg = this.env.eg;
     this.argv = this.env.argv;
-    if (this.argv) {
-      let cliConfig = config.systemConfig.cli || {};
-      this.admin = require('../lib/admin')({
-        cliConfig,
-        headers: this.argv.H,
-        verbose: this.argv.v || cliConfig.verbose
-      });
-    }
+    this.admin = require('../lib/admin')({
+      baseUrl: this._getAdminClientBaseURL(),
+      verbose: this._getAdminClientVerboseFlag(),
+      headers: this.argv ? this.argv.H : null
+    });
   }
 
   configureCommand (configuration) {
@@ -59,5 +56,38 @@ module.exports = class EgGenerator extends Generator {
       .describe('v', 'Verbose output, will show request to Admin API')
       .group(['no-color', 'q'], 'Options:')
       .help('h');
+  }
+
+  _getAdminClientBaseURL () {
+    const gatewayConfig = config.gatewayConfig;
+    const systemConfig = config.systemConfig;
+
+    let baseURL = 'http://localhost:9876/'; // fallback default
+
+    if (process.env.EG_ADMIN_URL) {
+      baseURL = process.env.EG_ADMIN_URL;
+    } else if (systemConfig && systemConfig.cli && systemConfig.cli.url) {
+      baseURL = systemConfig.cli.url;
+    } else if (gatewayConfig && gatewayConfig.admin) {
+      const adminConfig = gatewayConfig.admin;
+      const hostname = adminConfig.hostname || 'localhost';
+      const port = adminConfig.port || 9876;
+
+      baseURL = `http://${hostname}:${port}/`;
+    }
+
+    return baseURL;
+  }
+
+  _getAdminClientVerboseFlag () {
+    let verbose = false; // default
+
+    if (this.argv && this.argv.v) {
+      verbose = this.argv.v;
+    } else if (config.systemConfig && config.systemConfig.cli) {
+      verbose = !!config.systemConfig.cli.verbose;
+    }
+
+    return verbose;
   }
 };
