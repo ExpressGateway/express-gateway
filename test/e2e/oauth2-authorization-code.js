@@ -244,7 +244,6 @@ describe('oauth2 authorization code grant type', () => {
     return new Promise((resolve, reject) => {
       const childEnv = Object.assign({}, process.env);
       childEnv.EG_CONFIG_DIR = path.join(testGatewayConfigPath, '..');
-      childEnv.EG_ADMIN_URL = `http://localhost:${adminPort}`;
 
       const modulePath = path.join(__dirname, '..', '..', 'bin', 'index.js');
 
