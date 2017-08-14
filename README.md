@@ -56,7 +56,10 @@ Express has a large vibrant community that we hope to extend further with Expres
 - [Facebook][eg-facebook]
 
 #### Roadmap
-Express Gateway publishes and updates its roadmap in real time as a [public task board][eg-taskbaord] on Waffle.io. and as a [roadmap wiki page][gh-roadmap] at the epic level.
+The Express Gateway roadmap consists of three parts:
+1. [FeatHub][eg-feathub] - features requested and voted on by any community member, this feeds into the...
+2. [Roadmap][eg-roadmap] - the published roadmap of all features under considerations and projected timeframes, the highest priority items are put into the...
+3. [Waffle board][eg-waffle] - a real time as a public task board on Waffle.io with backlog of stories for the next release
 
 #### Contribution
 All contributions welcome! Please see the [contributor's guide][contributor-guide]
@@ -87,12 +90,13 @@ Copyright © LunchBadger, Inc. and Express Gateway Contributors
 [eg-website]: http://www.express-gateway.io
 [eg-getting-started]: http://www.express-gateway.io/getting-started
 [eg-docs]: http://www.express-gateway.io/docs
-[eg-taskboard]: https://waffle.io/ExpressGateway/express-gateway
+[eg-feathub]: http://feathub.com/ExpressGateway/express-gateway
+[eg-roadmap]: https://github.com/ExpressGateway/express-gateway/wiki/Express-Gateway-Roadmap
+[eg-waffle]: https://waffle.io/ExpressGateway/express-gateway
 [eg-faq]: http://www.express-gateway.io/docs/faq
 [eg-twitter]: https://twitter.com/express_gateway
 [eg-newsgroup]: https://groups.google.com/forum/#!forum/express-gateway
 [eg-facebook]: https://www.facebook.com/expressjsgateway
-[gh-roadmap]: https://github.com/ExpressGateway/express-gateway/wiki/Express-Gateway-Roadmap
 [contributor-guide]: https://github.com/ExpressGateway/express-gateway/blob/master/Contributing.md
 [lb-url]: https://www.lunchbadger.com
 [joyent-url]: https://www.joyent.com

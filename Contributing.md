@@ -29,6 +29,16 @@ add appropriate metadata before the issue is addressed.
 Please be courteous and respectful. Every participant is expected to follow the
 project's Code of Conduct.
 
+# Roadmap
+When contributing to Express Gateway please consider the Express Gateway roadmap and community feedback for features.
+The Express Gateway roadmap is broken into three parts. This design enables features to be added with community feedback, transparency and ease based on the stage of consideration.
+
+1. [FeatHub][eg-feathub] - a list of features that users can vote on so that the project maintainers can prioritize
+2. [roadmap][eg-roadmap] - all features and timeframes being considered, filtering from feature hub and other sources
+3. [waffle board][eg-waffle] - the current backlog and next few sprints leading up to the next release of Express Gateway
+
+The three parts are designed to filter signal from noise and reduce clutter commonly seen on other open source projects.
+
 # Contributions
 
 ## Pull Requests
@@ -98,3 +108,6 @@ a majority of the other members are expected to resign.
 [comment]: <> (Links Section)
 [express-gateway.io-repo]: https://github.com/ExpressGateway/express-gateway.io
 [circleci]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master
+[eg-feathub]: http://feathub.com/ExpressGateway/express-gateway
+[eg-roadmap]: https://github.com/ExpressGateway/express-gateway/wiki/Express-Gateway-Roadmap
+[eg-waffle]: https://waffle.io/ExpressGateway/express-gateway
