@@ -1,35 +1,37 @@
 const testHelper = require('../common/routing.helper');
-let config = require('../../lib/config');
-let originalGatewayConfig = config.gatewayConfig;
+let Config = require('../../lib/config/config');
 
 [undefined, 'sample.com', 'sub.acme.com'].forEach(host => {
   describe('pathRegex resolution for host:' + host, () => {
     let helper = testHelper();
-    helper.addPolicy('test', () => (req, res) => {
-      res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
-    });
+    let config = new Config();
+    let plugins = { policies: [ {
+      name: 'testRegex',
+      policy: () => (req, res) => {
+        res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+      }}]
+    };
 
     before('setup', () => {
       config.gatewayConfig = {
-        http: { port: 9086 },
+        http: { port: 0 },
         apiEndpoints: {
           test: { pathRegex: '/id-[0-9]{3}', host }
         },
-        policies: ['test'],
+        policies: ['testRegex'],
         pipelines: {
           pipeline1: {
             apiEndpoints: ['test'],
-            policies: { test: {} }
+            policies: { testRegex: {} }
           }
         }
       };
 
-      helper.setup();
+      helper.setup({config, plugins});
     });
 
     after('cleanup', (done) => {
       helper.cleanup();
-      config.gatewayConfig = originalGatewayConfig;
       done();
     });
 

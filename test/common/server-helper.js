@@ -10,8 +10,8 @@ const generateBackendServer = port => {
     res.send('Hello from port ' + port);
   });
   return new Promise((resolve) => {
-    let runningApp = app.listen(port, () => {
-      logger.log('running test stub server at ' + port);
+    let runningApp = app.listen(port || 0, () => {
+      logger.log('running test stub server at ' + runningApp.address().port);
       resolve({
         app: runningApp
       });
