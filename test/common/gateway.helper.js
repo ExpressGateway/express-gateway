@@ -9,10 +9,14 @@ const { generateBackendServer } =
 let gatewayPort = null;
 let adminPort = null;
 let backendPort = null;
-module.exports.setGatewayConfig = function ({gatewayConfigPath, newConfig}) {
-  fs.writeFileSync(gatewayConfigPath, yaml.dump(newConfig));
+
+// Set gateway.config or system.config yml files
+module.exports.setYmlConfig = function ({ymlConfigPath, newConfig}) {
+  fs.writeFileSync(ymlConfigPath, yaml.dump(newConfig));
 };
-module.exports.getGatewayConfig = function ({gatewayConfigPath}) {
+
+// Get config by path (gateway.config.yml or system.config.yml)
+module.exports.getYmlConfig = function ({ymlConfigPath}) {
   let content = fs.readFileSync();
   return yaml.load(content);
 };
@@ -49,18 +53,16 @@ module.exports.findOpenPortNumbers = function (count = 1) {
 module.exports.startGatewayInstance = function ({dirInfo, gatewayConfig}) {
   return this.findOpenPortNumbers(4)
       .then(ports => {
-        console.log(ports);
         gatewayPort = ports[0];
         backendPort = ports[1];
         adminPort = ports[2];
 
         gatewayConfig.http = {port: gatewayPort};
         gatewayConfig.admin = {port: adminPort};
-
-        gatewayConfig.serviceEndpoints.backend.url =
-        `http://localhost:${backendPort}`;
-        return this.setGatewayConfig({
-          gatewayConfigPath: dirInfo.gatewayConfigPath,
+        gatewayConfig.serviceEndpoints = gatewayConfig.serviceEndpoints || {};
+        gatewayConfig.serviceEndpoints.backend = {url: `http://localhost:${backendPort}`};
+        return this.setYmlConfig({
+          ymlConfigPath: dirInfo.gatewayConfigPath,
           newConfig: gatewayConfig
         });
       })

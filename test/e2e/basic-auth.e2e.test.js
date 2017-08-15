@@ -1,0 +1,110 @@
+const cliHelper = require('../common/cli.helper');
+const gwHelper = require('../common/gateway.helper');
+const request = require('supertest');
+let gatewayProcess = null;
+let gatewayPort, adminPort, configDirectoryPath;
+let username = 'test';
+let proxyPolicy = {
+  proxy: { action: { serviceEndpoint: 'backend' } }
+};
+describe('E2E: basic-auth Policy', () => {
+  before('setup', () => {
+    let gatewayConfig = {
+      apiEndpoints: {
+        authorizedEndpoint: {
+          host: '*',
+          paths: ['/authorizedPath'],
+          scopes: [ 'authorizedScope' ]
+        },
+        unauthorizedEndpoint: {
+          host: '*',
+          paths: ['/unauthorizedPath'],
+          scopes: ['unauthorizedScope']
+        }
+      },
+      policies: ['basic-auth', 'proxy'],
+      pipelines: {
+        pipeline1: {
+          apiEndpoint: 'authorizedEndpoint',
+          policies: [
+            { 'basic-auth': {} }, proxyPolicy
+          ]
+        },
+        pipeline2: {
+          apiEndpoint: 'unauthorizedEndpoint',
+          policies: [
+            { 'basic-auth': {} }, proxyPolicy
+          ]
+        }
+      }
+    };
+    return cliHelper.bootstrapFolder().then(dirInfo => {
+      return gwHelper.startGatewayInstance({dirInfo, gatewayConfig});
+    }).then(gwInfo => {
+      gatewayProcess = gwInfo.gatewayProcess;
+      gatewayPort = gwInfo.gatewayPort;
+      adminPort = gwInfo.adminPort;
+      configDirectoryPath = gwInfo.dirInfo.configDirectoryPath;
+
+      return cliHelper.runCLICommand({
+        cliArgs: ['scopes create', 'authorizedScope', 'unauthorizedScope'],
+        adminPort,
+        configDirectoryPath});
+    }).then((scopes) => {
+      const args = [
+        '-p', `username=${username}`,
+        '-p', 'firstname=Kate',
+        '-p', 'lastname=Smith'
+      ];
+      return cliHelper.runCLICommand({
+        cliArgs: ['users create '].concat(args),
+        adminPort,
+        configDirectoryPath});
+    }).then(newUser => {
+      return cliHelper.runCLICommand({
+        cliArgs: ['credentials create -t basic-auth -p "scopes=authorizedScope" -p "password=pass" -c ', newUser.id],
+        adminPort,
+        configDirectoryPath});
+    }).then(cred => {
+      console.log(cred);
+    });
+  });
+
+  after('cleanup', (done) => {
+    gatewayProcess.kill();
+    done();
+  });
+
+  it('should not authenticate token for requests without token header', function () {
+    return request(`http://localhost:${gatewayPort}`)
+      .get('/authorizedPath')
+      .expect(401);
+  });
+
+  it('should not authenticate token for requests if requester doesn\'t have authorized scopes', function () {
+    let credentials = Buffer.from(username.concat(':pass')).toString('base64');
+
+    return request(`http://localhost:${gatewayPort}`)
+      .get('/unauthorizedPath')
+      .set('Authorization', 'basic ' + credentials)
+      .expect(401);
+  });
+
+  it('should authenticate token for requests with scopes if requester is authorized', function () {
+    let credentials = Buffer.from(username.concat(':pass')).toString('base64');
+
+    return request(`http://localhost:${gatewayPort}`)
+      .get('/authorizedPath')
+      .set('Authorization', 'basic ' + credentials)
+      .expect(200);
+  });
+
+  it('should not authenticate invalid token', function () {
+    let credentials = Buffer.from(username.concat(':wrongPassword')).toString('base64');
+
+    request(`http://localhost:${gatewayPort}`)
+      .get('/authorizedPath')
+      .set('Authorization', 'basic ' + credentials)
+      .expect(401);
+  });
+});

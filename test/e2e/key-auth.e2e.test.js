@@ -9,14 +9,9 @@ const headerName = 'Authorization';
 let proxyPolicy = {
   proxy: { action: { serviceEndpoint: 'backend' } }
 };
-describe('E2E: keyAuth Policy', () => {
+describe('E2E: key-auth Policy', () => {
   before('setup', () => {
     let gatewayConfig = {
-      serviceEndpoints: {
-        backend: {
-          url: 'http://localhost:6057'
-        }
-      },
       apiEndpoints: {
         authorizedEndpoint: {
           host: '*',

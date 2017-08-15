@@ -86,10 +86,7 @@ describe('Functional Tests basic auth Policy', () => {
     };
 
     db.flushdbAsync()
-      .then(function (didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
+      .then(function () {
         let user1 = {
           username: 'irfanbaqui',
           firstname: 'irfan',
