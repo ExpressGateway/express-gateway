@@ -35,11 +35,7 @@ describe('round-robin load balancing', () => {
 
         testGatewayConfigPath = path.join(tempPath, 'gateway.config.yml');
 
-        findOpenPortNumbers(4, (err, ports) => {
-          if (err) {
-            throw err;
-          }
-
+        findOpenPortNumbers(4).then(ports => {
           fs.readFile(testGatewayConfigPath, (err, configData) => {
             if (err) {
               throw err;
@@ -100,7 +96,7 @@ describe('round-robin load balancing', () => {
                 });
             });
           });
-        });
+        }).catch(err => done(err));
       });
     });
   });
