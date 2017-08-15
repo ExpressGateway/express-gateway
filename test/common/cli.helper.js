@@ -36,7 +36,6 @@ module.exports.runCLICommand = function ({adminPort, adminUrl, configDirectoryPa
   cliExecOptions.env.EG_CONFIG_DIR = configDirectoryPath;
   cliExecOptions.env.EG_ADMIN_URL = adminUrl || `http://localhost:${adminPort}`;
   const command = [modulePath].concat(cliArgs).join(' ');
-  console.log(command);
   return new Promise((resolve, reject) => {
     exec(command, cliExecOptions, (err, stdout, stderr) => {
       if (err) {

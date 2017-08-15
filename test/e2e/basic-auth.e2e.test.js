@@ -62,11 +62,9 @@ describe('E2E: basic-auth Policy', () => {
         configDirectoryPath});
     }).then(newUser => {
       return cliHelper.runCLICommand({
-        cliArgs: ['credentials create -t basic-auth -p "scopes=authorizedScope" -p "password=pass" -c ', newUser.id],
+        cliArgs: ['credentials create -t basic-auth -p "scopes=authorizedScope" -p "password=pass" -c ', username],
         adminPort,
         configDirectoryPath});
-    }).then(cred => {
-      console.log(cred);
     });
   });
 
