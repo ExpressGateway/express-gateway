@@ -1,4 +1,5 @@
-const { exec, fork } = require('child_process');
+const { fork } = require('child_process');
+const {runCLICommand} = require('../common/cli.helper');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
@@ -13,6 +14,7 @@ const rimraf = require('rimraf');
 const tmp = require('tmp');
 const webdriver = require('selenium-webdriver');
 const yaml = require('js-yaml');
+let tempPath = null;
 
 require('util.promisify/shim')();
 
@@ -171,8 +173,6 @@ describe('oauth2 authorization code grant type', () => {
   });
 
   function startGatewayInstance (done) {
-    let tempPath = null;
-
     return util.promisify(tmp.dir)()
       .then(temp => {
         tempPath = temp;
@@ -180,7 +180,7 @@ describe('oauth2 authorization code grant type', () => {
       })
       .then(files => {
         testGatewayConfigPath = path.join(tempPath, 'gateway.config.yml');
-        return util.promisify(findOpenPortNumbers)(4);
+        return findOpenPortNumbers(4);
       })
       .then(ports => {
         gatewayPort = ports[0];
@@ -235,49 +235,33 @@ describe('oauth2 authorization code grant type', () => {
                 assert(res.statusCode, 404);
                 resolve();
               });
-          }, 2000);
+          }, 4000);
         });
       });
   }
 
-  function runCLICommand (args) {
-    return new Promise((resolve, reject) => {
-      const childEnv = Object.assign({}, process.env);
-      childEnv.EG_CONFIG_DIR = path.join(testGatewayConfigPath, '..');
-
-      const modulePath = path.join(__dirname, '..', '..', 'bin', 'index.js');
-
-      const command = [process.argv[0], modulePath].concat(args).join(' ');
-      exec(command, { env: childEnv }, (err, stdout) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        try {
-          const obj = JSON.parse(stdout);
-          resolve(obj);
-        } catch (err) {
-          if (err instanceof SyntaxError) {
-            resolve(stdout);
-          } else {
-            reject(err);
-          }
-        }
-      });
+  function createUser (args, done) {
+    return runCLICommand({
+      cliArgs: ['users', 'create'].concat(args),
+      adminPort,
+      configDirectoryPath: tempPath
     });
   }
 
-  function createUser (args, done) {
-    return runCLICommand(['users', 'create'].concat(args));
-  }
-
   function createCredential (args, done) {
-    return runCLICommand(['credentials', 'create'].concat(args));
+    return runCLICommand({
+      cliArgs: ['credentials', 'create'].concat(args),
+      adminPort,
+      configDirectoryPath: tempPath
+    });
   }
 
   function createApp (args, done) {
-    return runCLICommand(['apps', 'create'].concat(args));
+    return runCLICommand({
+      cliArgs: ['apps', 'create'].concat(args),
+      adminPort,
+      configDirectoryPath: tempPath
+    });
   }
 
   function generateRedirectServer (port) {

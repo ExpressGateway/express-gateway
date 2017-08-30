@@ -19,32 +19,33 @@ const generateBackendServer = port => {
   });
 };
 
-const findOpenPortNumbers = (count, cb) => {
+const findOpenPortNumbers = function (count = 1) {
   let completeCount = 0;
   const ports = [];
+  return new Promise((resolve, reject) => {
+    for (let i = 0; i < count; i++) {
+      const server = net.createServer();
 
-  for (let i = 0; i < count; i++) {
-    const server = net.createServer();
+      server.listen(0);
 
-    server.listen(0);
+      server.on('listening', () => {
+        ports.push(server.address().port);
 
-    server.on('listening', () => {
-      ports.push(server.address().port);
+        server.once('close', () => {
+          completeCount++;
 
-      server.once('close', () => {
-        completeCount++;
-
-        if (completeCount === count) {
-          cb(null, ports);
-        }
+          if (completeCount === count) {
+            resolve(ports);
+          }
+        });
+        server.close();
       });
-      server.close();
-    });
 
-    server.on('error', (err) => {
-      cb(err);
-    });
-  }
+      server.on('error', (err) => {
+        reject(err);
+      });
+    }
+  });
 };
 
 module.exports = {

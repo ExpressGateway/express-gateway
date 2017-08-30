@@ -10,7 +10,7 @@ const rimraf = require('rimraf');
 const tmp = require('tmp');
 const yaml = require('js-yaml');
 
-const { findOpenPortNumbers } = require('./common/server-helper');
+const { findOpenPortNumbers } = require('../common/server-helper');
 
 /*
     1) Copy config to a temp directory.
@@ -22,7 +22,7 @@ const { findOpenPortNumbers } = require('./common/server-helper');
     7) Clean up the temp directory.
 */
 
-const baseConfigDirectory = path.join(__dirname, 'fixtures', 'hot-reload');
+const baseConfigDirectory = path.join(__dirname, '..', 'fixtures', 'hot-reload');
 
 describe('hot-reload', () => {
   describe('gateway config', () => {
@@ -45,7 +45,7 @@ describe('hot-reload', () => {
 
           testGatewayConfigPath = path.join(tempPath, 'gateway.config.yml');
 
-          findOpenPortNumbers(3, (err, ports) => {
+          findOpenPortNumbers(3).then(ports => {
             if (err) {
               throw err;
             }
@@ -77,7 +77,7 @@ describe('hot-reload', () => {
                 // Need to remove this paramter in the child process.
                 delete childEnv.EG_DISABLE_CONFIG_WATCH;
 
-                const modulePath = path.join(__dirname, '..', 'lib', 'index.js');
+                const modulePath = path.join(__dirname, '../..', 'lib', 'index.js');
                 childProcess = fork(modulePath, [], {
                   cwd: tempPath,
                   env: childEnv
@@ -99,7 +99,7 @@ describe('hot-reload', () => {
                 }, 5000);
               });
             });
-          });
+          }).catch(err => done(err));
         });
       });
     });

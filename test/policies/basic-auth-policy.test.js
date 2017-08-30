@@ -86,10 +86,7 @@ describe('Functional Tests basic auth Policy', () => {
     };
 
     db.flushdbAsync()
-      .then(function (didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
+      .then(function () {
         let user1 = {
           username: 'irfanbaqui',
           firstname: 'irfan',
@@ -135,52 +132,36 @@ describe('Functional Tests basic auth Policy', () => {
     done();
   });
 
-  it('should not authenticate token for requests without token header', function (done) {
-    request(app)
+  it('should not authenticate token for requests without token header', function () {
+    return request(app)
       .get('/authorizedPath')
-      .expect(401)
-      .end(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .expect(401);
   });
 
-  it('should not authenticate token for requests if requester doesn\'t have authorized scopes', function (done) {
+  it('should not authenticate token for requests if requester doesn\'t have authorized scopes', function () {
     let credentials = Buffer.from(user.id.concat(':user-secret')).toString('base64');
 
-    request(app)
+    return request(app)
       .get('/unauthorizedPath')
       .set('Authorization', 'basic ' + credentials)
-      .expect(401)
-      .end(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .expect(401);
   });
 
-  it('should authenticate token for requests with scopes if requester is authorized', function (done) {
+  it('should authenticate token for requests with scopes if requester is authorized', function () {
     let credentials = Buffer.from(user.username.concat(':user-secret')).toString('base64');
 
-    request(app)
+    return request(app)
       .get('/authorizedPath')
       .set('Authorization', 'basic ' + credentials)
-      .expect(200)
-      .end(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .expect(200);
   });
 
-  it('should not authenticate invalid token', function (done) {
+  it('should not authenticate invalid token', function () {
     let credentials = Buffer.from(user.id.concat(':wrongPassword')).toString('base64');
 
-    request(app)
+    return request(app)
       .get('/authorizedPath')
       .set('Authorization', 'basic ' + credentials)
-      .expect(401)
-      .end(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .expect(401);
   });
 });

@@ -23,7 +23,7 @@ let testHelper = require('../common/routing.helper');
 let config = require('../../lib/config');
 let originalGatewayConfig = config.gatewayConfig;
 
-describe('End to End tests with oauth2, proxy, log, expression, rate-limit policies', () => {
+describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
   let helper = testHelper();
   let spy = sinon.spy();
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
