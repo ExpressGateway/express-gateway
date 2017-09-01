@@ -3,7 +3,7 @@ We use [Waffle.io](https://waffle.io/ExpressGateway/express-gateway) to track wo
 
 Please see the checklist below and thanks again for your contribution!
 
-- [ ] in description title please use "Connect #<Github Issue>" anywhere within the description
+- [ ] please use "Connect #<Github Issue>" anywhere within the description
     example) "fixes bug with OAuth2 - connect #345" 
 - [ ] branch naming prefix:
   - bugfix/branch-name (for bugs)
