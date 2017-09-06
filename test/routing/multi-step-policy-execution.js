@@ -9,7 +9,6 @@ let config = new Config();
 
 // there are several configuration ways to listen to all hosts
 describe('default config with multi step (multi action) policy', () => {
-  // let originalGatewayConfig = config.gatewayConfig;
   let helper = testHelper();
   let spy = sinon.spy();
   let handler = (params) => (req, res, next) => {
@@ -60,7 +59,6 @@ describe('default config with multi step (multi action) policy', () => {
 
   after('cleanup', (done) => {
     helper.cleanup();
-    // config.gatewayConfig = originalGatewayConfig;
     done();
   });
 
