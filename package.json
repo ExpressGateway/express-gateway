@@ -74,6 +74,7 @@
     "minimatch": "3.0.3",
     "node-uuid": "1.4.8",
     "oauth2orize": "1.8.0",
+    "parent-require": "^1.0.0",
     "passport": "0.3.2",
     "passport-http": "0.3.0",
     "passport-http-bearer": "1.0.1",
