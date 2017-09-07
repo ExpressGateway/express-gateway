@@ -1,35 +1,39 @@
 let testHelper = require('../common/routing.helper');
 let config = require('../../lib/config');
-let originalGatewayConfig = config.gatewayConfig;
 
 describe('When scopes defined for apiEndpoint', () => {
   let helper = testHelper();
 
   before('setup', () => {
+    let scopes = [
+      { scope: 'admin', verbs: 'GET' },
+      { scope: 'profile', verbs: ['GET', 'POST'] }
+    ];
     config.gatewayConfig = {
-      http: { port: 9089 },
+      http: { port: 0 },
       apiEndpoints: {
         test_default: {
-          scopes: [
-            { scope: 'admin', verbs: 'GET' },
-            { scope: 'profile', verbs: ['GET', 'POST'] }
-          ]
+          scopes
         }
       },
-      policies: ['test'],
+      policies: ['scopeTest'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test_default'],
-          policies: { test: {} }
+          policies: { scopeTest: {} }
         }
       }
     };
-
-    helper.setup();
+    let plugins = {
+      policies: [{
+        name: 'scopeTest',
+        policy: () => (req, res) => res.json({url: req.url, scopes, apiEndpoint: req.egContext.apiEndpoint})
+      } ]
+    };
+    helper.setup({config, plugins});
   });
 
   after('cleanup', (done) => {
-    config.gatewayConfig = originalGatewayConfig;
     helper.cleanup();
     done();
   });

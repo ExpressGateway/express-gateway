@@ -2,10 +2,10 @@
 const request = require('supertest');
 const assert = require('chai').assert;
 const logger = require('../../lib/logger').test;
-let gateway = require('../../lib/gateway/index');
+let gateway = require('../../lib/gateway');
 const _ = require('lodash');
-let config = require('../../lib/config/index');
-let policies = require('../../lib/policies/index');
+let config = require('../../lib/config');
+let policies = require('../../lib/policies');
 
 module.exports = function () {
   let app, httpsApp, originalGatewayConfig, originalPolicies;
@@ -27,19 +27,21 @@ module.exports = function () {
     return testScenario;
   }
   return {
-    addPolicy: (name, handler) => {
-      policies[name] = { policy: handler };
+    addPolicy: (name, handler) => {  // TODO: make it plugin
+      policies.register({policy: handler, name});
     },
-    setup: () => {
+    setup: ({config, plugins} = {}) => {
       originalPolicies = policies;
-      originalGatewayConfig = config.gatewayConfig;
 
-      return gateway()
+      return gateway({config, plugins})
         .then(apps => {
           app = apps.app;
           httpsApp = apps.httpsApp;
           return apps;
         });
+    },
+    setupApp: (preparedApp) => {
+      app = preparedApp;
     },
     cleanup: () => {
       if (originalGatewayConfig) {

@@ -8,6 +8,9 @@ db:
 cli:
   url: http://localhost:9876
 
+plugins:
+  # eg-example-plugin:
+
 crypto:
   cipherKey: sensitiveKey
   algorithm: aes256

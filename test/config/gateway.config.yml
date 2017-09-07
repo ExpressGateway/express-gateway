@@ -1,8 +1,5 @@
 http:
-  port: 8080
-https:
-  port: 9999
-  tls: {}
+  port: 0
 admin:
   port: 9876
   baseUrl: 'http://localhost:9876/'
