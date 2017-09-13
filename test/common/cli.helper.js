@@ -14,22 +14,31 @@ module.exports.bootstrapFolder = function (options) {
         env: Object.assign({}, process.env)
       };
 
+      delete execOptions.env.EG_CONFIG_DIR;
+
       let cmd = modulePath + ' gateway create -t getting-started -n test -d ' + tempDir;
 
       return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          exec(cmd, execOptions, function (error, stdout, stderr) {
-            if (error !== null) {
-              reject(error);
-            }
+        const child = exec(cmd, execOptions, function (error, stdout, stderr) {
+          if (error !== null) {
+            reject(error);
+          }
+        });
+
+        child.on('error', err => {
+          reject(err);
+        });
+
+        child.on('exit', code => {
+          if (code === 0) {
             resolve({
               basePath: tempDir,
               configDirectoryPath: path.join(tempDir, 'config'),
               gatewayConfigPath: path.join(tempDir, 'config', 'gateway.config.yml'),
               systemConfigPath: path.join(tempDir, 'config', 'system.config.yml')
             });
-          });
-        }, 1000);
+          }
+        });
       });
     });
 };
