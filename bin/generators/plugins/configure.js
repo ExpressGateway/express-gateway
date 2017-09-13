@@ -38,7 +38,7 @@ module.exports = class extends eg.Generator {
         this.pluginManifest = this._getPluginManifest(this.packageName);
       } catch (_) {
         this.log.error('Plugin not installed:', this.packageName);
-        process.exit();
+        return;
       }
     }
 
