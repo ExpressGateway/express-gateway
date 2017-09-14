@@ -90,28 +90,28 @@ module.exports = class extends eg.Generator {
     });
 
     return this.prompt(pluginQuestions)
-    .then(answers => {
-      this.pluginOptions = {};
+      .then(answers => {
+        this.pluginOptions = {};
 
-      const keys = pluginQuestions.map(opt => opt.name);
-      const self = this;
-      keys.forEach(key => {
-        let answer = answers[key];
-        const stripped = key.substr('pluginOption'.length);
-        const optionMeta = optionsMeta[stripped];
+        const keys = pluginQuestions.map(opt => opt.name);
 
-        if (optionMeta && optionMeta.type && answer) {
-          const type = optionMeta.type;
-          if (type === 'number') {
-            answer = Number(answer);
-          } else if (type === 'boolean') {
-            answer = Boolean(answer);
+        keys.forEach(key => {
+          let answer = answers[key];
+          const stripped = key.substr('pluginOption'.length);
+          const optionMeta = optionsMeta[stripped];
+
+          if (optionMeta && optionMeta.type && answer) {
+            const type = optionMeta.type;
+            if (type === 'number') {
+              answer = Number(answer);
+            } else if (type === 'boolean') {
+              answer = Boolean(answer);
+            }
           }
-        }
 
-        self.pluginOptions[stripped] = answer;
+          this.pluginOptions[stripped] = answer;
+        });
       });
-    });
   }
 
   writing () {

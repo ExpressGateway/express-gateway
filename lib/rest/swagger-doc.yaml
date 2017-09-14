@@ -468,6 +468,7 @@ paths:
       tags:
       - Plugins
       summary: Returns a list of installed plugins
+      description: Currently an experimental feature activated using the `--experimental-plugins-api` flag.
       responses:
         '200':
           description: Plugins
@@ -479,6 +480,7 @@ paths:
       tags:
       - Plugins
       summary: Install Plugin
+      description: Currently an experimental feature activated using the `--experimental-plugins-api` flag.
       responses:
         '201':
           description: Created
@@ -501,6 +503,7 @@ paths:
       tags:
       - Plugins
       summary: Return a single plugin
+      description: Currently an experimental feature activated using the `--experimental-plugins-api` flag.
       responses:
         '200':
           description: Plugin
@@ -512,6 +515,7 @@ paths:
       tags:
       - Plugins
       summary: Update a single plugin
+      description: Currently an experimental feature activated using the `--experimental-plugins-api` flag.
       parameters:
       - name: pluginName
         in: path

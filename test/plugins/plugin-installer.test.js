@@ -85,8 +85,7 @@ describe('PluginInstaller#runNPMInstallation', () => {
       pluginOptions,
       enablePlugin: true,
       addPoliciesToWhitelist: true
-    })
-    .then(() => {
+    }).then(() => {
       const systemConfigData = fs.readFileSync(config.systemConfigPath);
       const systemConfig = yaml.load(systemConfigData.toString());
       const comparison =
@@ -99,6 +98,6 @@ describe('PluginInstaller#runNPMInstallation', () => {
 
       assert(gatewayConfig.policies.indexOf('policy1') > -1);
       assert(gatewayConfig.policies.indexOf('policy2') > -1);
-    });
+    })
   });
 });

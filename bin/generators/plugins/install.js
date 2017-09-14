@@ -56,7 +56,6 @@ module.exports = class extends eg.Generator {
     if (optionValues.length) {
       this.pluginOptions = {};
 
-      const self = this;
       optionValues.forEach(o => {
         const equalIndex = o.indexOf('=');
 
@@ -69,7 +68,7 @@ module.exports = class extends eg.Generator {
         const key = o.substring(0, equalIndex);
         const value = o.substring(equalIndex + 1);
 
-        self.pluginOptions[key] = value;
+        this.pluginOptions[key] = value;
       });
     }
 
@@ -93,11 +92,10 @@ module.exports = class extends eg.Generator {
     const commandLineOptionKeys =
       this.pluginOptions ? Object.keys(this.pluginOptions) : [];
 
-    const self = this;
 
     commandLineOptionKeys.forEach(key => {
       const schema = optionsMeta[key];
-      if (!self._validateOption(key, self.pluginOptions[key], schema)) {
+      if (!this._validateOption(key, this.pluginOptions[key], schema)) {
         this.log.error(`Invalid plugin option value for ${key}, ` +
           `expected: ${schema.type || 'string'}`);
       }
@@ -115,7 +113,7 @@ module.exports = class extends eg.Generator {
           message: `Set value for ${key}:`,
           default: previousPluginOptions[key],
           validate: input => {
-            return self._validateOption(key, input, schema);
+            return this._validateOption(key, input, schema);
           }
         };
       });
@@ -148,7 +146,7 @@ module.exports = class extends eg.Generator {
         this.pluginOptions = this.pluginOptions || {};
 
         const keys = pluginQuestions.map(opt => opt.name);
-        const self = this;
+
         keys.forEach(key => {
           let answer = answers[key];
           const stripped = key.substr('pluginOption'.length);
@@ -163,7 +161,7 @@ module.exports = class extends eg.Generator {
             }
           }
 
-          self.pluginOptions[stripped] = answer;
+          this.pluginOptions[stripped] = answer;
         });
       }
     });
