@@ -15,7 +15,7 @@ describe('gateway routing with plugins', () => {
     });
     return gateway({
       plugins: {
-        gatewayExtensions: [function (gatewayExpressInstance) {
+        gatewayRoutes: [function (gatewayExpressInstance) {
           gatewayExpressInstance.all('/test', (req, res) => res.json({enabled: true}));
         }]},
       config
