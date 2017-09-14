@@ -98,6 +98,6 @@ describe('PluginInstaller#runNPMInstallation', () => {
 
       assert(gatewayConfig.policies.indexOf('policy1') > -1);
       assert(gatewayConfig.policies.indexOf('policy2') > -1);
-    })
+    });
   });
 });

@@ -23,6 +23,7 @@ module.exports = class extends eg.Generator {
   initializing () {
     this.packageName = this.argv.package;
 
+    // Try loading the package with the prefix.
     if (!this.packageName.startsWith(PluginInstaller.PACKAGE_PREFIX)) {
       try {
         const prefixedName = PluginInstaller.PACKAGE_PREFIX + this.packageName;
@@ -33,13 +34,19 @@ module.exports = class extends eg.Generator {
       }
     }
 
+    // Maybe the prefix didn't work. Just load it as-is.
     if (!this.pluginManifest) {
       try {
         this.pluginManifest = this._getPluginManifest(this.packageName);
       } catch (_) {
-        this.log.error('Plugin not installed:', this.packageName);
-        return;
+        // This will fall through to the next conditional statement.
       }
+    }
+
+    // Well, we gave it our best shot.
+    if (!this.pluginManifest) {
+      this.log.error('Plugin not installed:', this.packageName);
+      return;
     }
 
     this.installer = PluginInstaller.create({
@@ -49,6 +56,10 @@ module.exports = class extends eg.Generator {
   }
 
   prompting () {
+    if (!this.pluginManifest) {
+      return;
+    }
+
     const optionsMeta = this.installer.pluginManifest.options || {};
     const keys = Object.keys(optionsMeta);
 
@@ -115,6 +126,10 @@ module.exports = class extends eg.Generator {
   }
 
   writing () {
+    if (!this.pluginManifest) {
+      return;
+    }
+
     return this.installer.updateConfigurationFiles({
       pluginOptions: this.pluginOptions,
       enablePlugin: true,
@@ -137,6 +152,10 @@ module.exports = class extends eg.Generator {
   }
 
   end () {
+    if (!this.pluginManifest) {
+      return;
+    }
+
     this.stdout('Plugin configured!');
   }
 };

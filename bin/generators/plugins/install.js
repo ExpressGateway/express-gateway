@@ -92,7 +92,6 @@ module.exports = class extends eg.Generator {
     const commandLineOptionKeys =
       this.pluginOptions ? Object.keys(this.pluginOptions) : [];
 
-
     commandLineOptionKeys.forEach(key => {
       const schema = optionsMeta[key];
       if (!this._validateOption(key, this.pluginOptions[key], schema)) {
