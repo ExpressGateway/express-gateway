@@ -1,6 +1,7 @@
+const request = require('supertest');
 const cliHelper = require('../common/cli.helper');
 const gwHelper = require('../common/gateway.helper');
-const request = require('supertest');
+
 let gatewayProcess = null;
 let gatewayPort, adminPort, configDirectoryPath;
 let username = 'test';
@@ -99,7 +100,10 @@ describe('E2E: key-auth Policy', () => {
   });
 
   after('cleanup', (done) => {
-    gatewayProcess.kill();
+    if (gatewayProcess) {
+      gatewayProcess.kill();
+    }
+
     done();
   });
 
