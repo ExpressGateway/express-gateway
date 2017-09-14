@@ -4,7 +4,7 @@ db:
     emulate: true
     namespace: EG
 
-plugins:
+# plugins:
   # express-gateway-plugin-example:
   #   param1: 'param from system.config' 
 
