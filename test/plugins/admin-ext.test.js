@@ -10,7 +10,7 @@ describe('admin with plugins', () => {
     });
     return admin({
       plugins: {
-        adminExtensions: [function (adminExpressInstance) {
+        adminRoutes: [function (adminExpressInstance) {
           adminExpressInstance.all('/test', (req, res) => res.json({enabled: true}));
         }]},
       config: {
