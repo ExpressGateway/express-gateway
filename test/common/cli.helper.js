@@ -16,7 +16,8 @@ module.exports.bootstrapFolder = function (options) {
 
       delete execOptions.env.EG_CONFIG_DIR;
 
-      let cmd = modulePath + ' gateway create -t getting-started -n test -d ' + tempDir;
+      let cmd = `node ${modulePath} gateway create ` +
+        `-t getting-started -n test -d ${tempDir}`;
 
       return new Promise((resolve, reject) => {
         const child = exec(cmd, execOptions, function (error, stdout, stderr) {
@@ -51,7 +52,7 @@ module.exports.runCLICommand = function ({adminPort, adminUrl, configDirectoryPa
 
   cliExecOptions.env.EG_CONFIG_DIR = configDirectoryPath;
   cliExecOptions.env.EG_ADMIN_URL = adminUrl || `http://localhost:${adminPort}`;
-  const command = [modulePath].concat(cliArgs).join(' ');
+  const command = ['node', modulePath].concat(cliArgs).join(' ');
   return new Promise((resolve, reject) => {
     exec(command, cliExecOptions, (err, stdout, stderr) => {
       if (err) {
