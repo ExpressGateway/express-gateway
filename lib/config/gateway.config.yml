@@ -17,6 +17,8 @@ apiEndpoints:
 serviceEndpoints:
   backend:
     url: 'http://localhost:9876'
+  api5:
+    url: 'http://localhost:9833'
 policies:
   - proxy
   - key-auth
