@@ -1,17 +1,22 @@
 http:
   port: 8080
-# https:
-#   port: 9999
-#   tls: {}
-admin: # remove this section to disable admin API
+admin:
   port: 9876
-  hostname: localhost # use 0.0.0.0 to listen on all IPv4 interfaces 
+  hostname: localhost
 apiEndpoints:
   api:
     host: '*'
+  api2:
+    host: '*.admin.com'
+  api3:
+    host: '*.admin.com'
+  api4:
+    host: '*.admin.com'
+  api5:
+    host: '*.admidfdfn.com'
 serviceEndpoints:
   backend:
-    url: 'http://localhost:9876' # btw this is EG admin API
+    url: 'http://localhost:9876'
 policies:
   - proxy
   - key-auth
@@ -20,7 +25,6 @@ pipelines:
     apiEndpoints:
       - api
     policies:
-      # - key-auth: # uncomment to enable key-auth 
       - proxy:
           - action:
               serviceEndpoint: backend
