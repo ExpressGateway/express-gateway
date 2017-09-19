@@ -1,21 +1,14 @@
+# Core
 db:
   redis:
     emulate: true
-    host: localhost
-    port: 6379
     namespace: EG
-
-cli:
-  url: http://localhost:9876
-
-#plugins:
-  # express-gateway-plugin-example:
-  #   param1: 'param from system.config' 
-
 crypto:
   cipherKey: sensitiveKey
   algorithm: aes256
   saltRounds: 10
+
+# OAuth2 Settings
 session:
   secret: keyboard cat
   resave: false

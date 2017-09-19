@@ -2,7 +2,7 @@ let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 let should = require('should');
-let uuid = require('node-uuid');
+let uuid = require('uuid');
 let redisConfig = require('../../lib/config').systemConfig.db.redis;
 let services = require('../../lib/services');
 let userService = services.user;
