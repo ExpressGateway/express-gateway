@@ -4,7 +4,6 @@ mock('redis', require('fakeredis'));
 let session = require('supertest-session');
 let should = require('should');
 let app = require('./bootstrap');
-let Promise = require('bluebird');
 
 let config = require('../../lib/config');
 let services = require('../../lib/services');
@@ -59,7 +58,7 @@ describe('Functional Test Client Password grant', function () {
       };
 
       return Promise.all([userService.insert(user1), userService.insert(user2)])
-      .spread((_fromDbUser1, _fromDbUser2) => {
+      .then(([_fromDbUser1, _fromDbUser2]) => {
         should.exist(_fromDbUser1);
         should.exist(_fromDbUser2);
 
@@ -79,7 +78,7 @@ describe('Functional Test Client Password grant', function () {
           .then(() => {
             Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth2', { secret: 'user-secret' }),
               credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: [ 'someScope' ] }) ])
-            .spread((userRes, appRes) => {
+            .then(([userRes, appRes]) => {
               should.exist(userRes);
               should.exist(appRes);
               done();

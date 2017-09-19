@@ -2,7 +2,6 @@ let mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 let should = require('should');
-let Promise = require('bluebird');
 let _ = require('lodash');
 let config = require('../../lib/config');
 let services = require('../../lib/services');

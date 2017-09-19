@@ -7,7 +7,6 @@ let services = require('../../../lib/services');
 let credentialService = services.credential;
 let userService = services.user;
 let db = require('../../../lib/db')();
-let Promise = require('bluebird');
 
 describe('Credential service tests', function () {
   describe('Credential tests', function () {
@@ -234,7 +233,7 @@ describe('Credential service tests', function () {
     it('should delete all credentials associated with a user when user is deleted', function (done) {
       Promise.all([ credentialService.getCredential(user.username, 'oauth2'),
         credentialService.getCredential(user.username, 'basic-auth') ])
-      .spread((oauthRes, basicAuthRes) => {
+      .then(([oauthRes, basicAuthRes]) => {
         should.exist(oauthRes); // Check to confirm the credentials exist
         should.exist(basicAuthRes);
         return userService.remove(user.id)
@@ -243,7 +242,7 @@ describe('Credential service tests', function () {
           res.should.eql(true);
           return Promise.all([ credentialService.getCredential(user.username, 'oauth2'),
             credentialService.getCredential(user.username, 'basic-auth') ])
-          .spread((oauthResAfterDelete, basicAuthResAfterDelete) => {
+          .then(([oauthResAfterDelete, basicAuthResAfterDelete]) => {
             should.not.exist(oauthResAfterDelete);
             should.not.exist(basicAuthResAfterDelete);
             done();
