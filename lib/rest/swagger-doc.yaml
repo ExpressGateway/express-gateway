@@ -535,8 +535,216 @@ paths:
           application/json:
             schema:
               '$ref': '#/components/schemas/PluginUpdateRequest'
+
+  /policies:
+    get:
+      tags:
+        - Policies
+      summary: Return list of policies enabled in "policies" section
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  '/policies/{name}':
+    put:
+      tags:
+        - Policies
+      summary: Enable policy
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - Policies
+      summary: Disable policy
+      responses:
+        '204':
+          description: No Content
+  /api-endpoints:
+    get:
+      tags:
+        - API Endpoints
+      summary: Return all API Endpoints
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIEndpoints'
+  '/api-endpoints/{name}':
+    put:
+      tags:
+        - API Endpoints
+      summary: Add API Endpoint
+      responses:
+        '201':
+          description: No Content
+        '204':
+          description: No Content
+    get:
+      tags:
+        - API Endpoints
+      summary: GET API Endpoint
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIEndpoint'
+    delete:
+      tags:
+        - API Endpoints
+      summary: Remove API Endpoint
+      responses:
+        '204':
+          description: No Content
+  /service-endpoints:
+    get:
+      tags:
+        - Service Endpoints
+      summary: Return all Service Endpoints
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceEndpoints'
+  '/service-endpoints/{name}':
+    put:
+      tags:
+        - Service Endpoints
+      summary: Add Service Endpoint
+      responses:
+        '201':
+          description: No Content
+        '204':
+          description: No Content
+    get:
+      tags:
+        - Service Endpoints
+      summary: GET Service Endpoint
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceEndpoint'
+    delete:
+      tags:
+        - Service Endpoints
+      summary: remove Service Endpoint
+      responses:
+        '204':
+          description: No Content
+  /pipelines:
+    get:
+      tags:
+        - Pipelines
+      summary: Return all Pipelines
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipelines'
+  '/pipelines/{name}':
+    put:
+      tags:
+        - Pipelines
+      summary: Add Pipeline
+      responses:
+        '201':
+          description: No Content
+        '204':
+          description: No Content
+    get:
+      tags:
+        - Pipelines
+      summary: GET Pipeline
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+    delete:
+      tags:
+        - Pipelines
+      summary: Remove Pipeline
+      responses:
+        '204':
+          description: No Content
 components:
   schemas:
+    APIEndpoint:
+      properties:
+        host:
+          type: string
+        paths:
+          type: array
+          items:
+            type: string
+    APIEndpoints:
+      properties:
+        endpointName1:
+          $ref: '#/components/schemas/APIEndpoint'
+        endpointName2:
+          $ref: '#/components/schemas/APIEndpoint'
+    ServiceEndpoint:
+      properties:
+        url:
+          type: string
+    ServiceEndpoints:
+      properties:
+        endpointName1:
+          $ref: '#/components/schemas/ServiceEndpoint'
+        endpointName2:
+          $ref: '#/components/schemas/ServiceEndpoint'
+    ConditionActionPair:
+      properties:
+        condition:
+          type: object
+          properties:
+            name:
+              type: string
+            conditionParam1:
+              type: string
+        action:
+          type: object
+          properties:
+            actionParam1:
+              type: string
+            actionParam2:
+              type: string
+    PipelinePolicy:
+      properties:
+        policyName:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionActionPair'
+    Pipeline:
+      properties:
+        pipelineName:
+          type: object
+          properties:
+            apiEndpoints:
+              type: array
+              items:
+                type: string
+            policies:
+              type: array
+              items:
+                $ref: '#/components/schemas/PipelinePolicy'
+    Pipelines:
+      properties:
+        pipelineName1:
+          $ref: '#/components/schemas/Pipeline'
+        pipelineName2:
+          $ref: '#/components/schemas/Pipeline'
     CreateUserRequest:
       required:
       - username
