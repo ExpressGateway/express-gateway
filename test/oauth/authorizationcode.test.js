@@ -6,7 +6,6 @@ let should = require('should');
 let url = require('url');
 let qs = require('querystring');
 let app = require('./bootstrap');
-let Promise = require('bluebird');
 let config = require('../../lib/config');
 
 let services = require('../../lib/services');
@@ -66,7 +65,7 @@ describe('Functional Test Authorization Code grant', function () {
       };
 
       Promise.all([userService.insert(user1), userService.insert(user2)])
-      .spread((_fromDbUser1, _fromDbUser2) => {
+      .then(([_fromDbUser1, _fromDbUser2]) => {
         should.exist(_fromDbUser1);
         should.exist(_fromDbUser2);
 
@@ -86,7 +85,7 @@ describe('Functional Test Authorization Code grant', function () {
           .then(() => {
             return Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'basic-auth', { password: 'user-secret' }),
               credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] }) ])
-              .spread((userRes, appRes) => {
+              .then(([userRes, appRes]) => {
                 should.exist(userRes);
                 should.exist(appRes);
                 done();
