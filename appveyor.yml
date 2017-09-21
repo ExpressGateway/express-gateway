@@ -6,7 +6,6 @@ cache:
   - node_modules
 install:
   - ps: Install-Product node $env:nodejs_version
-  - if exist node_modules npm prune --ignore=node_modules/\.bin
   - if exist node_modules npm rebuild
   - npm install
 build: off
