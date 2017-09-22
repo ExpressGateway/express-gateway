@@ -34,7 +34,7 @@ describe('eg credentials list -c ', () => {
   };
 
   const createCredential = (type, options = {}, isActive = true) => {
-    const {credentials} = adminHelper.admin;
+    const { credentials } = adminHelper.admin;
     return credentials
       .create(username, type, options)
       .then((credential) => {
@@ -43,7 +43,7 @@ describe('eg credentials list -c ', () => {
 
         switch (type) {
           case 'key-auth':
-            const {keyId} = credential;
+            const { keyId } = credential;
             createdKeyAuthKeys.add(keyId, isActive);
             if (!isActive) {
               promises.push(credentials.deactivate(keyId, type));
@@ -56,7 +56,7 @@ describe('eg credentials list -c ', () => {
   };
 
   before(() => {
-    ({program, env} = environment.bootstrap());
+    ({ program, env } = environment.bootstrap());
     return adminHelper.start();
   });
 
@@ -80,8 +80,8 @@ describe('eg credentials list -c ', () => {
         username = user.username;
         return Promise.all([
           createCredential('key-auth'),
-          createCredential('basic-auth', {password: 'test1'}),
-          createCredential('oauth2', {secret: 'eg1'}),
+          createCredential('basic-auth', { password: 'test1' }),
+          createCredential('oauth2', { secret: 'eg1' }),
           createCredential('key-auth', {}, false),
           createCredential('key-auth', {}, false),
           createCredential('key-auth', {}, false)
@@ -119,14 +119,9 @@ describe('eg credentials list -c ', () => {
     env.argv = program.parse('credentials list -c ' + username);
   });
 
-<<<<<<< HEAD
-  it('should show credentials', done => {
-    const output = {};
-=======
   it('should show all active and deactivated credentials', done => {
     const types = {};
     const keyAuthKeys = [];
->>>>>>> Adds tests for cli credential list
     env.hijack(namespace, generator => {
       generator.once('run', () => {
         generator.log.error = message => {
@@ -134,14 +129,10 @@ describe('eg credentials list -c ', () => {
         };
         generator.stdout = msg => {
           const crd = JSON.parse(msg);
-<<<<<<< HEAD
-          output[crd.type] = (crd.keyId || crd.secret || crd.password);
-=======
           types[crd.type] = (types[crd.type] || 0) + 1;
           if (crd.type === 'key-auth') {
             keyAuthKeys.push(crd.keyId);
           }
->>>>>>> Adds tests for cli credential list
         };
       });
 
