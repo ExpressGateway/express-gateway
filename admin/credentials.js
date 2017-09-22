@@ -27,10 +27,10 @@ module.exports = function (client) {
         .get(baseUrl + `${type}/${credentialId}`)
         .then(res => res.body);
     },
-    list (consumerId) {
+    list (consumerId, getAll = false) {
       if (!consumerId) throw new Error('Consumer Id is required');
       return client
-        .get(baseUrl + consumerId)
+        .get(`${baseUrl}${consumerId}?getAll=${getAll ? 1 : ''}`)
         .then(res => res.body);
     },
     addScope (credentialId, type, scope) {
@@ -52,7 +52,6 @@ module.exports = function (client) {
         .send({scopes})
         .then(res => res.body);
     }
-
   };
   function validate (credentialId, type) {
     if (!credentialId) throw new Error('Credential Id is required');
