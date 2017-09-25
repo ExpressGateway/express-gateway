@@ -518,11 +518,11 @@ describe('Application service tests', function () {
     it('should cascade deactivate app upon deactivating user', function (done) {
       let user1;
       let app1 = {
-        name: 'test-app-1'
+        name: 'test-app-3'
       };
 
       let app2 = {
-        name: 'test-app-2'
+        name: 'test-app-4'
       };
 
       userService
@@ -732,7 +732,7 @@ describe('Application service tests', function () {
         should.exist(newUser);
         user1 = newUser;
         app1 = {
-          name: 'test-app-1'
+          name: 'test-app-5'
         };
         return applicationService
         .insert(app1, user1.id)
