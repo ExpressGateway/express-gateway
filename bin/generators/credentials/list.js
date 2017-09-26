@@ -6,32 +6,24 @@ module.exports = class extends eg.Generator {
 
     this.configureCommand({
       command: 'list [options]',
-      description: 'List all active credentials for Consumer (User or App)',
+      description: 'List Consumer (User or App) credentials',
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} list [options]`)
           .example(`$0 ${process.argv[2]} list -c 7498d1a9-7f90-4438-a9b7-0ba4c6022353`)
-          .string(['c'])
-          .boolean(['a', 'd'])
+          .string(['c', 'i'])
           .describe('c', 'Consumer ID: can be User ID or username or app ID')
-          .describe('a', 'List activated and deactivated credentials')
-          .describe('d', 'List only deactivated credentials')
+          .describe('i', 'Comma separated list of credential state (active, archive), default: active')
           .alias('c', 'consumerId').nargs('c', 1)
-          .alias('a', 'all')
-          .alias('d', 'deactivated')
-          .group(['c', 'a'], 'Options:')
+          .alias('i', 'include')
+          .group(['c', 'i'], 'Options:')
     });
   }
 
   prompting () {
-    const {consumerId, all, deactivated} = this.argv;
-    let mode = 'activeOnly';
-    if (all) {
-      mode = 'both';
-    } else if (deactivated) {
-      mode = 'deactivatedOnly';
-    }
-    return this.admin.credentials.list(consumerId, mode)
+    const {consumerId, include} = this.argv;
+
+    return this.admin.credentials.list(consumerId, include)
       .then(data => {
         const credentials = data.credentials;
         if (!credentials || !credentials.length) {

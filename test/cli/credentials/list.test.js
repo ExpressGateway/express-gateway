@@ -11,11 +11,20 @@ describe('eg credentials list -c ', () => {
     inc (type, isActive) {
       if (isActive) {
         this.active[type] = (this.active[type] || 0) + 1;
+<<<<<<< HEAD
+=======
+      } else {
+        this.archive[type] = (this.archive[type] || 0) + 1;
+>>>>>>> Rename cli / admin rest filter params
       }
       this.all[type] = (this.all[type] || 0) + 1;
     },
     reset () {
       this.active = {};
+<<<<<<< HEAD
+=======
+      this.archive = {};
+>>>>>>> Rename cli / admin rest filter params
       this.all = {};
     }
   };
@@ -24,11 +33,20 @@ describe('eg credentials list -c ', () => {
     add (keyId, isActive) {
       if (isActive) {
         this.active.push(keyId);
+<<<<<<< HEAD
+=======
+      } else {
+        this.archive.push(keyId);
+>>>>>>> Rename cli / admin rest filter params
       }
       this.all.push(keyId);
     },
     reset () {
       this.active = [];
+<<<<<<< HEAD
+=======
+      this.archive = [];
+>>>>>>> Rename cli / admin rest filter params
       this.all = [];
     }
   };
@@ -119,7 +137,41 @@ describe('eg credentials list -c ', () => {
     env.argv = program.parse('credentials list -c ' + username);
   });
 
+<<<<<<< HEAD
   it('should show all active and deactivated credentials', done => {
+=======
+  it('should show all archive credentials', done => {
+    const types = {};
+    const keyAuthKeys = [];
+    env.hijack(namespace, generator => {
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.stdout = msg => {
+          const crd = JSON.parse(msg);
+          types[crd.type] = (types[crd.type] || 0) + 1;
+          if (crd.type === 'key-auth') {
+            keyAuthKeys.push(crd.keyId);
+          }
+        };
+      });
+
+      generator.once('end', () => {
+        keyAuthKeys.sort();
+        createdKeyAuthKeys.archive.sort();
+
+        assert.deepEqual(types, createdTypes.archive);
+        assert.deepEqual(keyAuthKeys, createdKeyAuthKeys.archive);
+        done();
+      });
+    });
+
+    env.argv = program.parse('credentials list -i archive -c ' + username);
+  });
+
+  it('should show all active and archive credentials', done => {
+>>>>>>> Rename cli / admin rest filter params
     const types = {};
     const keyAuthKeys = [];
     env.hijack(namespace, generator => {
@@ -146,6 +198,6 @@ describe('eg credentials list -c ', () => {
       });
     });
 
-    env.argv = program.parse('credentials list -a -c ' + username);
+    env.argv = program.parse('credentials list -i archive,active -c ' + username);
   });
 });
