@@ -17,9 +17,4 @@ policies:
   - proxy
   - rate-limit
 pipelines:
-  basic:
-    apiEndpoints:
-      - api
-    policies:
-      # - proxy: # see: http://www.express-gateway.io/docs/policies/proxy
-
+  # see: https://www.express-gateway.io/docs/configuration/gateway.config.yml/pipelines
