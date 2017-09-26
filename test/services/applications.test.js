@@ -196,25 +196,6 @@ describe('Application service tests', function () {
       });
     });
 
-    it('should get app by name', function (done) {
-      applicationService
-        .get(app.name)
-        .then(function (_app) {
-          should.exist(_app);
-          should.exist(_app.id);
-          _app.id.should.eql(app.id);
-          should.exist(_app.name);
-          _app.name.should.eql(app.name);
-          should.exist(_app.createdAt);
-          should.exist(_app.updatedAt);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
-        });
-    });
-
     it('should get all apps', function (done) {
       applicationService
       .findAll()
@@ -518,11 +499,11 @@ describe('Application service tests', function () {
     it('should cascade deactivate app upon deactivating user', function (done) {
       let user1;
       let app1 = {
-        name: 'test-app-3'
+        name: 'test-app-1'
       };
 
       let app2 = {
-        name: 'test-app-4'
+        name: 'test-app-2'
       };
 
       userService
@@ -732,7 +713,7 @@ describe('Application service tests', function () {
         should.exist(newUser);
         user1 = newUser;
         app1 = {
-          name: 'test-app-5'
+          name: 'test-app-1'
         };
         return applicationService
         .insert(app1, user1.id)

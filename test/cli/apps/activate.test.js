@@ -37,7 +37,7 @@ describe('eg apps activate', () => {
     .then(createdApp => {
       app2 = createdApp;
       return adminHelper.admin.apps.create(user.id, {
-        name: 'appy3',
+        name: 'appy2',
         redirectUri: 'http://localhost:3000/cb'
       });
     })
