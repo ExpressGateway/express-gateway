@@ -6,16 +6,23 @@ module.exports = class extends eg.Generator {
 
     this.configureCommand({
       command: 'list [options]',
-      description: 'List apps',
+      description: 'List applications',
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} list [options]`)
           .example(`$0 ${process.argv[2]} list`)
+          .string(['n', 'u'])
+          .describe('n', 'Application name')
+          .describe('u', 'Application User ID')
+          .alias('n', 'name')
+          .alias('u', 'userId')
+          .group(['n', 'u'], 'Options:')
     });
   }
 
   prompting () {
-    return this.admin.apps.list()
+    const {name, userId} = this.argv;
+    return this.admin.apps.list(name, userId)
       .then(data => {
         let apps = data.apps;
         if (!apps || !apps.length) {
