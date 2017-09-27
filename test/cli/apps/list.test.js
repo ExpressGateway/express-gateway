@@ -1,11 +1,11 @@
+const _ = require('lodash');
 const assert = require('assert');
 const adminHelper = require('../../common/admin-helper')();
-const idGen = require('uuid-base62');
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:apps:list';
 
 describe('eg apps list', () => {
-  let program, env, user1, app1, app2;
+  let program, env, user1, apps;
 
   before(() => {
     ({ program, env } = environment.bootstrap());
@@ -15,26 +15,38 @@ describe('eg apps list', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    return adminHelper.admin.users.create({
-      username: idGen.v4(),
-      firstname: 'La',
-      lastname: 'Deeda'
-    }).then(user => {
-      user1 = user;
-      return adminHelper.admin.apps.create(user1.id, {
-        name: idGen.v4(),
-        redirectUri: 'http://localhost:3000/cb'
+
+    return Promise
+      .all([
+        adminHelper.admin.users.create({
+          username: 'user1',
+          firstname: 'La',
+          lastname: 'Deeda'
+        }),
+        adminHelper.admin.users.create({
+          username: 'user2',
+          firstname: 'La',
+          lastname: 'Deeda'
+        })
+      ])
+      .then(users => {
+        [user1] = users;
+        return Promise.all(users.map(user => {
+          return Promise.all([
+            adminHelper.admin.apps.create(user.id, {
+              name: 'app1',
+              redirectUri: 'http://localhost:3000/cb'
+            }),
+            adminHelper.admin.apps.create(user.id, {
+              name: 'app2',
+              redirectUri: 'http://localhost:3000/cb'
+            })
+          ]);
+        }));
+      })
+      .then(([user1Apps, user2Apps]) => {
+        apps = user1Apps.concat(user2Apps);
       });
-    }).then(app => {
-      app1 = app;
-      return adminHelper.admin.apps.create(user1.id, {
-        name: idGen.v4(),
-        redirectUri: 'http://localhost:3000/cb'
-      });
-    })
-    .then(app => {
-      app2 = app;
-    });
   });
 
   afterEach(() => {
@@ -52,21 +64,108 @@ describe('eg apps list', () => {
         };
         generator.stdout = message => {
           let app = JSON.parse(message);
-          output[app.name] = true;
-          output[app.id] = true;
+          output[app.id] = app;
         };
       });
 
       generator.once('end', () => {
-        assert.ok(output[app1.name]);
-        assert.ok(output[app1.id]);
-        assert.ok(output[app2.name]);
-        assert.ok(output[app2.id]);
+        assert.equal(_.size(output), apps.length);
+        for (const app of apps) {
+          assert.ok(output[app.id]);
+          assert.ok(output[app.id].name, app.name);
+        }
         done();
       });
     });
 
-    env.argv = program.parse('apps list ');
+    env.argv = program.parse('apps list');
+  });
+
+  it('should show apps with specific name', done => {
+    env.hijack(namespace, generator => {
+      let output = {};
+
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.stdout = message => {
+          let app = JSON.parse(message);
+          output[app.id] = app;
+        };
+      });
+
+      generator.once('end', () => {
+        const filteredApps = apps.filter((app) => app.name === 'app1');
+        assert.equal(_.size(output), filteredApps.length);
+        for (const app of filteredApps) {
+          assert.ok(output[app.id]);
+          assert.ok(output[app.id].name, app.name);
+        }
+        done();
+      });
+    });
+
+    env.argv = program.parse('apps list -n app1');
+  });
+
+  it('should show user apps', done => {
+    env.hijack(namespace, generator => {
+      let output = {};
+
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.stdout = message => {
+          let app = JSON.parse(message);
+          output[app.id] = app;
+        };
+      });
+
+      generator.once('end', () => {
+        const filteredApps = apps.filter((app) => app.userId === user1.id);
+        assert.equal(_.size(output), filteredApps.length);
+        for (const app of filteredApps) {
+          assert.ok(output[app.id]);
+          assert.ok(output[app.id].name, app.name);
+        }
+        done();
+      });
+    });
+
+    env.argv = program.parse(`apps list -u ${user1.id}`);
+  });
+
+  it('should show user apps with specific name', done => {
+    env.hijack(namespace, generator => {
+      let output = {};
+
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.stdout = message => {
+          let app = JSON.parse(message);
+          output[app.id] = app;
+        };
+      });
+
+      generator.once('end', () => {
+        const filteredApps = apps.filter((app) => (
+          app.userId === user1.id &&
+          app.name === 'app1'
+        ));
+        assert.equal(_.size(output), filteredApps.length);
+        for (const app of filteredApps) {
+          assert.ok(output[app.id]);
+          assert.ok(output[app.id].name, app.name);
+        }
+        done();
+      });
+    });
+
+    env.argv = program.parse(`apps list -n app1 -u ${user1.id}`);
   });
 
   // For now output is the same as without -q, just to check that flag is accepted
@@ -84,12 +183,14 @@ describe('eg apps list', () => {
       });
 
       generator.once('end', () => {
-        assert.ok(output[app1.id]);
-        assert.ok(output[app2.id]);
+        assert.equal(_.size(output), apps.length);
+        for (const app of apps) {
+          assert.ok(output[app.id]);
+        }
         done();
       });
     });
 
-    env.argv = program.parse('apps list --quiet ');
+    env.argv = program.parse('apps list --quiet');
   });
 });
