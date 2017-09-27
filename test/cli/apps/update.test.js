@@ -37,35 +37,6 @@ describe('eg apps update', () => {
       app1 = createdApp;
     });
   });
-  it('updates an app from prompts', done => {
-    env.hijack(namespace, generator => {
-      let output = null;
-
-      generator.once('run', () => {
-        generator.log.error = message => {
-          done(new Error(message));
-        };
-        generator.log.ok = message => {
-          output = message;
-        };
-
-        helpers.mockPrompt(generator, {
-          redirectUri: 'http://example.com/cb'
-        });
-      });
-
-      generator.once('end', () => {
-        return adminHelper.admin.apps.info(app1.id)
-          .then(app => {
-            assert.equal(app.redirectUri, 'http://example.com/cb');
-            assert.equal(output, `Updated ${app1.id}`);
-            done();
-          });
-      });
-    });
-
-    env.argv = program.parse(`apps update ${app1.id}`);
-  });
 
   it('updates an app from properties', done => {
     env.hijack(namespace, generator => {
