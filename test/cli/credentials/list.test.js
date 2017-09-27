@@ -198,6 +198,36 @@ describe('eg credentials list -c ', () => {
       });
     });
 
+    env.argv = program.parse('credentials list -i archive -i active -c ' + username);
+  });
+
+  it('should show all active and archive credentials (comma sep list)', done => {
+    const types = {};
+    const keyAuthKeys = [];
+    env.hijack(namespace, generator => {
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.stdout = msg => {
+          const crd = JSON.parse(msg);
+          types[crd.type] = (types[crd.type] || 0) + 1;
+          if (crd.type === 'key-auth') {
+            keyAuthKeys.push(crd.keyId);
+          }
+        };
+      });
+
+      generator.once('end', () => {
+        keyAuthKeys.sort();
+        createdKeyAuthKeys.all.sort();
+
+        assert.deepEqual(types, createdTypes.all);
+        assert.deepEqual(keyAuthKeys, createdKeyAuthKeys.all);
+        done();
+      });
+    });
+
     env.argv = program.parse('credentials list -i archive,active -c ' + username);
   });
 });
