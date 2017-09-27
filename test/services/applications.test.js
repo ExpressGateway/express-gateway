@@ -33,7 +33,6 @@ describe('Application service tests', function () {
     before(function (done) {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'someGroup', isMutable: false },
         irrelevantProp: { isMutable: true } // isRequired is false by default
       };
@@ -138,7 +137,6 @@ describe('Application service tests', function () {
     before(function (done) {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'someGroup', isMutable: false },
         irrelevantProp: { isMutable: true } // isRequired is false by default
       };
@@ -284,7 +282,7 @@ describe('Application service tests', function () {
     before(function (done) {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
+        requiredProp: { isRequired: true },
         group: { defaultValue: 'admin', isMutable: false }
       };
 
@@ -315,7 +313,8 @@ describe('Application service tests', function () {
         user = newUser;
         should.exist(user.id);
         app = {
-          name: 'test-app-1'
+          name: 'test-app-1',
+          requiredProp: 'prop-1'
         };
 
         applicationService
@@ -332,7 +331,7 @@ describe('Application service tests', function () {
         })
         .then(() => {
           let updatedApp = {
-            name: 'test-app-updated'
+            requiredProp: 'prop-2'
           };
           applicationService.update(app.id, updatedApp)
           .then((res) => {
@@ -344,7 +343,7 @@ describe('Application service tests', function () {
               should.exist(_app.id);
               _app.id.should.eql(app.id);
               should.exist(_app.name);
-              _app.name.should.eql(updatedApp.name);
+              _app.requiredProp.should.eql(updatedApp.requiredProp);
               should.exist(_app.createdAt);
               _app.createdAt.should.eql(app.createdAt);
               should.exist(_app.updatedAt);
@@ -396,7 +395,6 @@ describe('Application service tests', function () {
     before(function (done) {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'admin', isMutable: false }
       };
 
@@ -563,7 +561,6 @@ describe('Application service tests', function () {
     before(function (done) {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
         group: { defaultValue: 'someGroup', isMutable: false },
         irrelevantProp: { isMutable: true } // isRequired is false by default
       };
