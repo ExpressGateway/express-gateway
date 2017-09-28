@@ -1,5 +1,5 @@
 const rest = require('../../lib/rest');
-const adminClient = require('../../lib/admin');
+const adminClient = require('express-gateway-admin-api-client');
 module.exports = function () {
   return {
     start ({config} = {}) {
