@@ -3,7 +3,6 @@ const request = require('supertest');
 const assert = require('chai').assert;
 const logger = require('../../lib/logger').test;
 const gateway = require('../../lib/gateway');
-const _ = require('lodash');
 const config = require('../../lib/config');
 let policies = require('../../lib/policies');
 
@@ -104,7 +103,7 @@ module.exports = function () {
               assert.equal(res.body.hostname, testCase.test.host);
             }
             if (testCase.test.scopes) {
-              assert.ok(_.isEqual(res.body.apiEndpoint.scopes, testCase.test.scopes));
+              assert.deepEqual(res.body.apiEndpoint.scopes, testCase.test.scopes);
             }
           })
           .end((err, res) => {

@@ -2,7 +2,6 @@ const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 const should = require('should');
-const _ = require('lodash');
 const services = require('../../lib/services');
 const authCodeService = services.authorizationCode;
 const db = require('../../lib/db')();
@@ -10,15 +9,8 @@ const db = require('../../lib/db')();
 describe('Authorization Code Tests', function () {
   let newCode, codeFromDb;
 
-  before(function (done) {
-    db.flushdbAsync()
-    .then(function (didSucceed) {
-      if (!didSucceed) {
-        console.log('Failed to flush the database');
-      }
-      done();
-    })
-    .catch(done);
+  before(function () {
+    return db.flushdbAsync();
   });
 
   it('should save a code', function (done) {
@@ -35,7 +27,7 @@ describe('Authorization Code Tests', function () {
       should.exist(code.id);
       code.id.length.should.be.greaterThan(15);
       should.ok(new Date(code.expiresAt) > Date.now());
-      _.omit(code, [ 'id', 'createdAt', 'expiresAt' ]).should.deepEqual(newCode);
+      code.should.have.properties(newCode);
       codeFromDb = code;
       done();
     })
