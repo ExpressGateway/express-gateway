@@ -78,18 +78,18 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return this._insert(app, { user: argv.user })
-    .then(newApp => {
-      if (!argv.q) {
-        this.log.ok(`Created ${newApp.id}`);
-        this.stdout(JSON.stringify(newApp, null, 2));
-      } else {
-        this.stdout(newApp.id);
-      }
-    })
-    .catch(err => {
-      this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-    });
+    return this._insert(app, {user: argv.user})
+      .then(newApp => {
+        if (!argv.q) {
+          this.log.ok(`Created ${newApp.id}`);
+          this.stdout(JSON.stringify(newApp, null, 2));
+        } else {
+          this.stdout(newApp.id);
+        }
+      })
+      .catch(err => {
+        this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
+      });
   };
 
   _createFromStdin () {
@@ -136,9 +136,9 @@ module.exports = class extends eg.Generator {
                 }
               }
             })
-            .catch(err => {
-              this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-            });
+              .catch(err => {
+                this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
+              });
           });
 
         let p = Promise.all(promises);
@@ -159,7 +159,9 @@ module.exports = class extends eg.Generator {
       let shouldPrompt = false;
       let missingProperties = [];
 
-      let configProperties = models.applications.properties;
+      const configProperties = Object.assign({name: {isRequired: true}},
+        models.applications.properties);
+
       Object.keys(configProperties).forEach(prop => {
         const descriptor = configProperties[prop];
 
@@ -168,31 +170,31 @@ module.exports = class extends eg.Generator {
             shouldPrompt = true;
           }
 
-          missingProperties.push({ name: prop, descriptor: descriptor });
+          missingProperties.push({name: prop, descriptor: descriptor});
         }
       });
 
       if (shouldPrompt) {
         questions = missingProperties.map(p => {
           const required = p.descriptor.isRequired
-                    ? ' [required]'
-                    : '';
+            ? ' [required]'
+            : '';
 
           return {
             name: p.name,
             message: `Enter ${chalk.yellow(p.name)}${chalk.green(required)}:`,
             default: p.defaultValue,
             validate: input => !p.descriptor.isRequired ||
-                (!!input && p.descriptor.isRequired)
+              (!!input && p.descriptor.isRequired)
           };
         });
       }
     }
 
     return this.prompt(questions)
-        .then(answers => {
-          app = Object.assign(app, answers);
-          return this.admin.apps.create(options.user, app);
-        });
+      .then(answers => {
+        app = Object.assign(app, answers);
+        return this.admin.apps.create(options.user, app);
+      });
   };
 };
