@@ -4,11 +4,9 @@ admin:
   port: 9876
   hostname: localhost
 apiEndpoints:
-  api:
-    host: '*'
+  # see: http://www.express-gateway.io/docs/configuration/gateway.config.yml/apiEndpoints
 serviceEndpoints:
-  httpbin:
-    url: 'https://httpbin.org'
+  # see: http://www.express-gateway.io/docs/configuration/gateway.config.yml/serviceEndpoints
 policies:
   - basic-auth
   - cors
@@ -19,11 +17,4 @@ policies:
   - proxy
   - rate-limit
 pipelines:
-  basic:
-    apiEndpoints:
-      - api
-    policies:
-      - proxy:
-          - action:
-              serviceEndpoint: httpbin
-              changeOrigin: true
+  # see: https://www.express-gateway.io/docs/configuration/gateway.config.yml/pipelines
