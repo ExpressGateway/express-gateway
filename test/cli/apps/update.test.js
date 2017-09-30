@@ -37,37 +37,6 @@ describe('eg apps update', () => {
       app1 = createdApp;
     });
   });
-  it('updates an app from prompts', done => {
-    env.hijack(namespace, generator => {
-      let output = null;
-
-      generator.once('run', () => {
-        generator.log.error = message => {
-          done(new Error(message));
-        };
-        generator.log.ok = message => {
-          output = message;
-        };
-
-        helpers.mockPrompt(generator, {
-          name: 'AppName',
-          redirectUri: 'http://example.com/cb'
-        });
-      });
-
-      generator.once('end', () => {
-        return adminHelper.admin.apps.info(app1.id)
-          .then(app => {
-            assert.equal(app.name, 'AppName');
-            assert.equal(app.redirectUri, 'http://example.com/cb');
-            assert.equal(output, `Updated ${app1.id}`);
-            done();
-          });
-      });
-    });
-
-    env.argv = program.parse(`apps update ${app1.id}`);
-  });
 
   it('updates an app from properties', done => {
     env.hijack(namespace, generator => {
@@ -85,7 +54,6 @@ describe('eg apps update', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.name, 'AppName1');
             assert.equal(app.redirectUri, 'http://example.com/cb');
             assert.equal(output, `Updated ${app1.id}`);
             done();
@@ -94,7 +62,7 @@ describe('eg apps update', () => {
     });
 
     env.argv = program.parse(`apps update ${app1.id} ` +
-      '-p "name=AppName1" -p "redirectUri=http://example.com/cb"');
+      '-p "redirectUri=http://example.com/cb"');
   });
 
   it('prints only the app id when using the --quiet flag', done => {
@@ -113,7 +81,6 @@ describe('eg apps update', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.name, 'AppName2');
             assert.equal(app.redirectUri, 'http://example.com/cb');
             assert.equal(output, `${app1.id}`);
             done();
@@ -122,7 +89,7 @@ describe('eg apps update', () => {
     });
 
     env.argv = program.parse(`apps update ${app1.id} ` +
-      '-p "name=AppName2" -p "redirectUri=http://example.com/cb" -q');
+      '-p "redirectUri=http://example.com/cb" -q');
   });
 
   it('errors on unknown app ID', done => {
