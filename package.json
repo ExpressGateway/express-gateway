@@ -53,6 +53,7 @@
       "coverage"
     ]
   },
+  "types": "./index.d.ts",
   "dependencies": {
     "bcrypt": "1.0.2",
     "body-parser": "1.17.2",
