@@ -4,6 +4,8 @@ ARG VERSION
 ARG TYPE=basic
 
 ENV NODE_ENV production
+# this will enable polling, hot-reload will work on docker or network volumes
+ENV CHOKIDAR_USEPOLLING true 
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
