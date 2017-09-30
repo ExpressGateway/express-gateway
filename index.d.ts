@@ -29,10 +29,10 @@ declare global {
     }
 
     export interface Plugin {
-      version: string,
-      policies: Array<string>,
+      version?: string,
+      policies?: Array<string>,
       init(context: PluginContext): void
-      options: object
+      options?: object
     }
   }
 }
