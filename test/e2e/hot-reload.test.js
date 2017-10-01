@@ -128,7 +128,7 @@ describe('hot-reload', () => {
 
       watcher.on('ready', () => {
         // remove key-auth policy
-        testGatewayConfigData.pipelines[0].policies.shift();
+        testGatewayConfigData.pipelines.adminAPI.policies.shift();
 
         fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
           if (err) {
