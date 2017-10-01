@@ -33,7 +33,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
     sinon.spy(logger, 'info');
 
     config.gatewayConfig = {
-      http: { port: 9089 },
+      http: { port: 0 },
       serviceEndpoints: {
         backend: {
           url: 'http://localhost:7777'
