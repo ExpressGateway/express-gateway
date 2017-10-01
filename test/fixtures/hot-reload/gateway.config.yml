@@ -16,7 +16,7 @@ policies:
   - proxy
   - key-auth
 pipelines:
-  - name: adminAPI
+  adminAPI:
     apiEndpoints:
       - api
     policies:

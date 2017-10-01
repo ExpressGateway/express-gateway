@@ -14,7 +14,7 @@ serviceEndpoints:
 policies:
   - proxy
 pipelines:
-  - name: ecommerce
+  ecommerce:
     apiEndpoints:
       - users
     policies:

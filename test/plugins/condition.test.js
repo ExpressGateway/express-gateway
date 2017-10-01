@@ -16,17 +16,17 @@ config.gatewayConfig = {
       url: 'http://www.example.com'
     }},
   policies: ['proxy'],
-  pipelines: [{
-    name: 'ecommerce',
-    apiEndpoints: ['api'],
-    policies: [{
-      proxy: [{
-        action: {
-          serviceEndpoint: 'backend'
-        }
+  pipelines: {
+    ecommerce: {
+      apiEndpoints: ['api'],
+      policies: [{
+        proxy: [{
+          action: {
+            serviceEndpoint: 'backend'
+          }
+        }]
       }]
-    }]
-  }]
+    }}
 };
 
 describe('gateway condition with plugins', () => {
