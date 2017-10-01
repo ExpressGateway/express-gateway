@@ -1,24 +1,24 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let request = require('supertest');
-let should = require('should');
+const request = require('supertest');
+const should = require('should');
 
-let credentialModelConfig = require('../../lib/config/models/credentials');
-let userModelConfig = require('../../lib/config/models/users');
-let appModelConfig = require('../../lib/config/models/applications');
-let services = require('../../lib/services');
-let credentialService = services.credential;
-let userService = services.user;
-let serverHelper = require('../common/server-helper');
-let db = require('../../lib/db')();
+const credentialModelConfig = require('../../lib/config/models/credentials');
+const userModelConfig = require('../../lib/config/models/users');
+const appModelConfig = require('../../lib/config/models/applications');
+const services = require('../../lib/services');
+const credentialService = services.credential;
+const userService = services.user;
+const serverHelper = require('../common/server-helper');
+const db = require('../../lib/db')();
 
-let testHelper = require('../common/routing.helper');
-let config = require('../../lib/config');
-let originalGatewayConfig = config.gatewayConfig;
+const testHelper = require('../common/routing.helper');
+const config = require('../../lib/config');
+const originalGatewayConfig = config.gatewayConfig;
 
 describe('Functional Tests basic auth Policy', () => {
-  let helper = testHelper();
+  const helper = testHelper();
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let user, app;
 
@@ -87,7 +87,7 @@ describe('Functional Tests basic auth Policy', () => {
 
     db.flushdbAsync()
       .then(function () {
-        let user1 = {
+        const user1 = {
           username: 'irfanbaqui',
           firstname: 'irfan',
           lastname: 'baqui',
@@ -139,7 +139,7 @@ describe('Functional Tests basic auth Policy', () => {
   });
 
   it('should not authenticate token for requests if requester doesn\'t have authorized scopes', function () {
-    let credentials = Buffer.from(user.id.concat(':user-secret')).toString('base64');
+    const credentials = Buffer.from(user.id.concat(':user-secret')).toString('base64');
 
     return request(app)
       .get('/unauthorizedPath')
@@ -148,7 +148,7 @@ describe('Functional Tests basic auth Policy', () => {
   });
 
   it('should authenticate token for requests with scopes if requester is authorized', function () {
-    let credentials = Buffer.from(user.username.concat(':user-secret')).toString('base64');
+    const credentials = Buffer.from(user.username.concat(':user-secret')).toString('base64');
 
     return request(app)
       .get('/authorizedPath')
@@ -157,7 +157,7 @@ describe('Functional Tests basic auth Policy', () => {
   });
 
   it('should not authenticate invalid token', function () {
-    let credentials = Buffer.from(user.id.concat(':wrongPassword')).toString('base64');
+    const credentials = Buffer.from(user.id.concat(':wrongPassword')).toString('base64');
 
     return request(app)
       .get('/authorizedPath')

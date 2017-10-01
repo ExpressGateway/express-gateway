@@ -1,18 +1,18 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let should = require('should');
-let config = require('../../../lib/config');
-let services = require('../../../lib/services');
-let credentialService = services.credential;
-let userService = services.user;
-let db = require('../../../lib/db')();
+const should = require('should');
+const config = require('../../../lib/config');
+const services = require('../../../lib/services');
+const credentialService = services.credential;
+const userService = services.user;
+const db = require('../../../lib/db')();
 
 describe('Credential service tests', function () {
   describe('Credential tests', function () {
     let credential;
-    let originalModelConfig = config.models.credentials;
-    let username = 'someUser';
+    const originalModelConfig = config.models.credentials;
+    const username = 'someUser';
 
     before(function (done) {
       config.models.credentials.oauth2 = {
@@ -50,7 +50,7 @@ describe('Credential service tests', function () {
     });
 
     it('should insert a credential', function (done) {
-      let _credential = {
+      const _credential = {
         secret: 'password'
       };
 
@@ -68,7 +68,7 @@ describe('Credential service tests', function () {
     });
 
     it('should not insert a credential that already exists', function (done) {
-      let _credential = {
+      const _credential = {
         secret: 'password'
       };
 
@@ -85,7 +85,7 @@ describe('Credential service tests', function () {
     });
 
     it('should insert a credential without password specified if autoGeneratePassword is set to true', function (done) {
-      let _credential = {};
+      const _credential = {};
 
       credentialService
       .insertCredential('someUsername', 'oauth2', _credential)
@@ -102,7 +102,7 @@ describe('Credential service tests', function () {
     });
 
     it('should insert a credential with id but different type that already exists', function (done) {
-      let _credential = {
+      const _credential = {
         password: 'password'
       };
 
@@ -172,7 +172,7 @@ describe('Credential service tests', function () {
 
   describe('Credential Cascade Delete tests', function () {
     let user;
-    let originalModelConfig = config.models.credentials;
+    const originalModelConfig = config.models.credentials;
 
     before(function (done) {
       config.models.credentials.oauth2 = {
@@ -269,9 +269,9 @@ describe('Credential service tests', function () {
   });
 
   describe('Credential Property tests', function () {
-    let originalModelConfig = config.models.credentials;
-    let username = 'someUser';
-    let _credential = {
+    const originalModelConfig = config.models.credentials;
+    const username = 'someUser';
+    const _credential = {
       secret: 'password',
       scopes: 'someScope',
       someProperty: 'propVal'
@@ -435,8 +435,8 @@ describe('Credential service tests', function () {
     });
 
     it('should use default property if not defined', function (done) {
-      let username2 = 'otherUser';
-      let cred = {
+      const username2 = 'otherUser';
+      const cred = {
         secret: 'password',
         scopes: 'someOtherOne',
         someProperty: 'propVal'
@@ -458,8 +458,8 @@ describe('Credential service tests', function () {
     });
 
     it('should not create credential if a required property is not passed in', function (done) {
-      let username3 = 'anotherUser';
-      let cred = {
+      const username3 = 'anotherUser';
+      const cred = {
         secret: 'password',
         scopes: 'someScope'
       };

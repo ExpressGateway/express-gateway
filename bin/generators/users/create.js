@@ -39,7 +39,7 @@ module.exports = class extends eg.Generator {
     const argv = this.argv;
     this.stdin.setEncoding('utf8');
 
-    let bufs = [];
+    const bufs = [];
 
     this.stdin.on('readable', () => {
       const chunk = this.stdin.read();
@@ -49,11 +49,11 @@ module.exports = class extends eg.Generator {
     });
     return new Promise((resolve, reject) => {
       this.stdin.on('end', () => {
-        let lines = bufs.join('').split('\n');
-        let promises = lines
+        const lines = bufs.join('').split('\n');
+        const promises = lines
           .filter(line => line.length > 0)
           .map((line, index) => {
-            let user = JSON.parse(line);
+            const user = JSON.parse(line);
 
             const options = {
               skipPrompt: true,
@@ -74,7 +74,7 @@ module.exports = class extends eg.Generator {
             });
           });
 
-        let p = Promise.all(promises);
+        const p = Promise.all(promises);
         resolve(p);
       });
     });
@@ -88,7 +88,7 @@ module.exports = class extends eg.Generator {
       propertyValues = Array.isArray(argv.p) ? argv.p : [argv.p];
     }
 
-    let user = {};
+    const user = {};
 
     let hasInvalidProperty = false;
 
@@ -133,9 +133,9 @@ module.exports = class extends eg.Generator {
 
     if (!options.skipPrompt) {
       let shouldPrompt = false;
-      let missingProperties = [];
+      const missingProperties = [];
 
-      let configProperties = Object.assign({ username: { isRequired: true } },
+      const configProperties = Object.assign({ username: { isRequired: true } },
                 models.users.properties);
 
       Object.keys(configProperties).forEach(prop => {

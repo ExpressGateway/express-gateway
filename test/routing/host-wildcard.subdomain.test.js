@@ -1,8 +1,8 @@
- let testHelper = require('../common/routing.helper');
- let config = require('../../lib/config');
+ const testHelper = require('../common/routing.helper');
+ const config = require('../../lib/config');
 
  describe('exact host name configuration', () => {
-   let helper = testHelper();
+   const helper = testHelper();
    let originalGatewayConfig;
    originalGatewayConfig = config.gatewayConfig;
    helper.addPolicy('test', () => (req, res) => {

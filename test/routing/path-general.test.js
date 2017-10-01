@@ -1,12 +1,12 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 const testHelper = require('../common/routing.helper');
-let Config = require('../../lib/config/config');
+const Config = require('../../lib/config/config');
 describe('path resolution for specific and general domains', () => {
-  let config = new Config();
+  const config = new Config();
   [undefined, 'example.com', 'sub.demo.com'].forEach(host => {
-    let configTemplate = {
+    const configTemplate = {
       http: { port: 9085 },
       apiEndpoints: {
         test: { paths: undefined, host }
@@ -21,9 +21,9 @@ describe('path resolution for specific and general domains', () => {
     };
 
     describe('paths configuration without wildcards paths:/admin host:' + host, () => {
-      let helper = testHelper();
+      const helper = testHelper();
       before('setup', () => {
-        let plugins = {policies: [{
+        const plugins = {policies: [{
           name: 'routeTest',
           policy: () => (req, res) => {
             res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
@@ -64,8 +64,8 @@ describe('path resolution for specific and general domains', () => {
     });
 
     describe('paths configuration with  /admin/*', () => {
-      let helper = testHelper();
-      let plugins = {policies: [{name: 'routeTest',
+      const helper = testHelper();
+      const plugins = {policies: [{name: 'routeTest',
         policy: () => (req, res) => {
           res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
         }}]};
@@ -106,8 +106,8 @@ describe('path resolution for specific and general domains', () => {
     });
 
     describe('paths with one named parameter /admin/:id', () => {
-      let helper = testHelper();
-      let plugins = {policies: [{name: 'routeTest',
+      const helper = testHelper();
+      const plugins = {policies: [{name: 'routeTest',
         policy: () => (req, res) => {
           res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
         }}]};
@@ -148,8 +148,8 @@ describe('path resolution for specific and general domains', () => {
     });
 
     describe('paths with one named parameter /admin/:group/:id', () => {
-      let helper = testHelper();
-      let plugins = {policies: [{name: 'routeTest',
+      const helper = testHelper();
+      const plugins = {policies: [{name: 'routeTest',
         policy: () => (req, res) => {
           res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
         }}]};
@@ -190,8 +190,8 @@ describe('path resolution for specific and general domains', () => {
     });
 
     describe('paths configuration with wildcard after slash or directory ["/admin","/admin/*"]', () => {
-      let helper = testHelper();
-      let plugins = {policies: [{name: 'routeTest',
+      const helper = testHelper();
+      const plugins = {policies: [{name: 'routeTest',
         policy: () => (req, res) => {
           res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
         }}]};

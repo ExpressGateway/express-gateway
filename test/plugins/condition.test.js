@@ -3,7 +3,7 @@ const gateway = require('../../lib/gateway');
 const Config = require('../../lib/config/config');
 const express = require('express');
 
-let config = new Config();
+const config = new Config();
 config.gatewayConfig = {
   http: {
     port: 0
@@ -50,13 +50,13 @@ describe('gateway condition with plugins', () => {
   });
 
   it('should  return false for param1 not matching url', function () {
-    let req = Object.create(express.request);
+    const req = Object.create(express.request);
     req.url = '/test';
     assert.isFalse(req.matchEGCondition({ name: 'test-condition', param1: true }));
   });
 
   it('should  return true for param1 matching url', function () {
-    let req = Object.create(express.request);
+    const req = Object.create(express.request);
     req.url = '/test';
     assert.ok(req.matchEGCondition({ name: 'test-condition', param1: '/test' }));
   });

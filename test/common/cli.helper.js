@@ -10,13 +10,13 @@ const modulePath = path.resolve(__dirname, '..', '..', 'bin', 'index.js');
 module.exports.bootstrapFolder = function (options) {
   return util.promisify(tmp.dir)()
     .then(tempDir => {
-      let execOptions = {
+      const execOptions = {
         env: Object.assign({}, process.env)
       };
 
       delete execOptions.env.EG_CONFIG_DIR;
 
-      let cmd = `node ${modulePath} gateway create ` +
+      const cmd = `node ${modulePath} gateway create ` +
         `-t getting-started -n test -d ${tempDir}`;
 
       return new Promise((resolve, reject) => {

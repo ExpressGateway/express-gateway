@@ -1,9 +1,9 @@
-let testHelper = require('../common/routing.helper');
-let config = require('../../lib/config');
+const testHelper = require('../common/routing.helper');
+const config = require('../../lib/config');
 
 describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
   let originalGatewayConfig;
-  let helper = testHelper();
+  const helper = testHelper();
   helper.addPolicy('test', () => (req, res) => {
     res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
   });

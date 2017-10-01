@@ -1,31 +1,31 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let session = require('supertest-session');
-let should = require('should');
-let qs = require('querystring');
-let url = require('url');
-let express = require('express');
-let sinon = require('sinon');
-let assert = require('assert');
+const session = require('supertest-session');
+const should = require('should');
+const qs = require('querystring');
+const url = require('url');
+const express = require('express');
+const sinon = require('sinon');
+const assert = require('assert');
 
-let logger = require('../../lib/policies/log/winston-logger');
-let credentialModelConfig = require('../../lib/config/models/credentials');
-let userModelConfig = require('../../lib/config/models/users');
-let appModelConfig = require('../../lib/config/models/applications');
-let services = require('../../lib/services');
-let credentialService = services.credential;
-let userService = services.user;
-let applicationService = services.application;
-let db = require('../../lib/db')();
+const logger = require('../../lib/policies/log/winston-logger');
+const credentialModelConfig = require('../../lib/config/models/credentials');
+const userModelConfig = require('../../lib/config/models/users');
+const appModelConfig = require('../../lib/config/models/applications');
+const services = require('../../lib/services');
+const credentialService = services.credential;
+const userService = services.user;
+const applicationService = services.application;
+const db = require('../../lib/db')();
 
-let testHelper = require('../common/routing.helper');
-let config = require('../../lib/config');
-let originalGatewayConfig = config.gatewayConfig;
+const testHelper = require('../common/routing.helper');
+const config = require('../../lib/config');
+const originalGatewayConfig = config.gatewayConfig;
 
 describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
-  let helper = testHelper();
-  let spy = sinon.spy();
+  const helper = testHelper();
+  const spy = sinon.spy();
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let user, application, token, app, backendServer;
 
@@ -119,7 +119,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
 
     db.flushdbAsync()
       .then(function () {
-        let user1 = {
+        const user1 = {
           username: 'irfanbaqui',
           firstname: 'irfan',
           lastname: 'baqui',
@@ -131,7 +131,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
             should.exist(_user);
             user = _user;
 
-            let app1 = {
+            const app1 = {
               name: 'irfan_app',
               redirectUri: 'https://some.host.com/some/route'
             };
@@ -151,7 +151,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
                         helper.setup()
                           .then(apps => {
                             app = apps.app;
-                            let request = session(app);
+                            const request = session(app);
 
                             request
                               .post('/login')
@@ -183,16 +183,16 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
                                       .expect(302)
                                       .end(function (err, res) {
                                         should.not.exist(err);
-                                        let params = qs.parse(url.parse(res.headers.location).hash.slice(1));
+                                        const params = qs.parse(url.parse(res.headers.location).hash.slice(1));
                                         token = params.access_token;
 
-                                        let backendApp = express();
+                                        const backendApp = express();
                                         backendApp.all('*', (req, res) => {
                                           spy(req.headers);
                                           res.send();
                                         });
 
-                                        let runningBackendApp = backendApp.listen(7777, () => {
+                                        const runningBackendApp = backendApp.listen(7777, () => {
                                           backendServer = runningBackendApp;
                                           done();
                                         });
@@ -223,7 +223,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
   });
 
   it('should execute oauth2, proxy, log, expression, rate-limit policies and return 200', function (done) {
-    let request = session(app);
+    const request = session(app);
 
     request
       .get('/authorizedPath')
@@ -239,7 +239,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
   });
 
   it('should execute oauth2, proxy, log, expression, rate-limit policies and return 429 as rate limit is reached', function (done) {
-    let request = session(app);
+    const request = session(app);
 
     request
       .get('/authorizedPath')

@@ -16,7 +16,7 @@ describe('eg users remove', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    let promises = [];
+    const promises = [];
     for (let i = 0; i < 5; i++) {
       promises.push(adminHelper.admin.users.create({
         username: idGen.v4(),
@@ -90,7 +90,7 @@ describe('eg users remove', () => {
 
   it('removes multiple users', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {

@@ -55,7 +55,7 @@ module.exports = class extends eg.Generator {
       propertyValues = Array.isArray(argv.p) ? argv.p : [argv.p];
     }
 
-    let app = {};
+    const app = {};
 
     let hasInvalidProperty = false;
 
@@ -96,7 +96,7 @@ module.exports = class extends eg.Generator {
     const argv = this.argv;
     this.stdin.setEncoding('utf8');
 
-    let bufs = [];
+    const bufs = [];
 
     this.stdin.on('readable', () => {
       const chunk = this.stdin.read();
@@ -107,11 +107,11 @@ module.exports = class extends eg.Generator {
     });
     return new Promise((resolve, reject) => {
       this.stdin.on('end', () => {
-        let lines = bufs.join('').split('\n');
-        let promises = lines
+        const lines = bufs.join('').split('\n');
+        const promises = lines
           .filter(line => line.length > 0)
           .map((line, index) => {
-            let app = JSON.parse(line);
+            const app = JSON.parse(line);
             let user;
 
             if (app.user) {
@@ -141,7 +141,7 @@ module.exports = class extends eg.Generator {
             });
           });
 
-        let p = Promise.all(promises);
+        const p = Promise.all(promises);
         resolve(p);
       });
     });
@@ -157,9 +157,9 @@ module.exports = class extends eg.Generator {
 
     if (!options.skipPrompt) {
       let shouldPrompt = false;
-      let missingProperties = [];
+      const missingProperties = [];
 
-      let configProperties = models.applications.properties;
+      const configProperties = models.applications.properties;
       Object.keys(configProperties).forEach(prop => {
         const descriptor = configProperties[prop];
 

@@ -1,11 +1,11 @@
-let rest = require('../../lib/rest');
-let adminClient = require('../../lib/admin');
+const rest = require('../../lib/rest');
+const adminClient = require('../../lib/admin');
 module.exports = function () {
   return {
     start ({config} = {}) {
       return rest({config}).then((srv) => {
         this.adminSrv = srv;
-        let srvInfo = srv.address();
+        const srvInfo = srv.address();
         this.admin = adminClient({
           baseUrl: `http://${srvInfo.address}:${srvInfo.port}`
         });

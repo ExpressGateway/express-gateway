@@ -4,15 +4,15 @@ const gwHelper = require('../common/gateway.helper');
 
 let gatewayProcess = null;
 let gatewayPort, adminPort, configDirectoryPath;
-let username = 'test';
+const username = 'test';
 let keyCred;
 const headerName = 'Authorization';
-let proxyPolicy = {
+const proxyPolicy = {
   proxy: { action: { serviceEndpoint: 'backend' } }
 };
 describe('E2E: key-auth Policy', () => {
   before('setup', () => {
-    let gatewayConfig = {
+    const gatewayConfig = {
       apiEndpoints: {
         authorizedEndpoint: {
           host: '*',
@@ -114,7 +114,7 @@ describe('E2E: key-auth Policy', () => {
   });
 
   it('should not authorise key for requests if requester doesn\'t have authorized scopes', function (done) {
-    let apikey = 'apiKey ' + keyCred.keyId + ':' + keyCred.keySecret;
+    const apikey = 'apiKey ' + keyCred.keyId + ':' + keyCred.keySecret;
 
     request(`http://localhost:${gatewayPort}`)
       .get('/unauthorizedPath')
@@ -126,7 +126,7 @@ describe('E2E: key-auth Policy', () => {
   });
 
   it('should authenticate key with scheme in headers for requests with scopes if requester is authorized', function (done) {
-    let apikey = 'SCHEME1 ' + keyCred.keyId + ':' + keyCred.keySecret;
+    const apikey = 'SCHEME1 ' + keyCred.keyId + ':' + keyCred.keySecret;
 
     request(`http://localhost:${gatewayPort}`)
       .get('/authorizedPath')
@@ -135,7 +135,7 @@ describe('E2E: key-auth Policy', () => {
       .end(done);
   });
   it('should authenticate key with scheme ignoring case in headers for requests with scopes if requester is authorized', function (done) {
-    let apikey = 'scheME1 ' + keyCred.keyId + ':' + keyCred.keySecret;
+    const apikey = 'scheME1 ' + keyCred.keyId + ':' + keyCred.keySecret;
 
     request(`http://localhost:${gatewayPort}`)
       .get('/authorizedPath')
@@ -144,7 +144,7 @@ describe('E2E: key-auth Policy', () => {
       .end(done);
   });
   it('should authenticate key in query for requests with scopes if requester is authorized ', function (done) {
-    let apikey = keyCred.keyId + ':' + keyCred.keySecret;
+    const apikey = keyCred.keyId + ':' + keyCred.keySecret;
 
     request(`http://localhost:${gatewayPort}`)
       .get('/authorizedPath?apiKey=' + apikey)
@@ -153,7 +153,7 @@ describe('E2E: key-auth Policy', () => {
   });
 
   it('should not authorize invalid key', function (done) {
-    let apikey = 'apiKey test:wrong';
+    const apikey = 'apiKey test:wrong';
 
     request(`http://localhost:${gatewayPort}`)
       .get('/authorizedPath')
@@ -163,7 +163,7 @@ describe('E2E: key-auth Policy', () => {
   });
 
   it('should authenticate key in query if endpoint allows only query ', function (done) {
-    let apikey = keyCred.keyId + ':' + keyCred.keySecret;
+    const apikey = keyCred.keyId + ':' + keyCred.keySecret;
 
     request(`http://localhost:${gatewayPort}`)
       .get('/by_query?customApiKeyParam=' + apikey)
@@ -171,7 +171,7 @@ describe('E2E: key-auth Policy', () => {
       .end(done);
   });
   it('should not authenticate with header of EP allows only query', function (done) {
-    let apikey = 'apiKey ' + keyCred.keyId + ':' + keyCred.keySecret;
+    const apikey = 'apiKey ' + keyCred.keyId + ':' + keyCred.keySecret;
 
     request(`http://localhost:${gatewayPort}`)
       .get('/by_query')

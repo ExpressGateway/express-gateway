@@ -5,10 +5,10 @@ const sinon = require('sinon');
 const assert = require('assert');
 
 describe('logging policy', () => {
-  let res = {
+  const res = {
     test: 'text'
   };
-  let req = {
+  const req = {
     url: '/test',
     method: 'GET',
     egContext: Object.create(new EgContextBase())
@@ -20,8 +20,8 @@ describe('logging policy', () => {
     sinon.spy(logger, 'error');
   });
   it('should log url', () => {
-    let next = sinon.spy();
-    let logMiddleware = logPolicy({
+    const next = sinon.spy();
+    const logMiddleware = logPolicy({
       // eslint-disable-next-line no-template-curly-in-string
       message: '${req.url} ${egContext.req.method} ${res.test}'
     });
@@ -31,8 +31,8 @@ describe('logging policy', () => {
     assert.ok(next.calledOnce);
   });
   it('should fail to access global context', () => {
-    let next = sinon.spy();
-    let logMiddleware = logPolicy({
+    const next = sinon.spy();
+    const logMiddleware = logPolicy({
       // eslint-disable-next-line no-template-curly-in-string
       message: '${process.exit(1)}'
     });

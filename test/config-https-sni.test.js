@@ -1,12 +1,12 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 const assert = require('assert');
 const fs = require('fs');
 const tls = require('tls');
 const path = require('path');
-let config = require('../lib/config');
-let testHelper = require('./common/routing.helper');
+const config = require('../lib/config');
+const testHelper = require('./common/routing.helper');
 
 const testCases = [{
   clientOptions: {
@@ -129,7 +129,7 @@ describe('sni', () => {
   });
 
   testCases.forEach(tc => {
-    let options = tc.clientOptions;
+    const options = tc.clientOptions;
     tc.actual = {};
     it('sni ' + options.testTitle, (done) => {
       serverError = null;

@@ -90,7 +90,7 @@ describe('eg users deactivate', () => {
 
   it('deactivates multiple users', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {
@@ -104,7 +104,7 @@ describe('eg users deactivate', () => {
       generator.once('end', () => {
         return adminHelper.admin.users.list()
           .then(data => {
-            let users = data.users;
+            const users = data.users;
             assert.equal(users[0].isActive, false);
             assert.equal(users[1].isActive, false);
 

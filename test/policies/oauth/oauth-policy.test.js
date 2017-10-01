@@ -1,25 +1,25 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let session = require('supertest-session');
-let should = require('should');
+const session = require('supertest-session');
+const should = require('should');
 
-let credentialModelConfig = require('../../../lib/config/models/credentials');
-let userModelConfig = require('../../../lib/config/models/users');
-let appModelConfig = require('../../../lib/config/models/applications');
-let services = require('../../../lib/services/index');
-let credentialService = services.credential;
-let userService = services.user;
-let applicationService = services.application;
-let serverHelper = require('../../common/server-helper');
-let db = require('../../../lib/db')();
+const credentialModelConfig = require('../../../lib/config/models/credentials');
+const userModelConfig = require('../../../lib/config/models/users');
+const appModelConfig = require('../../../lib/config/models/applications');
+const services = require('../../../lib/services/index');
+const credentialService = services.credential;
+const userService = services.user;
+const applicationService = services.application;
+const serverHelper = require('../../common/server-helper');
+const db = require('../../../lib/db')();
 
-let testHelper = require('../../common/routing.helper');
-let config = require('../../../lib/config');
-let originalGatewayConfig = config.gatewayConfig;
+const testHelper = require('../../common/routing.helper');
+const config = require('../../../lib/config');
+const originalGatewayConfig = config.gatewayConfig;
 
 describe('Functional Tests oAuth2.0 Policy', () => {
-  let helper = testHelper();
+  const helper = testHelper();
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let user, application, token, app;
 
@@ -84,7 +84,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
 
     db.flushdbAsync()
       .then(function () {
-        let user1 = {
+        const user1 = {
           username: 'irfanbaqui',
           firstname: 'irfan',
           lastname: 'baqui',
@@ -96,7 +96,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
             should.exist(_user);
             user = _user;
 
-            let app1 = {
+            const app1 = {
               name: 'irfan_app',
               redirectUri: 'https://some.host.com/some/route'
             };
@@ -115,7 +115,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
                         helper.setup()
                           .then(apps => {
                             app = apps.app;
-                            let request = session(app);
+                            const request = session(app);
                             request
                               .post('/oauth2/token')
                               .send({
@@ -157,7 +157,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
   });
 
   it('should not authenticate token for requests without token header', function (done) {
-    let request = session(app);
+    const request = session(app);
 
     request
       .get('/authorizedPath')
@@ -169,7 +169,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
   });
 
   it('should not authenticate token for requests if requester doesn\'t have authorized scopes', function (done) {
-    let request = session(app);
+    const request = session(app);
 
     request
       .get('/unauthorizedPath')
@@ -181,7 +181,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
   });
 
   it('should authenticate token for requests with scopes if requester is authorized', function (done) {
-    let request = session(app);
+    const request = session(app);
 
     request
       .get('/authorizedPath')
@@ -194,7 +194,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
   });
 
   it('should not authenticate invalid token', function (done) {
-    let request = session(app);
+    const request = session(app);
 
     request
       .get('/authorizedPath')
