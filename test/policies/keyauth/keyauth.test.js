@@ -38,7 +38,7 @@ describe('Functional Tests keyAuth Policy', () => {
         authorizedEndpoint: {
           host: '*',
           paths: ['/authorizedPath'],
-          scopes: ['authorizedScope']
+          scopes: 'authorizedScope' // #434 should allow string not only array
         },
         onlyQueryParamEndpoint: {
           host: '*',
@@ -47,7 +47,7 @@ describe('Functional Tests keyAuth Policy', () => {
         unauthorizedEndpoint: {
           host: '*',
           paths: ['/unauthorizedPath'],
-          scopes: ['unauthorizedScope']
+          scopes: ['unauthorizedScope'] // #434 should accept array
         }
       },
       policies: ['key-auth', 'proxy'],
