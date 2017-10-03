@@ -1,30 +1,30 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let session = require('supertest-session');
-let should = require('should');
-let qs = require('querystring');
-let url = require('url');
-let express = require('express');
-let sinon = require('sinon');
-let assert = require('assert');
+const session = require('supertest-session');
+const should = require('should');
+const qs = require('querystring');
+const url = require('url');
+const express = require('express');
+const sinon = require('sinon');
+const assert = require('assert');
 
 let credentialModelConfig = require('../../../lib/config/models/credentials');
-let userModelConfig = require('../../../lib/config/models/users');
-let appModelConfig = require('../../../lib/config/models/applications');
-let services = require('../../../lib/services/index');
-let credentialService = services.credential;
-let userService = services.user;
-let applicationService = services.application;
-let db = require('../../../lib/db')();
+const userModelConfig = require('../../../lib/config/models/users');
+const appModelConfig = require('../../../lib/config/models/applications');
+const services = require('../../../lib/services/index');
+const credentialService = services.credential;
+const userService = services.user;
+const applicationService = services.application;
+const db = require('../../../lib/db')();
 
-let testHelper = require('../../common/routing.helper');
-let config = require('../../../lib/config');
-let originalGatewayConfig = config.gatewayConfig;
+const testHelper = require('../../common/routing.helper');
+const config = require('../../../lib/config');
+const originalGatewayConfig = config.gatewayConfig;
 
 describe('Request Headers with consumer and token information as part of auth policies', () => {
-  let helper = testHelper();
-  let spy = sinon.spy();
+  const helper = testHelper();
+  const spy = sinon.spy();
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let user, application, token, app, backendServer;
 
@@ -77,7 +77,7 @@ describe('Request Headers with consumer and token information as part of auth po
 
     db.flushdbAsync()
       .then(function () {
-        let user1 = {
+        const user1 = {
           username: 'irfanbaqui',
           firstname: 'irfan',
           lastname: 'baqui',
@@ -89,7 +89,7 @@ describe('Request Headers with consumer and token information as part of auth po
             should.exist(_user);
             user = _user;
 
-            let app1 = {
+            const app1 = {
               name: 'irfan_app',
               redirectUri: 'https://some.host.com/some/route'
             };
@@ -109,7 +109,7 @@ describe('Request Headers with consumer and token information as part of auth po
                         helper.setup()
                           .then(apps => {
                             app = apps.app;
-                            let request = session(app);
+                            const request = session(app);
 
                             request
                               .post('/login')
@@ -141,16 +141,16 @@ describe('Request Headers with consumer and token information as part of auth po
                                       .expect(302)
                                       .end(function (err, res) {
                                         should.not.exist(err);
-                                        let params = qs.parse(url.parse(res.headers.location).hash.slice(1));
+                                        const params = qs.parse(url.parse(res.headers.location).hash.slice(1));
                                         token = params.access_token;
 
-                                        let backendApp = express();
+                                        const backendApp = express();
                                         backendApp.all('*', (req, res) => {
                                           spy(req.headers);
                                           res.send();
                                         });
 
-                                        let runningBackendApp = backendApp.listen(7777, () => {
+                                        const runningBackendApp = backendApp.listen(7777, () => {
                                           backendServer = runningBackendApp;
                                           done();
                                         });
@@ -180,8 +180,8 @@ describe('Request Headers with consumer and token information as part of auth po
   });
 
   it('should authenticate token for requests with scopes if requester is authorized', function (done) {
-    let request = session(app);
-    let expectedHeaders = [
+    const request = session(app);
+    const expectedHeaders = [
       'eg-token-scopes',
       'eg-token-redirect-uri',
       'eg-token-id',

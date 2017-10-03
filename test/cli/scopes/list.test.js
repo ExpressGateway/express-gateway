@@ -27,7 +27,7 @@ describe('eg scopes list', () => {
 
   it('should show scopes list', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {
@@ -51,7 +51,7 @@ describe('eg scopes list', () => {
   // For now output is the same as without -q, just to check that flag is accepted
   it('prints only the scope names when using the --quiet flag', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {

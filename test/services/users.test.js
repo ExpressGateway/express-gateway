@@ -1,13 +1,13 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let should = require('should');
-let uuid = require('uuid');
-let redisConfig = require('../../lib/config').systemConfig.db.redis;
-let services = require('../../lib/services');
-let userService = services.user;
-let db = require('../../lib/db')();
-let _ = require('lodash');
+const should = require('should');
+const uuid = require('uuid');
+const redisConfig = require('../../lib/config').systemConfig.db.redis;
+const services = require('../../lib/services');
+const userService = services.user;
+const db = require('../../lib/db')();
+const _ = require('lodash');
 
 describe('User service tests', function () {
   describe('Insert tests', function () {
@@ -26,7 +26,7 @@ describe('User service tests', function () {
     });
 
     it('should insert a user', function (done) {
-      let user = {
+      const user = {
         username: 'irfanbaqui',
         firstname: 'irfan',
         lastname: 'baqui',
@@ -36,10 +36,10 @@ describe('User service tests', function () {
       userService
       .insert(user)
       .then(function (newUser) {
-        let expectedUserProps = ['firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt'];
+        const expectedUserProps = ['firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt'];
         /* including what's predictable. id, createdAt and updatedAt are initialized at
         time of creation, so they're not predictable */
-        let expectedPartialUserObj = {
+        const expectedPartialUserObj = {
           firstname: user.firstname,
           lastname: user.lastname,
           username: user.username,
@@ -62,7 +62,7 @@ describe('User service tests', function () {
     });
 
     it('should throw an error when inserting a user with missing properties', function (done) {
-      let user = {
+      const user = {
         username: 'irfanbaqui-1',
         lastname: 'baqui',
         email: 'irfan@eg.com'
@@ -81,7 +81,7 @@ describe('User service tests', function () {
     });
 
     it('should throw an error when inserting a user with existing username', function (done) {
-      let user = {
+      const user = {
         username: 'irfanbaqui',
         firstname: 'irfan',
         lastname: 'baqui',
@@ -127,8 +127,8 @@ describe('User service tests', function () {
     it('should get user by userId', function (done) {
       userService.get(user.id)
         .then(function (_user) {
-          let expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
-          let expectedPartialObj = {
+          const expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
+          const expectedPartialObj = {
             firstname: user.firstname,
             lastname: user.lastname,
             email: user.email,
@@ -153,9 +153,9 @@ describe('User service tests', function () {
           should.exist(data.users);
           should.exist(data.nextKey);
           data.users.length.should.be.eql(1);
-          let user = data.users[0];
-          let expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
-          let expectedPartialObj = {
+          const user = data.users[0];
+          const expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
+          const expectedPartialObj = {
             firstname: user.firstname,
             lastname: user.lastname,
             email: user.email,
@@ -185,8 +185,8 @@ describe('User service tests', function () {
     it('should find user by username', function (done) {
       userService.find(user.username)
         .then(function (_user) {
-          let expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
-          let expectedPartialObj = {
+          const expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
+          const expectedPartialObj = {
             firstname: user.firstname,
             lastname: user.lastname,
             email: user.email,
@@ -273,7 +273,7 @@ describe('User service tests', function () {
     });
 
     it('should allow update of any single user property user', function (done) {
-      let anotherUpdatedUser = {
+      const anotherUpdatedUser = {
         email: 'baq@eg.com'
       };
       userService.update(user.id, anotherUpdatedUser)
@@ -301,7 +301,7 @@ describe('User service tests', function () {
     });
 
     it('should not update user with unvalid id', function (done) {
-      let updatedUser = {
+      const updatedUser = {
         username: 'joecamper',
         firstname: 'Joe',
         lastname: 'Camper',
@@ -320,7 +320,7 @@ describe('User service tests', function () {
     });
 
     it('should not update user with invalid properties', function (done) {
-      let updatedUser = {
+      const updatedUser = {
         username: 'joecamper',
         invalid_prop: 'xyz111'
       };

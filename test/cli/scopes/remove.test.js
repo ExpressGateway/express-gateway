@@ -52,7 +52,7 @@ describe('eg scopes remove', () => {
 
   it('should rm multi scope', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {

@@ -1,9 +1,9 @@
-let testHelper = require('../common/routing.helper');
-let config = require('../../lib/config');
+const testHelper = require('../common/routing.helper');
+const config = require('../../lib/config');
 
 describe('Multi entry api endpoint with methods', () => {
-  let helper = testHelper();
-  let originalGatewayConfig = config.gatewayConfig;
+  const helper = testHelper();
+  const originalGatewayConfig = config.gatewayConfig;
   helper.addPolicy('test', () => (req, res) => {
     res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
   });

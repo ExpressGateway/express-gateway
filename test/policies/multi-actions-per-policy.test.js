@@ -1,6 +1,6 @@
 const serverHelper = require('../common/server-helper');
 const assert = require('chai').assert;
-let config = require('../../lib/config');
+const config = require('../../lib/config');
 const request = require('supertest');
 const port1 = 5998;
 const port2 = 5999;

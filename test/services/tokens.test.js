@@ -1,12 +1,12 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let should = require('should');
-let _ = require('lodash');
-let config = require('../../lib/config');
-let services = require('../../lib/services');
-let tokenService = services.token;
-let db = require('../../lib/db')();
+const should = require('should');
+const _ = require('lodash');
+const config = require('../../lib/config');
+const services = require('../../lib/services');
+const tokenService = services.token;
+const db = require('../../lib/db')();
 
 describe('Access Token tests', function () {
   describe('Save, Find and Get Access Token tests', function () {
@@ -56,8 +56,8 @@ describe('Access Token tests', function () {
     });
 
     it('should get an access token', function (done) {
-      let tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt'];
-      let [ id, _tokenDecrypted ] = accessTokenFromDb.split('|');
+      const tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt'];
+      const [ id, _tokenDecrypted ] = accessTokenFromDb.split('|');
 
       tokenService.get(id)
       .then((tokenObj) => {
@@ -122,8 +122,8 @@ describe('Access Token tests', function () {
     });
 
     it('should get an access token with scopes', function (done) {
-      let tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt', 'scopes'];
-      let [ id, _tokenDecrypted ] = accessTokenFromDbWithScopes.split('|');
+      const tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt', 'scopes'];
+      const [ id, _tokenDecrypted ] = accessTokenFromDbWithScopes.split('|');
 
       tokenService.get(id)
       .then((tokenObj) => {
@@ -273,7 +273,7 @@ describe('Access Token tests', function () {
             console.log('Failed to flush the database');
           }
 
-          let expiredTokenPromises = [];
+          const expiredTokenPromises = [];
 
           tokenObjs.forEach(tokenObj => {
             expiredTokenPromises.push(tokenService.findOrSave(tokenObj));
@@ -283,7 +283,7 @@ describe('Access Token tests', function () {
             .then(() => {
               config.systemConfig.accessTokens.timeToExpiry = 20000000;
 
-              let activeTokenPromises = [];
+              const activeTokenPromises = [];
 
               tokenObjs.forEach(tokenObj => {
                 activeTokenPromises.push(tokenService.findOrSave(tokenObj));
@@ -405,8 +405,8 @@ describe('Refresh Token tests', function () {
     });
 
     it('should get a refresh token', function (done) {
-      let tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt'];
-      let [ id, _tokenDecrypted ] = tokensFromDb.refresh_token.split('|');
+      const tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt'];
+      const [ id, _tokenDecrypted ] = tokensFromDb.refresh_token.split('|');
 
       tokenService.get(id, { type: 'refresh_token' })
         .then((tokenObj) => {
@@ -472,8 +472,8 @@ describe('Refresh Token tests', function () {
     });
 
     it('should get a refresh token with scopes', function (done) {
-      let tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt', 'scopes'];
-      let [ id, _tokenDecrypted ] = tokensFromDbWithScopes.refresh_token.split('|');
+      const tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt', 'scopes'];
+      const [ id, _tokenDecrypted ] = tokensFromDbWithScopes.refresh_token.split('|');
 
       tokenService.get(id, { type: 'refresh_token' })
         .then((tokenObj) => {
@@ -592,7 +592,7 @@ describe('Refresh Token tests', function () {
     });
 
     it('should create a new refresh token if one does not exist, even if the access token is exists', function (done) {
-      let tokenObj = {
+      const tokenObj = {
         consumerId: '555555',
         authType: 'oauth2'
       };
@@ -669,7 +669,7 @@ describe('Refresh Token tests', function () {
             console.log('Failed to flush the database');
           }
 
-          let expiredTokenPromises = [];
+          const expiredTokenPromises = [];
 
           tokenObjs.forEach(tokenObj => {
             expiredTokenPromises.push(tokenService.findOrSave(tokenObj, { includeRefreshToken: true }));
@@ -680,7 +680,7 @@ describe('Refresh Token tests', function () {
               config.systemConfig.refreshTokens.timeToExpiry = 20000000;
               // config.systemConfig.accessTokens.timeToExpiry = 20000000;
 
-              let activeTokenPromises = [];
+              const activeTokenPromises = [];
 
               tokenObjs.forEach(tokenObj => {
                 activeTokenPromises.push(tokenService.findOrSave(tokenObj, { includeRefreshToken: true }));

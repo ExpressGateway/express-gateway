@@ -33,14 +33,14 @@ describe('eg credentials list -c ', () => {
   });
 
   it('should show credentials', done => {
-    let output = {};
+    const output = {};
     env.hijack(namespace, generator => {
       generator.once('run', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
         generator.stdout = msg => {
-          let crd = JSON.parse(msg);
+          const crd = JSON.parse(msg);
           output[crd.type] = (crd.keyId || crd.secret || crd.password);
         };
       });

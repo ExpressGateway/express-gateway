@@ -3,14 +3,14 @@ const express = require('express');
 const logger = require('../../lib/logger').test;
 
 const generateBackendServer = port => {
-  let app = express();
+  const app = express();
 
   app.all('*', (req, res) => {
     const port = req.connection.server.address().port;
     res.send('Hello from port ' + port);
   });
   return new Promise((resolve) => {
-    let runningApp = app.listen(port || 0, () => {
+    const runningApp = app.listen(port || 0, () => {
       logger.log('running test stub server at ' + runningApp.address().port);
       resolve({
         app: runningApp

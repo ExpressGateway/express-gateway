@@ -41,7 +41,7 @@ describe('eg credential:scopes add', () => {
 
   it('adds scope to a credential', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {

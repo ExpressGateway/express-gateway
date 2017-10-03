@@ -16,7 +16,7 @@ module.exports.setYmlConfig = function ({ymlConfigPath, newConfig}) {
 
 // Get config by path (gateway.config.yml or system.config.yml)
 module.exports.getYmlConfig = function ({ymlConfigPath}) {
-  let content = fs.readFileSync();
+  const content = fs.readFileSync();
   return yaml.load(content);
 };
 
@@ -50,7 +50,7 @@ module.exports.startGatewayInstance = function ({dirInfo, gatewayConfig}) {
 
           const modulePath = path.join(__dirname, '..', '..',
             'lib', 'index.js');
-          let gatewayProcess = fork(modulePath, [], {
+          const gatewayProcess = fork(modulePath, [], {
             cwd: dirInfo.basePath,
             env: childEnv
           });
@@ -59,7 +59,7 @@ module.exports.startGatewayInstance = function ({dirInfo, gatewayConfig}) {
             reject(err);
           });
           let count = 0;
-          let interval = setInterval(() => {
+          const interval = setInterval(() => {
             count++; // Waiting for process to start, ignoring conn refused errors
             request
               .get(`http://localhost:${gatewayPort}/not-found`)

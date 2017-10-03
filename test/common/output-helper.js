@@ -7,21 +7,21 @@
 // assert against it.
 exports.checkOutput = function (f, argv, cb) {
   let exit = false;
-  let _exit = process.exit;
-  let _emit = process.emit;
-  let _env = process.env;
-  let _argv = process.argv;
-  let _error = console.error;
-  let _log = console.log;
-  let _warn = console.warn;
+  const _exit = process.exit;
+  const _emit = process.emit;
+  const _env = process.env;
+  const _argv = process.argv;
+  const _error = console.error;
+  const _log = console.log;
+  const _warn = console.warn;
 
   process.exit = function () { exit = true; };
   process.env = Object.assign(process.env, { _: 'node' });
   process.argv = argv || [ './usage' ];
 
-  let errors = [];
-  let logs = [];
-  let warnings = [];
+  const errors = [];
+  const logs = [];
+  const warnings = [];
 
   console.error = function (msg) { errors.push(msg); };
   console.log = function (msg) { logs.push(msg); };

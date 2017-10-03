@@ -59,9 +59,9 @@ module.exports = class extends eg.Generator {
         let questions = [];
 
         let shouldPrompt = false;
-        let missingProperties = [];
+        const missingProperties = [];
 
-        let configProperties = models.applications.properties;
+        const configProperties = models.applications.properties;
         Object.keys(configProperties).forEach(prop => {
           const descriptor = configProperties[prop];
           if (!app[prop]) {

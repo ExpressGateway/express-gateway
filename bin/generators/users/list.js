@@ -16,7 +16,7 @@ module.exports = class extends eg.Generator {
   prompting () {
     return this.admin.users.list()
       .then(data => {
-        let users = data.users;
+        const users = data.users;
         if (!users || !users.length) {
           return this.stdout('You have no users');
         }

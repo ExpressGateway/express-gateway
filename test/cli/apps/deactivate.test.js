@@ -76,7 +76,7 @@ describe('eg apps deactivate', () => {
 
   it('deactivates multiple apps', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {
@@ -90,7 +90,7 @@ describe('eg apps deactivate', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
-            let apps = data.apps;
+            const apps = data.apps;
             assert.equal(apps[0].isActive, false);
             assert.equal(apps[1].isActive, false);
 

@@ -1,6 +1,6 @@
 const assert = require('assert');
 const request = require('supertest');
-let app = require('../../oauth/bootstrap');
+const app = require('../../oauth/bootstrap');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:tokens:revoke';
@@ -41,7 +41,7 @@ describe('eg tokens revoke', () => {
         .expect(200);
     })
     .then(res => {
-      let token = res.body;
+      const token = res.body;
       assert.ok(token);
       assert.ok(token.access_token);
       accessToken = token.access_token;

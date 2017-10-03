@@ -40,14 +40,14 @@ describe('eg users list', () => {
 
   it('should show users list', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
         generator.stdout = message => {
-          let usr = JSON.parse(message);
+          const usr = JSON.parse(message);
           output[usr.username] = true;
         };
       });
@@ -65,7 +65,7 @@ describe('eg users list', () => {
   // For now output is the same as without -q, just to check that flag is accepted
   it('prints only the usernames when using the --quiet flag', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {
@@ -95,7 +95,7 @@ describe('eg users list', () => {
     });
     it('should send header', done => {
       env.hijack(namespace, generator => {
-        let output = {};
+        const output = {};
 
         generator.once('run', () => {
           generator.log.error = message => {
@@ -107,7 +107,7 @@ describe('eg users list', () => {
         });
 
         generator.once('end', () => {
-          let args = superagent.Request.prototype.set.lastCall.args;
+          const args = superagent.Request.prototype.set.lastCall.args;
           // .set('X','Y') (headerName,value)
           assert.equal(args[0], 'X');
           assert.equal(args[1], 'Y');
@@ -121,7 +121,7 @@ describe('eg users list', () => {
     });
     it('should send multi headers', done => {
       env.hijack(namespace, generator => {
-        let output = {};
+        const output = {};
 
         generator.once('run', () => {
           generator.log.error = message => {

@@ -1,11 +1,11 @@
 const testHelper = require('../common/routing.helper');
-let Config = require('../../lib/config/config');
+const Config = require('../../lib/config/config');
 
 [undefined, 'sample.com', 'sub.acme.com'].forEach(host => {
   describe('pathRegex resolution for host:' + host, () => {
-    let helper = testHelper();
-    let config = new Config();
-    let plugins = { policies: [ {
+    const helper = testHelper();
+    const config = new Config();
+    const plugins = { policies: [ {
       name: 'testRegex',
       policy: () => (req, res) => {
         res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });

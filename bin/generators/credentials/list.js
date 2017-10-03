@@ -21,7 +21,7 @@ module.exports = class extends eg.Generator {
   prompting () {
     return this.admin.credentials.list(this.argv.consumerId)
       .then(data => {
-        let credentials = data.credentials;
+        const credentials = data.credentials;
         if (!credentials || !credentials.length) {
           this.log.error(`Consumer ${this.argv.consumerId} has no credentials`);
         } else {
