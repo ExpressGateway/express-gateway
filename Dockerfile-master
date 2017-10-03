@@ -10,9 +10,9 @@ ENV CHOKIDAR_USEPOLLING true
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-RUN npm install express-gateway@$VERSION && \
-    ./node_modules/.bin/eg gateway create -n gateway -d . -t $TYPE && \
-    npm cache clean --force
+COPY package.json /usr/src/app/
+RUN npm install
+COPY . /usr/src/app
 
 EXPOSE 8080
 
@@ -20,5 +20,5 @@ EXPOSE 8080
 # EXPOSE 8443 
 
 # Admin API
-# EXPOSE 9876 
+EXPOSE 9876 
 CMD [ "npm", "run", "start" ]
