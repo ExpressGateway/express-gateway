@@ -30,7 +30,7 @@ describe('Request Headers with consumer and token information as part of auth po
 
   before('setup', (done) => {
     config.gatewayConfig = {
-      http: { port: 9089 },
+      http: { port: 0 },
       serviceEndpoints: {
         backend: {
           url: 'http://localhost:7777'

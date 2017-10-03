@@ -25,7 +25,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
 
   before('setup', (done) => {
     config.gatewayConfig = {
-      http: { port: 9089 },
+      http: { port: 0 },
       serviceEndpoints: {
         backend: {
           url: 'http://localhost:6069'

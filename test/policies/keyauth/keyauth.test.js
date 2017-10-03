@@ -27,7 +27,7 @@ describe('Functional Tests keyAuth Policy', () => {
   before('setup', () => {
     config.gatewayConfig = {
       http: {
-        port: 9089
+        port: 0
       },
       serviceEndpoints: {
         backend: {

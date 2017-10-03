@@ -14,7 +14,7 @@ describe('rate-limit by host', () => {
 
   before('setup', () => {
     config.gatewayConfig = {
-      http: { port: 9089 },
+      http: { port: 0 },
       apiEndpoints: {
         test_default: {}
       },
