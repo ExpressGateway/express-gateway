@@ -4,7 +4,6 @@ const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:update';
 const idGen = require('uuid-base62');
 const util = require('util');
-const helpers = require('yeoman-test');
 
 describe('eg apps update', () => {
   let program, env, user, app1;
