@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const assert = require('assert');
 const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
@@ -69,7 +68,7 @@ describe('eg apps list', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(_.size(output), apps.length);
+        assert.equal(Object.keys(output).length, apps.length);
         for (const app of apps) {
           assert.ok(output[app.id]);
           assert.ok(output[app.id].name, app.name);
@@ -97,7 +96,7 @@ describe('eg apps list', () => {
 
       generator.once('end', () => {
         const filteredApps = apps.filter((app) => app.name === 'app1');
-        assert.equal(_.size(output), filteredApps.length);
+        assert.equal(Object.keys(output).length, filteredApps.length);
         for (const app of filteredApps) {
           assert.ok(output[app.id]);
           assert.ok(output[app.id].name, app.name);
@@ -125,7 +124,7 @@ describe('eg apps list', () => {
 
       generator.once('end', () => {
         const filteredApps = apps.filter((app) => app.userId === user1.id);
-        assert.equal(_.size(output), filteredApps.length);
+        assert.equal(Object.keys(output).length, filteredApps.length);
         for (const app of filteredApps) {
           assert.ok(output[app.id]);
           assert.ok(output[app.id].name, app.name);
@@ -156,7 +155,7 @@ describe('eg apps list', () => {
           app.userId === user1.id &&
           app.name === 'app1'
         ));
-        assert.equal(_.size(output), filteredApps.length);
+        assert.equal(Object.keys(output).length, filteredApps.length);
         for (const app of filteredApps) {
           assert.ok(output[app.id]);
           assert.ok(output[app.id].name, app.name);
@@ -183,7 +182,7 @@ describe('eg apps list', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(_.size(output), apps.length);
+        assert.equal(Object.keys(output).length, apps.length);
         for (const app of apps) {
           assert.ok(output[app.id]);
         }
