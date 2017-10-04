@@ -8,7 +8,7 @@ module.exports = class EgGenerator extends Generator {
     this._configuration = null;
     this.eg = this.env.eg;
     this.argv = this.env.argv;
-    this.admin = require('../lib/admin')({
+    this.admin = require('express-gateway-admin-api-client')({
       baseUrl: this._getAdminClientBaseURL(),
       verbose: this._getAdminClientVerboseFlag(),
       headers: this.argv ? this.argv.H : null

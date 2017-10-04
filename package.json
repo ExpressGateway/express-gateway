@@ -64,6 +64,7 @@
     "cors": "2.8.3",
     "ejs": "2.5.6",
     "express": "4.15.2",
+    "express-gateway-admin-api-client": "file:admin",
     "express-rate-limit": "2.8.0",
     "express-session": "1.15.3",
     "fakeredis": "2.0.0",
