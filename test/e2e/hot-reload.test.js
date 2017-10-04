@@ -12,6 +12,9 @@ const yaml = require('js-yaml');
 
 const { findOpenPortNumbers } = require('../common/server-helper');
 
+const GATEWAY_STARTUP_WAIT_TIME = 5000;
+const TEST_TIMEOUT = 10000;
+
 /*
     1) Copy config to a temp directory.
     2) Execute a child process with `process.env.EG_CONFIG_DIR` set to the temp directory.
@@ -30,9 +33,10 @@ describe('hot-reload', () => {
     let testGatewayConfigData = null;
     let childProcess = null;
     let originalGatewayPort = null;
+    let watcher = null;
 
     before(function (done) {
-      this.timeout(10000);
+      this.timeout(TEST_TIMEOUT);
       tmp.dir((err, tempPath) => {
         if (err) {
           return done(err);
@@ -79,19 +83,18 @@ describe('hot-reload', () => {
                   env: childEnv
                 });
 
-                childProcess.on('error', err => {
-                  return done(err);
-                });
+                childProcess.on('error', done);
 
                 // Not ideal, but we need to make sure the process is running.
                 setTimeout(() => {
                   request
                     .get(`http://localhost:${originalGatewayPort}`)
                     .end((err, res) => {
+                      assert(err);
                       assert(res.unauthorized);
-                      done(err);
+                      done();
                     });
-                }, 5000);
+                }, GATEWAY_STARTUP_WAIT_TIME);
               });
             });
           }).catch(done);
@@ -99,68 +102,58 @@ describe('hot-reload', () => {
       });
     });
 
-    after(done => {
+    after(function (done) {
       childProcess.kill();
       rimraf(testGatewayConfigPath, done);
     });
 
-    it('reloads valid gateway.config.yml', done => {
-      const watchOptions = {
-        awaitWriteFinish: true
-      };
+    beforeEach(function (done) {
+      watcher = chokidar.watch(testGatewayConfigPath, { awaitWriteFinish: true });
+      watcher.on('ready', done);
+    });
 
-      const watcher = chokidar.watch(testGatewayConfigPath, watchOptions);
-      watcher.once('change', (evt) => {
-        request
-          .get(`http://localhost:${originalGatewayPort}`)
-          .end((err, res) => {
-            assert(err);
-            assert(res.clientError);
-            assert.equal(res.statusCode, 404);
-            done();
-          });
-      });
+    afterEach(function () {
+      watcher.close();
+    });
 
-      watcher.on('ready', () => {
-        // remove key-auth policy
-        testGatewayConfigData.pipelines.adminAPI.policies.shift();
-
-        fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
-          if (err) {
-            return done(err);
-          }
+    describe('reloads valid gateway.config.yml', function () {
+      it('will respond with a 404 - proxy policy', function (done) {
+        this.timeout(TEST_TIMEOUT);
+        watcher.once('change', (evt) => {
+          setTimeout(() => {
+            request
+              .get(`http://localhost:${originalGatewayPort}`)
+              .end((err, res) => {
+                assert(err);
+                assert(res.clientError);
+                assert.equal(res.statusCode, 404);
+                done();
+              });
+          }, GATEWAY_STARTUP_WAIT_TIME);
         });
+
+        testGatewayConfigData.pipelines.adminAPI.policies.shift();
+        fs.writeFileSync(testGatewayConfigPath, yaml.dump(testGatewayConfigData));
       });
-    }).timeout(10000);
+    });
 
-    it('uses previous config on reload of invalid gateway.config.yml', done => {
-      const watchOptions = {
-        awaitWriteFinish: true
-      };
-
-      const watcher = chokidar.watch(testGatewayConfigPath, watchOptions);
-      watcher.once('change', (evt) => {
-        setTimeout(() => {
+    describe('uses previous config on reload of invalid gateway.config.yml', function () {
+      it('will respond with 404 - empty proxy', function (done) {
+        this.timeout(TEST_TIMEOUT);
+        watcher.once('change', () => {
           request
             .get(`http://localhost:${originalGatewayPort}`)
             .end((err, res) => {
+              assert(err);
               assert(res.clientError);
               assert.equal(res.statusCode, 404);
-              done(err);
+              done();
             });
-        }, 5000);
-      });
-
-      watcher.on('ready', () => {
+        });
         // make config invalid
         delete testGatewayConfigData.pipelines;
-
-        fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
-          if (err) {
-            return done(err);
-          }
-        });
+        fs.writeFileSync(testGatewayConfigPath, yaml.dump(testGatewayConfigData));
       });
-    }).timeout(10000);
+    });
   });
 });
