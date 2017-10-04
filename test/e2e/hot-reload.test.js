@@ -140,14 +140,15 @@ describe('hot-reload', () => {
 
       const watcher = chokidar.watch(testGatewayConfigPath, watchOptions);
       watcher.once('change', (evt) => {
-        request
-          .get(`http://localhost:${originalGatewayPort}`)
-          .end((err, res) => {
-            assert(err);
-            assert(res.clientError);
-            assert.equal(res.statusCode, 404);
-            done();
-          });
+        setTimeout(() => {
+          request
+            .get(`http://localhost:${originalGatewayPort}`)
+            .end((err, res) => {
+              assert(res.clientError);
+              assert.equal(res.statusCode, 404);
+              done(err);
+            });
+        }, 5000);
       });
 
       watcher.on('ready', () => {
