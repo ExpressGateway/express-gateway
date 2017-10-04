@@ -151,8 +151,7 @@ describe('hot-reload', () => {
             });
         });
         // make config invalid
-        delete testGatewayConfigData.pipelines;
-        fs.writeFileSync(testGatewayConfigPath, yaml.dump(testGatewayConfigData));
+        fs.writeFileSync(testGatewayConfigPath, yaml.dump('{er:t4'));
       });
     });
   });
