@@ -36,6 +36,13 @@ describe('gateway condition with plugins', () => {
       plugins: {
         conditions: [{
           name: 'test-condition',
+          schema: {
+            type: 'object',
+            properties: {
+              param1: { type: ['string', 'boolean'] }
+            },
+            required: ['param1']
+          },
           handler: function (req, conditionConfig) {
             assert.ok(conditionConfig.param1);
             assert.equal(req.url, '/test');
