@@ -35,24 +35,24 @@ describe('hot-reload', () => {
       this.timeout(10000);
       tmp.dir((err, tempPath) => {
         if (err) {
-          throw err;
+          return done(err);
         }
 
         cpr(baseConfigDirectory, tempPath, (err, files) => {
           if (err) {
-            throw err;
+            return done(err);
           }
 
           testGatewayConfigPath = path.join(tempPath, 'gateway.config.yml');
 
           findOpenPortNumbers(3).then(ports => {
             if (err) {
-              throw err;
+              return done(err);
             }
 
             fs.readFile(testGatewayConfigPath, (err, configData) => {
               if (err) {
-                throw err;
+                return done(err);
               }
 
               testGatewayConfigData = yaml.load(configData);
@@ -67,7 +67,7 @@ describe('hot-reload', () => {
 
               fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
                 if (err) {
-                  throw err;
+                  return done(err);
                 }
 
                 const childEnv = Object.assign({}, process.env);
@@ -84,7 +84,7 @@ describe('hot-reload', () => {
                 });
 
                 childProcess.on('error', err => {
-                  throw err;
+                  return done(err);
                 });
 
                 // Not ideal, but we need to make sure the process is running.
@@ -132,7 +132,7 @@ describe('hot-reload', () => {
 
         fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
           if (err) {
-            throw err;
+            return done(err);
           }
         });
       });
@@ -161,7 +161,7 @@ describe('hot-reload', () => {
 
         fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
           if (err) {
-            throw err;
+            return done(err);
           }
         });
       });
