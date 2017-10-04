@@ -46,10 +46,6 @@ describe('hot-reload', () => {
           testGatewayConfigPath = path.join(tempPath, 'gateway.config.yml');
 
           findOpenPortNumbers(3).then(ports => {
-            if (err) {
-              return done(err);
-            }
-
             fs.readFile(testGatewayConfigPath, (err, configData) => {
               if (err) {
                 return done(err);
@@ -92,9 +88,8 @@ describe('hot-reload', () => {
                   request
                     .get(`http://localhost:${originalGatewayPort}`)
                     .end((err, res) => {
-                      assert(err);
                       assert(res.unauthorized);
-                      done();
+                      done(err);
                     });
                 }, 5000);
               });
