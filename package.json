@@ -125,5 +125,8 @@
   },
   "yargs": {
     "boolean-negation": false
+  },
+  "optionalDependencies": {
+    "bcrypt": "^1.0.3"
   }
 }
