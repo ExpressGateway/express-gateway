@@ -1,19 +1,19 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let session = require('supertest-session');
-let should = require('should');
-let url = require('url');
-let qs = require('querystring');
-let app = require('./bootstrap');
+const session = require('supertest-session');
+const should = require('should');
+const url = require('url');
+const qs = require('querystring');
+const app = require('./bootstrap');
 
-let config = require('../../lib/config');
-let services = require('../../lib/services');
-let credentialService = services.credential;
-let userService = services.user;
-let applicationService = services.application;
-let tokenService = services.token;
-let db = require('../../lib/db')();
+const config = require('../../lib/config');
+const services = require('../../lib/services');
+const credentialService = services.credential;
+const userService = services.user;
+const applicationService = services.application;
+const tokenService = services.token;
+const db = require('../../lib/db')();
 
 describe('Functional Test Implicit grant', function () {
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
@@ -50,14 +50,14 @@ describe('Functional Test Implicit grant', function () {
       if (!didSucceed) {
         console.log('Failed to flush the database');
       }
-      let user1 = {
+      const user1 = {
         username: 'irfanbaqui',
         firstname: 'irfan',
         lastname: 'baqui',
         email: 'irfan@eg.com'
       };
 
-      let user2 = {
+      const user2 = {
         username: 'somejoe',
         firstname: 'joe',
         lastname: 'smith',
@@ -71,7 +71,7 @@ describe('Functional Test Implicit grant', function () {
 
         fromDbUser1 = _fromDbUser1;
 
-        let app1 = {
+        const app1 = {
           name: 'irfan_app',
           redirectUri: 'https://some.host.com/some/route'
         };
@@ -108,7 +108,7 @@ describe('Functional Test Implicit grant', function () {
   });
 
   it('should grant access token when requesting without scopes', function (done) {
-    let request = session(app);
+    const request = session(app);
     request
       .get('/oauth2/authorize')
       .query({
@@ -153,7 +153,7 @@ describe('Functional Test Implicit grant', function () {
               should.not.exist(err);
               should.exist(res.headers.location);
               res.headers.location.should.containEql(fromDbApp.redirectUri);
-              let params = qs.parse(url.parse(res.headers.location).hash.slice(1));
+              const params = qs.parse(url.parse(res.headers.location).hash.slice(1));
               should.exist(params.access_token);
               should.exist(params.token_type);
 
@@ -171,7 +171,7 @@ describe('Functional Test Implicit grant', function () {
   });
 
   it('should grant access token with requesting with scopes and scopes are authorized', function (done) {
-    let request = session(app);
+    const request = session(app);
     request
       .get('/oauth2/authorize')
       .query({
@@ -217,7 +217,7 @@ describe('Functional Test Implicit grant', function () {
               should.not.exist(err);
               should.exist(res.headers.location);
               res.headers.location.should.containEql(fromDbApp.redirectUri);
-              let params = qs.parse(url.parse(res.headers.location).hash.slice(1));
+              const params = qs.parse(url.parse(res.headers.location).hash.slice(1));
               should.exist(params.access_token);
               should.exist(params.token_type);
               tokenService.get(params.access_token)
@@ -234,7 +234,7 @@ describe('Functional Test Implicit grant', function () {
   });
 
   it('should not grant access token with requesting with scopes and scopes are unauthorized', function (done) {
-    let request = session(app);
+    const request = session(app);
     request
       .get('/oauth2/authorize')
       .query({

@@ -21,7 +21,7 @@ module.exports = class extends eg.Generator {
     const argv = this.argv;
     return this.admin.credentials.activate(argv.id, argv.t)
       .then(res => {
-        let status = res.status;
+        const status = res.status;
 
         if (status) {
           if (argv.q) {

@@ -17,7 +17,7 @@ module.exports = class extends eg.Generator {
   prompting () {
     return this.admin.apps.list()
       .then(data => {
-        let apps = data.apps;
+        const apps = data.apps;
         if (!apps || !apps.length) {
           return this.stdout('You have no apps');
         }

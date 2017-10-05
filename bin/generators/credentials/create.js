@@ -60,7 +60,7 @@ module.exports = class extends eg.Generator {
       propertyValues = Array.isArray(argv.p) ? argv.p : [argv.p];
     }
 
-    let credential = {};
+    const credential = {};
 
     let hasInvalidProperty = false;
 
@@ -101,7 +101,7 @@ module.exports = class extends eg.Generator {
     const argv = this.argv;
     this.stdin.setEncoding('utf8');
 
-    let bufs = [];
+    const bufs = [];
 
     this.stdin.on('readable', () => {
       const chunk = this.stdin.read();
@@ -112,11 +112,11 @@ module.exports = class extends eg.Generator {
     });
     return new Promise((resolve, reject) => {
       this.stdin.on('end', () => {
-        let lines = bufs.join('').split('\n');
-        let promises = lines
+        const lines = bufs.join('').split('\n');
+        const promises = lines
           .filter(line => line.length > 0)
           .map((line, index) => {
-            let credential = JSON.parse(line);
+            const credential = JSON.parse(line);
             let consumer, type;
 
             if (credential.consumer) {
@@ -148,14 +148,14 @@ module.exports = class extends eg.Generator {
             });
           });
 
-        let p = Promise.all(promises);
+        const p = Promise.all(promises);
         resolve(p);
       });
     });
   };
 
   _output (credential, options) {
-    let argv = this.argv;
+    const argv = this.argv;
     if (!argv.q) {
       this.log.ok(`Created ${credential.id || credential.keyId}`);
       this.stdout(JSON.stringify(credential, null, 2));
@@ -178,9 +178,9 @@ module.exports = class extends eg.Generator {
 
     if (!options.skipPrompt) {
       let shouldPrompt = false;
-      let missingProperties = [];
+      const missingProperties = [];
 
-      let configProperties = models.credentials[this.argv.type].properties;
+      const configProperties = models.credentials[this.argv.type].properties;
       Object.keys(configProperties).forEach(prop => {
         const descriptor = configProperties[prop];
 

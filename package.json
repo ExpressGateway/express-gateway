@@ -31,7 +31,7 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "start-dev": "LOG_LEVEL=debug node lib/index.js",
+    "start-dev": "cross-env LOG_LEVEL=debug node lib/index.js",
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "pretest": "eslint .",
@@ -53,6 +53,7 @@
       "coverage"
     ]
   },
+  "types": "./index.d.ts",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "1.17.2",
@@ -63,6 +64,7 @@
     "cors": "2.8.3",
     "ejs": "2.5.6",
     "express": "4.15.2",
+    "express-gateway-admin-api-client": "file:admin",
     "express-rate-limit": "2.8.0",
     "express-session": "1.15.3",
     "fakeredis": "2.0.0",
@@ -96,6 +98,7 @@
     "yeoman-generator": "1.1.1"
   },
   "devDependencies": {
+    "@types/express": "^4.0.37",
     "chai": "3.5.0",
     "codecov": "^2.2.0",
     "cpr": "2.2.0",

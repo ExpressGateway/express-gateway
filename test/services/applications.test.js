@@ -1,13 +1,13 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let should = require('should');
-let uuid = require('uuid');
-let config = require('../../lib/config');
-let services = require('../../lib/services');
-let applicationService = services.application;
-let userService = services.user;
-let db = require('../../lib/db')();
+const should = require('should');
+const uuid = require('uuid');
+const config = require('../../lib/config');
+const services = require('../../lib/services');
+const applicationService = services.application;
+const userService = services.user;
+const db = require('../../lib/db')();
 
 describe('Application service tests', function () {
   let originalUserModelConfig;
@@ -57,7 +57,7 @@ describe('Application service tests', function () {
     });
 
     it('should insert an application and application should have default value of properties if not defined, and un-required properties ignored if not defined', function (done) {
-      let _user = createRandomUserObject();
+      const _user = createRandomUserObject();
       let app;
 
       userService
@@ -94,7 +94,7 @@ describe('Application service tests', function () {
     });
 
     it('should throw an error when inserting an app with missing properties that are required', function (done) {
-      let app = {};
+      const app = {};
 
       applicationService
       .insert(app, user.id)
@@ -109,7 +109,7 @@ describe('Application service tests', function () {
     });
 
     it('should allow inserting multiple applications per user', function (done) {
-      let app = {
+      const app = {
         name: 'test-app-2'
       };
 
@@ -148,7 +148,7 @@ describe('Application service tests', function () {
         if (!didSucceed) {
           console.log('Failed to flush the database');
         }
-        let _user = createRandomUserObject();
+        const _user = createRandomUserObject();
         userService
         .insert(_user)
         .then(function (newUser) {
@@ -202,7 +202,7 @@ describe('Application service tests', function () {
       .then(function (data) {
         should.exist(data.apps);
         data.apps.length.should.eql(1);
-        let app = data.apps[0];
+        const app = data.apps[0];
         should.exist(app);
         should.exist(app.id);
         app.id.should.eql(app.id);
@@ -307,7 +307,7 @@ describe('Application service tests', function () {
     });
 
     it('should update an application', function (done) {
-      let _user = createRandomUserObject();
+      const _user = createRandomUserObject();
 
       userService
       .insert(_user)
@@ -331,7 +331,7 @@ describe('Application service tests', function () {
           newApp.userId.should.eql(user.id);
         })
         .then(() => {
-          let updatedApp = {
+          const updatedApp = {
             name: 'test-app-updated'
           };
           applicationService.update(app.id, updatedApp)
@@ -360,7 +360,7 @@ describe('Application service tests', function () {
     });
 
     it('should throw an error when updating an app with invalid properties', function (done) {
-      let updatedApp = { invalid: 'someVal' };
+      const updatedApp = { invalid: 'someVal' };
 
       applicationService
       .update(app.id, updatedApp)
@@ -375,7 +375,7 @@ describe('Application service tests', function () {
     });
 
     it('should throw an error when updating an immutable property', function (done) {
-      let updatedApp = { group: 'marketing' };
+      const updatedApp = { group: 'marketing' };
 
       applicationService
       .update(app.id, updatedApp)
@@ -419,7 +419,7 @@ describe('Application service tests', function () {
     });
 
     it('should deactivate an application', function (done) {
-      let _user = createRandomUserObject();
+      const _user = createRandomUserObject();
 
       userService
       .insert(_user)
@@ -573,7 +573,7 @@ describe('Application service tests', function () {
         if (!didSucceed) {
           console.log('Failed to flush the database');
         }
-        let _user = createRandomUserObject();
+        const _user = createRandomUserObject();
         userService
         .insert(_user)
         .then(function (newUser) {

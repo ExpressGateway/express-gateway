@@ -58,7 +58,7 @@ module.exports = class extends eg.Generator {
     return this.admin.users.info(argv.user_id)
       .then(foundUser => {
         const configProperties = config.users.properties;
-        let missingProperties = Object.keys(configProperties).map(prop => {
+        const missingProperties = Object.keys(configProperties).map(prop => {
           return { name: prop, descriptor: configProperties[prop] };
         });
 

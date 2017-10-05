@@ -1,17 +1,16 @@
 module.exports = function (client) {
-  let baseUrl = 'apps/';
+  const baseUrl = `users/`;
   return {
-    create (userId, app) {
-      app.userId = userId;
+    create (user) {
       return client
         .post(baseUrl)
-        .send(app)
+        .send(user)
         .then(res => res.body);
     },
-    update (appId, app) {
+    update (id, user) {
       return client
-        .put(baseUrl + appId)
-        .send(app)
+        .put(baseUrl + id)
+        .send(user)
         .then(res => res.body);
     },
     activate (id) {
@@ -36,7 +35,9 @@ module.exports = function (client) {
     list () { // TODO: add pagination
       return client
         .get(baseUrl)
-          .then(res => res.body);
+         .then(res => {
+           return res.body;
+         });
     },
 
     remove (id) {

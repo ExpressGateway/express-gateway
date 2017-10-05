@@ -4,12 +4,23 @@
     "es6": true,
     "node": true
   },
-  "plugins": [ "markdown", "promise", "node" ],
+  "plugins": [
+    "markdown",
+    "promise",
+    "node"
+  ],
   "rules": {
-    "comma-dangle": [2, "never"],
+    "comma-dangle": [
+      2,
+      "never"
+    ],
     "no-var": "error",
-    "semi": [2, "always"],
-    "no-console": "warn"
+    "semi": [
+      2,
+      "always"
+    ],
+    "no-console": "warn",
+    "prefer-const": "error"
   },
   "root": true
 }

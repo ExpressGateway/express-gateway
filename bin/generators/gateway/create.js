@@ -116,7 +116,7 @@ module.exports = class extends eg.Generator {
     this.sourceRoot(path.join(this.sourceRoot(), this.type));
     this.destinationRoot(this.directory);
 
-    let packageJSON = this.fs.readJSON(this.templatePath('./package.json'));
+    const packageJSON = this.fs.readJSON(this.templatePath('./package.json'));
     packageJSON.name = this.name;
 
     this.fs.writeJSON(this.destinationPath('./package.json'), packageJSON);

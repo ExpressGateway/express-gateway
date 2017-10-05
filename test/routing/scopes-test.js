@@ -1,11 +1,11 @@
-let testHelper = require('../common/routing.helper');
-let config = require('../../lib/config');
+const testHelper = require('../common/routing.helper');
+const config = require('../../lib/config');
 
 describe('When scopes defined for apiEndpoint', () => {
-  let helper = testHelper();
+  const helper = testHelper();
 
   before('setup', () => {
-    let scopes = [
+    const scopes = [
       { scope: 'admin', verbs: 'GET' },
       { scope: 'profile', verbs: ['GET', 'POST'] }
     ];
@@ -24,7 +24,7 @@ describe('When scopes defined for apiEndpoint', () => {
         }
       }
     };
-    let plugins = {
+    const plugins = {
       policies: [{
         name: 'scopeTest',
         policy: () => (req, res) => res.json({url: req.url, scopes, apiEndpoint: req.egContext.apiEndpoint})

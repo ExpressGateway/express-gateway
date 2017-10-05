@@ -72,7 +72,7 @@ describe('eg apps remove', () => {
 
   it('removes multiple apps', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {

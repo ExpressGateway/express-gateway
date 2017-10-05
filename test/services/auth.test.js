@@ -1,20 +1,20 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let should = require('should');
-let _ = require('lodash');
-let credentialModelConfig = require('../../lib/config/models/credentials');
-let userModelConfig = require('../../lib/config/models/users');
-let services = require('../../lib/services');
-let credentialService = services.credential;
-let userService = services.user;
-let tokenService = services.token;
-let authService = services.auth;
-let db = require('../../lib/db')();
+const should = require('should');
+const _ = require('lodash');
+const credentialModelConfig = require('../../lib/config/models/credentials');
+const userModelConfig = require('../../lib/config/models/users');
+const services = require('../../lib/services');
+const credentialService = services.credential;
+const userService = services.user;
+const tokenService = services.token;
+const authService = services.auth;
+const db = require('../../lib/db')();
 
 describe('Auth tests', function () {
   let user, userFromDb;
-  let originalModelConfig = credentialModelConfig;
+  const originalModelConfig = credentialModelConfig;
   let _credential;
   let originalUserModelConfig;
 
@@ -79,7 +79,7 @@ describe('Auth tests', function () {
     it('should authenticate user', function (done) {
       authService.authenticateCredential(user.username, _credential.secret, 'oauth2')
       .then(authResponse => {
-        let expectedResponse = Object.assign({
+        const expectedResponse = Object.assign({
           type: 'user',
           id: userFromDb.id,
           username: user.username,
@@ -180,7 +180,7 @@ describe('Auth tests', function () {
   describe('Token Auth', function () {
     let userAccessToken, tokenId, tokenDecrypted;
     before(function (done) {
-      let tokenObj = {
+      const tokenObj = {
         consumerId: userFromDb.id,
         authType: 'oauth2',
         scopes: [ 'someScope1', 'someScope2', 'someScope3' ]
@@ -198,10 +198,10 @@ describe('Auth tests', function () {
     it('should authenticate token', function (done) {
       authService.authenticateToken(userAccessToken, 'oauth2')
       .then(authResponse => {
-        let expectedTokenProps = [ 'consumerId', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted' ];
-        let expectedConsumerProps = [ 'type', 'createdAt', 'email', 'firstname', 'id', 'isActive', 'lastname', 'updatedAt', 'username' ];
+        const expectedTokenProps = [ 'consumerId', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted' ];
+        const expectedConsumerProps = [ 'type', 'createdAt', 'email', 'firstname', 'id', 'isActive', 'lastname', 'updatedAt', 'username' ];
 
-        let expectedResponse = {
+        const expectedResponse = {
           token: {
             consumerId: userFromDb.id,
             authType: 'oauth2',

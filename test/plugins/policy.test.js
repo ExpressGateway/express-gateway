@@ -1,9 +1,9 @@
 const assert = require('chai').assert;
 const gateway = require('../../lib/gateway');
 const Config = require('../../lib/config/config');
-let testHelper = require('../common/routing.helper');
+const testHelper = require('../common/routing.helper');
 
-let config = new Config();
+const config = new Config();
 config.gatewayConfig = {
   http: {
     port: 0
@@ -35,7 +35,7 @@ config.gatewayConfig = {
 
 describe('gateway policy with plugins', () => {
   let gatewaySrv;
-  let helper = testHelper();
+  const helper = testHelper();
 
   before('fires up a new gateway instance', function () {
     return gateway({

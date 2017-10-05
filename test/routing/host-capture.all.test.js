@@ -1,12 +1,12 @@
-let testHelper = require('../common/routing.helper');
-let config = require('../../lib/config');
+const testHelper = require('../common/routing.helper');
+const config = require('../../lib/config');
 
 // there are several configuration ways to listen to all hosts
 ['*', '', undefined].forEach(hostBind => {
   describe('When configured to capture all hosts with config host:' + hostBind, () => {
-    let originalGatewayConfig = config.gatewayConfig;
+    const originalGatewayConfig = config.gatewayConfig;
 
-    let helper = testHelper();
+    const helper = testHelper();
     helper.addPolicy('test', () => (req, res) => {
       res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
     });

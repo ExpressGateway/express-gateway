@@ -11,7 +11,7 @@ serviceEndpoints:
 policies:
   - proxy
 pipelines:
-  - name: default 
+  default:
     apiEndpoints:
       - api
     policies:

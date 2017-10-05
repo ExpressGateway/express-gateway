@@ -16,14 +16,14 @@ exports.bootstrap = (eg, adapter) => {
     env.adapter = adapter;
   }
 
-  let program = yargs;
+  const program = yargs;
 
   const generatorsPath = path.join(__dirname, 'generators');
 
   const prefix = 'express-gateway';
 
-  let commands = [];
-  let subCommands = {};
+  const commands = [];
+  const subCommands = {};
 
   const dirs = fs
     .readdirSync(generatorsPath)

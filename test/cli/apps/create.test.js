@@ -57,13 +57,13 @@ describe('eg apps create', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
-            let app = data.apps[0];
+            const app = data.apps[0];
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
             assert.equal(text, `Created ${app.id}`);
 
-            let stdoutApp = JSON.parse(output);
+            const stdoutApp = JSON.parse(output);
             assert.equal(stdoutApp.name, 'appy');
             assert.equal(stdoutApp.redirectUri, 'http://localhost:3000/cb');
             done();
@@ -95,7 +95,7 @@ describe('eg apps create', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
-            let app = data.apps[0];
+            const app = data.apps[0];
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
@@ -124,7 +124,7 @@ describe('eg apps create', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
-            let app = data.apps[0];
+            const app = data.apps[0];
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
             assert.equal(output, `Created ${app.id}`);
@@ -153,7 +153,7 @@ describe('eg apps create', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
-            let app = data.apps[0];
+            const app = data.apps[0];
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
             assert.equal(output, `Created ${app.id}`);
@@ -194,7 +194,7 @@ describe('eg apps create', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
-            let app = data.apps[0];
+            const app = data.apps[0];
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 
@@ -223,7 +223,7 @@ describe('eg apps create', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
-            let app = data.apps[0];
+            const app = data.apps[0];
             assert.equal(app.name, 'appy');
             assert.equal(app.redirectUri, 'http://localhost:3000/cb');
 

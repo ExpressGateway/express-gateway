@@ -1,33 +1,33 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 const headerName = 'Authorization';
 
-let request = require('supertest');
-let should = require('should');
+const request = require('supertest');
+const should = require('should');
 
-let services = require('../../../lib/services');
-let credentialService = services.credential;
-let userService = services.user;
-let serverHelper = require('../../common/server-helper');
-let db = require('../../../lib/db')();
-let testHelper = require('../../common/routing.helper');
-let config = require('../../../lib/config');
-let originalGatewayConfig = config.gatewayConfig;
+const services = require('../../../lib/services');
+const credentialService = services.credential;
+const userService = services.user;
+const serverHelper = require('../../common/server-helper');
+const db = require('../../../lib/db')();
+const testHelper = require('../../common/routing.helper');
+const config = require('../../../lib/config');
+const originalGatewayConfig = config.gatewayConfig;
 
 describe('Functional Tests keyAuth Policy', () => {
-  let helper = testHelper();
+  const helper = testHelper();
   helper.addPolicy('test', () => (req, res) => {
     res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
   });
 
   let user, app;
-  let proxyPolicy = {
+  const proxyPolicy = {
     proxy: { action: { serviceEndpoint: 'backend' } }
   };
   before('setup', () => {
     config.gatewayConfig = {
       http: {
-        port: 9089
+        port: 0
       },
       serviceEndpoints: {
         backend: {
@@ -38,7 +38,7 @@ describe('Functional Tests keyAuth Policy', () => {
         authorizedEndpoint: {
           host: '*',
           paths: ['/authorizedPath'],
-          scopes: ['authorizedScope']
+          scopes: 'authorizedScope' // #434 should allow string not only array
         },
         onlyQueryParamEndpoint: {
           host: '*',
@@ -47,7 +47,7 @@ describe('Functional Tests keyAuth Policy', () => {
         unauthorizedEndpoint: {
           host: '*',
           paths: ['/unauthorizedPath'],
-          scopes: ['unauthorizedScope']
+          scopes: ['unauthorizedScope'] // #434 should accept array
         }
       },
       policies: ['key-auth', 'proxy'],
@@ -96,7 +96,7 @@ describe('Functional Tests keyAuth Policy', () => {
 
     return db.flushdbAsync()
       .then(function () {
-        let user1 = {
+        const user1 = {
           username: 'test',
           firstname: 't',
           lastname: 't',
@@ -145,7 +145,7 @@ describe('Functional Tests keyAuth Policy', () => {
   });
 
   it('should not authorise key for requests if requester doesn\'t have authorized scopes', function (done) {
-    let apikey = 'apiKey ' + user.keyId + ':' + user.keySecret;
+    const apikey = 'apiKey ' + user.keyId + ':' + user.keySecret;
 
     request(app)
       .get('/unauthorizedPath')
@@ -157,7 +157,7 @@ describe('Functional Tests keyAuth Policy', () => {
   });
 
   it('should authenticate key with scheme in headers for requests with scopes if requester is authorized', function (done) {
-    let apikey = 'SCHEME1 ' + user.keyId + ':' + user.keySecret;
+    const apikey = 'SCHEME1 ' + user.keyId + ':' + user.keySecret;
 
     request(app)
       .get('/authorizedPath')
@@ -166,7 +166,7 @@ describe('Functional Tests keyAuth Policy', () => {
       .end(done);
   });
   it('should authenticate key with scheme ignoring case in headers for requests with scopes if requester is authorized', function (done) {
-    let apikey = 'scheME1 ' + user.keyId + ':' + user.keySecret;
+    const apikey = 'scheME1 ' + user.keyId + ':' + user.keySecret;
 
     request(app)
       .get('/authorizedPath')
@@ -175,7 +175,7 @@ describe('Functional Tests keyAuth Policy', () => {
       .end(done);
   });
   it('should authenticate key in query for requests with scopes if requester is authorized ', function (done) {
-    let apikey = user.keyId + ':' + user.keySecret;
+    const apikey = user.keyId + ':' + user.keySecret;
 
     request(app)
       .get('/authorizedPath?apiKey=' + apikey)
@@ -184,7 +184,7 @@ describe('Functional Tests keyAuth Policy', () => {
   });
 
   it('should not authorize invalid key', function (done) {
-    let apikey = 'apiKey test:wrong';
+    const apikey = 'apiKey test:wrong';
 
     request(app)
       .get('/authorizedPath')
@@ -194,7 +194,7 @@ describe('Functional Tests keyAuth Policy', () => {
   });
 
   it('should authenticate key in query if endpoint allows only query ', function (done) {
-    let apikey = user.keyId + ':' + user.keySecret;
+    const apikey = user.keyId + ':' + user.keySecret;
 
     request(app)
       .get('/by_query?customApiKeyParam=' + apikey)
@@ -202,7 +202,7 @@ describe('Functional Tests keyAuth Policy', () => {
       .end(done);
   });
   it('should not authenticate with header of EP allows only query', function (done) {
-    let apikey = 'apiKey ' + user.keyId + ':' + user.keySecret;
+    const apikey = 'apiKey ' + user.keyId + ':' + user.keySecret;
 
     request(app)
       .get('/by_query')

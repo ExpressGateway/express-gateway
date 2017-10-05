@@ -51,7 +51,7 @@ describe('eg credentials create', () => {
       });
 
       generator.once('end', () => {
-        let loggedCred = JSON.parse(output);
+        const loggedCred = JSON.parse(output);
         assert.equal(text, 'Created ' + loggedCred.keyId);
 
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
@@ -92,7 +92,7 @@ describe('eg credentials create', () => {
       });
 
       generator.once('end', () => {
-        let loggedCred = JSON.parse(output);
+        const loggedCred = JSON.parse(output);
         assert.equal(text, 'Created ' + loggedCred.keyId);
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
               .then(cred => {
@@ -122,7 +122,7 @@ describe('eg credentials create', () => {
       });
 
       generator.once('end', () => {
-        let loggedCred = output.split(':')[0];
+        const loggedCred = output.split(':')[0];
         return adminHelper.admin.credentials.info(loggedCred, 'key-auth')
               .then(cred => {
                 assert.ok(cred.keyId);

@@ -44,14 +44,14 @@ describe('eg apps list', () => {
 
   it('should show apps list', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {
           done(new Error(message));
         };
         generator.stdout = message => {
-          let app = JSON.parse(message);
+          const app = JSON.parse(message);
           output[app.name] = true;
           output[app.id] = true;
         };
@@ -72,7 +72,7 @@ describe('eg apps list', () => {
   // For now output is the same as without -q, just to check that flag is accepted
   it('prints only the ids when using the --quiet flag', done => {
     env.hijack(namespace, generator => {
-      let output = {};
+      const output = {};
 
       generator.once('run', () => {
         generator.log.error = message => {

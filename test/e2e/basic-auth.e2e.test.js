@@ -3,13 +3,13 @@ const gwHelper = require('../common/gateway.helper');
 const request = require('supertest');
 let gatewayProcess = null;
 let gatewayPort, adminPort, configDirectoryPath;
-let username = 'test';
-let proxyPolicy = {
+const username = 'test';
+const proxyPolicy = {
   proxy: { action: { serviceEndpoint: 'backend' } }
 };
 describe('E2E: basic-auth Policy', () => {
   before('setup', () => {
-    let gatewayConfig = {
+    const gatewayConfig = {
       apiEndpoints: {
         authorizedEndpoint: {
           host: '*',
@@ -80,7 +80,7 @@ describe('E2E: basic-auth Policy', () => {
   });
 
   it('should not authenticate token for requests if requester doesn\'t have authorized scopes', function () {
-    let credentials = Buffer.from(username.concat(':pass')).toString('base64');
+    const credentials = Buffer.from(username.concat(':pass')).toString('base64');
 
     return request(`http://localhost:${gatewayPort}`)
       .get('/unauthorizedPath')
@@ -89,7 +89,7 @@ describe('E2E: basic-auth Policy', () => {
   });
 
   it('should authenticate token for requests with scopes if requester is authorized', function () {
-    let credentials = Buffer.from(username.concat(':pass')).toString('base64');
+    const credentials = Buffer.from(username.concat(':pass')).toString('base64');
 
     return request(`http://localhost:${gatewayPort}`)
       .get('/authorizedPath')
@@ -98,7 +98,7 @@ describe('E2E: basic-auth Policy', () => {
   });
 
   it('should not authenticate invalid token', function () {
-    let credentials = Buffer.from(username.concat(':wrongPassword')).toString('base64');
+    const credentials = Buffer.from(username.concat(':wrongPassword')).toString('base64');
 
     request(`http://localhost:${gatewayPort}`)
       .get('/authorizedPath')

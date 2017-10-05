@@ -1,4 +1,4 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 const EgContextBase = require('../lib/gateway/context');
@@ -7,21 +7,21 @@ const express = require('express');
 const assert = require('chai').assert;
 
 describe('always', function () {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   it('should always return true', function () {
     assert.isTrue(req.matchEGCondition({ name: 'always' }));
   });
 });
 
 describe('never', function () {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   it('should always return false', function () {
     assert.isFalse(req.matchEGCondition({ name: 'never' }));
   });
 });
 
 describe('allOf', function () {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   it('should return true if all of the arguments is true', function () {
     assert.isTrue(req.matchEGCondition({
       name: 'allOf',
@@ -37,7 +37,7 @@ describe('allOf', function () {
 });
 
 describe('oneOf', function () {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   it('should return true if one of the arguments is true', function () {
     assert.isTrue(req.matchEGCondition({
       name: 'oneOf',
@@ -60,7 +60,7 @@ describe('oneOf', function () {
 });
 
 describe('not', function () {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   it('should return true if the argument is false', function () {
     assert.isTrue(req.matchEGCondition({ name: 'not', condition: { name: 'never' } }));
   });
@@ -70,7 +70,7 @@ describe('not', function () {
 });
 
 describe('pathExact', function () {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   it('should return true if request url is the same', function () {
     req.url = '/foo/bar/baz';
     assert.isTrue(req.matchEGCondition({ name: 'pathExact', path: '/foo/bar/baz' }));
@@ -82,7 +82,7 @@ describe('pathExact', function () {
 });
 
 describe('pathMatch', function () {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   it('should return true if request url matches', function () {
     req.url = '/foo/bar';
     assert.isTrue(req.matchEGCondition({ name: 'pathMatch', pattern: '(/(foo|bar|baz))+/?' }));
@@ -94,7 +94,7 @@ describe('pathMatch', function () {
 });
 
 describe('expression', () => {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   req.egContext = Object.create(new EgContextBase());
   req.egContext.req = req;
   it('should return false if expression does not match', function () {
@@ -114,7 +114,7 @@ describe('expression', () => {
 });
 
 describe('method', function () {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   it('should return true if methods param is string and matches', function () {
     req.method = 'GET';
     assert.isTrue(req.matchEGCondition({
@@ -150,10 +150,10 @@ describe('method', function () {
 });
 
 describe('req.matchEGCondition', function () {
-  let req = Object.create(express.request);
+  const req = Object.create(express.request);
   it('correctly handles complex conditional rule', function () {
-    let control = { name: 'never' };
-    let rule = {
+    const control = { name: 'never' };
+    const rule = {
       name: 'allOf',
       conditions: [{
         name: 'oneOf',

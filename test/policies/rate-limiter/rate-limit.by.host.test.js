@@ -1,12 +1,12 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let testHelper = require('../../common/routing.helper');
-let config = require('../../../lib/config');
-let originalGatewayConfig = config.gatewayConfig;
+const testHelper = require('../../common/routing.helper');
+const config = require('../../../lib/config');
+const originalGatewayConfig = config.gatewayConfig;
 
 describe('rate-limit by host', () => {
-  let helper = testHelper();
+  const helper = testHelper();
   helper.addPolicy('test', () => (req, res) => {
     res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
   });
@@ -14,7 +14,7 @@ describe('rate-limit by host', () => {
 
   before('setup', () => {
     config.gatewayConfig = {
-      http: { port: 9089 },
+      http: { port: 0 },
       apiEndpoints: {
         test_default: {}
       },

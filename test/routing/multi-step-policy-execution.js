@@ -1,23 +1,23 @@
-let mock = require('mock-require');
+const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
-let testHelper = require('../common/routing.helper');
-let sinon = require('sinon');
-let assert = require('assert');
-let Config = require('../../lib/config/config');
-let config = new Config();
+const testHelper = require('../common/routing.helper');
+const sinon = require('sinon');
+const assert = require('assert');
+const Config = require('../../lib/config/config');
+const config = new Config();
 
 // there are several configuration ways to listen to all hosts
 describe('default config with multi step (multi action) policy', () => {
-  let helper = testHelper();
-  let spy = sinon.spy();
-  let handler = (params) => (req, res, next) => {
+  const helper = testHelper();
+  const spy = sinon.spy();
+  const handler = (params) => (req, res, next) => {
     spy(params);
     next();
   };
 
   before('setup', () => {
-    let plugins = {
+    const plugins = {
       policies: [
         {
           name: 'test', policy: handler

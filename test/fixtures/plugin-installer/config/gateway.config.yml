@@ -19,7 +19,7 @@ policies:
   - proxy
   - rate-limit
 pipelines:
-  - name: basic
+  basic:
     apiEndpoints:
       - api
     policies:

@@ -4,7 +4,7 @@ const eventBus = require('../../lib/eventBus');
 const Config = require('../../lib/config/config');
 const request = require('supertest');
 
-let config = new Config();
+const config = new Config();
 config.loadGatewayConfig();
 
 describe('gateway routing with plugins', () => {

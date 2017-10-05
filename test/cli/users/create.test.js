@@ -48,7 +48,7 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        let stdOutUser = JSON.parse(output);
+        const stdOutUser = JSON.parse(output);
         return adminHelper.admin.users.info(username)
               .then(user => {
                 assert.equal(user.username, username);
@@ -87,7 +87,7 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        let stdOutUser = JSON.parse(output);
+        const stdOutUser = JSON.parse(output);
         return adminHelper.admin.users.info(username)
           .then(user => {
             assert.equal(user.username, username);
