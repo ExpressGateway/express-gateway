@@ -75,3 +75,64 @@ describe('gateway policy with plugins', () => {
     gatewaySrv.close();
   });
 });
+
+describe('gateway policy schema with plugins', () => {
+  let gatewaySrv;
+  const helper = testHelper();
+
+  afterEach('cleanup', () => {
+    gatewaySrv.close();
+    helper.cleanup();
+  });
+
+  it('should setup policy with valid schema', function () {
+    return gateway({
+      plugins: {
+        policies: [{
+          name: 'test-policy',
+          schema: {
+            type: 'object',
+            properties: {
+              p1: {type: ['number']}
+            },
+            required: ['p1']
+          },
+          policy: function (actionParams) {
+            return (req, res, next) => {
+              assert(actionParams.p1, 42);
+              res.json({hello: 'ok', url: req.url, actionParams});
+            };
+          }
+        }]},
+      config
+    }).then(srv => {
+      helper.setupApp(srv.app);
+      gatewaySrv = srv.app;
+      return srv;
+    });
+  });
+
+  it('should fail on policy schema validation', function () {
+    return gateway({
+      plugins: {
+        policies: [{
+          name: 'test-policy',
+          schema: {
+            type: 'object',
+            properties: {
+              p2: {type: ['number']}
+            },
+            required: ['p2']
+          },
+          policy: function () {
+            assert.fail();
+          }
+        }]},
+      config
+    }).then(srv => {
+      helper.setupApp(srv.app);
+      gatewaySrv = srv.app;
+      return srv;
+    });
+  });
+});

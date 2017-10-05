@@ -12,7 +12,8 @@ module.exports = function (options) {
       policies: require('./config/policies')(client),
       pipelines: require('./config/pipelines')(client),
       apiEndpoints: require('./config/api-endpoints')(client),
-      serviceEndpoints: require('./config/service-endpoints')(client)
+      serviceEndpoints: require('./config/service-endpoints')(client),
+      schemas: require('./config/schemas')(client)
     }
   };
 };
