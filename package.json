@@ -73,7 +73,6 @@
     "has-flag": "2.0.0",
     "http-proxy": "1.16.2",
     "js-yaml": "3.8.3",
-    "lodash": "4.17.4",
     "minimatch": "3.0.3",
     "oauth2orize": "1.8.0",
     "parent-require": "^1.0.0",

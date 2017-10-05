@@ -2,7 +2,6 @@ const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 const should = require('should');
-const _ = require('lodash');
 const config = require('../../lib/config');
 const services = require('../../lib/services');
 const tokenService = services.token;
@@ -313,7 +312,7 @@ describe('Access Token tests', function () {
           should.exist(tokens);
           tokens.length.should.eql(tokenObjs.length);
           tokens.forEach(tokenObj => {
-            tokenObj.prop.should.be.oneOf(_.map(tokenObjs, 'prop'));
+            tokenObj.prop.should.be.oneOf(tokenObjs.map(x => x.prop));
           });
           done();
         })
@@ -323,20 +322,18 @@ describe('Access Token tests', function () {
         });
     });
 
-    it('should get active and expired access tokens by consumer if provided includeExpired flag', function (done) {
-      tokenService.getTokensByConsumer('1234', { includeExpired: true })
+    it('should get active and expired access tokens by consumer if provided includeExpired flag', function () {
+      return tokenService.getTokensByConsumer('1234', { includeExpired: true })
         .then((tokens) => {
           should.exist(tokens);
           tokens.length.should.eql(tokenObjs.length * 2);
           tokens.forEach(tokenObj => {
-            tokenObj.prop.should.be.oneOf(_.map(tokenObjs, 'prop'));
+            tokenObj.prop.should.be.oneOf(tokenObjs.map(x => x.prop));
           });
-          _.map(tokens, 'archived').filter(val => val).length.should.eql(4);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
+          // it tests number of archived tokens
+          tokens
+            .map(x => x.archived)
+            .filter(val => val).length.should.eql(4);
         });
     });
   });
@@ -345,18 +342,8 @@ describe('Access Token tests', function () {
 describe('Refresh Token tests', function () {
   describe('Save, Find and Get Refresh Token tests', function () {
     let newToken, tokensFromDb, newTokenWithScopes, tokensFromDbWithScopes;
-    before(function (done) {
-      db.flushdbAsync()
-        .then(function (didSucceed) {
-          if (!didSucceed) {
-            console.log('Failed to flush the database');
-          }
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
-        });
+    before(function () {
+      return db.flushdbAsync();
     });
 
     it('should save a refresh token along with access token', function (done) {
@@ -710,7 +697,7 @@ describe('Refresh Token tests', function () {
           should.exist(tokens);
           tokens.length.should.eql(tokenObjs.length);
           tokens.forEach(tokenObj => {
-            tokenObj.prop.should.be.oneOf(_.map(tokenObjs, 'prop'));
+            tokenObj.prop.should.be.oneOf(tokenObjs.map(x => x.prop));
           });
           done();
         })
@@ -726,9 +713,10 @@ describe('Refresh Token tests', function () {
           should.exist(tokens);
           tokens.length.should.eql(tokenObjs.length * 2);
           tokens.forEach(tokenObj => {
-            tokenObj.prop.should.be.oneOf(_.map(tokenObjs, 'prop'));
+            tokenObj.prop.should.be.oneOf(tokenObjs.map(x => x.prop));
           });
-          _.map(tokens, 'archived').filter(val => val).length.should.eql(4);
+          tokens.map(x => x.archived)
+          .filter(val => val).length.should.eql(4);
           done();
         })
         .catch(function (err) {

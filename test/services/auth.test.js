@@ -2,7 +2,6 @@ const mock = require('mock-require');
 mock('redis', require('fakeredis'));
 
 const should = require('should');
-const _ = require('lodash');
 const credentialModelConfig = require('../../lib/config/models/credentials');
 const userModelConfig = require('../../lib/config/models/users');
 const services = require('../../lib/services');
@@ -223,8 +222,12 @@ describe('Auth tests', function () {
         should.exist(authResponse);
         Object.keys(authResponse.token).sort().should.eql(expectedTokenProps.sort());
         Object.keys(authResponse.consumer).sort().should.eql(expectedConsumerProps.sort());
-        should.deepEqual(_.omit(authResponse.token, ['expiresAt', 'createdAt']), expectedResponse.token);
-        should.deepEqual(_.omit(authResponse.consumer, ['updatedAt', 'createdAt']), expectedResponse.consumer);
+        delete authResponse.token.expiresAt;
+        delete authResponse.token.createdAt;
+        delete authResponse.consumer.createdAt;
+        delete authResponse.consumer.updatedAt;
+        should.deepEqual(authResponse.token, expectedResponse.token);
+        should.deepEqual(authResponse.consumer, expectedResponse.consumer);
         done();
       })
       .catch(function (err) {
