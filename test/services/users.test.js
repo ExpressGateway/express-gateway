@@ -119,7 +119,7 @@ describe('User service tests', function () {
           should.exist(data.users);
           should.exist(data.nextKey);
           data.users.length.should.be.eql(1);
-          const _user = data._users[0];
+          const _user = data.users[0];
           const expectedUserProps = [ 'firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt' ];
           should.exist(user);
           expectedUserProps.sort().should.eql(Object.keys(_user).sort());
