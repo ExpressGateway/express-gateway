@@ -46,7 +46,7 @@ describe('REST: schemas', () => {
         .list('policy')
         .then(({schemas}) => {
           const found = schemas.find(({name}) => name === 'basic-auth');
-          const other = schemas.filter(({type}) => type !== 'policy')
+          const other = schemas.filter(({type}) => type !== 'policy');
           assert.equal(found.type, 'policy');
           assert.equal(found.name, 'basic-auth');
           assert.equal(other.length, 0);
