@@ -11,19 +11,19 @@ module.exports = class extends eg.Generator {
         yargs
           .usage(`Usage: $0 ${process.argv[2]} list [options]`)
           .example(`$0 ${process.argv[2]} list -c 7498d1a9-7f90-4438-a9b7-0ba4c6022353`)
-          .string(['c', 'i'])
+          .string(['c', 'f'])
           .describe('c', 'Consumer ID: can be User ID or username or app ID')
-          .describe('i', 'Comma separated list of credential state (active, archive), default: active')
+          .describe('f', 'Comma separated list of credential state (active, archived), default: active')
           .alias('c', 'consumerId').nargs('c', 1)
-          .alias('i', 'include')
+          .alias('f', 'filter')
           .group(['c', 'i'], 'Options:')
     });
   }
 
   prompting () {
-    const {consumerId, include} = this.argv;
+    const {consumerId, filter} = this.argv;
 
-    return this.admin.credentials.list(consumerId, include)
+    return this.admin.credentials.list(consumerId, filter)
       .then(data => {
         const credentials = data.credentials;
         if (!credentials || !credentials.length) {

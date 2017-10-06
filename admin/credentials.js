@@ -27,10 +27,10 @@ module.exports = function (client) {
         .get(baseUrl + `${type}/${credentialId}`)
         .then(res => res.body);
     },
-    list (consumerId, include) {
+    list (consumerId, filter) {
       if (!consumerId) throw new Error('Consumer Id is required');
       return client
-        .get(`${baseUrl}${consumerId}?include=${include}`)
+        .get(`${baseUrl}${consumerId}?filter=${filter || ''}`)
         .then(res => res.body);
     },
     addScope (credentialId, type, scope) {
