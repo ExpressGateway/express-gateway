@@ -95,7 +95,7 @@ Copyright © LunchBadger, Inc. and Express Gateway Contributors
 [eg-waffle]: https://waffle.io/ExpressGateway/express-gateway
 [eg-faq]: http://www.express-gateway.io/docs/faq
 [eg-twitter]: https://twitter.com/express_gateway
-[eg-newsgroup]: https://groups.google.com/forum/#!forum/express-gateway
+[eg-newsgroup]: https://groups.google.com/a/express-gateway.io/forum/#!forum/discuss
 [eg-facebook]: https://www.facebook.com/expressjsgateway
 [contributor-guide]: https://github.com/ExpressGateway/express-gateway/blob/master/Contributing.md
 [lb-url]: https://www.lunchbadger.com
