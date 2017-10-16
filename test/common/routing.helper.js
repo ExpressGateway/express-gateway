@@ -60,7 +60,7 @@ module.exports = function () {
         const testScenario = prepareScenario(testCase);
         testScenario
           .expect(testCase.test.errorCode)
-          .expect('Content-Type', /text\/html/)
+          .expect('Content-Type', /json/)
           .end((err, res) => {
             if (err) { logger.error(res.body); }
             err ? done(err) : done();
