@@ -75,7 +75,6 @@ Express Gateway is proudly sponsored by...
 
 Copyright © LunchBadger, Inc. and Express Gateway Contributors
 
-[comment]: <> (Links Section)
 [npm-version-badge]: https://img.shields.io/npm/v/express-gateway.svg
 [npm-package-url]: https://www.npmjs.com/package/express-gateway
 [circleci-badge]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master.svg?style=shield&circle-token=ac6b0e86b46220da43a5ae63a267d12e81ccb2d5
