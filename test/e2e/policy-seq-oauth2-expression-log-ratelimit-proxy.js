@@ -43,7 +43,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
         authorizedEndpoint: {
           host: '*',
           paths: ['/authorizedPath'],
-          scopes: [ 'authorizedScope' ]
+          scopes: ['authorizedScope']
         }
       },
       policies: ['oauth2', 'proxy', 'log', 'expression', 'rate-limit'],
@@ -112,12 +112,13 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
     };
 
     userModelConfig.properties = {
-      firstname: {isRequired: true, isMutable: true},
-      lastname: {isRequired: true, isMutable: true},
-      email: {isRequired: false, isMutable: true}
+      firstname: { isRequired: true, isMutable: true },
+      lastname: { isRequired: true, isMutable: true },
+      email: { isRequired: false, isMutable: true }
     };
 
-    db.flushdbAsync()
+    db
+      .flushdbAsync()
       .then(function () {
         const user1 = {
           username: 'irfanbaqui',
@@ -126,81 +127,80 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
           email: 'irfan@eg.com'
         };
 
-        userService.insert(user1)
-          .then(_user => {
-            should.exist(_user);
-            user = _user;
+        return userService.insert(user1);
+      })
+      .then(_user => {
+        should.exist(_user);
+        user = _user;
 
-            const app1 = {
-              name: 'irfan_app',
-              redirectUri: 'https://some.host.com/some/route'
-            };
+        const app1 = {
+          name: 'irfan_app',
+          redirectUri: 'https://some.host.com/some/route'
+        };
 
-            applicationService.insert(app1, user.id)
-              .then(_app => {
-                should.exist(_app);
-                application = _app;
+        return applicationService.insert(app1, user.id);
+      })
+      .then(_app => {
+        should.exist(_app);
+        application = _app;
 
-                return credentialService.insertScopes(['authorizedScope'])
-                  .then(() => {
-                    Promise.all([ credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['authorizedScope'] }),
-                      credentialService.insertCredential(user.username, 'basic-auth', { password: 'password', scopes: ['authorizedScope'] }) ])
-                      .then(res => {
-                        should.exist(res);
+        return credentialService.insertScopes(['authorizedScope']);
+      })
+      .then(() =>
+        Promise.all([credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['authorizedScope'] }),
+          credentialService.insertCredential(user.username, 'basic-auth', { password: 'password', scopes: ['authorizedScope'] })])
+      )
+      .then(res => {
+        should.exist(res);
+        return helper.setup();
+      })
+      .then(apps => {
+        app = apps.app;
+        const request = session(app);
 
-                        helper.setup()
-                          .then(apps => {
-                            app = apps.app;
-                            const request = session(app);
+        request
+          .post('/login')
+          .query({
+            username: user.username,
+            password: 'password'
+          })
+          .expect(302)
+          .end(function (err, res) {
+            should.not.exist(err);
 
-                            request
-                              .post('/login')
-                              .query({
-                                username: user.username,
-                                password: 'password'
-                              })
-                              .expect(302)
-                              .end(function (err, res) {
-                                should.not.exist(err);
+            request
+              .get('/oauth2/authorize')
+              .query({
+                redirect_uri: application.redirectUri,
+                response_type: 'token',
+                client_id: application.id,
+                scope: 'authorizedScope'
+              })
+              .expect(200)
+              .end(function (err, res) {
+                should.not.exist(err);
 
-                                request
-                                  .get('/oauth2/authorize')
-                                  .query({
-                                    redirect_uri: application.redirectUri,
-                                    response_type: 'token',
-                                    client_id: application.id,
-                                    scope: 'authorizedScope'
-                                  })
-                                  .expect(200)
-                                  .end(function (err, res) {
-                                    should.not.exist(err);
+                request
+                  .post('/oauth2/authorize/decision')
+                  .query({
+                    transaction_id: res.headers.transaction_id
+                  })
+                  .expect(302)
+                  .end(function (err, res) {
+                    should.not.exist(err);
+                    const params = qs.parse(url.parse(res.headers.location).hash.slice(1));
+                    token = params.access_token;
 
-                                    request
-                                      .post('/oauth2/authorize/decision')
-                                      .query({
-                                        transaction_id: res.headers.transaction_id
-                                      })
-                                      .expect(302)
-                                      .end(function (err, res) {
-                                        should.not.exist(err);
-                                        const params = qs.parse(url.parse(res.headers.location).hash.slice(1));
-                                        token = params.access_token;
+                    const backendApp = express();
+                    backendApp.all('*', (req, res) => {
+                      spy(req.headers);
+                      res.send();
+                    });
 
-                                        const backendApp = express();
-                                        backendApp.all('*', (req, res) => {
-                                          spy(req.headers);
-                                          res.send();
-                                        });
-
-                                        const runningBackendApp = backendApp.listen(7777, () => {
-                                          backendServer = runningBackendApp;
-                                          done();
-                                        });
-                                      });
-                                  });
-                              });
-                          });
-                      });
+                    const runningBackendApp = backendApp.listen(7777, () => {
+                      backendServer = runningBackendApp;
+                      done();
+                    });
                   });
               });
           });
