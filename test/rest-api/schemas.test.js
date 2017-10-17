@@ -1,4 +1,4 @@
-const assert = require('assert');
+const { assert } = require('chai');
 const gateway = require('../../lib/gateway');
 const adminHelper = require('../common/admin-helper')();
 const Config = require('../../lib/config/config');
@@ -49,6 +49,7 @@ describe('REST: schemas', () => {
           const other = schemas.filter(schema => schema.key !== 'policy');
           assert.equal(found.type, 'basic-auth');
           assert.equal(found.key, 'policy');
+          assert.isDefined(found.schema);
           assert.equal(other.length, 0);
         });
     });
