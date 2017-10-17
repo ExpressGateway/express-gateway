@@ -57,13 +57,13 @@ describe('gateway condition with plugins', () => {
   it('should return false for param1 not matching url', function () {
     const req = Object.create(express.request);
     req.url = '/test';
-    assert.isFalse(req.matchEGCondition({name: 'test-condition', param1: true}));
+    assert.isFalse(req.matchEGCondition({ name: 'test-condition', param1: true }));
   });
 
   it('should return true for param1 matching url', function () {
     const req = Object.create(express.request);
     req.url = '/test';
-    assert.ok(req.matchEGCondition({name: 'test-condition', param1: '/test'}));
+    assert.ok(req.matchEGCondition({ name: 'test-condition', param1: '/test' }));
   });
 
   after('close gateway srv', () => {
@@ -82,11 +82,11 @@ describe('gateway condition schema with plugins', () => {
     return gateway({
       plugins: {
         conditions: [{
-          name: 'test-condition',
+          name: 'test-condition-1',
           schema: {
             type: 'object',
             properties: {
-              param1: {type: ['boolean']}
+              param1: { type: ['boolean'] }
             },
             required: ['param1']
           },
@@ -102,7 +102,7 @@ describe('gateway condition schema with plugins', () => {
       gatewaySrv = srv.app;
       const req = Object.create(express.request);
       req.url = '/test';
-      assert.isFalse(req.matchEGCondition({name: 'test-condition', param1: true}));
+      assert.isFalse(req.matchEGCondition({ name: 'test-condition-1', param1: true }));
     });
   });
 
@@ -110,11 +110,11 @@ describe('gateway condition schema with plugins', () => {
     return gateway({
       plugins: {
         conditions: [{
-          name: 'test-condition',
+          name: 'test-condition-2',
           schema: {
             type: 'object',
             properties: {
-              param2: {type: ['string']}
+              param2: { type: ['string'] }
             },
             required: ['param2']
           },
@@ -128,7 +128,7 @@ describe('gateway condition schema with plugins', () => {
       gatewaySrv = srv.app;
       const req = Object.create(express.request);
       req.url = '/test';
-      assert.isNull(req.matchEGCondition({name: 'test-condition', param1: true}));
+      assert.isNull(req.matchEGCondition({ name: 'test-condition-2', param1: true }));
     });
   });
 });

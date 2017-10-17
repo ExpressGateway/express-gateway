@@ -45,10 +45,11 @@ describe('gateway policy with plugins', () => {
           policy: function (actionParams) {
             return (req, res, next) => {
               assert(actionParams.p1, 42);
-              res.json({hello: 'ok', url: req.url, actionParams});
+              res.json({ hello: 'ok', url: req.url, actionParams });
             };
           }
-        }]},
+        }]
+      },
       config
     }).then(srv => {
       helper.setupApp(srv.app);
@@ -93,17 +94,18 @@ describe('gateway policy schema with plugins', () => {
           schema: {
             type: 'object',
             properties: {
-              p1: {type: ['number']}
+              p1: { type: ['number'] }
             },
             required: ['p1']
           },
           policy: function (actionParams) {
             return (req, res, next) => {
               assert(actionParams.p1, 42);
-              res.json({hello: 'ok', url: req.url, actionParams});
+              res.json({ hello: 'ok', url: req.url, actionParams });
             };
           }
-        }]},
+        }]
+      },
       config
     }).then(srv => {
       helper.setupApp(srv.app);
@@ -113,21 +115,23 @@ describe('gateway policy schema with plugins', () => {
   });
 
   it('should fail on policy schema validation', function () {
+    config.gatewayConfig.policies.push('test-policy-2');
     return gateway({
       plugins: {
         policies: [{
-          name: 'test-policy',
+          name: 'test-policy-2',
           schema: {
             type: 'object',
             properties: {
-              p2: {type: ['number']}
+              p2: { type: ['number'] }
             },
             required: ['p2']
           },
           policy: function () {
             assert.fail();
           }
-        }]},
+        }]
+      },
       config
     }).then(srv => {
       helper.setupApp(srv.app);
