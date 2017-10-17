@@ -21,7 +21,7 @@ describe('REST: schemas', () => {
 
   let gatewaySrv;
   before('fires up a new gateway instance', function () {
-    return gateway({config}).then(srv => {
+    return gateway({ config }).then(srv => {
       gatewaySrv = srv.app;
       return srv;
     });
@@ -34,21 +34,21 @@ describe('REST: schemas', () => {
   describe('when policies defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: {port: 0}
+        admin: { port: 0 }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
-      return adminHelper.start({config});
+      return adminHelper.start({ config });
     });
 
     it('should list all policy schemas', () => {
       return adminHelper.admin.config.schemas
         .list('policy')
-        .then(({schemas}) => {
-          const found = schemas.find(({name}) => name === 'basic-auth');
-          const other = schemas.filter(({type}) => type !== 'policy');
-          assert.equal(found.type, 'policy');
-          assert.equal(found.name, 'basic-auth');
+        .then((schemas) => {
+          const found = schemas.find(schema => schema.type === 'basic-auth');
+          const other = schemas.filter(schema => schema.key !== 'policy');
+          assert.equal(found.type, 'basic-auth');
+          assert.equal(found.key, 'policy');
           assert.equal(other.length, 0);
         });
     });
@@ -56,7 +56,7 @@ describe('REST: schemas', () => {
     it('should find basic-auth policy', () => {
       return adminHelper.admin.config.schemas
         .list('policy', 'basic-auth')
-        .then(({schemas}) => {
+        .then((schemas) => {
           assert.equal(schemas.length, 1);
           assert.equal(schemas[0].name, 'basic-auth');
         });
