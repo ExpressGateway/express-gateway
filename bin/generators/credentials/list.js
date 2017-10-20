@@ -1,7 +1,7 @@
 const eg = require('../../eg');
 
 module.exports = class extends eg.Generator {
-  constructor (args, opts) {
+  constructor(args, opts) {
     super(args, opts);
 
     this.configureCommand({
@@ -14,14 +14,14 @@ module.exports = class extends eg.Generator {
           .string(['c', 'f'])
           .describe('c', 'Consumer ID: can be User ID or username or app ID')
           .describe('f', 'Comma separated list of credential state (active, archived), default: active')
-          .alias('c', 'consumerId').nargs('c', 1)
+          .alias('c', 'consumerId').nargs('c', 1).required('c')
           .alias('f', 'filter')
           .group(['c', 'i'], 'Options:')
     });
   }
 
-  prompting () {
-    const {consumerId, filter} = this.argv;
+  prompting() {
+    const { consumerId, filter } = this.argv;
 
     return this.admin.credentials.list(consumerId, filter)
       .then(data => {
