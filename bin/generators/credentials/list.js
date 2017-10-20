@@ -16,7 +16,8 @@ module.exports = class extends eg.Generator {
           .describe('f', 'Comma separated list of credential state (active, archived), default: active')
           .alias('c', 'consumerId').nargs('c', 1).required('c')
           .alias('f', 'filter')
-          .group(['c', 'i'], 'Options:')
+          .coerce('f', (val) => val.toLowerCase())
+          .group(['c'], 'Options:')
     });
   }
 
