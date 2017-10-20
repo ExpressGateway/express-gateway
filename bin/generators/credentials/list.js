@@ -1,7 +1,7 @@
 const eg = require('../../eg');
 
 module.exports = class extends eg.Generator {
-  constructor(args, opts) {
+  constructor (args, opts) {
     super(args, opts);
 
     this.configureCommand({
@@ -20,7 +20,7 @@ module.exports = class extends eg.Generator {
     });
   }
 
-  prompting() {
+  prompting () {
     const { consumerId, filter } = this.argv;
 
     return this.admin.credentials.list(consumerId, filter)
