@@ -4,21 +4,21 @@ module.exports = function (client) {
     create (consumerId, type, credential) {
       return client
         .post(baseUrl)
-        .send({credential, consumerId, type})
+        .send({ credential, consumerId, type })
         .then(res => res.body);
     },
     deactivate (credentialId, type) {
       validate(credentialId, type);
       return client
         .put(baseUrl + type + '/' + credentialId + '/status')
-        .send({status: false})
+        .send({ status: false })
         .then(res => res.body);
     },
     activate (credentialId, type) {
       validate(credentialId, type);
       return client
         .put(baseUrl + type + '/' + credentialId + '/status')
-        .send({status: true})
+        .send({ status: true })
         .then(res => res.body);
     },
     info (credentialId, type) {
@@ -29,8 +29,9 @@ module.exports = function (client) {
     },
     list (consumerId, filter) {
       if (!consumerId) throw new Error('Consumer Id is required');
+      const filterUrl = filter ? `?filter=${filter}` : '';
       return client
-        .get(`${baseUrl}${consumerId}?filter=${filter || ''}`)
+        .get(`${baseUrl}${consumerId}${filterUrl}`)
         .then(res => res.body);
     },
     addScope (credentialId, type, scope) {
@@ -49,7 +50,7 @@ module.exports = function (client) {
       validate(credentialId, type);
       return client
         .put(`${baseUrl}${type}/${credentialId}/scopes/`)
-        .send({scopes})
+        .send({ scopes })
         .then(res => res.body);
     }
   };

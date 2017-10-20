@@ -122,7 +122,7 @@ describe('eg credentials list -c ', () => {
       });
     });
 
-    env.argv = program.parse('credentials list -c ' + username);
+    env.argv = program.parse(`credentials list -c ${username}`);
   });
 
   it('should show all archive credentials', done => {
@@ -152,7 +152,7 @@ describe('eg credentials list -c ', () => {
       });
     });
 
-    env.argv = program.parse('credentials list -i archive -c ' + username);
+    env.argv = program.parse(`credentials list -f archive -c ${username}`);
   });
 
   it('should show all active and archive credentials', done => {
@@ -182,6 +182,6 @@ describe('eg credentials list -c ', () => {
       });
     });
 
-    env.argv = program.parse('credentials list -i archive,active -c ' + username);
+    env.argv = program.parse(`credentials list -f archive,active -c ${username}`);
   });
 });
