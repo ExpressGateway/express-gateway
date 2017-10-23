@@ -55,6 +55,7 @@
   },
   "types": "./index.d.ts",
   "dependencies": {
+    "ajv": "^5.2.3",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
     "chalk": "1.1.3",

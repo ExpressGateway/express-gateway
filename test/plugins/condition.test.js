@@ -10,11 +10,14 @@ config.gatewayConfig = {
   },
   apiEndpoints: {
     api: {
-      host: '*'}},
+      host: '*'
+    }
+  },
   serviceEndpoints: {
     backend: {
       url: 'http://www.example.com'
-    }},
+    }
+  },
   policies: ['proxy'],
   pipelines: {
     ecommerce: {
@@ -26,7 +29,8 @@ config.gatewayConfig = {
           }
         }]
       }]
-    }}
+    }
+  }
 };
 
 describe('gateway condition with plugins', () => {
@@ -41,7 +45,8 @@ describe('gateway condition with plugins', () => {
             assert.equal(req.url, '/test');
             return (conditionConfig.param1 === req.url);
           }
-        }]},
+        }]
+      },
       config
     }).then(srv => {
       gatewaySrv = srv.app;
@@ -49,13 +54,13 @@ describe('gateway condition with plugins', () => {
     });
   });
 
-  it('should  return false for param1 not matching url', function () {
+  it('should return false for param1 not matching url', function () {
     const req = Object.create(express.request);
     req.url = '/test';
     assert.isFalse(req.matchEGCondition({ name: 'test-condition', param1: true }));
   });
 
-  it('should  return true for param1 matching url', function () {
+  it('should return true for param1 matching url', function () {
     const req = Object.create(express.request);
     req.url = '/test';
     assert.ok(req.matchEGCondition({ name: 'test-condition', param1: '/test' }));
@@ -63,5 +68,67 @@ describe('gateway condition with plugins', () => {
 
   after('close gateway srv', () => {
     gatewaySrv.close();
+  });
+});
+
+describe('gateway condition schema with plugins', () => {
+  let gatewaySrv;
+
+  afterEach('close gateway srv', () => {
+    gatewaySrv.close();
+  });
+
+  it('should call condition', () => {
+    return gateway({
+      plugins: {
+        conditions: [{
+          name: 'test-condition-1',
+          schema: {
+            type: 'object',
+            properties: {
+              param1: { type: ['boolean'] }
+            },
+            required: ['param1']
+          },
+          handler: function (req, conditionConfig) {
+            assert.ok(conditionConfig.param1);
+            assert.equal(req.url, '/test');
+            return (conditionConfig.param1 === req.url);
+          }
+        }]
+      },
+      config
+    }).then(srv => {
+      gatewaySrv = srv.app;
+      const req = Object.create(express.request);
+      req.url = '/test';
+      assert.isFalse(req.matchEGCondition({ name: 'test-condition-1', param1: true }));
+    });
+  });
+
+  it('should fail on condition schema validation', () => {
+    return gateway({
+      plugins: {
+        conditions: [{
+          name: 'test-condition-2',
+          schema: {
+            type: 'object',
+            properties: {
+              param2: { type: ['string'] }
+            },
+            required: ['param2']
+          },
+          handler: function () {
+            assert.fail();
+          }
+        }]
+      },
+      config
+    }).then(srv => {
+      gatewaySrv = srv.app;
+      const req = Object.create(express.request);
+      req.url = '/test';
+      assert.isNull(req.matchEGCondition({ name: 'test-condition-2', param1: true }));
+    });
   });
 });
