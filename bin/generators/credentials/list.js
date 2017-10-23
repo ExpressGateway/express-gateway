@@ -23,34 +23,36 @@ module.exports = class extends eg.Generator {
           .describe('c', 'Consumer ID: can be User ID or username or app ID')
 
           .array('f')
-          .describe('f', 'Comma separated list of credential state (active, archived), default: active')
+          .describe('f', 'List of credential state (active, archived), default: active')
           .alias('f', 'filter')
+          .default('f', ['active'])
           .coerce('f', (filters) =>
-            filters.reduce((array, filter) => {
+            filters.map((filter) => {
               if (filterTypes.indexOf(filter) === -1) {
                 throw new Error(`Unrecognised filter type: ${filter}`);
               }
               return filtersTable[filter];
-            }, [])
+            })
           )
     });
   }
 
   prompting () {
     const { consumerId, filter } = this.argv;
-
     return this.admin.credentials.list(consumerId)
       .then(data => {
-        let { credentials } = data;
+        const { credentials } = data;
 
         if (!credentials || !credentials.length) {
           this.log.error(`Consumer ${consumerId} has no credentials`);
           return;
         }
 
-        filter.forEach(f => { credentials = credentials.filter(f); });
+        const filteredCredentials = [];
 
-        credentials.forEach(credential => {
+        filter.forEach(f => { filteredCredentials.push(...credentials.filter(f)); });
+
+        filteredCredentials.forEach(credential => {
           if (this.argv.q) {
             this.stdout(credential.id);
           } else {

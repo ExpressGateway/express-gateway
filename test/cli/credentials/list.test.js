@@ -125,7 +125,7 @@ describe('eg credentials list -c ', () => {
     env.argv = program.parse(`credentials list -c ${username}`);
   });
 
-  it('should show all archive credentials', done => {
+  it('should show all archived credentials', done => {
     const types = {};
     const keyAuthKeys = [];
     env.hijack(namespace, generator => {
@@ -152,7 +152,7 @@ describe('eg credentials list -c ', () => {
       });
     });
 
-    env.argv = program.parse(`credentials list -f archive -c ${username}`);
+    env.argv = program.parse(`credentials list -f archived -c ${username}`);
   });
 
   it('should show all active and archive credentials', done => {
@@ -182,6 +182,6 @@ describe('eg credentials list -c ', () => {
       });
     });
 
-    env.argv = program.parse(`credentials list -f archive,active -c ${username}`);
+    env.argv = program.parse(`credentials list -f archived active -c ${username}`);
   });
 });
