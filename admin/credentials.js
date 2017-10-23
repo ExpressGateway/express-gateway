@@ -7,6 +7,7 @@ module.exports = function (client) {
         .send({ credential, consumerId, type })
         .then(res => res.body);
     },
+
     deactivate (credentialId, type) {
       validate(credentialId, type);
       return client
@@ -14,6 +15,7 @@ module.exports = function (client) {
         .send({ status: false })
         .then(res => res.body);
     },
+
     activate (credentialId, type) {
       validate(credentialId, type);
       return client
@@ -21,31 +23,35 @@ module.exports = function (client) {
         .send({ status: true })
         .then(res => res.body);
     },
+
     info (credentialId, type) {
       validate(credentialId, type);
       return client
         .get(baseUrl + `${type}/${credentialId}`)
         .then(res => res.body);
     },
-    list (consumerId, filter) {
+
+    list (consumerId) {
       if (!consumerId) throw new Error('Consumer Id is required');
-      const filterUrl = filter ? `?filter=${filter}` : '';
       return client
-        .get(`${baseUrl}${consumerId}${filterUrl}`)
+        .get(`${baseUrl}${consumerId}`)
         .then(res => res.body);
     },
+
     addScope (credentialId, type, scope) {
       validate(credentialId, type);
       return client
         .put(`${baseUrl}${type}/${credentialId}/scopes/${scope}`)
         .then(res => res.body);
     },
+
     removeScope (credentialId, type, scope) {
       validate(credentialId, type);
       return client
         .del(`${baseUrl}${type}/${credentialId}/scopes/${scope}`)
         .then(res => res.body);
     },
+
     setScopes (credentialId, type, scopes) {
       validate(credentialId, type);
       return client
@@ -54,6 +60,7 @@ module.exports = function (client) {
         .then(res => res.body);
     }
   };
+
   function validate (credentialId, type) {
     if (!credentialId) throw new Error('Credential Id is required');
     if (!type) throw new Error('Type is required');
