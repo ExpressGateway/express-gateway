@@ -45,10 +45,10 @@ describe('REST: schemas', () => {
       return adminHelper.admin.config.schemas
         .list('policy')
         .then((schemas) => {
-          const found = schemas.find(schema => schema.type === 'basic-auth');
-          const other = schemas.filter(schema => schema.key !== 'policy');
-          assert.equal(found.type, 'basic-auth');
-          assert.equal(found.key, 'policy');
+          const found = schemas.find(schema => schema.name === 'basic-auth');
+          const other = schemas.filter(schema => schema.type !== 'policy');
+          assert.equal(found.name, 'basic-auth');
+          assert.equal(found.type, 'policy');
           assert.isDefined(found.schema);
           assert.equal(other.length, 0);
         });
@@ -57,9 +57,8 @@ describe('REST: schemas', () => {
     it('should find basic-auth policy', () => {
       return adminHelper.admin.config.schemas
         .list('policy', 'basic-auth')
-        .then((schemas) => {
-          assert.equal(schemas.length, 1);
-          assert.equal(schemas[0].name, 'basic-auth');
+        .then((schema) => {
+          assert.equal(schema.name, 'basic-auth');
         });
     });
   });
