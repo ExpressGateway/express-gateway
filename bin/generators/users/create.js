@@ -14,10 +14,10 @@ module.exports = class extends eg.Generator {
           .usage(`Usage: $0 ${process.argv[2]} create [options]`)
           .example(`$0 ${process.argv[2]} create`)
           .example(`$0 ${process.argv[2]} create -p 'username=jdoe' ` +
-            '-p \'firstname=Jane\' -p \'lastname=Doe\'')
+          '-p \'firstname=Jane\' -p \'lastname=Doe\'')
           .example('echo \'{"username":"jdoe","firstname":"Jane"}\'' +
-            ` | $0 ${process.argv[2]} create --stdin`)
-          .example(`cat all_users.jsonl | $0 ${process.argv[2]} create --stdin`)
+          ` | $0 ${process.argv[2]} create --stdin`)
+          .example(`cat all_users.json | $0 ${process.argv[2]} create --stdin`)
           .string('p')
           .boolean(['stdin'])
           .describe('p', 'User property in the form [-p \'foo=bar\']')
@@ -69,9 +69,9 @@ module.exports = class extends eg.Generator {
                 }
               }
             })
-            .catch(err => {
-              this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-            });
+              .catch(err => {
+                this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
+              });
           });
 
         const p = Promise.all(promises);
@@ -136,7 +136,7 @@ module.exports = class extends eg.Generator {
       const missingProperties = [];
 
       const configProperties = Object.assign({ username: { isRequired: true } },
-                models.users.properties);
+        models.users.properties);
 
       Object.keys(configProperties).forEach(prop => {
         const descriptor = configProperties[prop];
@@ -152,15 +152,15 @@ module.exports = class extends eg.Generator {
       if (shouldPrompt) {
         questions = missingProperties.map(p => {
           const required = p.descriptor.isRequired
-                      ? ' [required]'
-                      : '';
+            ? ' [required]'
+            : '';
 
           return {
             name: p.name,
             message: `Enter ${chalk.yellow(p.name)}${chalk.green(required)}:`,
             default: p.defaultValue,
             validate: input => !p.descriptor.isRequired ||
-                  (!!input && p.descriptor.isRequired)
+              (!!input && p.descriptor.isRequired)
           };
         });
       }

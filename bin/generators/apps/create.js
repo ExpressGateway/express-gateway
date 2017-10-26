@@ -14,10 +14,10 @@ module.exports = class extends eg.Generator {
           .usage(`Usage: $0 ${process.argv[2]} create [options]`)
           .example(`$0 ${process.argv[2]} create -u jdoe`)
           .example(`$0 ${process.argv[2]} create -u jdoe -p 'name=mobile-app' ` +
-            '-p \'redirectUri=http://localhost/cb\'')
+          '-p \'redirectUri=http://localhost/cb\'')
           .example('echo \'{"user":"jdoe","name":"mobile-app"}\'' +
-            ` | $0 ${process.argv[2]} create --stdin`)
-          .example(`cat all_apps.jsonl | $0 ${process.argv[2]} create --stdin`)
+          ` | $0 ${process.argv[2]} create --stdin`)
+          .example(`cat all_apps.json | $0 ${process.argv[2]} create --stdin`)
           .string(['p', 'u'])
           .boolean(['stdin'])
           .describe('u', 'User ID or username associated with the app')
@@ -79,17 +79,17 @@ module.exports = class extends eg.Generator {
     }
 
     return this._insert(app, { user: argv.user })
-    .then(newApp => {
-      if (!argv.q) {
-        this.log.ok(`Created ${newApp.id}`);
-        this.stdout(JSON.stringify(newApp, null, 2));
-      } else {
-        this.stdout(newApp.id);
-      }
-    })
-    .catch(err => {
-      this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-    });
+      .then(newApp => {
+        if (!argv.q) {
+          this.log.ok(`Created ${newApp.id}`);
+          this.stdout(JSON.stringify(newApp, null, 2));
+        } else {
+          this.stdout(newApp.id);
+        }
+      })
+      .catch(err => {
+        this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
+      });
   };
 
   _createFromStdin () {
@@ -136,9 +136,9 @@ module.exports = class extends eg.Generator {
                 }
               }
             })
-            .catch(err => {
-              this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-            });
+              .catch(err => {
+                this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
+              });
           });
 
         const p = Promise.all(promises);
@@ -175,24 +175,24 @@ module.exports = class extends eg.Generator {
       if (shouldPrompt) {
         questions = missingProperties.map(p => {
           const required = p.descriptor.isRequired
-                    ? ' [required]'
-                    : '';
+            ? ' [required]'
+            : '';
 
           return {
             name: p.name,
             message: `Enter ${chalk.yellow(p.name)}${chalk.green(required)}:`,
             default: p.defaultValue,
             validate: input => !p.descriptor.isRequired ||
-                (!!input && p.descriptor.isRequired)
+              (!!input && p.descriptor.isRequired)
           };
         });
       }
     }
 
     return this.prompt(questions)
-        .then(answers => {
-          app = Object.assign(app, answers);
-          return this.admin.apps.create(options.user, app);
-        });
+      .then(answers => {
+        app = Object.assign(app, answers);
+        return this.admin.apps.create(options.user, app);
+      });
   };
 };
