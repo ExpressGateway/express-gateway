@@ -22,9 +22,9 @@ describe('eg credentials create', () => {
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
-    });
+      .then(createdUser => {
+        user = createdUser;
+      });
   });
 
   afterEach(() => {
@@ -55,13 +55,13 @@ describe('eg credentials create', () => {
         assert.equal(text, 'Created ' + loggedCred.keyId);
 
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
-              .then(cred => {
-                assert.ok(cred.keyId);
-                assert.ok(cred.keySecret);
-                assert.ok(cred.isActive);
-                assert.equal(cred.consumerId, user.username);
-                done();
-              }).catch(done);
+          .then(cred => {
+            assert.ok(cred.keyId);
+            assert.ok(cred.keySecret);
+            assert.ok(cred.isActive);
+            assert.equal(cred.consumerId, user.id);
+            done();
+          }).catch(done);
       });
     });
 
@@ -95,13 +95,13 @@ describe('eg credentials create', () => {
         const loggedCred = JSON.parse(output);
         assert.equal(text, 'Created ' + loggedCred.keyId);
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
-              .then(cred => {
-                assert.ok(cred.keyId);
-                assert.ok(cred.keySecret);
-                assert.ok(cred.isActive);
-                assert.equal(cred.consumerId, user.username);
-                done();
-              }).catch(done);
+          .then(cred => {
+            assert.ok(cred.keyId);
+            assert.ok(cred.keySecret);
+            assert.ok(cred.isActive);
+            assert.equal(cred.consumerId, user.id);
+            done();
+          }).catch(done);
       });
     });
 
@@ -124,15 +124,15 @@ describe('eg credentials create', () => {
       generator.once('end', () => {
         const loggedCred = output.split(':')[0];
         return adminHelper.admin.credentials.info(loggedCred, 'key-auth')
-              .then(cred => {
-                assert.ok(cred.keyId);
-                assert.ok(cred.keySecret);
-                assert.ok(cred.isActive);
-                assert.equal(cred.consumerId, user.username);
-                assert.equal(output, cred.keyId + ':' + cred.keySecret);
+          .then(cred => {
+            assert.ok(cred.keyId);
+            assert.ok(cred.keySecret);
+            assert.ok(cred.isActive);
+            assert.equal(cred.consumerId, user.id);
+            assert.equal(output, cred.keyId + ':' + cred.keySecret);
 
-                done();
-              }).catch(done);
+            done();
+          }).catch(done);
       });
     });
 
