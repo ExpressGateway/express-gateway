@@ -14,10 +14,10 @@ module.exports = class extends eg.Generator {
           .usage(`Usage: $0 ${process.argv[2]} create [options]`)
           .example(`$0 ${process.argv[2]} create -c jdoe -t key-auth`)
           .example(`echo '{"consumer":"jdoe", "type": "key-auth"}'` +
-             `| $0 ${process.argv[2]} create --stdin`)
+          `| $0 ${process.argv[2]} create --stdin`)
           .example(`echo '{"consumer":"jdoe", "type": "key-auth", "scopes":["existingScope"]}'` +
-             `| $0 ${process.argv[2]} create --stdin`)
-          .example(`cat all_apps.jsonl | $0 ${process.argv[2]} create --stdin`)
+          `| $0 ${process.argv[2]} create --stdin`)
+          .example(`cat all_apps.json | $0 ${process.argv[2]} create --stdin`)
           .example(`$0 ${process.argv[2]} create -u jdoe -p 'scopes=existingScope'`)
           .string(['p', 'c', 't'])
           .boolean(['stdin'])
@@ -89,12 +89,12 @@ module.exports = class extends eg.Generator {
     }
 
     return this._insert(credential, { consumer: argv.consumer, type: argv.type })
-    .then(newCredential => {
-      this._output(newCredential);
-    })
-    .catch(err => {
-      this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-    });
+      .then(newCredential => {
+        this._output(newCredential);
+      })
+      .catch(err => {
+        this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
+      });
   };
 
   _createFromStdin () {
@@ -143,9 +143,9 @@ module.exports = class extends eg.Generator {
               .then(newCredential => {
                 this._output(newCredential);
               })
-            .catch(err => {
-              this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
-            });
+              .catch(err => {
+                this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
+              });
           });
 
         const p = Promise.all(promises);
@@ -196,23 +196,23 @@ module.exports = class extends eg.Generator {
       if (shouldPrompt) {
         questions = missingProperties.map(p => {
           const required = p.descriptor.isRequired
-                    ? ' [required]'
-                    : '';
+            ? ' [required]'
+            : '';
 
           return {
             name: p.name,
             message: `Enter ${chalk.yellow(p.name)}${chalk.green(required)}:`,
             default: p.defaultValue,
             validate: input => !p.descriptor.isRequired ||
-                (!!input && p.descriptor.isRequired)
+              (!!input && p.descriptor.isRequired)
           };
         });
       }
     }
     return this.prompt(questions)
-        .then(answers => {
-          credential = Object.assign(credential, answers);
-          return this.admin.credentials.create(options.consumer, options.type, credential);
-        });
+      .then(answers => {
+        credential = Object.assign(credential, answers);
+        return this.admin.credentials.create(options.consumer, options.type, credential);
+      });
   };
 };
