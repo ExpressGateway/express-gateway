@@ -77,7 +77,7 @@ describe('Auth tests', function () {
   describe('Credential Auth', function () {
     it('should authenticate user', function (done) {
       authService.authenticateCredential(user.username, _credential.secret, 'oauth2')
-        .then(authResponse => {
+        .then(([authResponse, credentialId]) => {
           const expectedResponse = Object.assign({
             type: 'user',
             id: userFromDb.id,
@@ -96,7 +96,7 @@ describe('Auth tests', function () {
 
     it('should not authenticate invalid user with credentials', function (done) {
       authService.authenticateCredential('invalidUsername', _credential.secret, 'oauth2')
-        .then(authResponse => {
+        .then(([authResponse, credentialId]) => {
           should.exist(authResponse);
           authResponse.should.eql(false);
           done();
@@ -109,7 +109,7 @@ describe('Auth tests', function () {
 
     it('should not authenticate valid user with invalid credentials', function (done) {
       authService.authenticateCredential(user.username, 'invalidSecret', 'oauth2')
-        .then(authResponse => {
+        .then(([authResponse, credentialId]) => {
           should.exist(authResponse);
           authResponse.should.eql(false);
           done();

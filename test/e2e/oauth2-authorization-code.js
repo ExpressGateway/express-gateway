@@ -1,5 +1,5 @@
 const { fork } = require('child_process');
-const {runCLICommand} = require('../common/cli.helper');
+const { runCLICommand } = require('../common/cli.helper');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
@@ -197,7 +197,7 @@ describe('oauth2 authorization code grant type', () => {
         testGatewayConfigData.admin.port = adminPort;
 
         testGatewayConfigData.serviceEndpoints.backend.url =
-        `http://localhost:${backendPort}`;
+          `http://localhost:${backendPort}`;
 
         return generateBackendServer(backendPort);
       })
@@ -270,7 +270,7 @@ describe('oauth2 authorization code grant type', () => {
     app.get('/cb', (req, res) => {
       const parsed = url.parse(req.url, true);
       redirectParams = parsed.query;
-      res.send(200);
+      res.sendStatus(200);
     });
 
     return new Promise((resolve) => {
