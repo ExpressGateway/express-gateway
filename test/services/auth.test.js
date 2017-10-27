@@ -55,7 +55,7 @@ describe('Auth tests', function () {
         return credentialService.insertScopes(['someScope1', 'someScope2', 'someScope3']);
       })
       .then(() => {
-        return credentialService.insertCredential(user.username, 'oauth2', _credential)
+        return credentialService.insertCredential(userFromDb.id, 'oauth2', _credential)
           .then((res) => should.exist(res));
       });
   });
