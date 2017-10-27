@@ -56,9 +56,7 @@ describe('Auth tests', function () {
       })
       .then(() => {
         return credentialService.insertCredential(user.username, 'oauth2', _credential)
-          .then(function (res) {
-            should.exist(res);
-          });
+          .then((res) => should.exist(res));
       });
   });
 

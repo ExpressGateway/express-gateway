@@ -109,7 +109,7 @@ describe('Functional Tests keyAuth Policy', () => {
 
             return credentialService.insertScopes('authorizedScope', 'unauthorizedScope')
               .then(() => {
-                return credentialService.insertCredential(_fromDbUser1.username, 'key-auth', {
+                return credentialService.insertCredential(_fromDbUser1.id, 'key-auth', {
                   scopes: ['authorizedScope']
                 });
               })

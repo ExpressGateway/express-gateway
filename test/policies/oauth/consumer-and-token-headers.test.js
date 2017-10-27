@@ -40,7 +40,7 @@ describe('Request Headers with consumer and token information as part of auth po
         authorizedEndpoint: {
           host: '*',
           paths: ['/authorizedPath'],
-          scopes: [ 'authorizedScope' ]
+          scopes: ['authorizedScope']
         }
       },
       policies: ['oauth2', 'proxy'],
@@ -49,7 +49,7 @@ describe('Request Headers with consumer and token information as part of auth po
           apiEndpoints: ['authorizedEndpoint'],
           policies: [
             { oauth2: {} },
-            { proxy: [ { action: { serviceEndpoint: 'backend' } } ] }
+            { proxy: [{ action: { serviceEndpoint: 'backend' } }] }
           ]
         }
       }
@@ -70,9 +70,9 @@ describe('Request Headers with consumer and token information as part of auth po
     };
 
     userModelConfig.properties = {
-      firstname: {isRequired: true, isMutable: true},
-      lastname: {isRequired: true, isMutable: true},
-      email: {isRequired: false, isMutable: true}
+      firstname: { isRequired: true, isMutable: true },
+      lastname: { isRequired: true, isMutable: true },
+      email: { isRequired: false, isMutable: true }
     };
 
     db.flushdbAsync()
@@ -101,8 +101,8 @@ describe('Request Headers with consumer and token information as part of auth po
 
                 return credentialService.insertScopes(['authorizedScope'])
                   .then(() => {
-                    Promise.all([ credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['authorizedScope'] }),
-                      credentialService.insertCredential(user.username, 'basic-auth', { password: 'password', scopes: ['authorizedScope'] }) ])
+                    Promise.all([credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['authorizedScope'] }),
+                      credentialService.insertCredential(user.id, 'basic-auth', { password: 'password', scopes: ['authorizedScope'] })])
                       .then(res => {
                         should.exist(res);
 

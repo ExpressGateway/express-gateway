@@ -155,8 +155,8 @@ describe('Credential service tests', function () {
         .then((newUser) => {
           user = newUser;
           return Promise.all([
-            credentialService.insertCredential(user.username, 'oauth2'),
-            credentialService.insertCredential(user.username, 'basic-auth')
+            credentialService.insertCredential(user.username, 'oauth2').then((oauthCred) => should.exist(oauthCred.secret)),
+            credentialService.insertCredential(user.username, 'basic-auth').then((basicAuthCred) => should.exist(basicAuthCred.password))
           ]);
         });
     });
@@ -189,12 +189,12 @@ describe('Credential service tests', function () {
     });
 
     it('should delete a credential', () => {
-      return credentialService.insertCredential(user.username, 'oauth2').then(res => {
+      return credentialService.insertCredential(user.id, 'oauth2').then(res => {
         should.exist(res);
-        return credentialService.removeCredential(user.username, 'oauth2');
+        return credentialService.removeCredential(user.id, 'oauth2');
       }).then(deleted => {
         should(deleted).be.equal(1);
-        return credentialService.getCredential(user.username, 'oauth2');
+        return credentialService.getCredential(user.id, 'oauth2');
       }).then(resAfterDelete => should.not.exist(resAfterDelete));
     });
   });
