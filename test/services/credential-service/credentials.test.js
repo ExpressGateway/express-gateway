@@ -155,8 +155,8 @@ describe('Credential service tests', function () {
         .then((newUser) => {
           user = newUser;
           return Promise.all([
-            credentialService.insertCredential(user.username, 'oauth2').then((oauthCred) => should.exist(oauthCred.secret)),
-            credentialService.insertCredential(user.username, 'basic-auth').then((basicAuthCred) => should.exist(basicAuthCred.password))
+            credentialService.insertCredential(user.id, 'oauth2').then((oauthCred) => should.exist(oauthCred.secret)),
+            credentialService.insertCredential(user.id, 'basic-auth').then((basicAuthCred) => should.exist(basicAuthCred.password))
           ]);
         });
     });
@@ -167,8 +167,8 @@ describe('Credential service tests', function () {
 
     it('should delete all credentials associated with a user when user is deleted', () => {
       return Promise.all([
-        credentialService.getCredential(user.username, 'oauth2'),
-        credentialService.getCredential(user.username, 'basic-auth')
+        credentialService.getCredential(user.id, 'oauth2'),
+        credentialService.getCredential(user.id, 'basic-auth')
       ])
         .then(([oauthRes, basicAuthRes]) => {
           should.exist(oauthRes); // Check to confirm the credentials exist
@@ -178,8 +178,8 @@ describe('Credential service tests', function () {
         .then(res => {
           should.exist(res);
           return Promise.all([
-            credentialService.getCredential(user.username, 'oauth2'),
-            credentialService.getCredential(user.username, 'basic-auth')
+            credentialService.getCredential(user.id, 'oauth2'),
+            credentialService.getCredential(user.id, 'basic-auth')
           ]);
         })
         .then(([oauthResAfterDelete, basicAuthResAfterDelete]) => {
