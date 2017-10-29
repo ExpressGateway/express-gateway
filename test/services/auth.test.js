@@ -17,7 +17,7 @@ describe('Auth tests', function () {
   let _credential;
   let originalUserModelConfig;
 
-  before(function (done) {
+  before(() => {
     credentialModelConfig.oauth2 = {
       passwordKey: 'secret',
       autoGeneratePassword: true,
@@ -33,8 +33,8 @@ describe('Auth tests', function () {
       email: { isRequired: false, isMutable: true }
     };
 
-    db.flushdbAsync()
-      .then(function (didSucceed) {
+    return db.flushdbAsync()
+      .then(() => {
         user = {
           username: 'irfanbaqui',
           firstname: 'irfan',
@@ -47,36 +47,29 @@ describe('Auth tests', function () {
           scopes: ['someScope1', 'someScope2', 'someScope3']
         };
 
-        userService
-          .insert(user)
-          .then(_user => {
-            should.exist(_user);
-            userFromDb = _user;
-            return credentialService.insertScopes(['someScope1', 'someScope2', 'someScope3']);
-          })
-          .then(() => {
-            return credentialService.insertCredential(user.username, 'oauth2', _credential)
-              .then(function (res) {
-                should.exist(res);
-                done();
-              });
-          });
+        return userService.insert(user);
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
+      .then(_user => {
+        should.exist(_user);
+        userFromDb = _user;
+        return credentialService.insertScopes(['someScope1', 'someScope2', 'someScope3']);
+      })
+      .then(() => {
+        return credentialService.insertCredential(user.username, 'oauth2', _credential)
+          .then(function (res) {
+            should.exist(res);
+          });
       });
   });
 
-  after(function (done) {
+  after(() => {
     credentialModelConfig.oauth2 = originalModelConfig.oauth2;
     userModelConfig.properties = originalUserModelConfig;
-    done();
   });
 
-  describe('Credential Auth', function () {
-    it('should authenticate user', function (done) {
-      authService.authenticateCredential(user.username, _credential.secret, 'oauth2')
+  describe('Credential Auth', () => {
+    it('should authenticate user', () => {
+      return authService.authenticateCredential(user.username, _credential.secret, 'oauth2')
         .then(authResponse => {
           const expectedResponse = Object.assign({
             type: 'user',
@@ -86,116 +79,83 @@ describe('Auth tests', function () {
           }, userFromDb);
           should.exist(authResponse);
           should.deepEqual(authResponse, expectedResponse);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should not authenticate invalid user with credentials', function (done) {
-      authService.authenticateCredential('invalidUsername', _credential.secret, 'oauth2')
+    it('should not authenticate invalid user with credentials', () => {
+      return authService.authenticateCredential('invalidUsername', _credential.secret, 'oauth2')
         .then(authResponse => {
           should.exist(authResponse);
           authResponse.should.eql(false);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should not authenticate valid user with invalid credentials', function (done) {
-      authService.authenticateCredential(user.username, 'invalidSecret', 'oauth2')
+    it('should not authenticate valid user with invalid credentials', () => {
+      return authService.authenticateCredential(user.username, 'invalidSecret', 'oauth2')
         .then(authResponse => {
           should.exist(authResponse);
           authResponse.should.eql(false);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should authorize Credential with scopes', function (done) {
-      authService.authorizeCredential(user.username, 'oauth2', ['someScope1', 'someScope2'])
+    it('should authorize Credential with scopes', () => {
+      return authService.authorizeCredential(user.username, 'oauth2', ['someScope1', 'someScope2'])
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(true);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should not authorize Credential with invalid scopes', function (done) {
-      authService.authorizeCredential(user.username, 'oauth2', ['otherScope', 'someScope2'])
+    it('should not authorize Credential with invalid scopes', () => {
+      return authService.authorizeCredential(user.username, 'oauth2', ['otherScope', 'someScope2'])
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(false);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should not authorize Credential that is inActive', function (done) {
-      credentialService
+    it('should not authorize Credential that is inActive', () => {
+      return credentialService
         .deactivateCredential(user.username, 'oauth2')
         .then(function (res) {
           should.exist(res);
           res.should.eql(true);
         })
-        .then(() => {
-          authService.authorizeCredential(user.username, 'oauth2', ['otherScope', 'someScope2'])
-            .then((authResponse) => {
-              should.exist(authResponse);
-              authResponse.should.eql(false);
+        .then(() => authService.authorizeCredential(user.username, 'oauth2', ['otherScope', 'someScope2']))
+        .then((authResponse) => {
+          should.exist(authResponse);
+          authResponse.should.eql(false);
 
-              // reset credential back to active status
-              credentialService
-                .activateCredential(user.username, 'oauth2')
-                .then(function (res) {
-                  should.exist(res);
-                  res.should.eql(true);
-                  done();
-                });
-            })
-            .catch(function (err) {
-              should.not.exist(err);
-              done();
+          // reset credential back to active status
+          return credentialService
+            .activateCredential(user.username, 'oauth2')
+            .then(function (res) {
+              should.exist(res);
+              res.should.eql(true);
             });
         });
     });
   });
 
-  describe('Token Auth', function () {
+  describe('Token Auth', () => {
     let userAccessToken, tokenId, tokenDecrypted;
-    before(function (done) {
+    before(() => {
       const tokenObj = {
         consumerId: userFromDb.id,
         authType: 'oauth2',
         scopes: ['someScope1', 'someScope2', 'someScope3']
       };
 
-      tokenService.save(tokenObj)
+      return tokenService.save(tokenObj)
         .then((token) => {
           should.exist(token.access_token);
           userAccessToken = token.access_token;
           [tokenId, tokenDecrypted] = token.access_token.split('|');
-          done();
         });
     });
 
-    it('should authenticate token', function (done) {
-      authService.authenticateToken(userAccessToken, 'oauth2')
+    it('should authenticate token', () => {
+      return authService.authenticateToken(userAccessToken, 'oauth2')
         .then(authResponse => {
           const expectedTokenProps = ['consumerId', 'expiresAt', 'id', 'scopes', 'createdAt', 'authType', 'tokenDecrypted'];
           const expectedConsumerProps = ['type', 'createdAt', 'email', 'firstname', 'id', 'isActive', 'lastname', 'updatedAt', 'username'];
@@ -220,58 +180,38 @@ describe('Auth tests', function () {
           };
 
           should.exist(authResponse);
-          Object.keys(authResponse.token).sort().should.eql(expectedTokenProps.sort());
-          Object.keys(authResponse.consumer).sort().should.eql(expectedConsumerProps.sort());
+          should(authResponse.token).have.properties(expectedTokenProps);
+          should(authResponse.consumer).have.properties(expectedConsumerProps);
           delete authResponse.token.expiresAt;
           delete authResponse.token.createdAt;
           delete authResponse.consumer.createdAt;
           delete authResponse.consumer.updatedAt;
           should.deepEqual(authResponse.token, expectedResponse.token);
           should.deepEqual(authResponse.consumer, expectedResponse.consumer);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should not authenticate invalid token', function (done) {
+    it('should not authenticate invalid token', () => {
       authService.authenticateToken('invalidToken', 'oauth2')
         .then(authResponse => {
           should.exist(authResponse);
           authResponse.should.eql(false);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should authorize Token', function (done) {
+    it('should authorize Token', () => {
       authService.authorizeToken(userAccessToken, 'oauth2', ['someScope1', 'someScope2'])
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(true);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should not authorize Token with invalid scopes', function (done) {
+    it('should not authorize Token with invalid scopes', () => {
       authService.authorizeToken(userAccessToken, 'oauth2', ['otherScope', 'someScope2'])
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(false);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
   });
