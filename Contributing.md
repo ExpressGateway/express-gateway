@@ -47,7 +47,7 @@ to documentation, code, binary files, etc. Even long term committers and TC memb
 pull requests.
 
 A pull request should contain:
-- a spec if applicable, e.g. a GitHub gist, public Google Doc, etc. 
+- a spec if applicable, e.g. a GitHub gist, public Google Doc, etc.
 - tests
 - docs (please open a separate pull request in the express-gateway.io repo and reference the pull request #)
 
@@ -105,7 +105,6 @@ to the TC and the TC uses its standard consensus seeking process to evaluate whe
 not to add this new member. Members who do not participate consistently at the level of
 a majority of the other members are expected to resign.
 
-[comment]: <> (Links Section)
 [express-gateway.io-repo]: https://github.com/ExpressGateway/express-gateway.io
 [circleci]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master
 [eg-feathub]: http://feathub.com/ExpressGateway/express-gateway
