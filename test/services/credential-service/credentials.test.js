@@ -8,8 +8,8 @@ const credentialService = services.credential;
 const userService = services.user;
 const db = require('../../../lib/db')();
 
-describe('Credential service tests', function () {
-  describe('Credential tests', function () {
+describe('Credential service tests', () => {
+  describe('Credential tests', () => {
     let credential;
     const originalModelConfig = config.models.credentials;
     const username = 'someUser';
@@ -45,7 +45,7 @@ describe('Credential service tests', function () {
 
       return credentialService
         .insertCredential(username, 'oauth2', _credential)
-        .then(function (newCredential) {
+        .then((newCredential) => {
           should.exist(newCredential);
           credential = Object.assign(newCredential, _credential);
         });
@@ -65,10 +65,10 @@ describe('Credential service tests', function () {
 
       return credentialService
         .insertCredential('someUsername', 'oauth2', _credential)
-        .then(function (newCredential) {
+        .then((newCredential) => {
           should.exist(newCredential);
           should.exist(newCredential.secret);
-          newCredential.secret.length.should.greaterThanOrEqual(10);
+          should(newCredential.secret.length).greaterThanOrEqual(10);
         });
     });
 
@@ -79,7 +79,7 @@ describe('Credential service tests', function () {
 
       return credentialService
         .insertCredential(username, 'basic-auth', _credential)
-        .then(function (newCredential) {
+        .then((newCredential) => {
           should.exist(newCredential);
           newCredential.isActive.should.eql(true);
         });
@@ -88,7 +88,7 @@ describe('Credential service tests', function () {
     it('should get a credential', () => {
       return credentialService
         .getCredential(username, 'oauth2')
-        .then(function (cred) {
+        .then((cred) => {
           should.exist(cred);
           should.not.exist(cred.secret);
           credential.isActive.should.eql(true);
@@ -109,12 +109,12 @@ describe('Credential service tests', function () {
     it('should reactivate a credential', () => {
       return credentialService
         .activateCredential(username, 'oauth2')
-        .then(function (res) {
+        .then((res) => {
           should.exist(res);
 
           return credentialService.getCredential(username, 'oauth2');
         })
-        .then(function (cred) {
+        .then((cred) => {
           should.exist(cred);
           should.not.exist(cred.secret);
           cred.isActive.should.eql(true);
@@ -236,12 +236,13 @@ describe('Credential service tests', function () {
         .then(() => credentialService.insertCredential(username, 'oauth2', _credential))
         .then((newCredential) => {
           should.exist(newCredential);
-          newCredential.isActive.should.eql(true);
           should.exist(newCredential.scopes);
+          should.not.exist(newCredential.secret);
+
+          newCredential.isActive.should.eql(true);
           newCredential.scopes.should.eql(['someScope']);
           newCredential.someProperty.should.eql('propVal');
           newCredential.otherProperty.should.eql('someDefaultValue');
-          should.not.exist(newCredential.secret);
         });
     });
 
@@ -254,12 +255,12 @@ describe('Credential service tests', function () {
             .then((cred) => {
               should.exist(cred);
               should.exist(cred.scopes);
+              cred.isActive.should.eql(true);
               cred.scopes.should.containEql(_credential.scopes);
               cred.scopes.should.containEql('someScope1');
               cred.scopes.should.containEql('someScope2');
               cred.scopes.should.containEql('someScope3');
               cred.scopes.should.containEql('someOtherOne');
-              cred.isActive.should.eql(true);
             });
         });
     });
@@ -344,10 +345,10 @@ describe('Credential service tests', function () {
         .updateCredential(username, 'oauth2', {})
         .then((newCredential) => {
           should.not.exist(newCredential);
-          return credentialService.getCredential(username, 'oauth2')
-            .then(credential => {
-              should.exist(credential);
-            });
+          return credentialService.getCredential(username, 'oauth2');
+        })
+        .then(credential => {
+          should.exist(credential);
         });
     });
   });

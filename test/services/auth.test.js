@@ -55,9 +55,9 @@ describe('Auth tests', function () {
         return credentialService.insertScopes(['someScope1', 'someScope2', 'someScope3']);
       })
       .then(() => {
-        return credentialService.insertCredential(userFromDb.id, 'oauth2', _credential)
-          .then((res) => should.exist(res));
-      });
+        return credentialService.insertCredential(userFromDb.id, 'oauth2', _credential);
+      })
+      .then((res) => should.exist(res));
   });
 
   after(() => {
@@ -89,7 +89,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authenticate valid user with invalid credentials', () => {
-      return authService.authenticateCredential(user.username, 'invalidSecret', 'oauth2')
+      return authService.authenticateCredential(userFromDb.id, 'invalidSecret', 'oauth2')
         .then(authResponse => {
           should.exist(authResponse);
           authResponse.should.eql(false);
