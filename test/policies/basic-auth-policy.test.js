@@ -34,7 +34,7 @@ describe('Functional Tests basic auth Policy', () => {
         authorizedEndpoint: {
           host: '*',
           paths: ['/authorizedPath'],
-          scopes: [ 'authorizedScope' ]
+          scopes: ['authorizedScope']
         },
         unauthorizedEndpoint: {
           host: '*',
@@ -80,9 +80,9 @@ describe('Functional Tests basic auth Policy', () => {
     };
 
     userModelConfig.properties = {
-      firstname: {isRequired: true, isMutable: true},
-      lastname: {isRequired: true, isMutable: true},
-      email: {isRequired: false, isMutable: true}
+      firstname: { isRequired: true, isMutable: true },
+      lastname: { isRequired: true, isMutable: true },
+      email: { isRequired: false, isMutable: true }
     };
 
     db.flushdbAsync()
@@ -101,7 +101,7 @@ describe('Functional Tests basic auth Policy', () => {
 
             credentialService.insertScopes('authorizedScope', 'unauthorizedScope')
               .then(() => {
-                return credentialService.insertCredential(user.username, 'basic-auth', { password: 'user-secret', scopes: [ 'authorizedScope' ] })
+                return credentialService.insertCredential(user.id, 'basic-auth', { password: 'user-secret', scopes: ['authorizedScope'] })
                   .then((userRes) => {
                     should.exist(userRes);
                     return serverHelper.generateBackendServer(6067)
@@ -139,7 +139,7 @@ describe('Functional Tests basic auth Policy', () => {
   });
 
   it('should not authenticate token for requests if requester doesn\'t have authorized scopes', function () {
-    const credentials = Buffer.from(user.id.concat(':user-secret')).toString('base64');
+    const credentials = Buffer.from(user.username.concat(':user-secret')).toString('base64');
 
     return request(app)
       .get('/unauthorizedPath')
@@ -157,7 +157,7 @@ describe('Functional Tests basic auth Policy', () => {
   });
 
   it('should not authenticate invalid token', function () {
-    const credentials = Buffer.from(user.id.concat(':wrongPassword')).toString('base64');
+    const credentials = Buffer.from(user.username.concat(':wrongPassword')).toString('base64');
 
     return request(app)
       .get('/authorizedPath')

@@ -33,64 +33,64 @@ describe('Functional Test Client Password grant', function () {
     };
 
     config.models.users.properties = {
-      firstname: {isRequired: true, isMutable: true},
-      lastname: {isRequired: true, isMutable: true},
-      email: {isRequired: false, isMutable: true}
+      firstname: { isRequired: true, isMutable: true },
+      lastname: { isRequired: true, isMutable: true },
+      email: { isRequired: false, isMutable: true }
     };
 
     db.flushdbAsync()
-    .then(function (didSucceed) {
-      if (!didSucceed) {
-        console.log('Failed to flush the database');
-      }
-      const user1 = {
-        username: 'irfanbaqui',
-        firstname: 'irfan',
-        lastname: 'baqui',
-        email: 'irfan@eg.com'
-      };
-
-      const user2 = {
-        username: 'somejoe',
-        firstname: 'joe',
-        lastname: 'smith',
-        email: 'joe@eg.com'
-      };
-
-      return Promise.all([userService.insert(user1), userService.insert(user2)])
-      .then(([_fromDbUser1, _fromDbUser2]) => {
-        should.exist(_fromDbUser1);
-        should.exist(_fromDbUser2);
-
-        fromDbUser1 = _fromDbUser1;
-
-        const app1 = {
-          name: 'irfan_app',
-          redirectUri: 'https://some.host.com/some/route'
+      .then(function (didSucceed) {
+        if (!didSucceed) {
+          console.log('Failed to flush the database');
+        }
+        const user1 = {
+          username: 'irfanbaqui',
+          firstname: 'irfan',
+          lastname: 'baqui',
+          email: 'irfan@eg.com'
         };
 
-        applicationService.insert(app1, fromDbUser1.id)
-        .then(_fromDbApp => {
-          should.exist(_fromDbApp);
-          fromDbApp = _fromDbApp;
+        const user2 = {
+          username: 'somejoe',
+          firstname: 'joe',
+          lastname: 'smith',
+          email: 'joe@eg.com'
+        };
 
-          credentialService.insertScopes('someScope')
-          .then(() => {
-            Promise.all([ credentialService.insertCredential(fromDbUser1.username, 'oauth2', { secret: 'user-secret' }),
-              credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: [ 'someScope' ] }) ])
-            .then(([userRes, appRes]) => {
-              should.exist(userRes);
-              should.exist(appRes);
-              done();
-            });
+        return Promise.all([userService.insert(user1), userService.insert(user2)])
+          .then(([_fromDbUser1, _fromDbUser2]) => {
+            should.exist(_fromDbUser1);
+            should.exist(_fromDbUser2);
+
+            fromDbUser1 = _fromDbUser1;
+
+            const app1 = {
+              name: 'irfan_app',
+              redirectUri: 'https://some.host.com/some/route'
+            };
+
+            applicationService.insert(app1, fromDbUser1.id)
+              .then(_fromDbApp => {
+                should.exist(_fromDbApp);
+                fromDbApp = _fromDbApp;
+
+                credentialService.insertScopes('someScope')
+                  .then(() => {
+                    Promise.all([credentialService.insertCredential(fromDbUser1.id, 'oauth2', { secret: 'user-secret' }),
+                      credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })])
+                      .then(([userRes, appRes]) => {
+                        should.exist(userRes);
+                        should.exist(appRes);
+                        done();
+                      });
+                  });
+              });
           });
-        });
+      })
+      .catch(function (err) {
+        should.not.exist(err);
+        done();
       });
-    })
-    .catch(function (err) {
-      should.not.exist(err);
-      done();
-    });
   });
 
   after((done) => {
@@ -105,24 +105,24 @@ describe('Functional Test Client Password grant', function () {
     const credentials = Buffer.from(fromDbApp.id.concat(':app-secret')).toString('base64');
 
     request
-    .post('/oauth2/token')
-    .set('Authorization', 'basic ' + credentials)
-    .set('content-type', 'application/x-www-form-urlencoded')
-    .type('form')
-    .send({
-      grant_type: 'password',
-      username: 'irfanbaqui',
-      password: 'user-secret'
-    })
-    .expect(200)
-    .end(function (err, res) {
-      should.not.exist(err);
-      const token = res.body;
-      should.exist(token);
-      should.exist(token.access_token);
-      token.token_type.should.equal('Bearer');
-      done();
-    });
+      .post('/oauth2/token')
+      .set('Authorization', 'basic ' + credentials)
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .type('form')
+      .send({
+        grant_type: 'password',
+        username: 'irfanbaqui',
+        password: 'user-secret'
+      })
+      .expect(200)
+      .end(function (err, res) {
+        should.not.exist(err);
+        const token = res.body;
+        should.exist(token);
+        should.exist(token.access_token);
+        token.token_type.should.equal('Bearer');
+        done();
+      });
   });
 
   it('should grant access token with authorized scopes', function (done) {
@@ -130,34 +130,34 @@ describe('Functional Test Client Password grant', function () {
     const credentials = Buffer.from(fromDbApp.id.concat(':app-secret')).toString('base64');
 
     request
-    .post('/oauth2/token')
-    .set('Authorization', 'basic ' + credentials)
-    .set('content-type', 'application/x-www-form-urlencoded')
-    .type('form')
-    .send({
-      grant_type: 'password',
-      username: 'irfanbaqui',
-      password: 'user-secret',
-      scope: 'someScope'
-    })
-    .expect(200)
-    .end(function (err, res) {
-      should.not.exist(err);
-      const token = res.body;
-      should.exist(token);
-      should.exist(token.access_token);
-      should.exist(token.refresh_token);
-      token.token_type.should.equal('Bearer');
-      refreshToken = token.refresh_token;
+      .post('/oauth2/token')
+      .set('Authorization', 'basic ' + credentials)
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .type('form')
+      .send({
+        grant_type: 'password',
+        username: 'irfanbaqui',
+        password: 'user-secret',
+        scope: 'someScope'
+      })
+      .expect(200)
+      .end(function (err, res) {
+        should.not.exist(err);
+        const token = res.body;
+        should.exist(token);
+        should.exist(token.access_token);
+        should.exist(token.refresh_token);
+        token.token_type.should.equal('Bearer');
+        refreshToken = token.refresh_token;
 
-      tokenService.get(token.access_token)
-        .then(fromDbToken => {
-          should.exist(fromDbToken);
-          fromDbToken.scopes.should.eql([ 'someScope' ]);
-          [ fromDbToken.id, fromDbToken.tokenDecrypted ].should.eql(token.access_token.split('|'));
-          done();
-        });
-    });
+        tokenService.get(token.access_token)
+          .then(fromDbToken => {
+            should.exist(fromDbToken);
+            fromDbToken.scopes.should.eql(['someScope']);
+            [fromDbToken.id, fromDbToken.tokenDecrypted].should.eql(token.access_token.split('|'));
+            done();
+          });
+      });
   });
 
   it('should grant access token in exchange of refresh token', function (done) {
@@ -182,8 +182,8 @@ describe('Functional Test Client Password grant', function () {
         tokenService.get(res.body.access_token)
           .then(token => {
             should.exist(token);
-            token.scopes.should.eql([ 'someScope' ]);
-            [ token.id, token.tokenDecrypted ].should.eql(res.body.access_token.split('|'));
+            token.scopes.should.eql(['someScope']);
+            [token.id, token.tokenDecrypted].should.eql(res.body.access_token.split('|'));
             done();
           });
       });
@@ -194,20 +194,20 @@ describe('Functional Test Client Password grant', function () {
     const credentials = Buffer.from(fromDbApp.id.concat(':app-secret')).toString('base64');
 
     request
-    .post('/oauth2/token')
-    .set('Authorization', 'basic ' + credentials)
-    .set('content-type', 'application/x-www-form-urlencoded')
-    .type('form')
-    .send({
-      grant_type: 'password',
-      username: 'irfanbaqui',
-      password: 'user-secret',
-      scope: 'someScope unauthorizedScope'
-    })
-    .expect(401)
-    .end(function (err) {
-      should.not.exist(err);
-      done();
-    });
+      .post('/oauth2/token')
+      .set('Authorization', 'basic ' + credentials)
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .type('form')
+      .send({
+        grant_type: 'password',
+        username: 'irfanbaqui',
+        password: 'user-secret',
+        scope: 'someScope unauthorizedScope'
+      })
+      .expect(401)
+      .end(function (err) {
+        should.not.exist(err);
+        done();
+      });
   });
 });

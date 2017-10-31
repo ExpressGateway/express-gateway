@@ -55,11 +55,9 @@ describe('Auth tests', function () {
         return credentialService.insertScopes(['someScope1', 'someScope2', 'someScope3']);
       })
       .then(() => {
-        return credentialService.insertCredential(user.username, 'oauth2', _credential)
-          .then(function (res) {
-            should.exist(res);
-          });
-      });
+        return credentialService.insertCredential(userFromDb.id, 'oauth2', _credential);
+      })
+      .then((res) => should.exist(res));
   });
 
   after(() => {
@@ -91,7 +89,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authenticate valid user with invalid credentials', () => {
-      return authService.authenticateCredential(user.username, 'invalidSecret', 'oauth2')
+      return authService.authenticateCredential(userFromDb.id, 'invalidSecret', 'oauth2')
         .then(authResponse => {
           should.exist(authResponse);
           authResponse.should.eql(false);
@@ -99,7 +97,7 @@ describe('Auth tests', function () {
     });
 
     it('should authorize Credential with scopes', () => {
-      return authService.authorizeCredential(user.username, 'oauth2', ['someScope1', 'someScope2'])
+      return authService.authorizeCredential(userFromDb.id, 'oauth2', ['someScope1', 'someScope2'])
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(true);
@@ -107,7 +105,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authorize Credential with invalid scopes', () => {
-      return authService.authorizeCredential(user.username, 'oauth2', ['otherScope', 'someScope2'])
+      return authService.authorizeCredential(userFromDb.id, 'oauth2', ['otherScope', 'someScope2'])
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(false);
@@ -116,19 +114,19 @@ describe('Auth tests', function () {
 
     it('should not authorize Credential that is inActive', () => {
       return credentialService
-        .deactivateCredential(user.username, 'oauth2')
+        .deactivateCredential(userFromDb.id, 'oauth2')
         .then(function (res) {
           should.exist(res);
           res.should.eql(true);
         })
-        .then(() => authService.authorizeCredential(user.username, 'oauth2', ['otherScope', 'someScope2']))
+        .then(() => authService.authorizeCredential(userFromDb.id, 'oauth2', ['otherScope', 'someScope2']))
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(false);
 
           // reset credential back to active status
           return credentialService
-            .activateCredential(user.username, 'oauth2')
+            .activateCredential(userFromDb.id, 'oauth2')
             .then(function (res) {
               should.exist(res);
               res.should.eql(true);

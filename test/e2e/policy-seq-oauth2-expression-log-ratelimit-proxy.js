@@ -148,7 +148,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
       })
       .then(() =>
         Promise.all([credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['authorizedScope'] }),
-          credentialService.insertCredential(user.username, 'basic-auth', { password: 'password', scopes: ['authorizedScope'] })])
+          credentialService.insertCredential(user.id, 'basic-auth', { password: 'password', scopes: ['authorizedScope'] })])
       )
       .then(res => {
         should.exist(res);
