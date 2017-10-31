@@ -10,8 +10,8 @@ const credentialService = require('../lib/services/credentials/credential.servic
   way it looks up the data.
 */
 
-module.exports.up = function (next) {
-  userService.findAll() // Grab all the users
+module.exports.up = function () {
+  return userService.findAll() // Grab all the users
     .then(({ users }) => {
       const userPromises = users.map((user) => {
         log('Processing user', user.username);
@@ -27,16 +27,15 @@ module.exports.up = function (next) {
                 .then(() => credentialService.insertCredential(user.id, credential.type, credential)
                   .catch(err => log.error('Credential existing already', err)) // Create a new one with the ID instead of the username
                 )
-                .then(() => log('Created credential', `${user.username} credential migrated successfully to ${user.id}`))
-                .catch(next);
+                .then(() => log('Created credential', `${user.username} credential migrated successfully to ${user.id}`));
             });
 
             return Promise.all(credentialPromises);
           });
       });
 
-      return Promise.all(userPromises).then(() => next()); // Everything is awesome!
-    });
+      return Promise.all(userPromises); // Everything is awesome!
+    }).then(() => { });
 };
 
 module.exports.down = function (next) {
