@@ -71,6 +71,7 @@
     "has-flag": "2.0.0",
     "http-proxy": "1.16.2",
     "js-yaml": "^3.10.0",
+    "migrate": "^1.0.0-2",
     "minimatch": "^3.0.4",
     "oauth2orize": "^1.10.0",
     "parent-require": "^1.0.0",
