@@ -26,6 +26,7 @@ jobs:
     working_directory: ~/repo
 
     steps:
+      - checkout
       - setup_remote_docker
       - run: npm publish
       - run: "docker build -t expressgateway/express-gateway:${CIRCLE_TAG} --build-arg VERSION=latest - < Dockerfile"
@@ -53,3 +54,4 @@ workflows:
               only: master
           requires:
             - node-8
+            - node-6
