@@ -10,7 +10,7 @@ describe('Migrations', () => {
     let tmpFile;
     let userId;
     let oldCredential;
-    before('I insert some credentials by user ID', () => {
+    before('I insert some credentials by user name', () => {
       return userService.insert({
         username: 'vncz',
         firstname: 'Vincenzo',
