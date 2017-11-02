@@ -2,6 +2,7 @@ const log = require('migrate/lib/log');
 
 const userService = require('../lib/services/consumers/user.service');
 const credentialService = require('../lib/services/credentials/credential.service');
+const credentialDao = require('../lib/services/credentials/credential.dao');
 
 /*
   This migration will use the services to deactivate all credentials that are still active and coupled to the username
@@ -19,12 +20,17 @@ module.exports.up = function () {
         return credentialService.getCredentials(user.username) // Grab credentials coupled to the user name
           .then((credentials) => {
             const credentialPromises = credentials.filter(c => c.isActive).map((credential) => { // Filter the ones that are still active
+              const credentialType = credential.type;
               log('Processing credential', `${credential.type}, user: ${user.username}`);
 
               return credentialService
-                .deactivateCredential(user.username, credential.type) // Deactivate the credential
+                .deactivateCredential(user.username, credentialType) // Deactivate the credential
                 .then(() => log('Processed credential', `${user.username} credential deactivated successfully.`))
-                .then(() => credentialService.insertCredential(user.id, credential.type, credential)
+                .then(() => {
+                  credential.isActive = 'true';
+                  delete credential.type;
+                })
+                .then(() => credentialDao.insertCredential(user.id, credentialType, credential)
                   .catch(err => log.error('Credential existing already', err)) // Create a new one with the ID instead of the username
                 )
                 .then(() => log('Created credential', `${user.username} credential migrated successfully to ${user.id}`));
