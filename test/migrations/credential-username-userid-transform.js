@@ -1,25 +1,27 @@
 const migrate = require('migrate');
 const tmp = require('tmp');
 const db = require('../../lib/db')();
+const idGen = require('uuid-base62');
 const { assert } = require('chai');
 const userService = require('../../lib/services/consumers/user.service');
 const credentialService = require('../../lib/services/credentials/credential.service');
 
 describe('Migrations', () => {
   describe('Username -> UserID credential transform', () => {
+    const username = idGen.v4();
     let tmpFile;
     let userId;
     let oldCredential;
     before('I insert some credentials by user name', () => {
       return userService.insert({
-        username: 'vncz',
+        username,
         firstname: 'Vincenzo',
         lastname: 'Chianese'
       }).then((user) => {
         userId = user.id;
         return credentialService
-          .insertCredential('vncz', 'basic-auth', {})
-          .then(() => credentialService.getCredentials('vncz'))
+          .insertCredential(username, 'basic-auth', {})
+          .then(() => credentialService.getCredentials(username))
           .then((creds) => { oldCredential = creds[0]; });
       });
     });
@@ -35,7 +37,7 @@ describe('Migrations', () => {
     });
 
     it('should not find any active credential with user name any more', () => {
-      return credentialService.getCredentials('vncz').then((credentials) => {
+      return credentialService.getCredentials(username).then((credentials) => {
         assert.lengthOf(credentials.filter(c => c.isActive), 0);
       });
     });
@@ -48,7 +50,9 @@ describe('Migrations', () => {
     });
 
     after(() => {
-      tmpFile.removeCallback();
+      if (tmpFile) {
+        tmpFile.removeCallback();
+      }
       return db.flushdb();
     });
   });
