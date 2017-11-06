@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const request = require('supertest');
 const should = require('should');
 
@@ -11,7 +8,7 @@ const services = require('../../lib/services');
 const credentialService = services.credential;
 const userService = services.user;
 const serverHelper = require('../common/server-helper');
-const db = require('../../lib/db')();
+const db = require('../../lib/db');
 
 const testHelper = require('../common/routing.helper');
 const config = require('../../lib/config');
@@ -85,7 +82,7 @@ describe('Functional Tests basic auth Policy', () => {
       email: { isRequired: false, isMutable: true }
     };
 
-    db.flushdbAsync()
+    db.flushdb()
       .then(function () {
         const user1 = {
           username: 'irfanbaqui',

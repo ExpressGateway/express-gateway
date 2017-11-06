@@ -1,30 +1,25 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const should = require('should');
 const uuid = require('uuid');
 const config = require('../../lib/config');
 const services = require('../../lib/services');
 const applicationService = services.application;
 const userService = services.user;
-const db = require('../../lib/db')();
+const db = require('../../lib/db');
 
 describe('Application service tests', function () {
   let originalUserModelConfig;
 
-  before(function (done) {
+  before(function () {
     originalUserModelConfig = config.models.users.properties;
     config.models.users.properties = {
       firstname: { isRequired: true, isMutable: true },
       lastname: { isRequired: true, isMutable: true },
       email: { isRequired: false, isMutable: true }
     };
-    done();
   });
 
-  after(function (done) {
+  after(function () {
     config.models.users.properties = originalUserModelConfig;
-    done();
   });
 
   describe('Insert tests', function () {
@@ -38,15 +33,14 @@ describe('Application service tests', function () {
         irrelevantProp: { isMutable: true } // isRequired is false by default
       };
 
-      return db.flushdbAsync();
+      return db.flushdb();
     });
 
-    after(function (done) {
+    after(function () {
       config.models.applications.properties = originalAppModelConfig;
-      done();
     });
 
-    it('should insert an application and application should have default value of properties if not defined, and un-required properties ignored if not defined', function (done) {
+    it('should insert an application and application should have default value of properties if not defined, and un-required properties ignored if not defined', function () {
       const _user = createRandomUserObject();
       let app;
 
@@ -59,32 +53,35 @@ describe('Application service tests', function () {
             name: 'test-app-1'
           };
 
-          applicationService
-            .insert(app, user.id)
-            .then(function (newApp) {
-              should.exist(newApp);
-              should.exist(newApp.id);
-              should.exist(newApp.name);
-              should.exist(newApp.isActive);
-              should.exist(newApp.group);
-              newApp.isActive.should.eql(true);
-              newApp.name.should.eql(app.name);
-              newApp.group.should.eql('someGroup');
-              should.not.exist(newApp.irrelevantProp);
-              should.exist(newApp.createdAt);
-              should.exist(newApp.userId);
-              newApp.userId.should.eql(user.id);
-              done();
-            })
-            .catch(function (err) {
-              should.not.exist(err);
-              done();
-            });
+          return applicationService.insert(app, user.id);
+        })
+        .then(function (newApp) {
+          should.exist(newApp);
+          should.exist(newApp.id);
+          should.exist(newApp.name);
+          should.exist(newApp.isActive);
+          should.exist(newApp.group);
+          newApp.isActive.should.eql(true);
+          newApp.name.should.eql(app.name);
+          newApp.group.should.eql('someGroup');
+          should.not.exist(newApp.irrelevantProp);
+          should.exist(newApp.createdAt);
+          should.exist(newApp.userId);
+          newApp.userId.should.eql(user.id);
         });
     });
 
-    it('should throw an error when inserting an app with missing properties that are required', function () {
-      should(() => applicationService.insert({}, user.id)).throw('Failed to insert application: name is required');
+    it('should throw when inserting an app with missing properties that are required', function (done) {
+      applicationService
+        .insert({}, user.id)
+        .then(function (newApp) {
+          should.not.exist(newApp);
+        })
+        .catch(function (err) {
+          should.exist(err);
+          err.message.should.eql('Failed to insert application: name is required');
+          done();
+        });
     });
 
     it('should allow inserting multiple applications per user', function (done) {
@@ -122,7 +119,7 @@ describe('Application service tests', function () {
         irrelevantProp: { isMutable: true } // isRequired is false by default
       };
 
-      db.flushdbAsync()
+      db.flushdb()
         .then(function () {
           const _user = createRandomUserObject();
           userService
@@ -264,7 +261,7 @@ describe('Application service tests', function () {
         group: { defaultValue: 'admin', isMutable: false }
       };
 
-      return db.flushdbAsync();
+      return db.flushdb();
     });
 
     after(function (done) {
@@ -366,7 +363,7 @@ describe('Application service tests', function () {
         group: { defaultValue: 'admin', isMutable: false }
       };
 
-      return db.flushdbAsync();
+      return db.flushdb();
     });
 
     after(function (done) {
@@ -524,7 +521,7 @@ describe('Application service tests', function () {
         irrelevantProp: { isMutable: true } // isRequired is false by default
       };
 
-      db.flushdbAsync()
+      db.flushdb()
         .then(function () {
           const _user = createRandomUserObject();
           userService

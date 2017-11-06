@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const session = require('supertest-session');
 const should = require('should');
 const qs = require('querystring');
@@ -16,7 +13,7 @@ const services = require('../../../lib/services/index');
 const credentialService = services.credential;
 const userService = services.user;
 const applicationService = services.application;
-const db = require('../../../lib/db')();
+const db = require('../../../lib/db');
 
 const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
@@ -75,7 +72,7 @@ describe('Request Headers with consumer and token information as part of auth po
       email: { isRequired: false, isMutable: true }
     };
 
-    db.flushdbAsync()
+    db.flushdb()
       .then(function () {
         const user1 = {
           username: 'irfanbaqui',

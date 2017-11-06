@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const session = require('supertest-session');
 const should = require('should');
 const qs = require('querystring');
@@ -17,7 +14,7 @@ const services = require('../../lib/services');
 const credentialService = services.credential;
 const userService = services.user;
 const applicationService = services.application;
-const db = require('../../lib/db')();
+const db = require('../../lib/db');
 
 const testHelper = require('../common/routing.helper');
 const config = require('../../lib/config');
@@ -118,7 +115,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
     };
 
     db
-      .flushdbAsync()
+      .flushdb()
       .then(function () {
         const user1 = {
           username: 'irfanbaqui',

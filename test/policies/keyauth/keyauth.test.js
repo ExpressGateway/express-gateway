@@ -1,5 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
 const headerName = 'Authorization';
 
 const request = require('supertest');
@@ -9,7 +7,7 @@ const services = require('../../../lib/services');
 const credentialService = services.credential;
 const userService = services.user;
 const serverHelper = require('../../common/server-helper');
-const db = require('../../../lib/db')();
+const db = require('../../../lib/db');
 const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
 const originalGatewayConfig = config.gatewayConfig;
@@ -94,7 +92,7 @@ describe('Functional Tests keyAuth Policy', () => {
       }
     };
 
-    return db.flushdbAsync()
+    return db.flushdb()
       .then(function () {
         const user1 = {
           username: 'test',

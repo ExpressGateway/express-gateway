@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const session = require('supertest-session');
 const should = require('should');
 const url = require('url');
@@ -13,7 +10,7 @@ const credentialService = services.credential;
 const userService = services.user;
 const applicationService = services.application;
 const tokenService = services.token;
-const db = require('../../lib/db')();
+const db = require('../../lib/db');
 
 describe('Functional Test Implicit grant', function () {
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
@@ -45,7 +42,7 @@ describe('Functional Test Implicit grant', function () {
       email: { isRequired: false, isMutable: true }
     };
 
-    db.flushdbAsync()
+    db.flushdb()
       .then(() => {
         const user1 = {
           username: 'irfanbaqui',

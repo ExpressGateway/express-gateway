@@ -2,8 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 const sinon = require('sinon');
-const fakeredis = require('fakeredis');
-
+const ioredis = require('ioredis');
 const dbPath = '../lib/db';
 const config = require('../lib/config');
 let originalSystemConfig = config.systemConfig;
@@ -11,27 +10,26 @@ let originalSystemConfig = config.systemConfig;
 const clientKeyFile = path.join(__dirname, 'fixtures/certs/client', 'client.key');
 const clientCertFile = path.join(__dirname, 'fixtures/certs/client', 'client.crt');
 const chainFile = path.join(__dirname, 'fixtures/certs/chain', 'chain.pem');
-
-let db;
+const spy = sinon.spy(ioredis.prototype, 'parseOptions');
 
 describe('configured DB options', () => {
   describe('TLS keyFile, certFile and caFile', function () {
     before(() => {
-      sinon.spy(fakeredis, 'createClient');
-    });
-
-    beforeEach(() => {
       originalSystemConfig = config.systemConfig;
+    });
+    beforeEach(() => {
       delete require.cache[require.resolve(dbPath)];
-      db = require(dbPath);
+      config.systemConfig.db.redis.emulate = false;
     });
 
     afterEach(() => {
       config.systemConfig = originalSystemConfig;
+      ioredis.prototype.parseOptions.reset();
     });
 
     after(() => {
-      fakeredis.createClient.restore();
+      delete require.cache[require.resolve('../lib/config')];
+      ioredis.prototype.parseOptions.restore();
     });
 
     describe('when configured', () => {
@@ -41,24 +39,20 @@ describe('configured DB options', () => {
           certFile: clientCertFile,
           caFile: chainFile
         };
-        assert(!config.systemConfig.db.redis.tls.key);
-        assert(!config.systemConfig.db.redis.tls.cert);
-        assert(!config.systemConfig.db.redis.tls.ca);
-
-        db();
+        require(dbPath);
 
         assert.equal(
-          fakeredis.createClient.getCall(0).args[0].tls.key.toString(),
+          spy.getCall(0).args[0].tls.key.toString(),
           fs.readFileSync(clientKeyFile).toString()
         );
 
         assert.equal(
-          fakeredis.createClient.getCall(0).args[0].tls.cert.toString(),
+          spy.getCall(0).args[0].tls.cert.toString(),
           fs.readFileSync(clientCertFile).toString()
         );
 
         assert.equal(
-          fakeredis.createClient.getCall(0).args[0].tls.ca.toString(),
+          spy.getCall(0).args[0].tls.ca.toString(),
           fs.readFileSync(chainFile).toString()
         );
       });
@@ -67,12 +61,10 @@ describe('configured DB options', () => {
     describe('when not configured', () => {
       it('does not load certificates from specified paths', () => {
         config.systemConfig.db.redis.tls = {};
-
-        db();
-
-        assert(!fakeredis.createClient.getCall(0).args[0].tls.key);
-        assert(!fakeredis.createClient.getCall(0).args[0].tls.cert);
-        assert(!fakeredis.createClient.getCall(0).args[0].tls.ca);
+        require(dbPath);
+        assert(!spy.getCall(0).args[0].tls.key);
+        assert(!spy.getCall(0).args[0].tls.cert);
+        assert(!spy.getCall(0).args[0].tls.ca);
       });
     });
   });

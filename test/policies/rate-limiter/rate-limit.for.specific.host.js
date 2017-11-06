@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
 const originalGatewayConfig = config.gatewayConfig;

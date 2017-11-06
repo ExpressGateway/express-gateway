@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const session = require('supertest-session');
 const should = require('should');
 const app = require('./bootstrap');
@@ -11,7 +8,7 @@ const credentialService = services.credential;
 const userService = services.user;
 const applicationService = services.application;
 const tokenService = services.token;
-const db = require('../../lib/db')();
+const db = require('../../lib/db');
 
 describe('Functional Test Client Password grant', function () {
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
@@ -38,7 +35,7 @@ describe('Functional Test Client Password grant', function () {
       email: { isRequired: false, isMutable: true }
     };
 
-    db.flushdbAsync()
+    db.flushdb()
       .then(() => {
         const user1 = {
           username: 'irfanbaqui',

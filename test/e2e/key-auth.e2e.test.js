@@ -69,7 +69,7 @@ describe('E2E: key-auth Policy', () => {
       }
     };
     return cliHelper.bootstrapFolder().then(dirInfo => {
-      return gwHelper.startGatewayInstance({dirInfo, gatewayConfig});
+      return gwHelper.startGatewayInstance({ dirInfo, gatewayConfig });
     }).then(gwInfo => {
       gatewayProcess = gwInfo.gatewayProcess;
       gatewayPort = gwInfo.gatewayPort;
@@ -79,7 +79,8 @@ describe('E2E: key-auth Policy', () => {
       return cliHelper.runCLICommand({
         cliArgs: ['scopes create', 'authorizedScope', 'unauthorizedScope'],
         adminPort,
-        configDirectoryPath});
+        configDirectoryPath
+      });
     }).then((scopes) => {
       const args = [
         '-p', `username=${username}`,
@@ -87,14 +88,16 @@ describe('E2E: key-auth Policy', () => {
         '-p', 'lastname=Smith'
       ];
       return cliHelper.runCLICommand({
-        cliArgs: ['users create '].concat(args),
+        cliArgs: ['users create'].concat(args),
         adminPort,
-        configDirectoryPath});
+        configDirectoryPath
+      });
     }).then(newUser => {
       return cliHelper.runCLICommand({
-        cliArgs: ['credentials create -t key-auth -p "scopes=authorizedScope" -c ', newUser.id],
+        cliArgs: ['credentials create -t key-auth -p "scopes=authorizedScope" -c', newUser.id],
         adminPort,
-        configDirectoryPath});
+        configDirectoryPath
+      });
     }).then(cred => {
       keyCred = cred;
     });

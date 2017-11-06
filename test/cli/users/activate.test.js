@@ -59,7 +59,7 @@ describe('eg users activate', () => {
             assert.equal(output, 'Activated ' + userName);
             assert.equal(error, null);
             done();
-          });
+          }).catch(done);
       });
     });
 
@@ -87,7 +87,7 @@ describe('eg users activate', () => {
             assert.equal(output, 'Activated ' + userId);
             assert.equal(error, null);
             done();
-          });
+          }).catch(done);
       });
     });
 
@@ -118,7 +118,7 @@ describe('eg users activate', () => {
             assert.ok(output['Activated ' + userName2]);
             assert.equal(Object.keys(output).length, 2);
             done();
-          });
+          }).catch(done);
       });
     });
 
@@ -143,7 +143,7 @@ describe('eg users activate', () => {
               assert.equal(user.isActive, true);
               assert.equal(output, userName);
               done();
-            });
+            }).catch(done);
       });
     });
 

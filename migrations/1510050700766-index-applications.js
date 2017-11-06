@@ -21,7 +21,7 @@ module.exports.up = function () {
                 const appNamespace = 'application';
                 const appNameSetKey = config.systemConfig.db.redis.namespace.concat('-', appNamespace).concat(':', app.name);
                 log('Indexing', `${app.id} as ${app.name}`);
-                return db.saddAsync(appNameSetKey, app.id).catch((err) => log.error('Key existing', err)); // Try to add the missing index
+                return db.sadd(appNameSetKey, app.id).catch((err) => log.error('Key existing', err)); // Try to add the missing index
               });
               return Promise.all(applicationPromises);
             });

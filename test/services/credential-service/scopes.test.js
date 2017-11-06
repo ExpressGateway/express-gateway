@@ -1,13 +1,10 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const should = require('should');
 const services = require('../../../lib/services');
 const credentialService = services.credential;
-const db = require('../../../lib/db')();
+const db = require('../../../lib/db');
 
 describe('Scope tests', function () {
-  before(() => db.flushdbAsync());
+  before(() => db.flushdb());
 
   it('should insert a scope', function (done) {
     credentialService

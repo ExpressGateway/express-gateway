@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const session = require('supertest-session');
 const should = require('should');
 
@@ -12,7 +9,7 @@ const credentialService = services.credential;
 const userService = services.user;
 const applicationService = services.application;
 const serverHelper = require('../../common/server-helper');
-const db = require('../../../lib/db')();
+const db = require('../../../lib/db');
 
 const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
@@ -35,7 +32,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
         authorizedEndpoint: {
           host: '*',
           paths: ['/authorizedPath'],
-          scopes: [ 'authorizedScope' ]
+          scopes: ['authorizedScope']
         },
         unauthorizedEndpoint: {
           host: '*',
@@ -49,14 +46,14 @@ describe('Functional Tests oAuth2.0 Policy', () => {
           apiEndpoints: ['authorizedEndpoint'],
           policies: [
             { oauth2: {} },
-            { proxy: [ { action: { serviceEndpoint: 'backend' } } ] }
+            { proxy: [{ action: { serviceEndpoint: 'backend' } }] }
           ]
         },
         pipeline2: {
           apiEndpoints: ['unauthorizedEndpoint'],
           policies: [
             { oauth2: {} },
-            { proxy: [ { action: { serviceEndpoint: 'backend' } } ] }
+            { proxy: [{ action: { serviceEndpoint: 'backend' } }] }
           ]
         }
       }
@@ -77,12 +74,12 @@ describe('Functional Tests oAuth2.0 Policy', () => {
     };
 
     userModelConfig.properties = {
-      firstname: {isRequired: true, isMutable: true},
-      lastname: {isRequired: true, isMutable: true},
-      email: {isRequired: false, isMutable: true}
+      firstname: { isRequired: true, isMutable: true },
+      lastname: { isRequired: true, isMutable: true },
+      email: { isRequired: false, isMutable: true }
     };
 
-    db.flushdbAsync()
+    db.flushdb()
       .then(function () {
         const user1 = {
           username: 'irfanbaqui',
