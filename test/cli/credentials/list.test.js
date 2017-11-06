@@ -44,7 +44,6 @@ describe('eg credentials list -c ', () => {
     return credentials
       .create(username, type, options)
       .then((credential) => {
-        const promises = [];
         createdTypes.inc(type, isActive);
 
         switch (type) {
@@ -52,12 +51,10 @@ describe('eg credentials list -c ', () => {
             const { keyId } = credential;
             createdKeyAuthKeys.add(keyId, isActive);
             if (!isActive) {
-              promises.push(credentials.deactivate(keyId, type));
+              return credentials.deactivate(keyId, type);
             }
             break;
         }
-
-        return Promise.all(promises);
       });
   };
 
