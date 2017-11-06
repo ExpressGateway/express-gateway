@@ -12,36 +12,38 @@ const credentialDao = require('../lib/services/credentials/credential.dao');
 */
 
 module.exports.up = function () {
-  return userService.findAll() // Grab all the users
-    .then(({ users }) => {
-      const userPromises = users.map((user) => {
-        log('Processing user', user.username);
+  return new Promise((resolve, reject) => {
+    userService.findAll() // Grab all the users
+      .then(({ users }) => {
+        const userPromises = users.map((user) => {
+          log('Processing user', user.username);
 
-        return credentialService.getCredentials(user.username) // Grab credentials coupled to the user name
-          .then((credentials) => {
-            const credentialPromises = credentials.filter(c => c.isActive).map((credential) => { // Filter the ones that are still active
-              const credentialType = credential.type;
-              log('Processing credential', `${credential.type}, user: ${user.username}`);
+          return credentialService.getCredentials(user.username) // Grab credentials coupled to the user name
+            .then((credentials) => {
+              const credentialPromises = credentials.filter(c => c.isActive).map((credential) => { // Filter the ones that are still active
+                const credentialType = credential.type;
+                log('Processing credential', `${credential.type}, user: ${user.username}`);
 
-              return credentialService
-                .deactivateCredential(user.username, credentialType) // Deactivate the credential
-                .then(() => log('Processed credential', `${user.username} credential deactivated successfully.`))
-                .then(() => {
-                  credential.isActive = 'true';
-                  delete credential.type;
-                })
-                .then(() => credentialDao.insertCredential(user.id, credentialType, credential)
-                  .catch(err => log.error('Credential existing already', err)) // Create a new one with the ID instead of the username
-                )
-                .then(() => log('Created credential', `${user.username} credential migrated successfully to ${user.id}`));
+                return credentialService
+                  .deactivateCredential(user.username, credentialType) // Deactivate the credential
+                  .then(() => log('Processed credential', `${user.username} credential deactivated successfully.`))
+                  .then(() => {
+                    credential.isActive = 'true';
+                    delete credential.type;
+                  })
+                  .then(() => credentialDao.insertCredential(user.id, credentialType, credential)
+                    .catch(err => log.error('Credential existing already', err)) // Create a new one with the ID instead of the username
+                  )
+                  .then(() => log('Created credential', `${user.username} credential migrated successfully to ${user.id}`));
+              });
+
+              return Promise.all(credentialPromises);
             });
+        });
 
-            return Promise.all(credentialPromises);
-          });
-      });
-
-      return Promise.all(userPromises); // Everything is awesome!
-    }).then(() => { });
+        return Promise.all(userPromises); // Everything is awesome!
+      }).then(() => resolve()).catch(reject);
+  });
 };
 
 module.exports.down = function (next) {
