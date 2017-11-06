@@ -75,23 +75,27 @@ describe('eg credentials list -c ', () => {
     env.prepareHijack();
 
     return adminHelper
-      .admin
-      .users
-      .create({
-        username: idGen.v4(),
-        firstname: 'La',
-        lastname: 'Deeda'
-      })
-      .then(user => {
-        username = user.username;
-        return Promise.all([
-          createCredential('key-auth'),
-          createCredential('basic-auth', { password: 'test1' }),
-          createCredential('oauth2', { secret: 'eg1' }),
-          createCredential('key-auth', {}, false),
-          createCredential('key-auth', {}, false),
-          createCredential('key-auth', {}, false)
-        ]);
+      .reset()
+      .then(() => {
+        return adminHelper
+          .admin
+          .users
+          .create({
+            username: idGen.v4(),
+            firstname: 'La',
+            lastname: 'Deeda'
+          })
+          .then(user => {
+            username = user.username;
+            return Promise.all([
+              createCredential('key-auth'),
+              createCredential('basic-auth', { password: 'test1' }),
+              createCredential('oauth2', { secret: 'eg1' }),
+              createCredential('key-auth', {}, false),
+              createCredential('key-auth', {}, false),
+              createCredential('key-auth', {}, false)
+            ]);
+          });
       });
   });
 
