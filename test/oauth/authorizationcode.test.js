@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const session = require('supertest-session');
 const should = require('should');
 const url = require('url');

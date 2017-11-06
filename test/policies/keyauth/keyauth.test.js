@@ -1,5 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
 const headerName = 'Authorization';
 
 const request = require('supertest');

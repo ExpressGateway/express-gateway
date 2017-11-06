@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const should = require('should');
 const config = require('../../../lib/config');
 const services = require('../../../lib/services');

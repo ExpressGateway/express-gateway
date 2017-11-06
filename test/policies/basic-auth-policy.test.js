@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const request = require('supertest');
 const should = require('should');
 

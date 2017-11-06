@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const testHelper = require('../common/routing.helper');
 const Config = require('../../lib/config/config');
 describe('path resolution for specific and general domains', () => {
@@ -23,15 +20,17 @@ describe('path resolution for specific and general domains', () => {
     describe('paths configuration without wildcards paths:/admin host:' + host, () => {
       const helper = testHelper();
       before('setup', () => {
-        const plugins = {policies: [{
-          name: 'routeTest',
-          policy: () => (req, res) => {
-            res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
-          }
-        }]};
+        const plugins = {
+          policies: [{
+            name: 'routeTest',
+            policy: () => (req, res) => {
+              res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+            }
+          }]
+        };
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin';
-        helper.setup({config, plugins});
+        helper.setup({ config, plugins });
       });
 
       after('cleanup', (done) => {
@@ -65,15 +64,19 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths configuration with  /admin/*', () => {
       const helper = testHelper();
-      const plugins = {policies: [{name: 'routeTest',
-        policy: () => (req, res) => {
-          res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
-        }}]};
+      const plugins = {
+        policies: [{
+          name: 'routeTest',
+          policy: () => (req, res) => {
+            res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+          }
+        }]
+      };
 
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/*';
-        helper.setup({config, plugins});
+        helper.setup({ config, plugins });
       });
 
       after('cleanup', (done) => {
@@ -107,15 +110,19 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths with one named parameter /admin/:id', () => {
       const helper = testHelper();
-      const plugins = {policies: [{name: 'routeTest',
-        policy: () => (req, res) => {
-          res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
-        }}]};
+      const plugins = {
+        policies: [{
+          name: 'routeTest',
+          policy: () => (req, res) => {
+            res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+          }
+        }]
+      };
 
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/:id';
-        helper.setup({config, plugins});
+        helper.setup({ config, plugins });
       });
 
       after('cleanup', (done) => {
@@ -137,7 +144,7 @@ describe('path resolution for specific and general domains', () => {
         }));
       });
 
-      [ '/student', '/adm', '/admin', '/admin/', '/admin/1/rt' ].forEach(function (url) {
+      ['/student', '/adm', '/admin', '/admin/', '/admin/1/rt'].forEach(function (url) {
         it('should not serve  url: ' + url, helper.validate404({
           setup: {
             host,
@@ -149,15 +156,19 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths with one named parameter /admin/:group/:id', () => {
       const helper = testHelper();
-      const plugins = {policies: [{name: 'routeTest',
-        policy: () => (req, res) => {
-          res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
-        }}]};
+      const plugins = {
+        policies: [{
+          name: 'routeTest',
+          policy: () => (req, res) => {
+            res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+          }
+        }]
+      };
 
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/:group/:id';
-        helper.setup({config, plugins});
+        helper.setup({ config, plugins });
       });
 
       after('cleanup', (done) => {
@@ -191,15 +202,19 @@ describe('path resolution for specific and general domains', () => {
 
     describe('paths configuration with wildcard after slash or directory ["/admin","/admin/*"]', () => {
       const helper = testHelper();
-      const plugins = {policies: [{name: 'routeTest',
-        policy: () => (req, res) => {
-          res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
-        }}]};
+      const plugins = {
+        policies: [{
+          name: 'routeTest',
+          policy: () => (req, res) => {
+            res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+          }
+        }]
+      };
 
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = ['/admin', '/admin/*'];
-        helper.setup({config, plugins});
+        helper.setup({ config, plugins });
       });
 
       after('cleanup', (done) => {

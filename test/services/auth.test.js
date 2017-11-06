@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const should = require('should');
 const credentialModelConfig = require('../../lib/config/models/credentials');
 const userModelConfig = require('../../lib/config/models/users');
