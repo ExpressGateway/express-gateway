@@ -50,9 +50,7 @@ describe('Migrations', () => {
     });
 
     after(() => {
-      if (tmpFile) {
-        tmpFile.removeCallback();
-      }
+      tmpFile.removeCallback();
       return db.flushdb();
     });
   });
