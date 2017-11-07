@@ -51,7 +51,7 @@ workflows:
             tags:
               only: /^v\d\.\d\.\d/
             branches:
-              only: master
+              ignore: /.*/
           requires:
             - node-8
             - node-6
