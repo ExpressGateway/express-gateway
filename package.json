@@ -55,7 +55,8 @@
     "exclude": [
       "logo",
       "node_modules",
-      "coverage"
+      "coverage",
+      "migrations"
     ]
   },
   "types": "./index.d.ts",
