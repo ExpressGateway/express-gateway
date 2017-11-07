@@ -1,5 +1,6 @@
 import express = require("express");
 import { EventEmitter } from "events";
+import { JSONSchema4 } from "json-schema";
 
 declare global {
   namespace Express {
@@ -11,12 +12,14 @@ declare global {
   namespace ExpressGateway {
     interface Policy {
       name: string,
-      policy(actionParams): express.RequestHandler
+      policy(actionParams): express.RequestHandler,
+      schema?: JSONSchema4
     }
 
     interface Condition {
       name: string,
-      handler(req: express.Request, conditionConfig): boolean
+      handler(req: express.Request, conditionConfig): boolean,
+      schema?: JSONSchema4
     }
 
     interface PluginContext {
@@ -24,15 +27,15 @@ declare global {
       registerCondition(condition: Condition): void,
       registerGatewayRoute(gatewayRoutesDeclaration: (gatewayExpressApp: express.Application) => void): void,
       registerAdminRoute(adminRoutesDeclaration: (adminExpressApp: express.Application) => void): void,
-      registerCLIExtension(cliExtension): void
+      registerCLIExtension(cliExtension): void,
       eventBus: EventEmitter
     }
 
     export interface Plugin {
       version?: string,
       policies?: Array<string>,
-      init(context: PluginContext): void
-      options?: object
+      init(context: PluginContext): void,
+      schema?: JSONSchema4
     }
   }
 }
