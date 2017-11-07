@@ -46,14 +46,13 @@ describe('eg credentials list -c ', () => {
       .then((credential) => {
         createdTypes.inc(type, isActive);
 
-        switch (type) {
-          case 'key-auth':
-            const { keyId } = credential;
-            createdKeyAuthKeys.add(keyId, isActive);
-            if (!isActive) {
-              return credentials.deactivate(keyId, type);
-            }
-            break;
+        if (type === 'key-auth') {
+          const { keyId } = credential;
+          createdKeyAuthKeys.add(keyId, isActive);
+
+          if (!isActive) {
+            return credentials.deactivate(keyId, type);
+          }
         }
       });
   };
