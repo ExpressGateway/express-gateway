@@ -50,6 +50,8 @@ workflows:
           filters:
             tags:
               only: /^v\d\.\d\.\d/
+            branches:
+              ignore: /.*/
           requires:
             - node-8
             - node-6
