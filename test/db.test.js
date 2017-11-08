@@ -13,10 +13,13 @@ const clientCertFile = path.join(__dirname, 'fixtures/certs/client', 'client.crt
 const chainFile = path.join(__dirname, 'fixtures/certs/chain', 'chain.pem');
 
 let db;
+let EgDbEmulate;
 
 describe('configured DB options', () => {
   describe('TLS keyFile, certFile and caFile', function () {
     before(() => {
+      EgDbEmulate = process.env.EG_DB_EMULATE;
+      process.env.EG_DB_EMULATE = '1';
       sinon.spy(fakeredis, 'createClient');
     });
 
@@ -31,6 +34,12 @@ describe('configured DB options', () => {
     });
 
     after(() => {
+      if (EgDbEmulate) {
+        process.env.EG_DB_EMULATE = EgDbEmulate;
+      } else {
+        delete process.env.EG_DB_EMULATE;
+      }
+
       fakeredis.createClient.restore();
     });
 
