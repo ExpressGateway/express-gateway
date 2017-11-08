@@ -48,7 +48,8 @@
     "exclude": [
       "logo",
       "node_modules",
-      "coverage"
+      "coverage",
+      "test"
     ]
   },
   "types": "./index.d.ts",
