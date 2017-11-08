@@ -8,7 +8,7 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm test
+      - run: npm run test-all
 
   "node-8":
     docker:
