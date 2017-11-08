@@ -57,14 +57,11 @@ describe('eg credentials list -c ', () => {
       });
   };
 
-  before(() => {
-    ({ program, env } = environment.bootstrap());
-    return adminHelper.start();
-  });
-
+  before(() => adminHelper.start());
   after(() => adminHelper.stop());
 
   beforeEach(() => {
+    ({ program, env } = environment.bootstrap());
     createdTypes.reset();
     createdKeyAuthKeys.reset();
 
@@ -93,6 +90,10 @@ describe('eg credentials list -c ', () => {
             ]);
           });
       });
+  });
+
+  afterEach(() => {
+    env.resetHijack();
   });
 
   it('should show active credentials', done => {
