@@ -41,6 +41,9 @@
     "test:e2e": "mocha --recursive test/e2e --timeout 60000",
     "mocha-istanbul": "nyc --reporter=lcov npm run test-all && nyc report --report=lcov > coverage.lcov && codecov"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "bin": {
     "eg": "./bin/index.js"
   },
@@ -115,6 +118,7 @@
     "mock-require": "2.0.2",
     "nyc": "^11.2.1",
     "phantomjs-prebuilt": "^2.1.14",
+    "pre-commit": "^1.2.2",
     "rimraf": "^2.6.2",
     "selenium-webdriver": "^3.6.0",
     "should": "11.2.1",
