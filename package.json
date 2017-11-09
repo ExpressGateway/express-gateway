@@ -31,15 +31,15 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "start-dev": "cross-env LOG_LEVEL=debug node lib/index.js",
+    "start:dev": "cross-env LOG_LEVEL=debug node lib/index.js",
     "lint": "eslint --fix .",
     "clean": "rimraf dist/",
     "pretest": "eslint .",
-    "test": "npm run mocha-istanbul",
-    "test-all": "cross-env EG_CONFIG_DIR=test/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive test --timeout 60000",
+    "test": "npm run mocha:istanbul",
+    "test:all": "cross-env EG_CONFIG_DIR=test/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive test --timeout 60000",
     "test:unit": "cross-env EG_CONFIG_DIR=test/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive \"./test/{,!(e2e)/**/}*.test.js\" --timeout 5000",
     "test:e2e": "mocha --recursive test/e2e --timeout 60000",
-    "mocha-istanbul": "nyc --reporter=lcov npm run test-all && nyc report --report=lcov > coverage.lcov && codecov"
+    "mocha:istanbul": "nyc --reporter=lcov npm run test:all && nyc report --report=lcov > coverage.lcov && codecov"
   },
   "pre-commit": [
     "lint"
