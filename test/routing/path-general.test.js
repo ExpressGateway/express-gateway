@@ -147,11 +147,11 @@ describe('path resolution for specific and general domains', () => {
       });
     });
 
-    describe('paths with one named parameter /admin/:group/:id', () => {
+    describe('paths with named parameters /admin/:group/:id', () => {
       const helper = testHelper();
       const plugins = {policies: [{name: 'routeTest',
         policy: () => (req, res) => {
-          res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+          res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint, params: req.params });
         }}]};
 
       before('setup', () => {
@@ -165,7 +165,7 @@ describe('path resolution for specific and general domains', () => {
         done();
       });
 
-      ['/admin/new/1'].forEach(function (url) {
+      ['/admin/new/1', '/admin/another/2'].forEach(function (url) {
         it('should serve matched url: ' + url, helper.validateSuccess({
           setup: {
             host,
@@ -175,6 +175,19 @@ describe('path resolution for specific and general domains', () => {
             host,
             url,
             result: 'test'
+          }
+        }));
+
+        it('should map named route parameters to req.params', helper.validateParams({
+          setup: {
+            host,
+            url
+          },
+          test: {
+            host,
+            url,
+            result: 'test',
+            params: { group: url.split('/')[2], id: url.split('/')[3] }
           }
         }));
       });
