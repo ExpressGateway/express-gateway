@@ -179,16 +179,16 @@ describe('path resolution for specific and general domains', () => {
         }));
 
         it('should map named route parameters to req.params', helper.validateParams({
-            setup: {
-              host,
-              url
-            },
-            test: {
-              host,
-              url,
-              result: 'test',
-              params: { group: url.split("/")[2], id: url.split("/")[3] }
-            }
+          setup: {
+            host,
+            url
+          },
+          test: {
+            host,
+            url,
+            result: 'test',
+            params: { group: url.split('/')[2], id: url.split('/')[3] }
+          }
         }));
       });
 

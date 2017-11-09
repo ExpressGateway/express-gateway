@@ -111,19 +111,19 @@ module.exports = function () {
             err ? done(err) : done();
           });
       };
-  },
-  validateParams: (testCase) => {
+    },
+    validateParams: (testCase) => {
       return (done) => {
-          const testScenario = prepareScenario(testCase);
-          testScenario
+        const testScenario = prepareScenario(testCase);
+        testScenario
             .expect((res) => {
-                assert.deepEqual(res.body.params, testCase.test.params)
+              assert.deepEqual(res.body.params, testCase.test.params);
             })
             .end((err, res) => {
               if (err) { logger.error(res.body); }
               err ? done(err) : done();
             });
-      }
+      };
     }
   };
 };
