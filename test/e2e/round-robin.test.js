@@ -14,7 +14,7 @@ const { generateBackendServer, findOpenPortNumbers } =
 
 const baseConfigDirectory = path.join(__dirname, '..', 'fixtures', 'round-robin');
 
-describe('round-robin load balancing', () => {
+describe('round-robin load @balancing @proxy', () => {
   let testGatewayConfigPath = null;
   let testGatewayConfigData = null;
   let childProcess = null;

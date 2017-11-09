@@ -80,7 +80,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
                 action: {
                   max: 1,
                   // eslint-disable-next-line no-template-curly-in-string
-                  rateLimitBy: '${req.host}'
+                  rateLimitBy: '${req.hostname}'
                 }
               }
             },
