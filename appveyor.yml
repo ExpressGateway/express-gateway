@@ -9,7 +9,7 @@ build: off
 test_script:
   - node --version
   - npm --version
-  - npm run test-all
+  - npm run test:all
 version: "{build}"
 
 notifications:
