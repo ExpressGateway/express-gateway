@@ -118,13 +118,15 @@ describe('oauth2 authorization code grant type', () => {
     });
 
     return checkUnauthorized
-      .then(() => puppeteer.launch({ slowMo: 10 }))
+      .then(() => puppeteer.launch())
       .then(browser => Promise.all([browser, browser.newPage()]))
-      .then(([browser, page]) => Promise.all([browser, page, page.goto(authURL, { waitUntil: 'networkidle2' })]))
+      .then(([browser, page]) => Promise.all([browser, page, page.goto(authURL, { waitUntil: 'networkidle0' })]))
       .then(([browser, page]) => Promise.all([browser, page, page.type('[name=username]', username)]))
       .then(([browser, page]) => Promise.all([browser, page, page.type('[name=password]', password)]))
       .then(([browser, page]) => Promise.all([browser, page, page.click('input[type="submit"]')]))
+      .then(([browser, page]) => Promise.all([browser, page, page.waitForNavigation({ waitUntil: 'networkidle0' })]))
       .then(([browser, page]) => Promise.all([browser, page, page.click('#allow')]))
+      .then(([browser, page]) => Promise.all([browser, page, page.waitForNavigation({ waitUntil: 'networkidle0' })]))
       .then(([browser]) => browser.close())
       .then(() => {
         const params = {
