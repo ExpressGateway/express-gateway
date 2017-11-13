@@ -40,8 +40,6 @@ describe('oauth2 authorization code grant type', () => {
   let backendPort = null;
   let redirectPort = null;
 
-  let redirectParams = null;
-
   before(function () {
     return startGatewayInstance()
       .then(() => {
@@ -120,20 +118,23 @@ describe('oauth2 authorization code grant type', () => {
     return checkUnauthorized
       .then(() => puppeteer.launch())
       .then(browser => Promise.all([browser, browser.newPage()]))
-      .then(([browser, page]) => Promise.all([browser, page, page.goto(authURL, { waitUntil: 'networkidle0' })]))
-      .then(([browser, page]) => Promise.all([browser, page, page.type('[name=username]', username)]))
-      .then(([browser, page]) => Promise.all([browser, page, page.type('[name=password]', password)]))
-      .then(([browser, page]) => Promise.all([browser, page, page.click('input[type="submit"]')]))
-      .then(([browser, page]) => Promise.all([browser, page, page.waitForNavigation({ waitUntil: 'networkidle0' })]))
+      .then(([browser, page]) => Promise.all([browser, page, page.goto(authURL, { waitUntil: 'networkidle2' })]))
+      .then(([browser, page]) => Promise.all([browser, page, page.type('[name="username"]', username)]))
+      .then(([browser, page]) => Promise.all([browser, page, page.type('[name="password"]', password)]))
+      .then(([browser, page]) => Promise.all([browser, page, page.click('[type="submit"]')]))
+      .then(([browser, page]) => Promise.all([browser, page, page.waitForNavigation({ waitUntil: 'networkidle2' })]))
       .then(([browser, page]) => Promise.all([browser, page, page.click('#allow')]))
-      .then(([browser, page]) => Promise.all([browser, page, page.waitForNavigation({ waitUntil: 'networkidle0' })]))
-      .then(([browser]) => browser.close())
-      .then(() => {
+      .then(([browser, page]) => Promise.all([browser, page, page.waitForNavigation({ waitUntil: 'networkidle2' })]))
+      .then(([browser, page]) => Promise.all([page.url(), browser.close()]))
+      .then(([pageUrl]) => {
+        const parsedPageUrl = url.parse(pageUrl, true);
+        const { code } = parsedPageUrl.query;
+
         const params = {
           grant_type: 'authorization_code',
           client_id: clientID,
           client_secret: clientSecret,
-          code: redirectParams.code,
+          code,
           redirect_uri: `http://localhost:${redirectPort}/cb`
         };
 
@@ -249,11 +250,7 @@ describe('oauth2 authorization code grant type', () => {
   function generateRedirectServer (port) {
     const app = express();
 
-    app.get('/cb', (req, res) => {
-      const parsed = url.parse(req.url, true);
-      redirectParams = parsed.query;
-      res.sendStatus(200);
-    });
+    app.get('/cb', (req, res) => res.sendStatus(200));
 
     return new Promise((resolve) => {
       app.listen(port, () => {
