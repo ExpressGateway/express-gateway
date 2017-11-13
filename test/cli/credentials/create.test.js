@@ -68,7 +68,84 @@ describe('eg credentials create', () => {
     env.argv = program.parse('credentials create -t key-auth -c ' + user.username);
   });
 
-  it('creates a user from stdin', done => {
+  it('creates a credential from prompts and allows keyId and keySectet to be set', done => {
+    env.hijack(namespace, generator => {
+      let output = null;
+      let text = null;
+
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.log.ok = message => {
+          text = message;
+        };
+        generator.stdout = message => {
+          output = message;
+        };
+
+        helpers.mockPrompt(generator, {});
+      });
+
+      generator.once('end', () => {
+        const loggedCred = JSON.parse(output);
+        assert.equal(text, 'Created ' + loggedCred.keyId);
+
+        return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
+          .then(cred => {
+            assert.equal(cred.keyId, '888');
+            assert.equal(cred.keySecret, '999');
+            assert.ok(cred.isActive);
+            assert.equal(cred.consumerId, user.id);
+            done();
+          }).catch(done);
+      });
+    });
+
+    env.argv = program.parse('credentials create -p "keyId=888" -p "keySecret=999" -t key-auth -c ' + user.username);
+  });
+
+  it('creates a credential for user from stdin', done => {
+    const cmd = { consumer: user.username, type: 'key-auth', keyId: '777', keySecret: '666' };
+
+    env.hijack(namespace, generator => {
+      let output = null;
+      let text = null;
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.stdout = message => {
+          output = message;
+        };
+
+        generator.log.ok = message => {
+          text = message;
+        };
+
+        generator.stdin = new PassThrough();
+        generator.stdin.write(JSON.stringify(cmd), 'utf8');
+        generator.stdin.end();
+      });
+
+      generator.once('end', () => {
+        const loggedCred = JSON.parse(output);
+        assert.equal(text, 'Created ' + loggedCred.keyId);
+        return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
+          .then(cred => {
+            assert.equal(cred.keyId, cmd.keyId);
+            assert.equal(cred.keySecret, cmd.keySecret);
+            assert.ok(cred.isActive);
+            assert.equal(cred.consumerId, user.id);
+            done();
+          }).catch(done);
+      });
+    });
+
+    env.argv = program.parse('credentials create --stdin');
+  });
+
+  it('creates a credential for user from stdin and allows set keyId and keySecret', done => {
     const cmd = { consumer: user.username, type: 'key-auth' };
 
     env.hijack(namespace, generator => {
