@@ -5,14 +5,13 @@ const path = require('path');
 const url = require('url');
 const util = require('util');
 
-const assert = require('chai').assert;
+const { assert } = require('chai');
+const puppeteer = require('puppeteer');
 const cpr = require('cpr');
 const express = require('express');
-const phantomjs = require('phantomjs-prebuilt');
 const request = require('superagent');
 const rimraf = require('rimraf');
 const tmp = require('tmp');
-const webdriver = require('selenium-webdriver');
 const yaml = require('js-yaml');
 let tempPath = null;
 
@@ -106,15 +105,6 @@ describe('oauth2 authorization code grant type', () => {
       }
     });
 
-    const phantomCaps = webdriver.Capabilities.phantomjs();
-    phantomCaps.set('phantomjs.binary.path', phantomjs.path);
-
-    const driver = new webdriver.Builder()
-      .withCapabilities(phantomCaps)
-      .build();
-
-    const By = webdriver.By;
-
     const checkUnauthorized = new Promise((resolve, reject) => {
       request
         .get(`http://localhost:${gatewayPort}`)
@@ -128,23 +118,14 @@ describe('oauth2 authorization code grant type', () => {
     });
 
     return checkUnauthorized
-      .then(() => driver.get(authURL))
-      .then(() => driver
-        .findElement(By.name('username'))
-        .sendKeys(username)
-      )
-      .then(() => driver
-        .findElement(By.name('password'))
-        .sendKeys(password)
-      )
-      .then(() => driver
-        .findElement(By.xpath('//form//input[@type="submit"]'))
-        .click()
-      )
-      .then(() => driver
-        .findElement(By.id('allow'))
-        .click()
-      )
+      .then(() => puppeteer.launch({ slowMo: 10 }))
+      .then(browser => Promise.all([browser, browser.newPage()]))
+      .then(([browser, page]) => Promise.all([browser, page, page.goto(authURL, { waitUntil: 'networkidle2' })]))
+      .then(([browser, page]) => Promise.all([browser, page, page.type('[name=username]', username)]))
+      .then(([browser, page]) => Promise.all([browser, page, page.type('[name=password]', password)]))
+      .then(([browser, page]) => Promise.all([browser, page, page.click('input[type="submit"]')]))
+      .then(([browser, page]) => Promise.all([browser, page, page.click('#allow')]))
+      .then(([browser]) => browser.close())
       .then(() => {
         const params = {
           grant_type: 'authorization_code',
@@ -168,8 +149,7 @@ describe('oauth2 authorization code grant type', () => {
       })
       .then(res => {
         assert.equal(200, res.statusCode);
-      })
-      .then(() => driver.quit());
+      });
   });
 
   function startGatewayInstance (done) {
