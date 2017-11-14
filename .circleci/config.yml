@@ -22,7 +22,7 @@ jobs:
 
   "node-8-real-redis":
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:8-browsers
       - image: redis:alpine
     working_directory: ~/repo
     environment:
