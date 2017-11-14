@@ -4,8 +4,12 @@ const adminHelper = require('../common/admin-helper')();
 
 describe('REST: Applications', () => {
   before(() => adminHelper.start({
-    admin: { port: 0 },
-    pipelines: null
+    config: {
+      gatewayConfig: {
+        admin: { port: 0 },
+        pipelines: null
+      }
+    }
   }));
   afterEach(() => adminHelper.reset());
   after(() => adminHelper.stop());
