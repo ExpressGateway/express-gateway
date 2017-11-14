@@ -10,19 +10,7 @@ const db = require('../../lib/db')();
 describe('Access Token tests', function () {
   describe('Save, Find and Get Access Token tests', function () {
     let newToken, accessTokenFromDb, newTokenWithScopes, accessTokenFromDbWithScopes;
-    before(function (done) {
-      db.flushdbAsync()
-      .then(function (didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
-    });
+    before(() => db.flushdbAsync());
 
     it('should save an access token', function (done) {
       newToken = {
@@ -30,60 +18,60 @@ describe('Access Token tests', function () {
         authType: 'oauth2'
       };
       tokenService.save(newToken)
-      .then((token) => {
-        should.exist(token);
-        token.access_token.length.should.be.greaterThan(15);
-        accessTokenFromDb = token.access_token;
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          should.exist(token);
+          token.access_token.length.should.be.greaterThan(15);
+          accessTokenFromDb = token.access_token;
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should find an access token', function (done) {
       tokenService.find(newToken)
-      .then((token) => {
-        token.access_token.should.eql(accessTokenFromDb);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          token.access_token.should.eql(accessTokenFromDb);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should get an access token', function (done) {
       const tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt'];
-      const [ id, _tokenDecrypted ] = accessTokenFromDb.split('|');
+      const [id, _tokenDecrypted] = accessTokenFromDb.split('|');
 
       tokenService.get(id)
-      .then((tokenObj) => {
-        tokenFields.forEach(field => {
-          should.exist(tokenObj[field]);
-        });
+        .then((tokenObj) => {
+          tokenFields.forEach(field => {
+            should.exist(tokenObj[field]);
+          });
 
-        tokenObj.tokenDecrypted.should.eql(_tokenDecrypted);
-        tokenObj.consumerId.should.eql(newToken.consumerId);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+          tokenObj.tokenDecrypted.should.eql(_tokenDecrypted);
+          tokenObj.consumerId.should.eql(newToken.consumerId);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should not create a new access token if one exists and is not expired', function (done) {
       tokenService.findOrSave(newToken)
-      .then((token) => {
-        token.access_token.should.eql(accessTokenFromDb);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          token.access_token.should.eql(accessTokenFromDb);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should save an access token with scopes', function (done) {
@@ -93,16 +81,16 @@ describe('Access Token tests', function () {
         scopes: ['scope1', 'scope2', 'scope3']
       };
       tokenService.save(newTokenWithScopes)
-      .then((token) => {
-        should.exist(token);
-        token.access_token.length.should.be.greaterThan(15);
-        accessTokenFromDbWithScopes = token.access_token;
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          should.exist(token);
+          token.access_token.length.should.be.greaterThan(15);
+          accessTokenFromDbWithScopes = token.access_token;
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should find an access token with scopes', function (done) {
@@ -110,47 +98,47 @@ describe('Access Token tests', function () {
       newTokenWithScopes.scopes = ['scope3', 'scope2', 'scope1'];
 
       tokenService.find(newTokenWithScopes)
-      .then((token) => {
-        token.access_token.should.eql(accessTokenFromDbWithScopes);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          token.access_token.should.eql(accessTokenFromDbWithScopes);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should get an access token with scopes', function (done) {
       const tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt', 'scopes'];
-      const [ id, _tokenDecrypted ] = accessTokenFromDbWithScopes.split('|');
+      const [id, _tokenDecrypted] = accessTokenFromDbWithScopes.split('|');
 
       tokenService.get(id)
-      .then((tokenObj) => {
-        tokenFields.forEach(field => {
-          should.exist(tokenObj[field]);
-        });
+        .then((tokenObj) => {
+          tokenFields.forEach(field => {
+            should.exist(tokenObj[field]);
+          });
 
-        tokenObj.tokenDecrypted.should.eql(_tokenDecrypted);
-        tokenObj.scopes.should.eql(newTokenWithScopes.scopes);
-        tokenObj.consumerId.should.eql(newTokenWithScopes.consumerId);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+          tokenObj.tokenDecrypted.should.eql(_tokenDecrypted);
+          tokenObj.scopes.should.eql(newTokenWithScopes.scopes);
+          tokenObj.consumerId.should.eql(newTokenWithScopes.consumerId);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should not create a new access token with scopes if one exists and is not expired', function (done) {
       tokenService.findOrSave(newTokenWithScopes)
-      .then((token) => {
-        token.access_token.should.eql(accessTokenFromDbWithScopes);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          token.access_token.should.eql(accessTokenFromDbWithScopes);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
   });
 
@@ -162,16 +150,13 @@ describe('Access Token tests', function () {
       config.systemConfig.accessTokens.timeToExpiry = 0;
 
       db.flushdbAsync()
-      .then(function (didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then(() => {
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     after((done) => {
@@ -185,54 +170,54 @@ describe('Access Token tests', function () {
         authType: 'oauth2'
       };
       tokenService.save(newToken)
-      .then((token) => {
-        should.exist(token);
-        token.access_token.length.should.be.greaterThan(15);
-        expiredToken = token.access_token;
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          should.exist(token);
+          token.access_token.length.should.be.greaterThan(15);
+          expiredToken = token.access_token;
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should not get an expired access token if not using the includeExpired flag', function (done) {
       tokenService.get(expiredToken)
-      .then((token) => {
-        should.not.exist(token);
-        should.equal(token, null);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          should.not.exist(token);
+          should.equal(token, null);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should create a new access token if one is expired', function (done) {
       tokenService.findOrSave(newToken)
-      .then((token) => {
-        token.access_token.should.not.eql(expiredToken);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          token.access_token.should.not.eql(expiredToken);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
 
     it('should get an expired access token with includeExpired flag', function (done) {
       tokenService.get(expiredToken, { includeExpired: true })
-      .then((token) => {
-        should.exist(token);
-        token.id.should.eql(expiredToken.split('|')[0]);
-        done();
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+        .then((token) => {
+          should.exist(token);
+          token.id.should.eql(expiredToken.split('|')[0]);
+          done();
+        })
+        .catch(function (err) {
+          should.not.exist(err);
+          done();
+        });
     });
   });
 
@@ -267,11 +252,7 @@ describe('Access Token tests', function () {
       ];
 
       db.flushdbAsync()
-        .then(function (didSucceed) {
-          if (!didSucceed) {
-            console.log('Failed to flush the database');
-          }
-
+        .then(() => {
           const expiredTokenPromises = [];
 
           tokenObjs.forEach(tokenObj => {
@@ -393,7 +374,7 @@ describe('Refresh Token tests', function () {
 
     it('should get a refresh token', function (done) {
       const tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt'];
-      const [ id, _tokenDecrypted ] = tokensFromDb.refresh_token.split('|');
+      const [id, _tokenDecrypted] = tokensFromDb.refresh_token.split('|');
 
       tokenService.get(id, { type: 'refresh_token' })
         .then((tokenObj) => {
@@ -460,7 +441,7 @@ describe('Refresh Token tests', function () {
 
     it('should get a refresh token with scopes', function (done) {
       const tokenFields = ['id', 'tokenDecrypted', 'consumerId', 'createdAt', 'expiresAt', 'scopes'];
-      const [ id, _tokenDecrypted ] = tokensFromDbWithScopes.refresh_token.split('|');
+      const [id, _tokenDecrypted] = tokensFromDbWithScopes.refresh_token.split('|');
 
       tokenService.get(id, { type: 'refresh_token' })
         .then((tokenObj) => {
@@ -495,22 +476,12 @@ describe('Refresh Token tests', function () {
   describe('Archive Refresh Token tests', function () {
     let newToken, expiredToken, originalSystemConfig, activeRefreshToken;
 
-    before(function (done) {
+    before(function () {
       originalSystemConfig = config.systemConfig;
       config.systemConfig.accessTokens.timeToExpiry = 0;
       config.systemConfig.refreshTokens.timeToExpiry = 0;
 
-      db.flushdbAsync()
-        .then(function (didSucceed) {
-          if (!didSucceed) {
-            console.log('Failed to flush the database');
-          }
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
-        });
+      return db.flushdbAsync();
     });
 
     after((done) => {
@@ -651,11 +622,7 @@ describe('Refresh Token tests', function () {
       ];
 
       db.flushdbAsync()
-        .then(function (didSucceed) {
-          if (!didSucceed) {
-            console.log('Failed to flush the database');
-          }
-
+        .then(() => {
           const expiredTokenPromises = [];
 
           tokenObjs.forEach(tokenObj => {
@@ -716,7 +683,7 @@ describe('Refresh Token tests', function () {
             tokenObj.prop.should.be.oneOf(tokenObjs.map(x => x.prop));
           });
           tokens.map(x => x.archived)
-          .filter(val => val).length.should.eql(4);
+            .filter(val => val).length.should.eql(4);
           done();
         })
         .catch(function (err) {

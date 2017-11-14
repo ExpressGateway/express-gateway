@@ -14,35 +14,30 @@ describe('eg apps activate', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    return adminHelper.admin.users.create({
-      username: idGen.v4(),
-      firstname: 'La',
-      lastname: 'Deeda'
-    })
-    .then(createdUser => {
-      user = createdUser;
+    return adminHelper.reset()
+      .then(() => adminHelper.admin.users.create({
+        username: idGen.v4(),
+        firstname: 'La',
+        lastname: 'Deeda'
+      }))
+      .then(createdUser => {
+        user = createdUser;
 
-      return adminHelper.admin.apps.create(user.id, {
-        name: 'appy1',
-        redirectUri: 'http://localhost:3000/cb'
-      });
-    })
-    .then(createdApp => {
-      app1 = createdApp;
-      return adminHelper.admin.apps.create(user.id, {
-        name: 'appy2',
-        redirectUri: 'http://localhost:3000/cb'
-      });
-    })
-    .then(createdApp => {
-      app2 = createdApp;
-      return adminHelper.admin.apps.create(user.id, {
-        name: 'appy2',
-        redirectUri: 'http://localhost:3000/cb'
-      });
-    })
-    .then(() => adminHelper.admin.apps.deactivate(app1.id))
-    .then(() => adminHelper.admin.apps.deactivate(app2.id));
+        return adminHelper.admin.apps.create(user.id, {
+          name: 'appy1',
+          redirectUri: 'http://localhost:3000/cb'
+        });
+      })
+      .then(createdApp => {
+        app1 = createdApp;
+        return adminHelper.admin.apps.create(user.id, {
+          name: 'appy2',
+          redirectUri: 'http://localhost:3000/cb'
+        });
+      })
+      .then(createdApp => { app2 = createdApp; })
+      .then(() => adminHelper.admin.apps.deactivate(app1.id))
+      .then(() => adminHelper.admin.apps.deactivate(app2.id));
   });
 
   afterEach(() => {
