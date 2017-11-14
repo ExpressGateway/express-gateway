@@ -55,7 +55,8 @@
       "logo",
       "node_modules",
       "coverage",
-      "migrations"
+      "migrations",
+      "test"
     ]
   },
   "types": "./index.d.ts",
