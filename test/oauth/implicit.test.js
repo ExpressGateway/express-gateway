@@ -46,10 +46,7 @@ describe('Functional Test Implicit grant', function () {
     };
 
     db.flushdbAsync()
-      .then(function (didSucceed) {
-        if (!didSucceed) {
-          console.log('Failed to flush the database');
-        }
+      .then(() => {
         const user1 = {
           username: 'irfanbaqui',
           firstname: 'irfan',
