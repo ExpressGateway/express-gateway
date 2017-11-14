@@ -10,7 +10,7 @@ const db = require('../../lib/db')();
 describe('Access Token tests', function () {
   describe('Save, Find and Get Access Token tests', function () {
     let newToken, accessTokenFromDb, newTokenWithScopes, accessTokenFromDbWithScopes;
-    before(db.flushdbAsync);
+    before(() => db.flushdbAsync());
 
     it('should save an access token', function (done) {
       newToken = {

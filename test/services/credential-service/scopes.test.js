@@ -7,7 +7,7 @@ const credentialService = services.credential;
 const db = require('../../../lib/db')();
 
 describe('Scope tests', function () {
-  before(db.flushdbAsync);
+  before(() => db.flushdbAsync());
 
   it('should insert a scope', function (done) {
     credentialService

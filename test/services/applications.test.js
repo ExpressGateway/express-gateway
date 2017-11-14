@@ -83,19 +83,8 @@ describe('Application service tests', function () {
         });
     });
 
-    it('should throw an error when inserting an app with missing properties that are required', function (done) {
-      const app = {};
-
-      applicationService
-        .insert(app, user.id)
-        .then(function (newApp) {
-          should.not.exist(newApp);
-        })
-        .catch(function (err) {
-          should.exist(err);
-          err.message.should.eql('Failed to insert application: name is required');
-          done();
-        });
+    it('should throw an error when inserting an app with missing properties that are required', function () {
+      should(() => applicationService.insert({}, user.id)).throw('Failed to insert application: name is required');
     });
 
     it('should allow inserting multiple applications per user', function (done) {
