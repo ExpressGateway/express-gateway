@@ -371,10 +371,10 @@ describe('Application service tests', function () {
       done();
     });
 
-    it('should deactivate an application', function (done) {
+    it('should deactivate an application', function () {
       const _user = createRandomUserObject();
 
-      userService
+      return userService
         .insert(_user)
         .then(function (newUser) {
           user = newUser;
@@ -383,69 +383,53 @@ describe('Application service tests', function () {
             name: 'test-app-1'
           };
 
-          applicationService
-            .insert(app, user.id)
-            .then(function (newApp) {
-              app = newApp;
-              should.exist(newApp);
-              should.exist(newApp.id);
-              should.exist(newApp.name);
-              newApp.name.should.eql(app.name);
-              should.exist(newApp.createdAt);
-              should.exist(newApp.userId);
-              newApp.userId.should.eql(user.id);
-            })
-            .then(() => {
-              applicationService.deactivate(app.id)
-                .then((res) => {
-                  res.should.eql(true);
-                  applicationService
-                    .get(app.id)
-                    .then(function (_app) {
-                      should.exist(_app);
-                      should.exist(_app.id);
-                      _app.id.should.eql(app.id);
-                      should.exist(_app.isActive);
-                      _app.isActive.should.eql(false);
-                      should.exist(_app.name);
-                      _app.name.should.eql(app.name);
-                      should.exist(_app.createdAt);
-                      _app.createdAt.should.eql(app.createdAt);
-                      should.exist(_app.updatedAt);
-                      done();
-                    });
-                });
-            })
-            .catch(function (err) {
-              should.not.exist(err);
-              done();
-            });
+          return applicationService.insert(app, user.id);
+        })
+        .then(function (newApp) {
+          app = newApp;
+          should.exist(newApp);
+          should.exist(newApp.id);
+          should.exist(newApp.name);
+          newApp.name.should.eql(app.name);
+          should.exist(newApp.createdAt);
+          should.exist(newApp.userId);
+          newApp.userId.should.eql(user.id);
+          return applicationService.deactivate(app.id);
+        })
+        .then((res) => {
+          res.should.eql(true);
+          return applicationService.get(app.id);
+        })
+        .then(function (_app) {
+          should.exist(_app);
+          should.exist(_app.id);
+          _app.id.should.eql(app.id);
+          should.exist(_app.isActive);
+          _app.isActive.should.eql(false);
+          should.exist(_app.name);
+          _app.name.should.eql(app.name);
+          should.exist(_app.createdAt);
+          _app.createdAt.should.eql(app.createdAt);
+          should.exist(_app.updatedAt);
         });
     });
 
-    it('should reactivate an application', function (done) {
-      applicationService.activate(app.id)
+    it('should reactivate an application', function () {
+      return applicationService.activate(app.id)
         .then((res) => {
           res.should.eql(true);
-          applicationService
-            .get(app.id)
-            .then(function (_app) {
-              should.exist(_app);
-              should.exist(_app.id);
-              _app.id.should.eql(app.id);
-              should.exist(_app.isActive);
-              _app.isActive.should.eql(true);
-              should.exist(_app.name);
-              _app.name.should.eql(app.name);
-              should.exist(_app.createdAt);
-              _app.createdAt.should.eql(app.createdAt);
-              should.exist(_app.updatedAt);
-              done();
-            });
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
+          return applicationService.get(app.id);
+        }).then(function (_app) {
+          should.exist(_app);
+          should.exist(_app.id);
+          _app.id.should.eql(app.id);
+          should.exist(_app.isActive);
+          _app.isActive.should.eql(true);
+          should.exist(_app.name);
+          _app.name.should.eql(app.name);
+          should.exist(_app.createdAt);
+          _app.createdAt.should.eql(app.createdAt);
+          should.exist(_app.updatedAt);
         });
     });
 
@@ -565,17 +549,12 @@ describe('Application service tests', function () {
         });
     });
 
-    it('should not get deleted app', function (done) {
-      applicationService
+    it('should not get deleted app', function () {
+      return applicationService
         .get(app.id)
         .then(function (_app) {
           should.exist(_app);
           _app.should.eql(false);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
@@ -585,10 +564,7 @@ describe('Application service tests', function () {
           should.not.exist(deleted);
           done();
         })
-        .catch(function (err) {
-          should.exist(err);
-          done();
-        });
+        .catch(() => done());
     });
 
     it('should delete all apps belonging to a user', function (done) {
@@ -629,29 +605,22 @@ describe('Application service tests', function () {
             });
         })
         .then(function () {
-          applicationService
+          return applicationService
             .get(app1.id)
             .then(function (_app) {
               should.exist(_app);
               _app.should.eql(false);
-            })
-            .catch(function (err) {
-              should.not.exist(err);
             });
         })
         .then(function () {
-          applicationService
+          return applicationService
             .get(app2.id)
             .then(function (_app) {
               should.exist(_app);
               _app.should.eql(false);
               done();
-            })
-            .catch(function (err) {
-              should.not.exist(err);
-              done();
             });
-        });
+        }).catch(done);
     });
 
     it('should cascade delete app upon deleting user', function (done) {
@@ -692,7 +661,7 @@ describe('Application service tests', function () {
               should.not.exist(err);
               done();
             });
-        });
+        }).catch(done);
     });
   });
 });

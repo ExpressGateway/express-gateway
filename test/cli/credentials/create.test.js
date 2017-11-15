@@ -28,7 +28,7 @@ describe('eg credentials create', () => {
   });
 
   afterEach(() => {
-    env.resetHijack();
+    return env.resetHijack();
   });
 
   it('creates a credential from prompts', done => {

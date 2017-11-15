@@ -94,7 +94,7 @@ describe('eg apps deactivate', () => {
             assert.ok(output['Deactivated ' + app2.id]);
             assert.equal(Object.keys(output).length, 2);
             done();
-          });
+          }).catch(done);
       });
     });
     env.argv = program.parse(`apps deactivate ${app1.id} ${app2.id}`);
@@ -119,7 +119,7 @@ describe('eg apps deactivate', () => {
             assert.equal(app.isActive, false);
             assert.equal(output, app1.id);
             done();
-          });
+          }).catch(done);
       });
     });
 

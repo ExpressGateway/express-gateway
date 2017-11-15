@@ -78,7 +78,7 @@ describe('eg credentials deactivate', () => {
             assert.equal(cred.isActive, false);
             assert.equal(output, cred1.keyId);
             done();
-          });
+          }).catch(done);
       });
     });
 

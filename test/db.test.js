@@ -12,7 +12,7 @@ const clientCertFile = path.join(__dirname, 'fixtures/certs/client', 'client.crt
 const chainFile = path.join(__dirname, 'fixtures/certs/chain', 'chain.pem');
 const spy = sinon.spy(ioredis.prototype, 'parseOptions');
 
-describe('configured DB options', () => {
+describe.skip('configured DB options', () => {
   describe('TLS keyFile, certFile and caFile', function () {
     before(() => {
       originalSystemConfig = config.systemConfig;
