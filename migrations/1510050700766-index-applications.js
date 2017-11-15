@@ -1,5 +1,5 @@
 const log = require('migrate/lib/log');
-const db = require('../lib/db')();
+const db = require('../lib/db');
 const config = require('../lib/config');
 const userService = require('../lib/services/consumers/user.service');
 const applicationDao = require('../lib/services/consumers/application.dao');
