@@ -17,8 +17,8 @@ module.exports = function () {
       return this.reset();
     },
     reset () {
-      const db = require('../../lib/db')();
-      return db.flushdbAsync();
+      const db = require('../../lib/db');
+      return db.flushdb();
     }
   };
 };

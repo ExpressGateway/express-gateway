@@ -1,12 +1,9 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const should = require('should');
 const config = require('../../../lib/config');
 const services = require('../../../lib/services');
 const credentialService = services.credential;
 const userService = services.user;
-const db = require('../../../lib/db')();
+const db = require('../../../lib/db');
 
 describe('Credential service tests', () => {
   describe('Credential tests', () => {
@@ -31,7 +28,7 @@ describe('Credential service tests', () => {
         }
       };
 
-      return db.flushdbAsync();
+      return db.flushdb();
     });
 
     after(() => {
@@ -150,7 +147,7 @@ describe('Credential service tests', () => {
         email: 'irfan@eg.com'
       };
 
-      return db.flushdbAsync()
+      return db.flushdb()
         .then(() => userService.insert(user))
         .then((newUser) => {
           user = newUser;
@@ -219,7 +216,7 @@ describe('Credential service tests', () => {
         }
       };
 
-      return db.flushdbAsync();
+      return db.flushdb();
     });
 
     after(() => {

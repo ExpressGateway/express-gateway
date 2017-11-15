@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const EgContextBase = require('../lib/gateway/context');
 require('../lib/conditions').init();
 const express = require('express');
@@ -158,8 +155,8 @@ describe('req.matchEGCondition', function () {
       conditions: [{
         name: 'oneOf',
         conditions: [
-            { name: 'pathExact', path: '/foo/bar' },
-            { name: 'not', condition: { name: 'always' } }
+          { name: 'pathExact', path: '/foo/bar' },
+          { name: 'not', condition: { name: 'always' } }
         ]
       },
       {
@@ -168,7 +165,7 @@ describe('req.matchEGCondition', function () {
           name: 'oneOf',
           conditions: [
             control,
-              { name: 'pathExact', path: '/path/path/path' }
+            { name: 'pathExact', path: '/path/path/path' }
           ]
         }
       }

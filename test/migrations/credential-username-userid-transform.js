@@ -1,7 +1,7 @@
 const migrate = require('migrate');
 const tmp = require('tmp');
-const db = require('../../lib/db')();
 const idGen = require('uuid-base62');
+const db = require('../../lib/db');
 const { assert } = require('chai');
 const userService = require('../../lib/services/consumers/user.service');
 const credentialService = require('../../lib/services/credentials/credential.service');

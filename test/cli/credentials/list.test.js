@@ -44,55 +44,56 @@ describe('eg credentials list -c ', () => {
     return credentials
       .create(username, type, options)
       .then((credential) => {
-        const promises = [];
         createdTypes.inc(type, isActive);
 
-        switch (type) {
-          case 'key-auth':
-            const { keyId } = credential;
-            createdKeyAuthKeys.add(keyId, isActive);
-            if (!isActive) {
-              promises.push(credentials.deactivate(keyId, type));
-            }
-            break;
-        }
+        if (type === 'key-auth') {
+          const { keyId } = credential;
+          createdKeyAuthKeys.add(keyId, isActive);
 
-        return Promise.all(promises);
+          if (!isActive) {
+            return credentials.deactivate(keyId, type);
+          }
+        }
       });
   };
 
-  before(() => {
-    ({ program, env } = environment.bootstrap());
-    return adminHelper.start();
-  });
-
+  before(() => adminHelper.start());
   after(() => adminHelper.stop());
 
   beforeEach(() => {
+    ({ program, env } = environment.bootstrap());
     createdTypes.reset();
     createdKeyAuthKeys.reset();
 
     env.prepareHijack();
 
     return adminHelper
-      .admin
-      .users
-      .create({
-        username: idGen.v4(),
-        firstname: 'La',
-        lastname: 'Deeda'
-      })
-      .then(user => {
-        username = user.username;
-        return Promise.all([
-          createCredential('key-auth'),
-          createCredential('basic-auth', { password: 'test1' }),
-          createCredential('oauth2', { secret: 'eg1' }),
-          createCredential('key-auth', {}, false),
-          createCredential('key-auth', {}, false),
-          createCredential('key-auth', {}, false)
-        ]);
+      .reset()
+      .then(() => {
+        return adminHelper
+          .admin
+          .users
+          .create({
+            username: idGen.v4(),
+            firstname: 'La',
+            lastname: 'Deeda'
+          })
+          .then(user => {
+            username = user.username;
+            return Promise.all([
+              createCredential('key-auth'),
+              createCredential('basic-auth', { password: 'test1' }),
+              createCredential('oauth2', { secret: 'eg1' }),
+              createCredential('key-auth', {}, false),
+              createCredential('key-auth', {}, false),
+              createCredential('key-auth', {}, false)
+            ]);
+          });
       });
+  });
+
+  afterEach(() => {
+    env.resetHijack();
   });
 
   it('should show active credentials', done => {

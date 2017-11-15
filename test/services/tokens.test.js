@@ -1,16 +1,13 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const should = require('should');
 const config = require('../../lib/config');
 const services = require('../../lib/services');
 const tokenService = services.token;
-const db = require('../../lib/db')();
+const db = require('../../lib/db');
 
 describe('Access Token tests', function () {
   describe('Save, Find and Get Access Token tests', function () {
     let newToken, accessTokenFromDb, newTokenWithScopes, accessTokenFromDbWithScopes;
-    before(() => db.flushdbAsync());
+    before(() => db.flushdb());
 
     it('should save an access token', function (done) {
       newToken = {
@@ -145,18 +142,11 @@ describe('Access Token tests', function () {
   describe('Archive Access Token tests', function () {
     let newToken, expiredToken, originalSystemConfig;
 
-    before(function (done) {
+    before(function () {
       originalSystemConfig = config.systemConfig;
       config.systemConfig.accessTokens.timeToExpiry = 0;
 
-      db.flushdbAsync()
-        .then(() => {
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
-        });
+      return db.flushdb();
     });
 
     after((done) => {
@@ -224,7 +214,7 @@ describe('Access Token tests', function () {
   describe('Get Access Tokens By Consumer', function () {
     let originalSystemConfig, tokenObjs;
 
-    before(function (done) {
+    before(() => {
       originalSystemConfig = config.systemConfig;
       config.systemConfig.accessTokens.timeToExpiry = 0;
 
@@ -251,40 +241,17 @@ describe('Access Token tests', function () {
         }
       ];
 
-      db.flushdbAsync()
+      return db.flushdb()
+        .then(() => Promise.all(tokenObjs.map(tokenObj => tokenService.findOrSave(tokenObj))))
         .then(() => {
-          const expiredTokenPromises = [];
+          config.systemConfig.accessTokens.timeToExpiry = 20000000;
 
-          tokenObjs.forEach(tokenObj => {
-            expiredTokenPromises.push(tokenService.findOrSave(tokenObj));
-          });
-
-          Promise.all(expiredTokenPromises)
-            .then(() => {
-              config.systemConfig.accessTokens.timeToExpiry = 20000000;
-
-              const activeTokenPromises = [];
-
-              tokenObjs.forEach(tokenObj => {
-                activeTokenPromises.push(tokenService.findOrSave(tokenObj));
-              });
-
-              Promise.all(activeTokenPromises)
-                .then(res => {
-                  should.exist(res);
-                  done();
-                });
-            });
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
+          return Promise.all(tokenObjs.map(tokenObj => tokenService.findOrSave(tokenObj)));
         });
     });
 
-    after((done) => {
+    after(() => {
       config.systemConfig = originalSystemConfig;
-      done();
     });
 
     it('should get active access tokens by consumer', function (done) {
@@ -299,7 +266,7 @@ describe('Access Token tests', function () {
         })
         .catch(function (err) {
           should.not.exist(err);
-          done();
+          done(err);
         });
     });
 
@@ -324,7 +291,7 @@ describe('Refresh Token tests', function () {
   describe('Save, Find and Get Refresh Token tests', function () {
     let newToken, tokensFromDb, newTokenWithScopes, tokensFromDbWithScopes;
     before(function () {
-      return db.flushdbAsync();
+      return db.flushdb();
     });
 
     it('should save a refresh token along with access token', function (done) {
@@ -481,7 +448,7 @@ describe('Refresh Token tests', function () {
       config.systemConfig.accessTokens.timeToExpiry = 0;
       config.systemConfig.refreshTokens.timeToExpiry = 0;
 
-      return db.flushdbAsync();
+      return db.flushdb();
     });
 
     after((done) => {
@@ -621,7 +588,7 @@ describe('Refresh Token tests', function () {
         }
       ];
 
-      db.flushdbAsync()
+      db.flushdb()
         .then(() => {
           const expiredTokenPromises = [];
 

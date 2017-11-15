@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const testHelper = require('../common/routing.helper');
 const sinon = require('sinon');
 const assert = require('assert');
@@ -35,7 +32,7 @@ describe('default config with multi step (multi action) policy', () => {
       apiEndpoints: {
         test_default: {}
       },
-      policies: [ 'test', 'test-return' ],
+      policies: ['test', 'test-return'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['test_default'],
@@ -54,7 +51,7 @@ describe('default config with multi step (multi action) policy', () => {
         }
       }
     };
-    helper.setup({config, plugins});
+    helper.setup({ config, plugins });
   });
 
   after('cleanup', (done) => {

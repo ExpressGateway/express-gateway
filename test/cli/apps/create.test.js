@@ -67,7 +67,7 @@ describe('eg apps create', () => {
             assert.equal(stdoutApp.name, 'appy');
             assert.equal(stdoutApp.redirectUri, 'http://localhost:3000/cb');
             done();
-          });
+          }).catch(done);
       });
     });
 
@@ -101,7 +101,7 @@ describe('eg apps create', () => {
 
             assert.equal(output, `Created ${app.id}`);
             done();
-          });
+          }).catch(done);
       });
     });
 
@@ -200,7 +200,7 @@ describe('eg apps create', () => {
 
             assert.equal(output, `Created ${app.id}`);
             done();
-          });
+          }).catch(done);
       });
     });
 
@@ -229,7 +229,7 @@ describe('eg apps create', () => {
 
             assert.equal(output, `${app.id}`);
             done();
-          });
+          }).catch(done);
       });
     });
 

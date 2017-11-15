@@ -1,6 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
-
 const should = require('should');
 const credentialModelConfig = require('../../lib/config/models/credentials');
 const userModelConfig = require('../../lib/config/models/users');
@@ -9,7 +6,7 @@ const credentialService = services.credential;
 const userService = services.user;
 const tokenService = services.token;
 const authService = services.auth;
-const db = require('../../lib/db')();
+const db = require('../../lib/db');
 
 describe('Auth tests', function () {
   let user, userFromDb;
@@ -33,7 +30,7 @@ describe('Auth tests', function () {
       email: { isRequired: false, isMutable: true }
     };
 
-    return db.flushdbAsync()
+    return db.flushdb()
       .then(() => {
         user = {
           username: 'irfanbaqui',

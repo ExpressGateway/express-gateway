@@ -20,6 +20,18 @@ jobs:
       - run: npm install
       - run: npm test
 
+  "node-8-real-redis":
+    docker:
+      - image: circleci/node:8
+      - image: redis:alpine
+    working_directory: ~/repo
+    environment:
+      - EG_DB_EMULATE: 0
+    steps:
+      - checkout
+      - run: npm install
+      - run: npm test
+
   deploy:
     docker:
       - image: circleci/node:8
@@ -46,6 +58,7 @@ workflows:
     jobs:
       - node-6
       - node-8
+      - node-8-real-redis
       - deploy:
           filters:
             tags:
