@@ -78,7 +78,7 @@
     "has-flag": "2.0.0",
     "http-proxy": "1.16.2",
     "ioredis": "^3.2.1",
-    "ioredis-mock": "github:DrMegavolt/ioredis-mock#build",
+    "ioredis-mock": "^3.2.0",
     "js-yaml": "^3.10.0",
     "migrate": "^1.0.0-2",
     "minimatch": "^3.0.4",
