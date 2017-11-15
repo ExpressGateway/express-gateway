@@ -31,7 +31,6 @@ module.exports = function () {
     },
     setup: ({config, plugins} = {}) => {
       originalPolicies = policies;
-
       return gateway({config, plugins})
         .then(apps => {
           app = apps.app;

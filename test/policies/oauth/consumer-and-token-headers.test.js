@@ -86,7 +86,7 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
       email: { isRequired: false, isMutable: true }
     };
 
-    db.flushdb()
+    return db.flushdb()
       .then(function () {
         const user1 = {
           username: idGen.v4(),
