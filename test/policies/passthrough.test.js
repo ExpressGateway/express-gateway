@@ -1,5 +1,3 @@
-const mock = require('mock-require');
-mock('redis', require('fakeredis'));
 const idGen = require('uuid-base62');
 const request = require('supertest');
 
@@ -68,7 +66,7 @@ describe('Functional Tests @auth Policies @passthrough', () => {
       }
     };
 
-    return db.flushdbAsync()
+    return db.flushdb()
       .then(function () {
         const user1 = {
           username: idGen.v4(),
