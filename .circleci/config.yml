@@ -41,6 +41,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: npm publish
       - run: "docker build -t expressgateway/express-gateway:${CIRCLE_TAG} --build-arg VERSION=latest - < Dockerfile"
       - run: |
