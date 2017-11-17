@@ -19,7 +19,7 @@ const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
 const originalGatewayConfig = config.gatewayConfig;
 
-describe('Request Headers with consumer and token information as part of auth policies', () => {
+describe.skip('Request Headers with consumer and token information as part of auth policies', () => {
   const helper = testHelper();
   const spy = sinon.spy();
   let originalAppConfig, originalCredentialConfig, originalUserConfig;
