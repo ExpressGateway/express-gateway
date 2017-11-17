@@ -13,7 +13,8 @@ const generateBackendServer = port => {
     const runningApp = app.listen(port || 0, () => {
       logger.log('running test stub server at ' + runningApp.address().port);
       resolve({
-        app: runningApp
+        app: runningApp,
+        port: runningApp.address().port
       });
     });
   });
