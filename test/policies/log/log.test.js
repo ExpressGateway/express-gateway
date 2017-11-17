@@ -4,7 +4,7 @@ const logger = require('../../../lib/policies/log/winston-logger');
 const sinon = require('sinon');
 const assert = require('assert');
 
-describe('logging policy', () => {
+describe('@log policy', () => {
   const res = {
     test: 'text'
   };
@@ -28,6 +28,28 @@ describe('logging policy', () => {
 
     logMiddleware(req, {}, next);
     assert.equal(logger.info.getCall(0).args[0], '/test GET text');
+    assert.ok(next.calledOnce);
+  });
+  it('should log traceId', () => {
+    const next = sinon.spy();
+    const logMiddleware = logPolicy({
+      // eslint-disable-next-line no-template-curly-in-string
+      message: '${traceId}'
+    });
+
+    logMiddleware(req, {}, next);
+    assert.ok(logger.info.getCall(0).args[0].length > 10);
+    assert.ok(next.calledOnce);
+  });
+  it('should log egContext.traceId', () => {
+    const next = sinon.spy();
+    const logMiddleware = logPolicy({
+      // eslint-disable-next-line no-template-curly-in-string
+      message: '${egContext.traceId}'
+    });
+
+    logMiddleware(req, {}, next);
+    assert.ok(logger.info.getCall(0).args[0].length > 10);
     assert.ok(next.calledOnce);
   });
   it('should fail to access global context', () => {
