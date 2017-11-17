@@ -25,17 +25,17 @@ describe('eg apps update', () => {
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
+      .then(createdUser => {
+        user = createdUser;
 
-      return adminHelper.admin.apps.create(user.id, {
-        name: 'appy1',
-        redirectUri: 'http://localhost:3000/cb'
+        return adminHelper.admin.apps.create(user.id, {
+          name: 'appy1',
+          redirectUri: 'http://localhost:3000/cb'
+        });
+      })
+      .then(createdApp => {
+        app1 = createdApp;
       });
-    })
-    .then(createdApp => {
-      app1 = createdApp;
-    });
   });
   it('updates an app from prompts', done => {
     env.hijack(namespace, generator => {

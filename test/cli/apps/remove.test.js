@@ -23,24 +23,24 @@ describe('eg apps remove', () => {
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
+      .then(createdUser => {
+        user = createdUser;
 
-      return adminHelper.admin.apps.create(user.id, {
-        name: 'appy1',
-        redirectUri: 'http://localhost:3000/cb'
+        return adminHelper.admin.apps.create(user.id, {
+          name: 'appy1',
+          redirectUri: 'http://localhost:3000/cb'
+        });
+      })
+      .then(createdApp => {
+        app1 = createdApp;
+        return adminHelper.admin.apps.create(user.id, {
+          name: 'appy2',
+          redirectUri: 'http://localhost:3000/cb'
+        });
+      })
+      .then(createdApp => {
+        app2 = createdApp;
       });
-    })
-    .then(createdApp => {
-      app1 = createdApp;
-      return adminHelper.admin.apps.create(user.id, {
-        name: 'appy2',
-        redirectUri: 'http://localhost:3000/cb'
-      });
-    })
-    .then(createdApp => {
-      app2 = createdApp;
-    });
   });
 
   it('removes an app', done => {

@@ -27,15 +27,15 @@ module.exports = class extends eg.Generator {
       // executing in sequence to avoid race
       p = p.then(() => {
         return this.admin.credentials.addScope(argv.id, argv.t, scope)
-        .then(res => {
-          if (!argv.q) {
-            this.log.ok(`Scope ${scope} added to ${argv.id}`);
-          }
-          return res;
-        })
-        .catch(err => {
-          this.log.error(chalk.red('Error adding scope ') + chalk.yellow(scope) + ' : ' + ((err.response && err.response.error && err.response.error.text) || err.message));
-        });
+          .then(res => {
+            if (!argv.q) {
+              this.log.ok(`Scope ${scope} added to ${argv.id}`);
+            }
+            return res;
+          })
+          .catch(err => {
+            this.log.error(chalk.red('Error adding scope ') + chalk.yellow(scope) + ' : ' + ((err.response && err.response.error && err.response.error.text) || err.message));
+          });
       });
     });
     p.catch(err => {

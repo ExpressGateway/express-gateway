@@ -8,8 +8,8 @@ module.exports = class extends eg.Generator {
       desc: 'Create a scope',
       builder: yargs =>
         yargs
-        .usage(`Usage: $0 ${process.argv[2]} create [options] <scope..>`)
-        .example(`$0 ${process.argv[2]} create scope_name`)
+          .usage(`Usage: $0 ${process.argv[2]} create [options] <scope..>`)
+          .example(`$0 ${process.argv[2]} create scope_name`)
     });
   }
 

@@ -136,34 +136,34 @@ module.exports = class extends eg.Generator {
     }
 
     return this.prompt(questions)
-    .then(answers => {
-      this.enablePlugin = this.enablePlugin || answers.enablePlugin;
-      this.addPoliciesToWhitelist =
+      .then(answers => {
+        this.enablePlugin = this.enablePlugin || answers.enablePlugin;
+        this.addPoliciesToWhitelist =
         this.addPoliciesToWhitelist || answers.addPoliciesToWhitelist;
 
-      if (pluginQuestions.length) {
-        this.pluginOptions = this.pluginOptions || {};
+        if (pluginQuestions.length) {
+          this.pluginOptions = this.pluginOptions || {};
 
-        const keys = pluginQuestions.map(opt => opt.name);
+          const keys = pluginQuestions.map(opt => opt.name);
 
-        keys.forEach(key => {
-          let answer = answers[key];
-          const stripped = key.substr('pluginOption'.length);
-          const optionMeta = optionsMeta[stripped];
+          keys.forEach(key => {
+            let answer = answers[key];
+            const stripped = key.substr('pluginOption'.length);
+            const optionMeta = optionsMeta[stripped];
 
-          if (optionMeta && optionMeta.type && answer) {
-            const type = optionMeta.type;
-            if (type === 'number') {
-              answer = Number(answer);
-            } else if (type === 'boolean') {
-              answer = Boolean(answer);
+            if (optionMeta && optionMeta.type && answer) {
+              const type = optionMeta.type;
+              if (type === 'number') {
+                answer = Number(answer);
+              } else if (type === 'boolean') {
+                answer = Boolean(answer);
+              }
             }
-          }
 
-          this.pluginOptions[stripped] = answer;
-        });
-      }
-    });
+            this.pluginOptions[stripped] = answer;
+          });
+        }
+      });
   }
 
   writing () {

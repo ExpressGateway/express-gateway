@@ -22,9 +22,9 @@ describe('eg users info', () => {
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(user => {
-      userId = user.id;
-    });
+      .then(user => {
+        userId = user.id;
+      });
   });
 
   afterEach(() => {

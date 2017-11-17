@@ -27,12 +27,12 @@ module.exports = class extends eg.Generator {
       // executing in sequence to avoid race
       p = p.then(() => {
         return this.admin.credentials.removeScope(argv.id, argv.t, scope)
-        .then(res => {
-          if (!argv.q) {
-            this.log.ok(`Scope ${scope} removed from ${argv.id}`);
-          }
-          return res;
-        });
+          .then(res => {
+            if (!argv.q) {
+              this.log.ok(`Scope ${scope} removed from ${argv.id}`);
+            }
+            return res;
+          });
       });
     });
     p.catch(err => {

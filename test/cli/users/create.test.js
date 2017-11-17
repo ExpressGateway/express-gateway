@@ -50,19 +50,19 @@ describe('eg users create', () => {
       generator.once('end', () => {
         const stdOutUser = JSON.parse(output);
         return adminHelper.admin.users.info(username)
-              .then(user => {
-                assert.equal(user.username, username);
-                assert.equal(user.firstname, 'La');
-                assert.equal(user.lastname, 'Deeda');
+          .then(user => {
+            assert.equal(user.username, username);
+            assert.equal(user.firstname, 'La');
+            assert.equal(user.lastname, 'Deeda');
 
-                assert.equal(text, 'Created ' + user.id);
+            assert.equal(text, 'Created ' + user.id);
 
-                assert.equal(stdOutUser.username, username);
-                assert.equal(stdOutUser.firstname, 'La');
-                assert.equal(stdOutUser.lastname, 'Deeda');
+            assert.equal(stdOutUser.username, username);
+            assert.equal(stdOutUser.firstname, 'La');
+            assert.equal(stdOutUser.lastname, 'Deeda');
 
-                done();
-              }).catch(done);
+            done();
+          }).catch(done);
       });
     });
 
@@ -132,13 +132,13 @@ describe('eg users create', () => {
 
       generator.once('end', () => {
         return adminHelper.admin.users.info(username)
-              .then(user => {
-                assert.equal(user.username, username);
-                assert.equal(user.firstname, 'La');
-                assert.equal(user.lastname, 'Deeda');
-                assert.equal(output, 'Created ' + username);
-                done();
-              }).catch(done);
+          .then(user => {
+            assert.equal(user.username, username);
+            assert.equal(user.firstname, 'La');
+            assert.equal(user.lastname, 'Deeda');
+            assert.equal(output, 'Created ' + username);
+            done();
+          }).catch(done);
       });
     });
 
@@ -160,14 +160,14 @@ describe('eg users create', () => {
 
       generator.once('end', () => {
         return adminHelper.admin.users.info(username)
-              .then(user => {
-                assert.equal(user.username, username);
-                assert.equal(user.firstname, 'La');
-                assert.equal(user.lastname, 'Deeda');
+          .then(user => {
+            assert.equal(user.username, username);
+            assert.equal(user.firstname, 'La');
+            assert.equal(user.lastname, 'Deeda');
 
-                assert.equal(output, user.id);
-                done();
-              });
+            assert.equal(output, user.id);
+            done();
+          });
       });
     });
 

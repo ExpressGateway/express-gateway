@@ -60,7 +60,7 @@ describe('Functional Tests keyAuth Policy', () => {
               }
             }
           },
-            proxyPolicy
+          proxyPolicy
           ]
         },
         pipeline2: {
@@ -72,7 +72,7 @@ describe('Functional Tests keyAuth Policy', () => {
               }
             }]
           },
-            proxyPolicy
+          proxyPolicy
           ]
         },
         pipeline_by_query: {
@@ -86,7 +86,7 @@ describe('Functional Tests keyAuth Policy', () => {
               }
             }]
           },
-            proxyPolicy
+          proxyPolicy
           ]
         }
       }

@@ -63,10 +63,10 @@ describe('PluginInstaller#runNPMInstallation', () => {
       cwd: tempPath,
       env: Object.assign({}, process.env)
     })
-    .then(({ packageName, pluginManifest }) => {
-      assert.equal(packageName, PACKAGE_NAME);
-      assert(pluginManifest);
-    });
+      .then(({ packageName, pluginManifest }) => {
+        assert.equal(packageName, PACKAGE_NAME);
+        assert(pluginManifest);
+      });
   });
 
   it('updates configuration for a plugin', () => {

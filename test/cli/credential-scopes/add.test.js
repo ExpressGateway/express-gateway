@@ -19,19 +19,19 @@ describe('eg credential:scopes add', () => {
       firstname: 'f',
       lastname: 'l'
     })
-    .then(createdUser => {
-      user = createdUser;
-      return adminHelper.admin.credentials.create(user.id, 'key-auth', {});
-    })
-    .then(createdCred => {
-      cred1 = createdCred;
-      scope1 = idGen.v4();
-      scope2 = idGen.v4();
-      return Promise.all([
-        adminHelper.admin.scopes.create(scope1),
-        adminHelper.admin.scopes.create(scope2)
-      ]);
-    });
+      .then(createdUser => {
+        user = createdUser;
+        return adminHelper.admin.credentials.create(user.id, 'key-auth', {});
+      })
+      .then(createdCred => {
+        cred1 = createdCred;
+        scope1 = idGen.v4();
+        scope2 = idGen.v4();
+        return Promise.all([
+          adminHelper.admin.scopes.create(scope1),
+          adminHelper.admin.scopes.create(scope2)
+        ]);
+      });
   });
 
   afterEach(() => {

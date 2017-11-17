@@ -64,7 +64,7 @@ workflows:
       - deploy:
           filters:
             tags:
-              only: /^v\d\.\d\.\d/
+              only: /v\d+(\.\d+){2}/
             branches:
               ignore: /.*/
           requires:

@@ -21,16 +21,16 @@ describe('eg users activate', () => {
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(user => {
-      userId = user.id;
-      return adminHelper.admin.users.create({
-        username: userName2,
-        firstname: 'La2',
-        lastname: 'Deeda2'
-      });
-    })
-    .then(() => adminHelper.admin.users.deactivate(userName))
-    .then(() => adminHelper.admin.users.deactivate(userName2));
+      .then(user => {
+        userId = user.id;
+        return adminHelper.admin.users.create({
+          username: userName2,
+          firstname: 'La2',
+          lastname: 'Deeda2'
+        });
+      })
+      .then(() => adminHelper.admin.users.deactivate(userName))
+      .then(() => adminHelper.admin.users.deactivate(userName2));
   });
 
   afterEach(() => {
@@ -139,11 +139,11 @@ describe('eg users activate', () => {
 
       generator.once('end', () => {
         return adminHelper.admin.users.info(userName)
-            .then(user => {
-              assert.equal(user.isActive, true);
-              assert.equal(output, userName);
-              done();
-            }).catch(done);
+          .then(user => {
+            assert.equal(user.isActive, true);
+            assert.equal(output, userName);
+            done();
+          }).catch(done);
       });
     });
 

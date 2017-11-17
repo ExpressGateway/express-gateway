@@ -23,9 +23,9 @@ describe('eg apps create', () => {
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
-    });
+      .then(createdUser => {
+        user = createdUser;
+      });
   });
 
   afterEach(() => {

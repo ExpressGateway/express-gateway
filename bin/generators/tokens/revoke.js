@@ -16,16 +16,16 @@ module.exports = class extends eg.Generator {
     const argv = this.argv;
     return Promise.all(argv.tokens.map(token => {
       return this.admin.tokens.revoke(token)
-      .then(res => {
-        if (argv.q) {
-          this.stdout(token);
-        } else {
-          this.log.ok(`Access token has been revoked: ${token}`);
-        }
-      })
-      .catch(err => {
-        this.log.error(err.message);
-      });
+        .then(res => {
+          if (argv.q) {
+            this.stdout(token);
+          } else {
+            this.log.ok(`Access token has been revoked: ${token}`);
+          }
+        })
+        .catch(err => {
+          this.log.error(err.message);
+        });
     }));
   }
 };

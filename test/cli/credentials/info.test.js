@@ -19,15 +19,15 @@ describe('eg credentials info', () => {
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
+      .then(createdUser => {
+        user = createdUser;
 
-      return adminHelper.admin.credentials.create(user.id, 'key-auth', {});
-    })
-    .then(createdCred => {
-      cred = createdCred;
-      return cred;
-    });
+        return adminHelper.admin.credentials.create(user.id, 'key-auth', {});
+      })
+      .then(createdCred => {
+        cred = createdCred;
+        return cred;
+      });
   });
 
   afterEach(() => {

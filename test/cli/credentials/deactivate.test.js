@@ -19,13 +19,13 @@ describe('eg credentials deactivate', () => {
       firstname: 'f',
       lastname: 'l'
     })
-    .then(createdUser => {
-      user = createdUser;
-      return adminHelper.admin.credentials.create(user.id, 'key-auth', {});
-    })
-    .then(createdCred => {
-      cred1 = createdCred;
-    });
+      .then(createdUser => {
+        user = createdUser;
+        return adminHelper.admin.credentials.create(user.id, 'key-auth', {});
+      })
+      .then(createdCred => {
+        cred1 = createdCred;
+      });
   });
 
   afterEach(() => {

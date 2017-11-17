@@ -76,8 +76,8 @@ module.exports = class extends eg.Generator {
         if (shouldPrompt) {
           questions = missingProperties.map(p => {
             const required = p.descriptor.isRequired
-                        ? ' [required]'
-                        : '';
+              ? ' [required]'
+              : '';
 
             return {
               name: p.name,

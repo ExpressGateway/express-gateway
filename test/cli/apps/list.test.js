@@ -32,9 +32,9 @@ describe('eg apps list', () => {
         redirectUri: 'http://localhost:3000/cb'
       });
     })
-    .then(app => {
-      app2 = app;
-    });
+      .then(app => {
+        app2 = app;
+      });
   });
 
   afterEach(() => {

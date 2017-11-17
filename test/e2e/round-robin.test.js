@@ -55,46 +55,46 @@ describe('round-robin load @balancing @proxy', () => {
             backendPorts = [ports[2], ports[3]];
 
             generateBackendServer(ports[2])
-            .then(() => {
-              return generateBackendServer(ports[3]);
-            }).then(() => {
-              ;
-              fs.writeFile(testGatewayConfigPath,
-                yaml.dump(testGatewayConfigData), (err) => {
-                  if (err) {
-                    throw err;
-                  }
+              .then(() => {
+                return generateBackendServer(ports[3]);
+              }).then(() => {
+                ;
+                fs.writeFile(testGatewayConfigPath,
+                  yaml.dump(testGatewayConfigData), (err) => {
+                    if (err) {
+                      throw err;
+                    }
 
-                  const childEnv = Object.assign({}, process.env);
-                  childEnv.EG_CONFIG_DIR = tempPath;
+                    const childEnv = Object.assign({}, process.env);
+                    childEnv.EG_CONFIG_DIR = tempPath;
 
-                // Tests, by default have config watch disabled.
-                // Need to remove this paramter in the child process.
-                  delete childEnv.EG_DISABLE_CONFIG_WATCH;
+                    // Tests, by default have config watch disabled.
+                    // Need to remove this paramter in the child process.
+                    delete childEnv.EG_DISABLE_CONFIG_WATCH;
 
-                  const modulePath = path.join(__dirname, '..', '..', 'lib', 'index.js');
-                  childProcess = fork(modulePath, [], {
-                    cwd: tempPath,
-                    env: childEnv
-                  });
-
-                  childProcess.on('error', err => {
-                    throw err;
-                  });
-
-                // Not ideal, but we need to make sure the process is running.
-                  setTimeout(() => {
-                    request
-                    .get(`http://localhost:${gatewayPort}/not-found`)
-                    .end((err, res) => {
-                      assert(err);
-                      assert(res.clientError);
-                      assert(res.statusCode, 404);
-                      done();
+                    const modulePath = path.join(__dirname, '..', '..', 'lib', 'index.js');
+                    childProcess = fork(modulePath, [], {
+                      cwd: tempPath,
+                      env: childEnv
                     });
-                  }, 5000);
-                });
-            });
+
+                    childProcess.on('error', err => {
+                      throw err;
+                    });
+
+                    // Not ideal, but we need to make sure the process is running.
+                    setTimeout(() => {
+                      request
+                        .get(`http://localhost:${gatewayPort}/not-found`)
+                        .end((err, res) => {
+                          assert(err);
+                          assert(res.clientError);
+                          assert(res.statusCode, 404);
+                          done();
+                        });
+                    }, 5000);
+                  });
+              });
           });
         }).catch(err => done(err));
       });
