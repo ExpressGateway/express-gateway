@@ -30,22 +30,22 @@ describe('@log policy', () => {
     assert.equal(logger.info.getCall(0).args[0], '/test GET text');
     assert.ok(next.calledOnce);
   });
-  it('should log traceId', () => {
+  it('should log requestId', () => {
     const next = sinon.spy();
     const logMiddleware = logPolicy({
       // eslint-disable-next-line no-template-curly-in-string
-      message: '${traceId}'
+      message: '${requestId}'
     });
 
     logMiddleware(req, {}, next);
     assert.ok(logger.info.getCall(0).args[0].length > 10);
     assert.ok(next.calledOnce);
   });
-  it('should log egContext.traceId', () => {
+  it('should log egContext.requestId', () => {
     const next = sinon.spy();
     const logMiddleware = logPolicy({
       // eslint-disable-next-line no-template-curly-in-string
-      message: '${egContext.traceId}'
+      message: '${egContext.requestId}'
     });
 
     logMiddleware(req, {}, next);
