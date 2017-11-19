@@ -1,4 +1,4 @@
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const session = require('supertest-session');
 const qs = require('querystring');
 const url = require('url');
@@ -95,7 +95,7 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
     return db.flushdb()
       .then(function () {
         const user1 = {
-          username: idGen.v4(),
+          username: idGen(),
           firstname: 'test',
           lastname: 'test',
           email: 'test@eg.com'
@@ -106,7 +106,7 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
       .then(_user => {
         user = _user;
         const app1 = {
-          name: idGen.v4(),
+          name: idGen(),
           redirectUri: 'https://some.host.com/some/route'
         };
         return applicationService.insert(app1, user.id);
