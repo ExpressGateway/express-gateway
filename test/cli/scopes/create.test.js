@@ -1,6 +1,6 @@
 const assert = require('assert');
 const adminHelper = require('../../common/admin-helper')();
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:scopes:create';
 
@@ -15,7 +15,7 @@ describe('eg scopes create', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    scopeName = idGen.v4();
+    scopeName = idGen();
   });
 
   afterEach(() => {
@@ -65,11 +65,11 @@ describe('eg scopes create', () => {
 
       generator.once('end', () => {
         return adminHelper.admin.scopes.info(scopeName)
-              .then(res => {
-                assert.equal(res.scope, scopeName);
-                assert.equal(output, res.scope);
-                done();
-              });
+          .then(res => {
+            assert.equal(res.scope, scopeName);
+            assert.equal(output, res.scope);
+            done();
+          });
       });
     });
 

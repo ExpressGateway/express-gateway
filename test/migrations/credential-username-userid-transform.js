@@ -1,6 +1,6 @@
 const migrate = require('migrate');
 const tmp = require('tmp');
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const db = require('../../lib/db');
 const { assert } = require('chai');
 const userService = require('../../lib/services/consumers/user.service');
@@ -8,7 +8,7 @@ const credentialService = require('../../lib/services/credentials/credential.ser
 
 describe('Migrations', () => {
   describe('Username -> UserID credential transform', () => {
-    const username = idGen.v4();
+    const username = idGen();
     let tmpFile;
     let userId;
     let oldCredential;

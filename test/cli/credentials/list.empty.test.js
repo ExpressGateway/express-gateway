@@ -2,7 +2,7 @@ const assert = require('assert');
 const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:credentials:list';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 
 describe('eg credentials list -c x [no credentials]', () => {
   let program, env, user;
@@ -16,13 +16,13 @@ describe('eg credentials list -c x [no credentials]', () => {
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: idGen(),
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
-    });
+      .then(createdUser => {
+        user = createdUser;
+      });
   });
 
   it('should show friendly message if no credentials', done => {

@@ -3,7 +3,7 @@ const util = require('util');
 const helpers = require('yeoman-test');
 const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const namespace = 'express-gateway:users:update';
 
 describe('eg users update', () => {
@@ -19,13 +19,13 @@ describe('eg users update', () => {
     env.prepareHijack();
 
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: idGen(),
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
-    });
+      .then(createdUser => {
+        user = createdUser;
+      });
   });
 
   afterEach(() => {
@@ -52,7 +52,7 @@ describe('eg users update', () => {
         helpers.mockPrompt(generator, {
           firstname: 'FirstName',
           lastname: 'LastName',
-          email: '_',      // can't have empty values,
+          email: '_', // can't have empty values,
           redirectUri: '_' // limitation of yeoman-test.DummyPrompt
         });
       });
@@ -90,7 +90,7 @@ describe('eg users update', () => {
         helpers.mockPrompt(generator, {
           firstname: 'X1',
           lastname: 'L1',
-          email: '_',      // can't have empty values,
+          email: '_', // can't have empty values,
           redirectUri: '_' // limitation of yeoman-test.DummyPrompt
         });
       });

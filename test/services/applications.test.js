@@ -1,5 +1,5 @@
 const should = require('should');
-const uuid = require('uuid');
+const uuid = require('uuid/v4');
 const config = require('../../lib/config');
 const services = require('../../lib/services');
 const applicationService = services.application;
@@ -668,9 +668,9 @@ describe('Application service tests', function () {
 
 function createRandomUserObject () {
   return {
-    username: uuid.v4(),
-    firstname: uuid.v4(),
-    lastname: uuid.v4(),
-    email: uuid.v4()
+    username: uuid(),
+    firstname: uuid(),
+    lastname: uuid(),
+    email: uuid()
   };
 }

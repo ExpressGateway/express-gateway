@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:users:activate';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 
 describe('eg users activate', () => {
   let program, env, userId, userName, userName2;
@@ -14,23 +14,23 @@ describe('eg users activate', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    userName = idGen.v4();
-    userName2 = idGen.v4();
+    userName = idGen();
+    userName2 = idGen();
     return adminHelper.admin.users.create({
       username: userName,
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(user => {
-      userId = user.id;
-      return adminHelper.admin.users.create({
-        username: userName2,
-        firstname: 'La2',
-        lastname: 'Deeda2'
-      });
-    })
-    .then(() => adminHelper.admin.users.deactivate(userName))
-    .then(() => adminHelper.admin.users.deactivate(userName2));
+      .then(user => {
+        userId = user.id;
+        return adminHelper.admin.users.create({
+          username: userName2,
+          firstname: 'La2',
+          lastname: 'Deeda2'
+        });
+      })
+      .then(() => adminHelper.admin.users.deactivate(userName))
+      .then(() => adminHelper.admin.users.deactivate(userName2));
   });
 
   afterEach(() => {
@@ -139,11 +139,11 @@ describe('eg users activate', () => {
 
       generator.once('end', () => {
         return adminHelper.admin.users.info(userName)
-            .then(user => {
-              assert.equal(user.isActive, true);
-              assert.equal(output, userName);
-              done();
-            }).catch(done);
+          .then(user => {
+            assert.equal(user.isActive, true);
+            assert.equal(output, userName);
+            done();
+          }).catch(done);
       });
     });
 

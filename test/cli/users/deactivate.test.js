@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:users:deactivate';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 
 describe('eg users deactivate', () => {
   let program, env, userId, username, username2;
@@ -14,8 +14,8 @@ describe('eg users deactivate', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    username = idGen.v4();
-    username2 = idGen.v4();
+    username = idGen();
+    username2 = idGen();
 
     return adminHelper.admin.users.create({
       username: username,
@@ -134,11 +134,11 @@ describe('eg users deactivate', () => {
 
       generator.once('end', () => {
         return adminHelper.admin.users.info(username)
-            .then(user => {
-              assert.equal(user.isActive, false);
-              assert.equal(output, username);
-              done();
-            });
+          .then(user => {
+            assert.equal(user.isActive, false);
+            assert.equal(output, username);
+            done();
+          });
       });
     });
 

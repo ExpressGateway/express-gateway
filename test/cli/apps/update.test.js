@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:update';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const util = require('util');
 const helpers = require('yeoman-test');
 
@@ -21,21 +21,21 @@ describe('eg apps update', () => {
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: idGen(),
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
+      .then(createdUser => {
+        user = createdUser;
 
-      return adminHelper.admin.apps.create(user.id, {
-        name: 'appy1',
-        redirectUri: 'http://localhost:3000/cb'
+        return adminHelper.admin.apps.create(user.id, {
+          name: 'appy1',
+          redirectUri: 'http://localhost:3000/cb'
+        });
+      })
+      .then(createdApp => {
+        app1 = createdApp;
       });
-    })
-    .then(createdApp => {
-      app1 = createdApp;
-    });
   });
   it('updates an app from prompts', done => {
     env.hijack(namespace, generator => {

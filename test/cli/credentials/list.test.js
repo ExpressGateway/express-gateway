@@ -1,5 +1,5 @@
 const assert = require('assert');
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:credentials:list';
@@ -74,7 +74,7 @@ describe('eg credentials list -c ', () => {
           .admin
           .users
           .create({
-            username: idGen.v4(),
+            username: idGen(),
             firstname: 'La',
             lastname: 'Deeda'
           })

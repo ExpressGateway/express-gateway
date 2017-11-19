@@ -1,6 +1,6 @@
 const assert = require('assert');
 const adminHelper = require('../../common/admin-helper')();
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:scopes:remove';
 
@@ -15,10 +15,10 @@ describe('eg scopes remove', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    scopeName = idGen.v4();
-    scopeName2 = idGen.v4();
+    scopeName = idGen();
+    scopeName2 = idGen();
     return adminHelper.admin.scopes.create(scopeName)
-    .then(() => adminHelper.admin.scopes.create(scopeName2));
+      .then(() => adminHelper.admin.scopes.create(scopeName2));
   });
 
   afterEach(() => {

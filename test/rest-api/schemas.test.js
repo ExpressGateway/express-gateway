@@ -5,14 +5,14 @@ const Config = require('../../lib/config/config');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const yaml = require('js-yaml');
 
 describe('REST: schemas', () => {
   let config;
   beforeEach(() => {
     config = new Config();
-    config.gatewayConfigPath = path.join(os.tmpdir(), idGen.v4() + 'yml');
+    config.gatewayConfigPath = path.join(os.tmpdir(), idGen() + 'yml');
   });
 
   afterEach(() => {
