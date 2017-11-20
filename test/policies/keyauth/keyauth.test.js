@@ -1,5 +1,5 @@
 const headerName = 'Authorization';
-
+const idGen = require('uuid-base62');
 const request = require('supertest');
 const should = require('should');
 
@@ -11,7 +11,7 @@ const db = require('../../../lib/db');
 const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
 const originalGatewayConfig = config.gatewayConfig;
-
+let dbuser1;
 describe('Functional Tests keyAuth Policy', () => {
   const helper = testHelper();
   helper.addPolicy('test', () => (req, res) => {
@@ -95,33 +95,33 @@ describe('Functional Tests keyAuth Policy', () => {
     return db.flushdb()
       .then(function () {
         const user1 = {
-          username: 'test',
+          username: idGen.v4(),
           firstname: 't',
           lastname: 't',
           email: 'test@example.com'
         };
 
-        return userService.insert(user1)
-          .then(_fromDbUser1 => {
-            should.exist(_fromDbUser1);
-
-            return credentialService.insertScopes('authorizedScope', 'unauthorizedScope')
-              .then(() => {
-                return credentialService.insertCredential(_fromDbUser1.id, 'key-auth', {
-                  scopes: ['authorizedScope']
-                });
-              })
-              .then((userRes) => {
-                should.exist(userRes);
-                user = userRes;
-                return serverHelper.generateBackendServer(6057);
-              }).then(() => {
-                helper.setup()
-                  .then(apps => {
-                    app = apps.app;
-                  });
-              });
-          });
+        return userService.insert(user1);
+      })
+      .then(u => {
+        dbuser1 = u;
+        return credentialService.insertScopes('authorizedScope', 'unauthorizedScope');
+      })
+      .then(() => {
+        return credentialService.insertCredential(dbuser1.id, 'key-auth', {
+          scopes: ['authorizedScope']
+        });
+      })
+      .then((userRes) => {
+        should.exist(userRes);
+        user = userRes;
+        return serverHelper.generateBackendServer(6057);
+      })
+      .then(() => {
+        return helper.setup();
+      })
+      .then(apps => {
+        app = apps.app;
       });
   });
 
