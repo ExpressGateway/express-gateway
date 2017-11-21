@@ -87,6 +87,7 @@
     "passport": "^0.4.0",
     "passport-http": "0.3.0",
     "passport-http-bearer": "1.0.1",
+    "passport-jwt": "^3.0.1",
     "passport-local": "1.0.0",
     "passport-oauth2-client-password": "0.1.2",
     "proxy-agent": "^2.1.0",
