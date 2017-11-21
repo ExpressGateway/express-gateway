@@ -1,4 +1,4 @@
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const request = require('supertest');
 
 const services = require('../../lib/services');
@@ -46,13 +46,15 @@ describe('Functional Tests @auth Policies @passthrough', () => {
               action: {
                 passThrough: true
               }
-            }]},
+            }]
+          },
           {
             'basic-auth': [{
               action: {
                 passThrough: true
               }
-            }]},
+            }]
+          },
           {
             'oauth2': [{
               action: {
@@ -69,7 +71,7 @@ describe('Functional Tests @auth Policies @passthrough', () => {
     return db.flushdb()
       .then(function () {
         const user1 = {
-          username: idGen.v4(),
+          username: idGen(),
           firstname: 't',
           lastname: 't',
           email: 'test@example.com'
@@ -90,7 +92,7 @@ describe('Functional Tests @auth Policies @passthrough', () => {
         user = userRes;
         return serverHelper.generateBackendServer();
       })
-      .then(({port}) => {
+      .then(({ port }) => {
         config.gatewayConfig.serviceEndpoints.backend.url += port;
         return helper.setup();
       })

@@ -1,5 +1,5 @@
 const headerName = 'Authorization';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const request = require('supertest');
 const should = require('should');
 
@@ -95,7 +95,7 @@ describe('Functional Tests keyAuth Policy', () => {
     return db.flushdb()
       .then(function () {
         const user1 = {
-          username: idGen.v4(),
+          username: idGen(),
           firstname: 't',
           lastname: 't',
           email: 'test@example.com'

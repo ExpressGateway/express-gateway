@@ -1,11 +1,11 @@
 const request = require('supertest');
 const cliHelper = require('../common/cli.helper');
 const gwHelper = require('../common/gateway.helper');
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 
 let gatewayProcess = null;
 let gatewayPort, adminPort, configDirectoryPath;
-const username = idGen.v4();
+const username = idGen();
 let keyCred;
 const headerName = 'Authorization';
 const proxyPolicy = {

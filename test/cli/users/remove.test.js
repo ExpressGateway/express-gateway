@@ -1,7 +1,7 @@
 const assert = require('assert');
 const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const namespace = 'express-gateway:users:remove';
 
 describe('eg users remove', () => {
@@ -19,7 +19,7 @@ describe('eg users remove', () => {
     const promises = [];
     for (let i = 0; i < 5; i++) {
       promises.push(adminHelper.admin.users.create({
-        username: idGen.v4(),
+        username: idGen(),
         firstname: 'La',
         lastname: 'Deeda'
       }));

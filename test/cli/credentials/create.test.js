@@ -2,7 +2,7 @@ const assert = require('assert');
 const PassThrough = require('stream').PassThrough;
 const helpers = require('yeoman-test');
 const adminHelper = require('../../common/admin-helper')();
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:credentials:create';
 
@@ -18,7 +18,7 @@ describe('eg credentials create', () => {
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: idGen(),
       firstname: 'La',
       lastname: 'Deeda'
     })

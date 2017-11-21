@@ -4,7 +4,7 @@ const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:create';
 const PassThrough = require('stream').PassThrough;
 const util = require('util');
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const helpers = require('yeoman-test');
 const { checkOutput } = require('../../common/output-helper');
 
@@ -19,13 +19,13 @@ describe('eg apps create', () => {
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: idGen(),
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
-    });
+      .then(createdUser => {
+        user = createdUser;
+      });
   });
 
   afterEach(() => {

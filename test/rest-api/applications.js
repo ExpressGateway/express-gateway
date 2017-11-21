@@ -1,5 +1,5 @@
 const should = require('should');
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const adminHelper = require('../common/admin-helper')();
 
 describe('REST: Applications', () => {
@@ -14,7 +14,7 @@ describe('REST: Applications', () => {
   afterEach(() => adminHelper.reset());
   after(() => adminHelper.stop());
 
-  const username = idGen.v4();
+  const username = idGen();
 
   describe('Insert two applications with the same name under the same user', () => {
     before(() => adminHelper.admin.users.create({

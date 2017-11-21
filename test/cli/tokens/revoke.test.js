@@ -4,7 +4,7 @@ const app = require('../../oauth/bootstrap');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:tokens:revoke';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const authService = require('../../../lib/services').auth;
 
 describe('eg tokens revoke', () => {
@@ -18,39 +18,39 @@ describe('eg tokens revoke', () => {
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: idGen(),
       firstname: 'f',
       lastname: 'l'
     })
-    .then(createdUser => {
-      user = createdUser;
-      return adminHelper.admin.credentials.create(user.username, 'oauth2', {secret: 'test'});
-    })
-    .then(createdCred => {
-      // cred = createdCred;
-      return request(app)
-        .post('/oauth2/token')
-        .set('Authorization', 'basic ' + (Buffer.from(user.username + ':test').toString('base64')))
-        .set('content-type', 'application/x-www-form-urlencoded')
-        .type('form')
-        .send({
-          grant_type: 'password',
-          username: user.username,
-          password: 'test'
-        })
-        .expect(200);
-    })
-    .then(res => {
-      const token = res.body;
-      assert.ok(token);
-      assert.ok(token.access_token);
-      accessToken = token.access_token;
-      assert.equal(token.token_type, 'Bearer');
-      return authService.authenticateToken(accessToken);
-    })
-    .then(res => {
-      assert.equal(res.consumer.username, user.username);
-    });
+      .then(createdUser => {
+        user = createdUser;
+        return adminHelper.admin.credentials.create(user.username, 'oauth2', { secret: 'test' });
+      })
+      .then(createdCred => {
+        // cred = createdCred;
+        return request(app)
+          .post('/oauth2/token')
+          .set('Authorization', 'basic ' + (Buffer.from(user.username + ':test').toString('base64')))
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .type('form')
+          .send({
+            grant_type: 'password',
+            username: user.username,
+            password: 'test'
+          })
+          .expect(200);
+      })
+      .then(res => {
+        const token = res.body;
+        assert.ok(token);
+        assert.ok(token.access_token);
+        accessToken = token.access_token;
+        assert.equal(token.token_type, 'Bearer');
+        return authService.authenticateToken(accessToken);
+      })
+      .then(res => {
+        assert.equal(res.consumer.username, user.username);
+      });
   });
 
   afterEach(() => {

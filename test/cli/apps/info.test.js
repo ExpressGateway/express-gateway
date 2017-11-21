@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:info';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 
 describe('eg apps info', () => {
   let program, env, user, app;
@@ -13,7 +13,7 @@ describe('eg apps info', () => {
 
   before(() => {
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: idGen(),
       firstname: 'La',
       lastname: 'Deeda'
     })

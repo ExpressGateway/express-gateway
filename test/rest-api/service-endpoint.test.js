@@ -4,14 +4,14 @@ const Config = require('../../lib/config/config');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const yaml = require('js-yaml');
 
 describe('REST: service endpoints', () => {
   let config;
   beforeEach(() => {
     config = new Config();
-    config.gatewayConfigPath = path.join(os.tmpdir(), idGen.v4() + 'yml');
+    config.gatewayConfigPath = path.join(os.tmpdir(), idGen() + 'yml');
   });
 
   afterEach(() => {
@@ -21,17 +21,17 @@ describe('REST: service endpoints', () => {
   describe('when no service endpoints defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: {port: 0},
+        admin: { port: 0 },
         serviceEndpoints: null
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
-      return adminHelper.start({config});
+      return adminHelper.start({ config });
     });
     it('should create a new service endpoint', () => {
       const testEndpoint = {
         url: 'express-gateway.io',
-        customId: idGen.v4()
+        customId: idGen()
       };
       return adminHelper.admin.config.serviceEndpoints
         .create('test', testEndpoint)
@@ -47,20 +47,20 @@ describe('REST: service endpoints', () => {
   describe('when service endpoints defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: {port: 0},
+        admin: { port: 0 },
         serviceEndpoints: {
-          example: {url: 'example.com'},
-          hello: {url: 'hello.com'}
+          example: { url: 'example.com' },
+          hello: { url: 'hello.com' }
         }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
-      return adminHelper.start({config});
+      return adminHelper.start({ config });
     });
     it('should create a new service endpoint', () => {
       const testEndpoint = {
         url: 'express-gateway.io',
-        customId: idGen.v4() // NOTE: save operation should allow custom props
+        customId: idGen() // NOTE: save operation should allow custom props
       };
       return adminHelper.admin.config.serviceEndpoints
         .create('test', testEndpoint)
@@ -76,7 +76,7 @@ describe('REST: service endpoints', () => {
     it('should update existing endpoint', () => {
       const testEndpoint = {
         url: 'express-gateway.io',
-        customId: idGen.v4()
+        customId: idGen()
       };
       return adminHelper.admin.config.serviceEndpoints
         .update('example', testEndpoint)

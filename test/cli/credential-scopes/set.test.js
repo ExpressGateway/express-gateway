@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:credential-scopes:set';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 
 describe('eg credential:scopes set', () => {
   let program, env, user, cred1, scope1, scope2, scope3;
@@ -14,30 +14,30 @@ describe('eg credential:scopes set', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    scope1 = idGen.v4();
-    scope2 = idGen.v4();
-    scope3 = idGen.v4();
+    scope1 = idGen();
+    scope2 = idGen();
+    scope3 = idGen();
     return Promise.all([
       adminHelper.admin.scopes.create(scope1),
       adminHelper.admin.scopes.create(scope2),
       adminHelper.admin.scopes.create(scope3)
     ]).then(() => {
       return adminHelper.admin.users.create({
-        username: idGen.v4(),
+        username: idGen(),
         firstname: 'f',
         lastname: 'l'
       });
     })
-    .then(createdUser => {
-      user = createdUser;
-      return adminHelper.admin.credentials.create(user.id, 'key-auth', {
-        scopes: [scope3]
+      .then(createdUser => {
+        user = createdUser;
+        return adminHelper.admin.credentials.create(user.id, 'key-auth', {
+          scopes: [scope3]
+        });
+      })
+      .then(createdCred => {
+        cred1 = createdCred;
+        assert.equal(cred1.scopes[0], scope3);
       });
-    })
-    .then(createdCred => {
-      cred1 = createdCred;
-      assert.equal(cred1.scopes[0], scope3);
-    });
   });
 
   afterEach(() => {

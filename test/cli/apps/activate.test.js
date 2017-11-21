@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:activate';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 
 describe('eg apps activate', () => {
   let program, env, user, app1, app2;
@@ -16,7 +16,7 @@ describe('eg apps activate', () => {
     env.prepareHijack();
     return adminHelper.reset()
       .then(() => adminHelper.admin.users.create({
-        username: idGen.v4(),
+        username: idGen(),
         firstname: 'La',
         lastname: 'Deeda'
       }))

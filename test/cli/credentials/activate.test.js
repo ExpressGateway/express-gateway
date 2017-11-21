@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:credentials:activate';
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 
 describe('eg credentials activate', () => {
   let program, env, user, cred1;
@@ -15,18 +15,18 @@ describe('eg credentials activate', () => {
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: idGen(),
       firstname: 'f',
       lastname: 'l'
     })
-    .then(createdUser => {
-      user = createdUser;
-      return adminHelper.admin.credentials.create(user.id, 'key-auth', {});
-    })
-    .then(createdCred => {
-      cred1 = createdCred;
-    })
-    .then(() => adminHelper.admin.credentials.deactivate(cred1.keyId, 'key-auth'));
+      .then(createdUser => {
+        user = createdUser;
+        return adminHelper.admin.credentials.create(user.id, 'key-auth', {});
+      })
+      .then(createdCred => {
+        cred1 = createdCred;
+      })
+      .then(() => adminHelper.admin.credentials.deactivate(cred1.keyId, 'key-auth'));
   });
 
   afterEach(() => {

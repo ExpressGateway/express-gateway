@@ -1,6 +1,6 @@
 const assert = require('assert');
 const adminHelper = require('../../common/admin-helper')();
-const idGen = require('uuid-base62');
+const idGen = require('uuid/v4');
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:apps:list';
 
@@ -16,25 +16,25 @@ describe('eg apps list', () => {
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: idGen(),
       firstname: 'La',
       lastname: 'Deeda'
     }).then(user => {
       user1 = user;
       return adminHelper.admin.apps.create(user1.id, {
-        name: idGen.v4(),
+        name: idGen(),
         redirectUri: 'http://localhost:3000/cb'
       });
     }).then(app => {
       app1 = app;
       return adminHelper.admin.apps.create(user1.id, {
-        name: idGen.v4(),
+        name: idGen(),
         redirectUri: 'http://localhost:3000/cb'
       });
     })
-    .then(app => {
-      app2 = app;
-    });
+      .then(app => {
+        app2 = app;
+      });
   });
 
   afterEach(() => {
