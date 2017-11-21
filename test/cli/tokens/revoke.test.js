@@ -22,35 +22,35 @@ describe('eg tokens revoke', () => {
       firstname: 'f',
       lastname: 'l'
     })
-    .then(createdUser => {
-      user = createdUser;
-      return adminHelper.admin.credentials.create(user.username, 'oauth2', {secret: 'test'});
-    })
-    .then(createdCred => {
+      .then(createdUser => {
+        user = createdUser;
+        return adminHelper.admin.credentials.create(user.username, 'oauth2', {secret: 'test'});
+      })
+      .then(createdCred => {
       // cred = createdCred;
-      return request(app)
-        .post('/oauth2/token')
-        .set('Authorization', 'basic ' + (Buffer.from(user.username + ':test').toString('base64')))
-        .set('content-type', 'application/x-www-form-urlencoded')
-        .type('form')
-        .send({
-          grant_type: 'password',
-          username: user.username,
-          password: 'test'
-        })
-        .expect(200);
-    })
-    .then(res => {
-      const token = res.body;
-      assert.ok(token);
-      assert.ok(token.access_token);
-      accessToken = token.access_token;
-      assert.equal(token.token_type, 'Bearer');
-      return authService.authenticateToken(accessToken);
-    })
-    .then(res => {
-      assert.equal(res.consumer.username, user.username);
-    });
+        return request(app)
+          .post('/oauth2/token')
+          .set('Authorization', 'basic ' + (Buffer.from(user.username + ':test').toString('base64')))
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .type('form')
+          .send({
+            grant_type: 'password',
+            username: user.username,
+            password: 'test'
+          })
+          .expect(200);
+      })
+      .then(res => {
+        const token = res.body;
+        assert.ok(token);
+        assert.ok(token.access_token);
+        accessToken = token.access_token;
+        assert.equal(token.token_type, 'Bearer');
+        return authService.authenticateToken(accessToken);
+      })
+      .then(res => {
+        assert.equal(res.consumer.username, user.username);
+      });
   });
 
   afterEach(() => {

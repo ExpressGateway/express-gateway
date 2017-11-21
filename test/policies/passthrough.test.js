@@ -60,7 +60,7 @@ describe('Functional Tests @auth Policies @passthrough', () => {
               }
             }]
           },
-            proxyPolicy
+          proxyPolicy
           ]
         }
       }

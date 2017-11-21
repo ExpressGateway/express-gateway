@@ -21,16 +21,16 @@ module.exports = class extends eg.Generator {
 
     return Promise.all(appIds.map((appId) => {
       return this.admin.apps.remove(appId)
-          .then(() => {
-            if (!argv.q) {
-              this.log.ok(`Removed ${appId}`);
-            } else {
-              this.stdout(appId);
-            }
-          })
-          .catch(err => {
-            this.log.error(err.message);
-          });
+        .then(() => {
+          if (!argv.q) {
+            this.log.ok(`Removed ${appId}`);
+          } else {
+            this.stdout(appId);
+          }
+        })
+        .catch(err => {
+          this.log.error(err.message);
+        });
     }));
   }
 };

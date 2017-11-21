@@ -21,20 +21,20 @@ module.exports = class extends eg.Generator {
 
     return Promise.all(userIds.map((userId) => {
       return this.admin.users.deactivate(userId)
-          .then(res => {
-            const status = res.status;
+        .then(res => {
+          const status = res.status;
 
-            if (status) {
-              if (argv.q) {
-                this.stdout(userId);
-              } else {
-                this.log.ok(`${status} ${userId}`);
-              }
+          if (status) {
+            if (argv.q) {
+              this.stdout(userId);
+            } else {
+              this.log.ok(`${status} ${userId}`);
             }
-          })
-          .catch(err => {
-            this.log.error(err.message);
-          });
+          }
+        })
+        .catch(err => {
+          this.log.error(err.message);
+        });
     }));
   }
 };

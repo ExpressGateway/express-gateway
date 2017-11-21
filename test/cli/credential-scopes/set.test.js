@@ -28,16 +28,16 @@ describe('eg credential:scopes set', () => {
         lastname: 'l'
       });
     })
-    .then(createdUser => {
-      user = createdUser;
-      return adminHelper.admin.credentials.create(user.id, 'key-auth', {
-        scopes: [scope3]
+      .then(createdUser => {
+        user = createdUser;
+        return adminHelper.admin.credentials.create(user.id, 'key-auth', {
+          scopes: [scope3]
+        });
+      })
+      .then(createdCred => {
+        cred1 = createdCred;
+        assert.equal(cred1.scopes[0], scope3);
       });
-    })
-    .then(createdCred => {
-      cred1 = createdCred;
-      assert.equal(cred1.scopes[0], scope3);
-    });
   });
 
   afterEach(() => {

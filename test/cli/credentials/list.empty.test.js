@@ -20,9 +20,9 @@ describe('eg credentials list -c x [no credentials]', () => {
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
-    });
+      .then(createdUser => {
+        user = createdUser;
+      });
   });
 
   it('should show friendly message if no credentials', done => {

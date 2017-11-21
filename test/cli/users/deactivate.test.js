@@ -134,11 +134,11 @@ describe('eg users deactivate', () => {
 
       generator.once('end', () => {
         return adminHelper.admin.users.info(username)
-            .then(user => {
-              assert.equal(user.isActive, false);
-              assert.equal(output, username);
-              done();
-            });
+          .then(user => {
+            assert.equal(user.isActive, false);
+            assert.equal(output, username);
+            done();
+          });
       });
     });
 

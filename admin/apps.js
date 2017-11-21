@@ -36,7 +36,7 @@ module.exports = function (client) {
     list () { // TODO: add pagination
       return client
         .get(baseUrl)
-          .then(res => res.body);
+        .then(res => res.body);
     },
 
     remove (id) {

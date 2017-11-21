@@ -23,9 +23,9 @@ describe('eg users update', () => {
       firstname: 'La',
       lastname: 'Deeda'
     })
-    .then(createdUser => {
-      user = createdUser;
-    });
+      .then(createdUser => {
+        user = createdUser;
+      });
   });
 
   afterEach(() => {
@@ -52,7 +52,7 @@ describe('eg users update', () => {
         helpers.mockPrompt(generator, {
           firstname: 'FirstName',
           lastname: 'LastName',
-          email: '_',      // can't have empty values,
+          email: '_', // can't have empty values,
           redirectUri: '_' // limitation of yeoman-test.DummyPrompt
         });
       });
@@ -90,7 +90,7 @@ describe('eg users update', () => {
         helpers.mockPrompt(generator, {
           firstname: 'X1',
           lastname: 'L1',
-          email: '_',      // can't have empty values,
+          email: '_', // can't have empty values,
           redirectUri: '_' // limitation of yeoman-test.DummyPrompt
         });
       });

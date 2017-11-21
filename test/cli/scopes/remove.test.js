@@ -18,7 +18,7 @@ describe('eg scopes remove', () => {
     scopeName = idGen.v4();
     scopeName2 = idGen.v4();
     return adminHelper.admin.scopes.create(scopeName)
-    .then(() => adminHelper.admin.scopes.create(scopeName2));
+      .then(() => adminHelper.admin.scopes.create(scopeName2));
   });
 
   afterEach(() => {

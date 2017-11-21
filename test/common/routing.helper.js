@@ -26,7 +26,7 @@ module.exports = function () {
     return testScenario;
   }
   return {
-    addPolicy: (name, handler) => {  // TODO: make it plugin
+    addPolicy: (name, handler) => { // TODO: make it plugin
       policies.register({policy: handler, name});
     },
     setup: ({config, plugins} = {}) => {
@@ -116,13 +116,13 @@ module.exports = function () {
       return (done) => {
         const testScenario = prepareScenario(testCase);
         testScenario
-            .expect((res) => {
-              assert.deepEqual(res.body.params, testCase.test.params);
-            })
-            .end((err, res) => {
-              if (err) { logger.error(res.body); }
-              err ? done(err) : done();
-            });
+          .expect((res) => {
+            assert.deepEqual(res.body.params, testCase.test.params);
+          })
+          .end((err, res) => {
+            if (err) { logger.error(res.body); }
+            err ? done(err) : done();
+          });
       };
     }
   };

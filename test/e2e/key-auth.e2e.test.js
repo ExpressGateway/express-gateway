@@ -42,7 +42,7 @@ describe('E2E: key-auth Policy', () => {
               }
             }
           },
-            proxyPolicy
+          proxyPolicy
           ]
         },
         pipeline2: {
@@ -50,7 +50,7 @@ describe('E2E: key-auth Policy', () => {
           policies: [{
             'key-auth': {}
           },
-            proxyPolicy
+          proxyPolicy
           ]
         },
         pipeline_by_query: {
@@ -63,7 +63,7 @@ describe('E2E: key-auth Policy', () => {
               }
             }]
           },
-            proxyPolicy
+          proxyPolicy
           ]
         }
       }
