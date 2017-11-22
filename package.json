@@ -22,7 +22,8 @@
     "Serhii Kuts <sergeykuc@gmail.com>",
     "Irfan Baqui <irfan.baqui@gmail.com>",
     "Kevin Swiber <kswiber@gmail.com>",
-    "Al Tsang <agilecto@gmail.com>"
+    "Al Tsang <agilecto@gmail.com>",
+    "Vincenzo Chianese <vincenz.chianese@icloud.com>"
   ],
   "license": "Apache-2.0",
   "main": "lib/index.js",
