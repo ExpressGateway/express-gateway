@@ -34,7 +34,9 @@ describe('JWT policy', () => {
       algorithm: 'RS256'
     },
     actionConfig: {
-      secretFile: require.resolve('../../fixtures/certs/client/client.crt')
+      secretFile: require.resolve('../../fixtures/certs/client/client.crt'),
+      jwtExtractor: 'query',
+      jwtExtractorField: 'jwtKey'
     }
   }].forEach((jwtSecretTestCase) => {
     describe(jwtSecretTestCase.description, () => {
@@ -145,7 +147,13 @@ describe('JWT policy', () => {
             .expect(testCase.statusCode);
 
           if (testCase.signedJwt) {
-            return req.set('Authorization', `Bearer ${testCase.signedJwt()}`);
+            if (jwtSecretTestCase.actionConfig.jwtExtractor === 'query') {
+              const query = {};
+              query[jwtSecretTestCase.actionConfig.jwtExtractorField] = testCase.signedJwt();
+              return req.query(query);
+            } else {
+              return req.set('Authorization', `Bearer ${testCase.signedJwt()}`);
+            }
           }
 
           return req;
