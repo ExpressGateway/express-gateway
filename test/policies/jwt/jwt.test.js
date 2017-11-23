@@ -95,6 +95,13 @@ describe('JWT policy', () => {
 
       [{
         description: 'should not forward requests without authorization header',
+        signedJwt: () => jwt.sign({ iss: jwtCredential.keyId }, 'error'),
+        statusCode: 401
+      }, {
+        description: 'should not forward requests when no issuer is provided',
+        signedJwt: () => jwt.sign({}, jwtSecretTestCase.jwtSecret, jwtSecretTestCase.jwtSignOptions
+        ),
+
         statusCode: 401
       }, {
         description: 'should not forward requests with a unmatching signed JWT',
