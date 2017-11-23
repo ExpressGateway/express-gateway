@@ -50,7 +50,7 @@ describe('@proxy through proxy', () => {
     delete process.env.http_proxy;
     gw.kill();
   });
-  it('send through proxy', () => {
+  it('should respect http_proxy env var and send through proxy', () => {
     return request
       .get(`http://localhost:${gatewayConfig.http.port}/test`)
       .then((res) => {
