@@ -5,7 +5,7 @@ const http = require('http');
 const assert = require('assert');
 const request = require('superagent');
 
-describe('@proxy through proxy', () => {
+describe('@e2e @proxy through proxy', () => {
   const gatewayConfig = {
     apiEndpoints: {
       api: {
