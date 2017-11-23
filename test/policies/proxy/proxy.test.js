@@ -22,7 +22,7 @@ function expectedResponse (app, status, contentType) {
   return request(app).get('/endpoint').expect(status).expect('Content-Type', contentType);
 }
 
-describe('proxy policy', () => {
+describe('@proxy policy', () => {
   const defaultProxyOptions = {
     target: {
       keyFile: clientKeyFile,
