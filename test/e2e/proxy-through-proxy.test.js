@@ -1,9 +1,9 @@
-const gwHelper = require('../../common/gateway.helper');
-const cliHelper = require('../../common/cli.helper');
 const httpProxy = require('http-proxy');
 const http = require('http');
 const assert = require('assert');
 const request = require('superagent');
+const gwHelper = require('../common/gateway.helper');
+const cliHelper = require('../common/cli.helper');
 
 describe('@e2e @proxy through proxy', () => {
   const gatewayConfig = {
