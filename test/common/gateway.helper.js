@@ -43,7 +43,6 @@ module.exports.startGatewayInstance = function ({dirInfo, gatewayConfig}) {
       return new Promise((resolve, reject) => {
         const childEnv = Object.assign({}, process.env);
         childEnv.EG_CONFIG_DIR = dirInfo.configDirectoryPath;
-
         // Tests, by default have config watch disabled.
         // Need to remove this paramter in the child process.
         delete childEnv.EG_DISABLE_CONFIG_WATCH;
