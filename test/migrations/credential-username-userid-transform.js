@@ -15,8 +15,8 @@ describe('Migrations', () => {
     before('I insert some credentials by user name', () => {
       return userService.insert({
         username,
-        firstname: 'Vincenzo',
-        lastname: 'Chianese'
+        firstname: 'Clark',
+        lastname: 'Kent'
       }).then((user) => {
         userId = user.id;
         return credentialService

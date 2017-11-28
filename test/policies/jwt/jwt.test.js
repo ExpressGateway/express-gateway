@@ -79,8 +79,8 @@ describe('JWT policy', () => {
         return db.flushdb()
           .then(() => userService.insert({
             username: idGen.v4(),
-            firstname: 'Vincenzo',
-            lastname: 'Chianese',
+            firstname: 'Clark',
+            lastname: 'Kent',
             email: 'test@example.com'
           }))
           .then((user) => credentialService.insertCredential(user.id, 'jwt')).then((credential) => { jwtCredential = credential; })
