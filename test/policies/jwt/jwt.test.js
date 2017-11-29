@@ -95,7 +95,7 @@ describe('JWT policy', () => {
 
       [{
         description: 'should not forward requests without authorization header',
-        signedJwt: () => jwt.sign({ iss: jwtCredential.keyId }, 'error'),
+        signedJwt: () => jwt.sign({ sub: jwtCredential.keyId }, 'error'),
         statusCode: 401
       }, {
         description: 'should not forward requests when no issuer is provided',
@@ -105,20 +105,20 @@ describe('JWT policy', () => {
         statusCode: 401
       }, {
         description: 'should not forward requests with a unmatching signed JWT',
-        signedJwt: () => jwt.sign({ iss: jwtCredential.keyId }, 'error'),
+        signedJwt: () => jwt.sign({ sub: jwtCredential.keyId }, 'error'),
         statusCode: 401
       }, {
         description: 'should not forward requests with a signed JWT but wrong keyID',
-        signedJwt: () => jwt.sign({ iss: 'I do not know' }, 'error'),
+        signedJwt: () => jwt.sign({ sub: 'I do not know' }, 'error'),
         statusCode: 401
       }, {
         description: 'should not forward requests with a signed JWT but wrong keyID',
-        signedJwt: () => jwt.sign({ iss: 'I do not know' }, 'error'),
+        signedJwt: () => jwt.sign({ sub: 'I do not know' }, 'error'),
         statusCode: 401
       }, {
         description: 'should not forward requests with a signed JWT and correct keyID, but expired token',
         signedJwt: () => jwt.sign(
-          { iss: jwtCredential.keyId, exp: (Date.now() / 1000) - 1000 },
+          { sub: jwtCredential.keyId, exp: (Date.now() / 1000) - 1000 },
           jwtSecretTestCase.jwtSecret,
           jwtSecretTestCase.jwtSignOptions
         ),
@@ -126,7 +126,7 @@ describe('JWT policy', () => {
       }, {
         description: 'should not forward requests with a signed JWT and correct keyID, but not valid yet',
         signedJwt: () => jwt.sign(
-          { iss: jwtCredential.keyId, nbf: (Date.now() / 1000) + 1000 },
+          { sub: jwtCredential.keyId, nbf: (Date.now() / 1000) + 1000 },
           jwtSecretTestCase.jwtSecret,
           jwtSecretTestCase.jwtSignOptions
         ),
@@ -134,7 +134,7 @@ describe('JWT policy', () => {
       }, {
         description: 'should forward requests with a signed JWT and correct keyID',
         signedJwt: () => jwt.sign(
-          { iss: jwtCredential.keyId },
+          { sub: jwtCredential.keyId },
           jwtSecretTestCase.jwtSecret,
           jwtSecretTestCase.jwtSignOptions
         ),
@@ -142,7 +142,7 @@ describe('JWT policy', () => {
       }, {
         description: 'should forward requests with a signed JWT and correct keyID, correct nbf and correct expiration',
         signedJwt: () => jwt.sign(
-          { iss: jwtCredential.keyId, nbf: (Date.now() / 1000) - 1000, exp: (Date.now() / 1000) + 1000 },
+          { sub: jwtCredential.keyId, nbf: (Date.now() / 1000) - 1000, exp: (Date.now() / 1000) + 1000 },
           jwtSecretTestCase.jwtSecret,
           jwtSecretTestCase.jwtSignOptions
         ),
