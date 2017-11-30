@@ -25,7 +25,7 @@ describe('JWT policy', () => {
     jwtSecret: 'superSecretString',
     jwtSignOptions: {},
     actionConfig: {
-      secret: 'superSecretString'
+      secretOrPubKey: 'superSecretString'
     }
   }, {
     description: 'Secret file',
@@ -34,7 +34,7 @@ describe('JWT policy', () => {
       algorithm: 'RS256'
     },
     actionConfig: {
-      secretFile: require.resolve('../../fixtures/certs/client/client.crt'),
+      secretOrPubKeyFile: require.resolve('../../fixtures/certs/client/client.crt'),
       jwtExtractor: 'query',
       jwtExtractorField: 'jwtKey'
     }
