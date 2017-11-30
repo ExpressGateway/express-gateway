@@ -19,6 +19,40 @@ let gateway;
 let backend;
 let jwtCredential;
 
+const jwtConfigGet = (jwtConfig) => {
+  return {
+    http: {
+      port: 0
+    },
+    serviceEndpoints: {
+      backend: {
+        url: 'http://localhost:6057'
+      }
+    },
+    apiEndpoints: {
+      api: {
+        host: '*'
+      }
+    },
+    policies: ['jwt', 'proxy'],
+    pipelines: {
+      pipeline1: {
+        apiEndpoints: ['api'],
+        policies: [
+          { 'jwt': { action: jwtConfig } },
+          {
+            proxy: [
+              {
+                action: { serviceEndpoint: 'backend' }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  };
+};
+
 describe('JWT policy', () => {
   [{
     description: 'Secret string',
@@ -41,40 +75,7 @@ describe('JWT policy', () => {
   }].forEach((jwtSecretTestCase) => {
     describe(jwtSecretTestCase.description, () => {
       before('setup', () => {
-        config.gatewayConfig = {
-          http: {
-            port: 0
-          },
-          serviceEndpoints: {
-            backend: {
-              url: 'http://localhost:6057'
-            }
-          },
-          apiEndpoints: {
-            api: {
-              host: '*'
-            }
-          },
-          policies: ['jwt', 'proxy'],
-          pipelines: {
-            pipeline1: {
-              apiEndpoints: ['api'],
-              policies: [{
-                'jwt': {
-                  action: jwtSecretTestCase.actionConfig
-                }
-              },
-              {
-                proxy: [
-                  {
-                    action: { serviceEndpoint: 'backend' }
-                  }
-                ]
-              }
-              ]
-            }
-          }
-        };
+        config.gatewayConfig = jwtConfigGet(jwtSecretTestCase.actionConfig);
 
         return db.flushdb()
           .then(() => userService.insert({
@@ -166,6 +167,30 @@ describe('JWT policy', () => {
           return req;
         });
       });
+    });
+  });
+
+  describe('Skip credential check enabled', () => {
+    before(() => {
+      config.gatewayConfig = jwtConfigGet({
+        secretOrPubKey: 'superSecretString',
+        checkCredentialExistence: false
+      });
+
+      return db.flushdb()
+        .then(() => serverHelper.generateBackendServer(6057)).then(({ app }) => { backend = app; })
+        .then(() => testHelper.setup()).then(({ app }) => { gateway = app; });
+    });
+
+    it('Should correctly forward the request', () => request(gateway)
+      .get('/')
+      .set('Authorization', `Bearer ${jwt.sign({ hello: 'world' }, 'superSecretString')}`)
+      .expect(200)
+    );
+
+    after('cleanup', (done) => {
+      config.gatewayConfig = originalGatewayConfig;
+      backend.close(() => gateway.close(done));
     });
   });
 });
