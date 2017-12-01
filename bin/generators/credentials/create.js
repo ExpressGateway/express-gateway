@@ -160,7 +160,7 @@ module.exports = class extends eg.Generator {
       this.log.ok(`Created ${credential.id || credential.keyId}`);
       this.stdout(JSON.stringify(credential, null, 2));
     } else {
-      if (argv.type === 'key-auth') {
+      if (argv.type === 'key-auth' || argv.type === 'jwt') {
         this.stdout(`${credential.keyId}:${credential.keySecret}`);
       } else if (argv.type === 'basic-auth') {
         this.stdout(`${credential.id}:${credential.password}`);

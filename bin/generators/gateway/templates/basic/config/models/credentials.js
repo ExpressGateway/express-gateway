@@ -13,6 +13,10 @@ module.exports = {
       scopes: { isRequired: false }
     }
   },
+  'jwt': {
+    properties: {
+    }
+  },
   oauth2: {
     passwordKey: 'secret',
     autoGeneratePassword: true,
