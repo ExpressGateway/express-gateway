@@ -19,14 +19,14 @@ let gateway;
 let backend;
 let jwtCredential;
 
-const jwtConfigGet = (jwtConfig) => {
+const jwtConfigGet = (jwtConfig, backendPort) => {
   return {
     http: {
       port: 0
     },
     serviceEndpoints: {
       backend: {
-        url: 'http://localhost:6057'
+        url: `http://localhost:${backendPort}`
       }
     },
     apiEndpoints: {
@@ -75,8 +75,6 @@ describe('JWT policy', () => {
   }].forEach((jwtSecretTestCase) => {
     describe(jwtSecretTestCase.description, () => {
       before('setup', () => {
-        config.gatewayConfig = jwtConfigGet(jwtSecretTestCase.actionConfig);
-
         return db.flushdb()
           .then(() => userService.insert({
             username: idGen.v4(),
@@ -85,7 +83,11 @@ describe('JWT policy', () => {
             email: 'test@example.com'
           }))
           .then((user) => credentialService.insertCredential(user.id, 'jwt')).then((credential) => { jwtCredential = credential; })
-          .then(() => serverHelper.generateBackendServer(6057)).then(({ app }) => { backend = app; })
+          .then(() => serverHelper.findOpenPortNumbers(1))
+          .then(([port]) => {
+            config.gatewayConfig = jwtConfigGet(jwtSecretTestCase.actionConfig, port);
+            return serverHelper.generateBackendServer(port);
+          }).then(({ app }) => { backend = app; })
           .then(() => testHelper.setup()).then(({ app }) => { gateway = app; });
       });
 
@@ -172,12 +174,16 @@ describe('JWT policy', () => {
 
   describe('Skip credential check enabled', () => {
     before(() => {
-      config.gatewayConfig = jwtConfigGet({
-        secretOrPubKey: 'superSecretString',
-        checkCredentialExistence: false
-      });
-
       return db.flushdb()
+        .then(() => serverHelper.findOpenPortNumbers(1))
+        .then(([port]) => {
+          config.gatewayConfig = jwtConfigGet({
+            secretOrPubKey: 'superSecretString',
+            checkCredentialExistence: false
+          }, port);
+          return serverHelper.generateBackendServer(port);
+        }).then(({ app }) => { backend = app; })
+
         .then(() => serverHelper.generateBackendServer(6057)).then(({ app }) => { backend = app; })
         .then(() => testHelper.setup()).then(({ app }) => { gateway = app; });
     });
