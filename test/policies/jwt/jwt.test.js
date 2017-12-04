@@ -104,7 +104,6 @@ describe('JWT policy', () => {
         description: 'should not forward requests when no issuer is provided',
         signedJwt: () => jwt.sign({}, jwtSecretTestCase.jwtSecret, jwtSecretTestCase.jwtSignOptions
         ),
-
         statusCode: 401
       }, {
         description: 'should not forward requests with a unmatching signed JWT',
@@ -112,11 +111,7 @@ describe('JWT policy', () => {
         statusCode: 401
       }, {
         description: 'should not forward requests with a signed JWT but wrong keyID',
-        signedJwt: () => jwt.sign({ sub: 'I do not know' }, 'error'),
-        statusCode: 401
-      }, {
-        description: 'should not forward requests with a signed JWT but wrong keyID',
-        signedJwt: () => jwt.sign({ sub: 'I do not know' }, 'error'),
+        signedJwt: () => jwt.sign({ sub: 'I do not know' }, jwtSecretTestCase.jwtSecret, jwtSecretTestCase.jwtSignOptions),
         statusCode: 401
       }, {
         description: 'should not forward requests with a signed JWT and correct keyID, but expired token',
