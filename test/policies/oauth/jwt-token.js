@@ -112,8 +112,9 @@ describe('oAuth2 policy', () => {
       should(decodedjwt).be.Object();
     });
 
-    it('should contain consumer id', () => {
-      should(decodedjwt).have.properties(['consumerId']);
+    it('should contain consumer id and scopes', () => {
+      should(decodedjwt).have.properties(['consumerId', 'scopes']);
+      should(decodedjwt).property('scopes').eql(['read', 'write']);
     });
 
     it('should let me access the authenticated resource using the JWT token', () =>
