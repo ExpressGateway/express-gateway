@@ -59,7 +59,7 @@ describe('JWT policy', () => {
     jwtSecret: 'superSecretString',
     jwtSignOptions: {},
     actionConfig: {
-      secretOrPubKey: 'superSecretString'
+      secretOrPublicKey: 'superSecretString'
     }
   }, {
     description: 'Secret file',
@@ -68,7 +68,7 @@ describe('JWT policy', () => {
       algorithm: 'RS256'
     },
     actionConfig: {
-      secretOrPubKeyFile: require.resolve('../../fixtures/certs/client/client.crt'),
+      secretOrPublicKeyFile: require.resolve('../../fixtures/certs/client/client.crt'),
       jwtExtractor: 'query',
       jwtExtractorField: 'jwtKey'
     }
@@ -173,7 +173,7 @@ describe('JWT policy', () => {
         .then(() => serverHelper.findOpenPortNumbers(1))
         .then(([port]) => {
           config.gatewayConfig = jwtConfigGet({
-            secretOrPubKey: 'superSecretString',
+            secretOrPublicKey: 'superSecretString',
             checkCredentialExistence: false
           }, port);
           return serverHelper.generateBackendServer(port);

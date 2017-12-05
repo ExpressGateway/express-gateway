@@ -50,7 +50,7 @@ const gatewayConfig = (port) => ({
                 issuer: 'express-gateway',
                 audience: 'something',
                 subject: 'somebody',
-                secretOrPubKey: 'ssssst',
+                secretOrPublicKey: 'ssssst',
                 checkCredentialExistence: false
               }
             }
@@ -81,7 +81,7 @@ describe('oAuth2 policy', () => {
           config.systemConfig.accessTokens.issuer = 'express-gateway';
           config.systemConfig.accessTokens.audience = 'something';
           config.systemConfig.accessTokens.subject = 'somebody';
-          config.systemConfig.accessTokens.secretOrPriKey = 'ssssst';
+          config.systemConfig.accessTokens.secretOrPrivateKey = 'ssssst';
           config.gatewayConfig = gatewayConfig(port);
           return serverHelper.generateBackendServer(port);
         }).then(({ app }) => { backend = app; })
@@ -98,7 +98,7 @@ describe('oAuth2 policy', () => {
       .then((response) => {
         should(response.body).have.property('token_type', 'Bearer');
         should(response.body).have.property('access_token');
-        should(jwt.verify(response.body.access_token, config.systemConfig.accessTokens.secretOrPriKey,
+        should(jwt.verify(response.body.access_token, config.systemConfig.accessTokens.secretOrPrivateKey,
           { audience: config.systemConfig.accessTokens.audience, issuer: config.systemConfig.accessTokens.issuer }))
           .be.Object();
 
