@@ -4,7 +4,7 @@ const Config = require('../../lib/config/config');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const yaml = require('js-yaml');
 
 describe('REST: service endpoints', () => {
@@ -21,12 +21,12 @@ describe('REST: service endpoints', () => {
   describe('when no service endpoints defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: {port: 0},
+        admin: { port: 0 },
         serviceEndpoints: null
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
-      return adminHelper.start({config});
+      return adminHelper.start({ config });
     });
     it('should create a new service endpoint', () => {
       const testEndpoint = {
@@ -47,15 +47,15 @@ describe('REST: service endpoints', () => {
   describe('when service endpoints defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: {port: 0},
+        admin: { port: 0 },
         serviceEndpoints: {
-          example: {url: 'example.com'},
-          hello: {url: 'hello.com'}
+          example: { url: 'example.com' },
+          hello: { url: 'hello.com' }
         }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
-      return adminHelper.start({config});
+      return adminHelper.start({ config });
     });
     it('should create a new service endpoint', () => {
       const testEndpoint = {

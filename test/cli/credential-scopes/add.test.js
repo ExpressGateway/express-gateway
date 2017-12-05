@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:credential-scopes:add';
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 
 describe('eg credential:scopes add', () => {
   let program, env, user, cred1, scope1, scope2;

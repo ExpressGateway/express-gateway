@@ -4,7 +4,7 @@ const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:create';
 const PassThrough = require('stream').PassThrough;
 const util = require('util');
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const helpers = require('yeoman-test');
 const { checkOutput } = require('../../common/output-helper');
 

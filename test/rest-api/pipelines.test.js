@@ -4,7 +4,7 @@ const Config = require('../../lib/config/config');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const yaml = require('js-yaml');
 
 describe('REST: pipelines', () => {
@@ -21,17 +21,17 @@ describe('REST: pipelines', () => {
   describe('when no pipelines defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: {port: 0},
+        admin: { port: 0 },
         pipelines: null
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
-      return adminHelper.start({config});
+      return adminHelper.start({ config });
     });
     it('should create a new pipeline', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
-        policies: [{action: 'proxy'}],
+        policies: [{ action: 'proxy' }],
         customId: idGen.v4() // NOTE: save operation should allow custom props
       };
       return adminHelper.admin.config.pipelines
@@ -49,21 +49,21 @@ describe('REST: pipelines', () => {
   describe('when pipelines defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: {port: 0},
+        admin: { port: 0 },
         pipelines: {
-          example: {apiEndpoints: ['example']},
-          hello: {apiEndpoints: ['hello']}
+          example: { apiEndpoints: ['example'] },
+          hello: { apiEndpoints: ['hello'] }
         }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
-      return adminHelper.start({config});
+      return adminHelper.start({ config });
     });
     it('should create a new pipeline', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
         customId: idGen.v4(), // NOTE: save operation should allow custom props
-        policies: [{action: 'proxy'}]
+        policies: [{ action: 'proxy' }]
       };
       return adminHelper.admin.config.pipelines
         .create('test', testPipeline)
@@ -80,7 +80,7 @@ describe('REST: pipelines', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
         customId: idGen.v4(), // NOTE: save operation should allow custom props
-        policies: [{action: 'proxy'}]
+        policies: [{ action: 'proxy' }]
       };
       return adminHelper.admin.config.pipelines
         .update('example', testPipeline)

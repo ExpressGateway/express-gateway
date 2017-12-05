@@ -3,7 +3,7 @@ const PassThrough = require('stream').PassThrough;
 const util = require('util');
 const helpers = require('yeoman-test');
 const adminHelper = require('../../common/admin-helper')();
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:users:create';
 

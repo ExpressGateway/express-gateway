@@ -4,7 +4,7 @@ const Config = require('../../lib/config/config');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const yaml = require('js-yaml');
 
 describe('REST: policies', () => {

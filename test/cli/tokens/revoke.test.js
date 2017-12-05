@@ -4,7 +4,7 @@ const app = require('../../oauth/bootstrap');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:tokens:revoke';
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const authService = require('../../../lib/services').auth;
 
 describe('eg tokens revoke', () => {
