@@ -19,7 +19,6 @@ const originalSystemConfig = JSON.parse(JSON.stringify(config.systemConfig));
 
 let gateway;
 let backend;
-let jwtToken;
 
 const appCredential = {
   secret: idGen.v4()
@@ -66,6 +65,7 @@ describe('oAuth2 policy', () => {
   describe('Issues a JWT token when configured', () => {
     before(() => {
       return db.flushdb()
+        .then(() => credentialService.insertScopes(['read', 'write']))
         .then(() => userService.insert({
           username: idGen.v4(),
           firstname: 'Clark',
@@ -74,6 +74,7 @@ describe('oAuth2 policy', () => {
         }))
         .then((user) => appService.insert({ name: 'appy', 'redirectUri': 'http://haha.com' }, user.id))
         .then((app) => credentialService.insertCredential(app.id, 'oauth2', appCredential))
+        .then(credential => credentialService.addScopesToCredential(credential.id, 'oauth2', ['read', 'write']).then(() => credential))
         .then(credential => Object.assign(appCredential, credential))
         .then(() => serverHelper.findOpenPortNumbers(1))
         .then(([port]) => {
@@ -88,30 +89,38 @@ describe('oAuth2 policy', () => {
         .then(() => testHelper.setup()).then(({ app }) => { gateway = app; });
     });
 
-    it('shuold return a JWT token', () => request(gateway)
+    let _response;
+    let decodedjwt;
+
+    before(() => request(gateway)
       .post('/oauth2/token')
       .send({
         grant_type: 'client_credentials',
         client_id: appCredential.id,
-        client_secret: appCredential.secret
-      }).expect(200)
-      .then((response) => {
-        should(response.body).have.property('token_type', 'Bearer');
-        should(response.body).have.property('access_token');
-        should(jwt.verify(response.body.access_token, config.systemConfig.accessTokens.secretOrPrivateKey,
-          { audience: config.systemConfig.accessTokens.audience, issuer: config.systemConfig.accessTokens.issuer }))
-          .be.Object();
+        client_secret: appCredential.secret,
+        scope: ['read', 'write'].join(' ')
+      }).expect(200).then((response) => { _response = response.body; }));
 
-        jwtToken = response.body.access_token;
-      })
-    );
+    it('shuold return a token with type \'Bearer\'', () => {
+      should(_response).have.property('token_type', 'Bearer');
+      should(_response).have.property('access_token');
+    });
+
+    it('should be correctly decoded as a JWT', () => {
+      decodedjwt = jwt.verify(_response.access_token, config.systemConfig.accessTokens.secretOrPrivateKey,
+        { audience: config.systemConfig.accessTokens.audience, issuer: config.systemConfig.accessTokens.issuer });
+      should(decodedjwt).be.Object();
+    });
+
+    it('should contain consumer id', () => {
+      should(decodedjwt).have.properties(['consumerId']);
+    });
 
     it('should let me access the authenticated resource using the JWT token', () =>
       request(gateway)
         .get('/authorizedPath')
-        .set('Authorization', `Bearer ${jwtToken}`)
+        .set('Authorization', `Bearer ${_response.access_token}`)
         .expect(200)
-
     );
 
     after('cleanup', (done) => {
