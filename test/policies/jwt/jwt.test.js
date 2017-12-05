@@ -31,7 +31,10 @@ const jwtConfigGet = (jwtConfig, backendPort) => {
     },
     apiEndpoints: {
       api: {
-        host: '*'
+        paths: '/'
+      },
+      anotherApi: {
+        paths: '/path'
       }
     },
     policies: ['jwt', 'proxy'],
@@ -187,6 +190,61 @@ describe('JWT policy', () => {
       .get('/')
       .set('Authorization', `Bearer ${jwt.sign({ hello: 'world' }, 'superSecretString')}`)
       .expect(200)
+    );
+
+    after('cleanup', (done) => {
+      config.gatewayConfig = originalGatewayConfig;
+      backend.close(() => gateway.close(done));
+    });
+  });
+
+  describe('Two JWT policies in two different pipelines', () => {
+    before(() => {
+      return db.flushdb()
+        .then(() => serverHelper.findOpenPortNumbers(1))
+        .then(([port]) => {
+          const gatewayConfig = jwtConfigGet({
+            secretOrPublicKey: 'superSecretString',
+            checkCredentialExistence: false
+          }, port);
+
+          gatewayConfig.pipelines.pipeline2 = {
+            apiEndpoints: ['anotherApi'],
+            policies: [
+              {
+                'jwt': {
+                  action: {
+                    secretOrPublicKey: 'anotherSuperSecret',
+                    checkCredentialExistence: false
+                  }
+                }
+              },
+              {
+                proxy: [
+                  {
+                    action: { serviceEndpoint: 'backend' }
+                  }
+                ]
+              }
+            ]
+          };
+
+          config.gatewayConfig = gatewayConfig;
+          return serverHelper.generateBackendServer(port);
+        }).then(({ app }) => { backend = app; })
+
+        .then(() => serverHelper.generateBackendServer(6057)).then(({ app }) => { backend = app; })
+        .then(() => testHelper.setup()).then(({ app }) => { gateway = app; });
+    });
+
+    it('Should correctly forward the request to both endpoints', () => request(gateway)
+      .get('/')
+      .set('Authorization', `Bearer ${jwt.sign({ hello: 'world' }, 'superSecretString')}`)
+      .expect(200)
+      .then(() => request(gateway)
+        .get('/path')
+        .set('Authorization', `Bearer ${jwt.sign({ hello: 'world' }, 'anotherSuperSecret')}`)
+        .expect(200))
     );
 
     after('cleanup', (done) => {
