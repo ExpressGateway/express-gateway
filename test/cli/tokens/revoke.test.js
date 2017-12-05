@@ -24,19 +24,22 @@ describe('eg tokens revoke', () => {
     })
       .then(createdUser => {
         user = createdUser;
-        return adminHelper.admin.credentials.create(user.username, 'oauth2', {secret: 'test'});
+        return Promise.all([
+          adminHelper.admin.credentials.create(user.username, 'oauth2'),
+          adminHelper.admin.credentials.create(user.username, 'basic-auth')
+        ]);
       })
-      .then(createdCred => {
-      // cred = createdCred;
+      .then(([oauthCredentials, basicCredentials]) => {
+        const base64Credentials = Buffer.from(`${oauthCredentials.id}:${oauthCredentials.secret}`).toString('base64');
         return request(app)
           .post('/oauth2/token')
-          .set('Authorization', 'basic ' + (Buffer.from(user.username + ':test').toString('base64')))
+          .set('Authorization', `basic ${base64Credentials}`)
           .set('content-type', 'application/x-www-form-urlencoded')
           .type('form')
           .send({
             grant_type: 'password',
-            username: user.username,
-            password: 'test'
+            username: basicCredentials.id,
+            password: basicCredentials.password
           })
           .expect(200);
       })

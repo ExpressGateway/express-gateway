@@ -70,8 +70,10 @@ describe('Functional Test Client Password grant', function () {
 
                 credentialService.insertScopes('someScope')
                   .then(() => {
-                    Promise.all([credentialService.insertCredential(fromDbUser1.id, 'oauth2', { secret: 'user-secret' }),
-                      credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })])
+                    Promise.all([
+                      credentialService.insertCredential(fromDbUser1.id, 'basic-auth', { password: 'user-secret' }),
+                      credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })
+                    ])
                       .then(([userRes, appRes]) => {
                         should.exist(userRes);
                         should.exist(appRes);
@@ -83,7 +85,7 @@ describe('Functional Test Client Password grant', function () {
       })
       .catch(function (err) {
         should.not.exist(err);
-        done();
+        done(err);
       });
   });
 
