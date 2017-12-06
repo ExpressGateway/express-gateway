@@ -106,7 +106,7 @@ describe('gateway condition schema with plugins', () => {
     });
   });
 
-  it('should fail on condition schema validation', () => {
+  it('should throw on condition schema validation', () => {
     return gateway({
       plugins: {
         conditions: [{
@@ -128,7 +128,7 @@ describe('gateway condition schema with plugins', () => {
       gatewaySrv = srv.app;
       const req = Object.create(express.request);
       req.url = '/test';
-      assert.isNull(req.matchEGCondition({ name: 'test-condition-2', param1: true }));
+      assert.throw(() => req.matchEGCondition({ name: 'test-condition-2', param1: true }));
     });
   });
 });
