@@ -108,7 +108,7 @@
   },
   "devDependencies": {
     "@types/express": "^4.0.39",
-    "@types/json-schema": "^4.0.0",
+    "@types/json-schema": "^6.0.0",
     "chai": "3.5.0",
     "codecov": "^2.2.0",
     "cpr": "2.2.0",
