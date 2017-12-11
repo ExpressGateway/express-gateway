@@ -92,6 +92,7 @@ describe('gateway policy schema with plugins', () => {
         policies: [{
           name: 'test-policy',
           schema: {
+            $id: 'http://express-gateway.io/schemas/policies/test-policy.json',
             type: 'object',
             properties: {
               p1: { type: ['number'] }

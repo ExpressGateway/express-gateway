@@ -84,6 +84,7 @@ describe('gateway condition schema with plugins', () => {
         conditions: [{
           name: 'test-condition-1',
           schema: {
+            $id: 'http://express-gateway.io/schemas/conditions/test-condition-1.json',
             type: 'object',
             properties: {
               param1: { type: ['boolean'] }
@@ -112,6 +113,7 @@ describe('gateway condition schema with plugins', () => {
         conditions: [{
           name: 'test-condition-2',
           schema: {
+            $id: 'http://express-gateway.io/schemas/conditions/test-policy.json',
             type: 'object',
             properties: {
               param2: { type: ['string'] }
