@@ -41,9 +41,13 @@ describe('E2E: eg plugins install', () => {
     return util.promisify(tmp.dir)()
       .then(temp => {
         tempPath = temp;
-        return util.promisify(cpr)(gatewayDirectory, tempPath);
+        const _cpr = util.promisify(cpr);
+        return Promise.all([
+          _cpr(gatewayDirectory, tempPath),
+          _cpr(path.join(__dirname, '../../lib/config/models'), path.join(tempPath, 'models'))
+        ]);
       })
-      .then(files => {
+      .then(([files]) => {
         configPath = path.join(tempPath, 'config');
         config.systemConfigPath = path.join(configPath, 'system.config.yml');
         config.gatewayConfigPath = path.join(configPath, 'gateway.config.yml');

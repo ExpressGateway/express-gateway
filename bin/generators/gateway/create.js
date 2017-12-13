@@ -123,6 +123,7 @@ module.exports = class extends eg.Generator {
     this.fs.writeJSON(this.destinationPath('./.yo-rc.json'), {});
     this.fs.copy(this.templatePath('server.js'), this.destinationPath('server.js'));
     this.fs.copy(this.templatePath('config'), this.destinationPath('config'));
+    this.fs.copy(path.join(__dirname, '../../../lib/config/models'), this.destinationPath('config/models'));
   }
 
   install () {
