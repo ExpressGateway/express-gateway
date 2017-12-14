@@ -3,7 +3,6 @@ const should = require('should');
 const url = require('url');
 const qs = require('querystring');
 const app = require('./bootstrap');
-const config = require('../../lib/config');
 
 const services = require('../../lib/services');
 const credentialService = services.credential;
@@ -13,35 +12,9 @@ const tokenService = services.token;
 const db = require('../../lib/db');
 
 describe('Functional Test Authorization Code grant', function () {
-  let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let fromDbUser1, fromDbApp, refreshToken;
 
   before(function (done) {
-    originalAppConfig = config.models.applications;
-    originalCredentialConfig = config.models.credentials;
-    originalUserConfig = config.models.users;
-
-    config.models.applications.properties = {
-      name: { isRequired: true, isMutable: true },
-      redirectUri: { isRequired: true, isMutable: true }
-    };
-
-    config.models.credentials.oauth2 = {
-      passwordKey: 'secret',
-      properties: { scopes: { isRequired: false } }
-    };
-
-    config.models.credentials['basic-auth'] = {
-      passwordKey: 'password',
-      properties: { scopes: { isRequired: false } }
-    };
-
-    config.models.users.properties = {
-      firstname: { isRequired: true, isMutable: true },
-      lastname: { isRequired: true, isMutable: true },
-      email: { isRequired: false, isMutable: true }
-    };
-
     db.flushdb()
       .then(() => {
         const user1 = {
@@ -92,13 +65,6 @@ describe('Functional Test Authorization Code grant', function () {
         should.not.exist(err);
         done();
       });
-  });
-
-  after((done) => {
-    config.models.applications.properties = originalAppConfig.properties;
-    config.models.credentials.oauth2 = originalCredentialConfig.oauth;
-    config.models.users.properties = originalUserConfig.properties;
-    done();
   });
 
   it('should grant access token if requesting without scopes', function (done) {

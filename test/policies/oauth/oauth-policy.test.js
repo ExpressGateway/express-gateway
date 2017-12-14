@@ -1,9 +1,6 @@
 const session = require('supertest-session');
 const should = require('should');
 
-const credentialModelConfig = require('../../../lib/config/models/credentials');
-const userModelConfig = require('../../../lib/config/models/users');
-const appModelConfig = require('../../../lib/config/models/applications');
 const services = require('../../../lib/services/index');
 const credentialService = services.credential;
 const userService = services.user;
@@ -17,7 +14,6 @@ const originalGatewayConfig = config.gatewayConfig;
 
 describe('Functional Tests oAuth2.0 Policy', () => {
   const helper = testHelper();
-  let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let user, application, token, app;
 
   before('setup', (done) => {
@@ -57,26 +53,6 @@ describe('Functional Tests oAuth2.0 Policy', () => {
           ]
         }
       }
-    };
-
-    originalAppConfig = appModelConfig;
-    originalCredentialConfig = credentialModelConfig;
-    originalUserConfig = userModelConfig;
-
-    appModelConfig.properties = {
-      name: { isRequired: true, isMutable: true },
-      redirectUri: { isRequired: true, isMutable: true }
-    };
-
-    credentialModelConfig.oauth2 = {
-      passwordKey: 'secret',
-      properties: { scopes: { isRequired: false } }
-    };
-
-    userModelConfig.properties = {
-      firstname: { isRequired: true, isMutable: true },
-      lastname: { isRequired: true, isMutable: true },
-      email: { isRequired: false, isMutable: true }
     };
 
     db.flushdb()
@@ -146,9 +122,6 @@ describe('Functional Tests oAuth2.0 Policy', () => {
 
   after('cleanup', (done) => {
     config.gatewayConfig = originalGatewayConfig;
-    appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth2 = originalCredentialConfig.oauth2;
-    userModelConfig.properties = originalUserConfig.properties;
     helper.cleanup();
     done();
   });

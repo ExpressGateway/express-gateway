@@ -6,9 +6,6 @@ const express = require('express');
 const sinon = require('sinon');
 const assert = require('assert');
 
-let credentialModelConfig = require('../../../lib/config/models/credentials');
-const userModelConfig = require('../../../lib/config/models/users');
-const appModelConfig = require('../../../lib/config/models/applications');
 const services = require('../../../lib/services/index');
 const credentialService = services.credential;
 const userService = services.user;
@@ -22,7 +19,6 @@ let request;
 describe('Request @headers @proxy downstream @auth @key-auth', () => {
   const helper = testHelper();
   const spy = sinon.spy();
-  let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let user, application, token, app, backendServer;
 
   before('setup', () => {
@@ -70,26 +66,6 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
           ]
         }
       }
-    };
-
-    originalAppConfig = appModelConfig;
-    originalCredentialConfig = credentialModelConfig;
-    originalUserConfig = userModelConfig;
-
-    appModelConfig.properties = {
-      name: { isRequired: true, isMutable: true },
-      redirectUri: { isRequired: true, isMutable: true }
-    };
-
-    credentialModelConfig.oauth2 = {
-      passwordKey: 'secret',
-      properties: { scopes: { isRequired: false } }
-    };
-
-    userModelConfig.properties = {
-      firstname: { isRequired: true, isMutable: true },
-      lastname: { isRequired: true, isMutable: true },
-      email: { isRequired: false, isMutable: true }
     };
 
     return db.flushdb()
@@ -176,9 +152,6 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
   after('cleanup', (done) => {
     helper.cleanup();
     config.gatewayConfig = originalGatewayConfig;
-    appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig = originalCredentialConfig;
-    userModelConfig.properties = originalUserConfig.properties;
     backendServer.close();
     done();
   });

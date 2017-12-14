@@ -7,21 +7,6 @@ const userService = services.user;
 const db = require('../../lib/db');
 
 describe('Application service tests', function () {
-  let originalUserModelConfig;
-
-  before(function () {
-    originalUserModelConfig = config.models.users.properties;
-    config.models.users.properties = {
-      firstname: { isRequired: true, isMutable: true },
-      lastname: { isRequired: true, isMutable: true },
-      email: { isRequired: false, isMutable: true }
-    };
-  });
-
-  after(function () {
-    config.models.users.properties = originalUserModelConfig;
-  });
-
   describe('Insert tests', function () {
     let user, originalAppModelConfig;
 

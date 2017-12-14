@@ -1,8 +1,6 @@
 const session = require('supertest-session');
 const should = require('should');
 const app = require('./bootstrap');
-
-const config = require('../../lib/config');
 const services = require('../../lib/services');
 const credentialService = services.credential;
 const userService = services.user;
@@ -11,30 +9,9 @@ const tokenService = services.token;
 const db = require('../../lib/db');
 
 describe('Functional Test Client Credentials grant', function () {
-  let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let user, application;
 
   before(function (done) {
-    originalAppConfig = config.models.applications;
-    originalCredentialConfig = config.models.credentials;
-    originalUserConfig = config.models.users;
-
-    config.models.applications.properties = {
-      name: { isRequired: true, isMutable: true },
-      redirectUri: { isRequired: true, isMutable: true }
-    };
-
-    config.models.credentials.oauth2 = {
-      passwordKey: 'secret',
-      properties: { scopes: { isRequired: false } }
-    };
-
-    config.models.users.properties = {
-      firstname: { isRequired: true, isMutable: true },
-      lastname: { isRequired: true, isMutable: true },
-      email: { isRequired: false, isMutable: true }
-    };
-
     db.flushdb()
       .then(() => {
         const user1 = {
@@ -74,13 +51,6 @@ describe('Functional Test Client Credentials grant', function () {
         should.not.exist(err);
         done();
       });
-  });
-
-  after((done) => {
-    config.models.applications.properties = originalAppConfig.properties;
-    config.models.credentials.oauth2 = originalCredentialConfig.oauth;
-    config.models.users.properties = originalUserConfig.properties;
-    done();
   });
 
   it('should grant access token for requests without scopes', function (done) {
