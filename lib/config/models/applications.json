@@ -1,6 +1,16 @@
-module.exports = {
-  properties: {
-    name: { isRequired: true, isMutable: true },
-    redirectUri: { isRequired: false, isMutable: true }
-  }
-};
+{
+  "title": "Application",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "redirectUri": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

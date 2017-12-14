@@ -1,8 +1,24 @@
-module.exports = {
-  properties: {
-    firstname: { isRequired: true, isMutable: true },
-    lastname: { isRequired: true, isMutable: true },
-    email: { isRequired: false, isMutable: true },
-    redirectUri: { isRequired: false, isMutable: true }
-  }
-};
+{
+  "title": "User",
+  "type": "object",
+  "properties": {
+    "firstname": {
+      "type": "string"
+    },
+    "lastname": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "redirectUri": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "required": [
+    "firstname",
+    "lastname"
+  ]
+}
