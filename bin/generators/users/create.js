@@ -1,5 +1,8 @@
 const chalk = require('chalk');
 const eg = require('../../eg');
+const { validate } = require('../../../lib/schemas');
+
+const USER_SCHEMA = 'http://express-gateway.io/models/users.json';
 
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
@@ -134,14 +137,12 @@ module.exports = class extends eg.Generator {
     if (!options.skipPrompt) {
       let shouldPrompt = false;
       const missingProperties = [];
+      const modelSchema = models.users;
 
-      const configProperties = Object.assign({ username: { isRequired: true } },
-        models.users.properties);
-
-      Object.keys(configProperties).forEach(prop => {
-        const descriptor = configProperties[prop];
+      Object.keys(modelSchema.properties).forEach(prop => {
+        const descriptor = modelSchema.properties[prop];
         if (!user[prop]) {
-          if (!shouldPrompt && descriptor.isRequired) {
+          if (!shouldPrompt && modelSchema.required.includes(prop)) {
             shouldPrompt = true;
           }
 
@@ -151,25 +152,31 @@ module.exports = class extends eg.Generator {
 
       if (shouldPrompt) {
         questions = missingProperties.map(p => {
-          const required = p.descriptor.isRequired
+          const required = modelSchema.required.includes(p.name)
             ? ' [required]'
             : '';
 
           return {
             name: p.name,
             message: `Enter ${chalk.yellow(p.name)}${chalk.green(required)}:`,
-            default: p.defaultValue,
-            validate: input => !p.descriptor.isRequired ||
-              (!!input && p.descriptor.isRequired)
+            default: p.default,
+            validate: input => !modelSchema.required.includes(p.name) ||
+              (!!input && modelSchema.required.includes(p.name)),
+            filter: input => input === '' && !modelSchema.required.includes(p.name) ? undefined : input
           };
         });
       }
     }
 
-    return this.prompt(questions)
-      .then(answers => {
-        user = Object.assign(user, answers);
-        return this.admin.users.create(user);
-      });
+    const validateAndInsert = user => {
+      const { isValid, error } = validate(USER_SCHEMA, user);
+      if (!isValid) {
+        this.stdout(error);
+        return this.prompt(questions).then(validateAndInsert);
+      }
+      return this.admin.users.create(user);
+    };
+
+    return this.prompt(questions).then(validateAndInsert);
   }
 };
