@@ -136,12 +136,18 @@ module.exports = class EgGenerator extends Generator {
     const validateData = data => {
       const { isValid, error } = validate(schema, data);
       if (!isValid) {
-        this.stdout(error);
-        return this.prompt(questions).then(validateData);
+        this.log.error(error);
+        if (!options.skipPrompt) {
+          return this.prompt(questions).then(validateData);
+        }
+        return {};
       }
       return data;
     };
 
-    return this.prompt(questions).then(validateData);
+    return this.prompt(questions).then((answers) => {
+      Object.assign(object, answers);
+      return validateData(object);
+    });
   }
 };
