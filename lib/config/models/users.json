@@ -5,10 +5,10 @@
     "firstname": {
       "type": "string"
     },
-    "username": {
+    "lastname": {
       "type": "string"
     },
-    "lastname": {
+    "username": {
       "type": "string"
     },
     "email": {

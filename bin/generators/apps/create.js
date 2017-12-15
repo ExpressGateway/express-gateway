@@ -1,5 +1,6 @@
-const chalk = require('chalk');
 const eg = require('../../eg');
+const SCHEMA = 'http://express-gateway.io/models/applications.json';
+
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -78,7 +79,8 @@ module.exports = class extends eg.Generator {
       return;
     }
 
-    return this._insert(app, { user: argv.user })
+    return this._promptAndValidate(app, SCHEMA)
+      .then((app) => this.admin.apps.create(argv.user, app))
       .then(newApp => {
         if (!argv.q) {
           this.log.ok(`Created ${newApp.id}`);
@@ -127,15 +129,17 @@ module.exports = class extends eg.Generator {
               user: user
             };
 
-            return this._insert(app, options).then(newApp => {
-              if (newApp) {
-                if (!argv.q) {
-                  this.log.ok(`Created ${newApp.id}`);
-                } else {
-                  this.stdout(newApp.id);
+            return this._promptAndValidate(app, SCHEMA, options)
+              .then((app) => this.admin.apps.create(options.user, app))
+              .then(newApp => {
+                if (newApp) {
+                  if (!argv.q) {
+                    this.log.ok(`Created ${newApp.id}`);
+                  } else {
+                    this.stdout(newApp.id);
+                  }
                 }
-              }
-            })
+              })
               .catch(err => {
                 this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
               });
@@ -145,54 +149,5 @@ module.exports = class extends eg.Generator {
         resolve(p);
       });
     });
-  };
-
-  _insert (app, options) {
-    const models = this.eg.config.models;
-
-    options = options || {};
-    options.skipPrompt = options.skipPrompt || false;
-
-    let questions = [];
-
-    if (!options.skipPrompt) {
-      let shouldPrompt = false;
-      const missingProperties = [];
-
-      const configProperties = models.applications.properties;
-      Object.keys(configProperties).forEach(prop => {
-        const descriptor = configProperties[prop];
-
-        if (!app[prop]) {
-          if (!shouldPrompt && descriptor.isRequired) {
-            shouldPrompt = true;
-          }
-
-          missingProperties.push({ name: prop, descriptor: descriptor });
-        }
-      });
-
-      if (shouldPrompt) {
-        questions = missingProperties.map(p => {
-          const required = p.descriptor.isRequired
-            ? ' [required]'
-            : '';
-
-          return {
-            name: p.name,
-            message: `Enter ${chalk.yellow(p.name)}${chalk.green(required)}:`,
-            default: p.defaultValue,
-            validate: input => !p.descriptor.isRequired ||
-              (!!input && p.descriptor.isRequired)
-          };
-        });
-      }
-    }
-
-    return this.prompt(questions)
-      .then(answers => {
-        app = Object.assign(app, answers);
-        return this.admin.apps.create(options.user, app);
-      });
   };
 };
