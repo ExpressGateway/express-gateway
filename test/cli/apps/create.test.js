@@ -135,8 +135,7 @@ describe('eg apps create', () => {
       });
     });
 
-    env.argv = program.parse('apps create -u lala -p "name=appy" ' +
-      '-p "redirectUri=http://localhost:3000/cb"');
+    env.argv = program.parse(`apps create -u ${usrName} -p "name=appy" -p "redirectUri=http://localhost:3000/cb"`);
   });
 
   it('creates an app from properties with user ID', done => {
@@ -206,7 +205,7 @@ describe('eg apps create', () => {
       });
     });
 
-    env.argv = program.parse('apps create -u lala --stdin');
+    env.argv = program.parse(`apps create -u ${usrName} --stdin`);
   });
 
   it('prints only the app id when using the --quiet flag', done => {
@@ -326,7 +325,6 @@ describe('eg apps create', () => {
       });
     });
 
-    env.argv = program.parse('apps create -u lala -p "name=" ' +
-      '-p "redirectUri=http://example.com/cb"');
+    env.argv = program.parse(`apps create -u ${usrName} -p "name=" -p "redirectUri=http://example.com/cb"`);
   });
 });
