@@ -258,7 +258,7 @@ describe('eg apps create', () => {
           output = message;
         };
         generator.log.error = message => {
-          assert.equal(message, 'Failed to insert application: name is required');
+          assert.equal(message, 'data should have required property \'name\'');
         };
         generator.log.ok = message => {
           output = message;
@@ -279,7 +279,11 @@ describe('eg apps create', () => {
   });
 
   it('prints error on invalid user', done => {
-    const app = {};
+    const app = {
+      name: 'appy',
+      redirectUri: 'http://localhost:3000/cb'
+    };
+
     env.hijack(namespace, generator => {
       generator.once('run', () => {
         generator.log = message => {
