@@ -8,6 +8,8 @@ const idGen = require('uuid62');
 const helpers = require('yeoman-test');
 const { checkOutput } = require('../../common/output-helper');
 
+const usrName = idGen.v4();
+
 describe('eg apps create', () => {
   let program, env, user;
   before(() => {
@@ -19,7 +21,7 @@ describe('eg apps create', () => {
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: usrName,
       firstname: 'La',
       lastname: 'Deeda'
     })
