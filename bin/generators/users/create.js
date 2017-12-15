@@ -1,8 +1,5 @@
-const chalk = require('chalk');
 const eg = require('../../eg');
-const { validate } = require('../../../lib/schemas');
-
-const USER_SCHEMA = 'http://express-gateway.io/models/users.json';
+const SCHEMA = 'http://express-gateway.io/models/users.json';
 
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
@@ -63,7 +60,7 @@ module.exports = class extends eg.Generator {
               isLast: index === lines.length - 1
             };
 
-            return this._insert(user, options).then(newUser => {
+            return this._promptAndValidate(user, options).then(this.admin.users.create).then(newUser => {
               if (newUser) {
                 if (!argv.q) {
                   this.log.ok(`Created ${newUser.username}`);
@@ -113,7 +110,8 @@ module.exports = class extends eg.Generator {
     if (hasInvalidProperty) {
       return;
     }
-    return this._insert(user)
+    return this._promptAndValidate(user, SCHEMA)
+      .then(this.admin.users.create)
       .then(newUser => {
         if (!argv.q) {
           this.log.ok(`Created ${newUser.id}`);
@@ -125,58 +123,5 @@ module.exports = class extends eg.Generator {
       .catch(err => {
         this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
       });
-  }
-  _insert (user, options) {
-    const models = this.eg.config.models;
-
-    options = options || {};
-    options.skipPrompt = options.skipPrompt || false;
-
-    let questions = [];
-
-    if (!options.skipPrompt) {
-      let shouldPrompt = false;
-      const missingProperties = [];
-      const modelSchema = models.users;
-
-      Object.keys(modelSchema.properties).forEach(prop => {
-        const descriptor = modelSchema.properties[prop];
-        if (!user[prop]) {
-          if (!shouldPrompt && modelSchema.required.includes(prop)) {
-            shouldPrompt = true;
-          }
-
-          missingProperties.push({ name: prop, descriptor: descriptor });
-        }
-      });
-
-      if (shouldPrompt) {
-        questions = missingProperties.map(p => {
-          const required = modelSchema.required.includes(p.name)
-            ? ' [required]'
-            : '';
-
-          return {
-            name: p.name,
-            message: `Enter ${chalk.yellow(p.name)}${chalk.green(required)}:`,
-            default: p.default,
-            validate: input => !modelSchema.required.includes(p.name) ||
-              (!!input && modelSchema.required.includes(p.name)),
-            filter: input => input === '' && !modelSchema.required.includes(p.name) ? undefined : input
-          };
-        });
-      }
-    }
-
-    const validateAndInsert = user => {
-      const { isValid, error } = validate(USER_SCHEMA, user);
-      if (!isValid) {
-        this.stdout(error);
-        return this.prompt(questions).then(validateAndInsert);
-      }
-      return this.admin.users.create(user);
-    };
-
-    return this.prompt(questions).then(validateAndInsert);
   }
 };
