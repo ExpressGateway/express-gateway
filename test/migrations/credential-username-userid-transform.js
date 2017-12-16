@@ -1,6 +1,6 @@
 const migrate = require('migrate');
 const tmp = require('tmp');
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const db = require('../../lib/db');
 const { assert } = require('chai');
 const userService = require('../../lib/services/consumers/user.service');

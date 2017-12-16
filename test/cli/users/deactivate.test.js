@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:users:deactivate';
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 
 describe('eg users deactivate', () => {
   let program, env, userId, username, username2;

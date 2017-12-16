@@ -1,5 +1,5 @@
 const should = require('should');
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const adminHelper = require('../common/admin-helper')();
 
 describe('REST: Applications', () => {

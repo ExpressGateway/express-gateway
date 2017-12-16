@@ -1,4 +1,4 @@
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const session = require('supertest-session');
 const qs = require('querystring');
 const url = require('url');

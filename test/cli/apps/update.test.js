@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:update';
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const util = require('util');
 const helpers = require('yeoman-test');
 

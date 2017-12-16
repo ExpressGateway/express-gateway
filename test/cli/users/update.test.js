@@ -3,7 +3,7 @@ const util = require('util');
 const helpers = require('yeoman-test');
 const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
-const idGen = require('uuid-base62');
+const idGen = require('uuid62');
 const namespace = 'express-gateway:users:update';
 
 describe('eg users update', () => {
