@@ -656,6 +656,6 @@ function createRandomUserObject () {
     username: uuid.v4(),
     firstname: uuid.v4(),
     lastname: uuid.v4(),
-    email: uuid.v4()
+    email: `${uuid.v4()}@hello.it`
   };
 }
