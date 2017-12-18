@@ -39,7 +39,7 @@ describe('eg credentials list -c ', () => {
     }
   };
 
-  const createCredential = (type, options = {}, isActive = true) => {
+  const createCredential = (username, type, options = {}, isActive = true) => {
     const { credentials } = adminHelper.admin;
     return credentials
       .create(username, type, options)
@@ -81,12 +81,12 @@ describe('eg credentials list -c ', () => {
           .then(user => {
             username = user.username;
             return Promise.all([
-              createCredential('key-auth'),
-              createCredential('basic-auth', { password: 'test1' }),
-              createCredential('oauth2', { secret: 'eg1' }),
-              createCredential('key-auth', {}, false),
-              createCredential('key-auth', {}, false),
-              createCredential('key-auth', {}, false)
+              createCredential(user.username, 'key-auth'),
+              createCredential(user.username, 'basic-auth', { password: 'test1' }),
+              createCredential(user.username, 'oauth2', { secret: 'eg1' }),
+              createCredential(user.username, 'key-auth', {}, false),
+              createCredential(user.username, 'key-auth', {}, false),
+              createCredential(user.username, 'key-auth', {}, false)
             ]);
           });
       });
