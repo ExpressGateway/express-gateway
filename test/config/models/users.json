@@ -1,10 +1,28 @@
-'use strict';
-
-module.exports = {
-  properties: {
-    firstname: {isRequired: true, isMutable: true},
-    lastname: {isRequired: true, isMutable: true},
-    email: {isRequired: false, isMutable: true},
-    redirectUri: {isRequired: false, isMutable: true}
-  }
-};
+{
+  "$id": "http://express-gateway.io/models/users.json",
+  "type": "object",
+  "properties": {
+    "firstname": {
+      "type": "string"
+    },
+    "lastname": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "redirectUri": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "required": [
+    "username",
+    "firstname",
+    "lastname"
+  ]
+}
