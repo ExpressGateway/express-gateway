@@ -141,7 +141,7 @@ module.exports = class extends eg.Generator {
               type
             };
 
-            return this._promptAndValidate(credential, options)
+            return this._promptAndValidate(credential, SCHEMA, options)
               .then((credential) => this.admin.credentials.create(options.consumer, options.type, credential))
               .then(newCredential => {
                 this._output(newCredential);
