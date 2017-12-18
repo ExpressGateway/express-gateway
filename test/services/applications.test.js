@@ -64,7 +64,7 @@ describe('Application service tests', function () {
         })
         .catch(function (err) {
           should.exist(err);
-          err.message.should.eql('Failed to insert application: name is required');
+          err.message.should.eql('Failed to insert application: data should have required property \'name\'');
           done();
         });
     });
