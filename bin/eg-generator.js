@@ -107,7 +107,7 @@ module.exports = class EgGenerator extends Generator {
       Object.keys(modelSchema.properties).forEach(prop => {
         const descriptor = modelSchema.properties[prop];
         if (!object[prop]) {
-          if (!shouldPrompt && modelSchema.required.includes(prop)) {
+          if (!shouldPrompt && modelSchema.required && modelSchema.required.includes(prop)) {
             shouldPrompt = true;
           }
 
