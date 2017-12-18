@@ -23,7 +23,7 @@ describe('User service tests', function () {
         .insert(user)
         .then(function (newUser) {
           const expectedUserProps = ['firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt'];
-          Object.keys(newUser).should.eql(expectedUserProps);
+          should(Object.keys(newUser)).containDeep(expectedUserProps);
           newUser.should.have.properties(user);
           should.ok(newUser.isActive);
           return db.hgetall(redisConfig.namespace.concat('-', 'user').concat(':', newUser.id))
@@ -48,7 +48,7 @@ describe('User service tests', function () {
         })
         .catch(function (err) {
           should.exist(err);
-          err.message.should.eql('firstname is required');
+          err.message.should.eql('data should have required property \'firstname\'');
           done();
         });
     });
