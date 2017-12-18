@@ -60,7 +60,7 @@ module.exports = class extends eg.Generator {
               isLast: index === lines.length - 1
             };
 
-            return this._promptAndValidate(user, options).then(this.admin.users.create).then(newUser => {
+            return this._promptAndValidate(user, SCHEMA, options).then(this.admin.users.create).then(newUser => {
               if (newUser) {
                 if (!argv.q) {
                   this.log.ok(`Created ${newUser.username}`);
