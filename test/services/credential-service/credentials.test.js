@@ -184,7 +184,7 @@ describe('Credential service tests', () => {
         .be.rejectedWith('one or more scopes don\'t exist');
     });
 
-    it('should insert a credential with scopes if the scopes are defined', () => {
+    it.only('should insert a credential with scopes if the scopes are defined', () => {
       return credentialService.insertScopes('someScope')
         .then(() => credentialService.insertCredential(username, 'oauth2', _credential))
         .then((newCredential) => {
