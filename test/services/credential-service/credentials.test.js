@@ -184,7 +184,7 @@ describe('Credential service tests', () => {
         .be.rejectedWith('one or more scopes don\'t exist');
     });
 
-    it.only('should insert a credential with scopes if the scopes are defined', () => {
+    it('should insert a credential with scopes if the scopes are defined', () => {
       return credentialService.insertScopes('someScope')
         .then(() => credentialService.insertCredential(username, 'oauth2', _credential))
         .then((newCredential) => {
@@ -192,10 +192,9 @@ describe('Credential service tests', () => {
           should.exist(newCredential.scopes);
           should.not.exist(newCredential.secret);
 
-          newCredential.isActive.should.eql(true);
-          newCredential.scopes.should.eql(['someScope']);
-          newCredential.someProperty.should.eql('propVal');
-          newCredential.otherProperty.should.eql('someDefaultValue');
+          should(newCredential.isActive).eql(true);
+          should(newCredential.scopes).eql(['someScope']);
+          should(newCredential.someProperty).eql('propVal');
         });
     });
 
@@ -281,7 +280,7 @@ describe('Credential service tests', () => {
 
       return should(credentialService
         .insertCredential(username3, 'oauth2', cred))
-        .be.rejectedWith('someProperty is required')
+        .be.rejectedWith('data should have required property \'.someProperty\'')
         .then(() => credentialService.getCredential(username3, 'oauth2'))
         .then(credential => should.not.exist(credential));
     });
