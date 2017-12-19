@@ -80,6 +80,8 @@
     "ioredis": "^3.2.1",
     "ioredis-mock": "^3.4.0",
     "js-yaml": "^3.10.0",
+    "json-schema-merge-allof": "^0.6.0",
+    "json-schema-ref-parser": "^4.0.4",
     "jsonwebtoken": "^7.4.3",
     "migrate": "^1.0.0-2",
     "minimatch": "^3.0.4",
