@@ -1,6 +1,4 @@
 const should = require('should');
-const credentialModelConfig = require('../../lib/config/models/credentials');
-const userModelConfig = require('../../lib/config/models/users');
 const services = require('../../lib/services');
 const credentialService = services.credential;
 const userService = services.user;
@@ -10,26 +8,9 @@ const db = require('../../lib/db');
 
 describe('Auth tests', function () {
   let user, userFromDb;
-  const originalModelConfig = credentialModelConfig;
   let _credential;
-  let originalUserModelConfig;
 
   before(() => {
-    credentialModelConfig.oauth2 = {
-      passwordKey: 'secret',
-      autoGeneratePassword: true,
-      properties: {
-        scopes: { isRequired: false }
-      }
-    };
-
-    originalUserModelConfig = userModelConfig.properties;
-    userModelConfig.properties = {
-      firstname: { isRequired: true, isMutable: true },
-      lastname: { isRequired: true, isMutable: true },
-      email: { isRequired: false, isMutable: true }
-    };
-
     return db.flushdb()
       .then(() => {
         user = {
@@ -55,11 +36,6 @@ describe('Auth tests', function () {
         return credentialService.insertCredential(userFromDb.id, 'oauth2', _credential);
       })
       .then((res) => should.exist(res));
-  });
-
-  after(() => {
-    credentialModelConfig.oauth2 = originalModelConfig.oauth2;
-    userModelConfig.properties = originalUserModelConfig;
   });
 
   describe('Credential Auth', () => {

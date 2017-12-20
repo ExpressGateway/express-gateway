@@ -7,9 +7,6 @@ const sinon = require('sinon');
 const assert = require('assert');
 
 const logger = require('../../lib/policies/log/winston-logger');
-const credentialModelConfig = require('../../lib/config/models/credentials');
-const userModelConfig = require('../../lib/config/models/users');
-const appModelConfig = require('../../lib/config/models/applications');
 const services = require('../../lib/services');
 const credentialService = services.credential;
 const userService = services.user;
@@ -23,7 +20,6 @@ const originalGatewayConfig = config.gatewayConfig;
 describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
   const helper = testHelper();
   const spy = sinon.spy();
-  let originalAppConfig, originalCredentialConfig, originalUserConfig;
   let user, application, token, app, backendServer;
 
   before('setup', (done) => {
@@ -92,26 +88,6 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
           ]
         }
       }
-    };
-
-    originalAppConfig = appModelConfig;
-    originalCredentialConfig = credentialModelConfig;
-    originalUserConfig = userModelConfig;
-
-    appModelConfig.properties = {
-      name: { isRequired: true, isMutable: true },
-      redirectUri: { isRequired: true, isMutable: true }
-    };
-
-    credentialModelConfig.oauth2 = {
-      passwordKey: 'secret',
-      properties: { scopes: { isRequired: false } }
-    };
-
-    userModelConfig.properties = {
-      firstname: { isRequired: true, isMutable: true },
-      lastname: { isRequired: true, isMutable: true },
-      email: { isRequired: false, isMutable: true }
     };
 
     db
@@ -211,9 +187,6 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
   after('cleanup', (done) => {
     helper.cleanup();
     config.gatewayConfig = originalGatewayConfig;
-    appModelConfig.properties = originalAppConfig.properties;
-    credentialModelConfig.oauth2 = originalCredentialConfig.oauth2;
-    userModelConfig.properties = originalUserConfig.properties;
     logger.info.restore();
     backendServer.close();
     done();

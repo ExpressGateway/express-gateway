@@ -8,32 +8,9 @@ const db = require('../../../lib/db');
 describe('Credential service tests', () => {
   describe('Credential tests', () => {
     let credential;
-    const originalModelConfig = config.models.credentials;
     const username = 'someUser';
 
-    before(() => {
-      config.models.credentials.oauth2 = {
-        passwordKey: 'secret',
-        autoGeneratePassword: true,
-        properties: {
-          scopes: { isRequired: false, isMutable: true, defaultVal: null }
-        }
-      };
-
-      config.models.credentials['basic-auth'] = {
-        passwordKey: 'password',
-        autoGeneratePassword: true,
-        properties: {
-          scopes: { isRequired: false, isMutable: true, userDefined: true }
-        }
-      };
-
-      return db.flushdb();
-    });
-
-    after(() => {
-      config.models.credentials = originalModelConfig;
-    });
+    before(() => db.flushdb());
 
     it('should insert a credential', () => {
       const _credential = {
@@ -121,25 +98,8 @@ describe('Credential service tests', () => {
 
   describe('Credential Cascade Delete tests', () => {
     let user;
-    const originalModelConfig = config.models.credentials;
 
     before(() => {
-      config.models.credentials.oauth2 = {
-        passwordKey: 'secret',
-        autoGeneratePassword: true,
-        properties: {
-          scopes: { isRequired: false, isMutable: true, defaultVal: null }
-        }
-      };
-
-      config.models.credentials['basic-auth'] = {
-        passwordKey: 'password',
-        autoGeneratePassword: true,
-        properties: {
-          scopes: { isRequired: false, isMutable: true, userDefined: true }
-        }
-      };
-
       user = {
         username: 'irfanbaqui',
         firstname: 'irfan',
@@ -156,10 +116,6 @@ describe('Credential service tests', () => {
             credentialService.insertCredential(user.id, 'basic-auth').then((basicAuthCred) => should.exist(basicAuthCred.password))
           ]);
         });
-    });
-
-    after(() => {
-      config.models.credentials = originalModelConfig;
     });
 
     it('should delete all credentials associated with a user when user is deleted', () => {
