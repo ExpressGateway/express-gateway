@@ -14,7 +14,7 @@ describe('E2E: basic-auth Policy', () => {
         authorizedEndpoint: {
           host: '*',
           paths: ['/authorizedPath'],
-          scopes: [ 'authorizedScope' ]
+          scopes: ['authorizedScope']
         },
         unauthorizedEndpoint: {
           host: '*',
@@ -38,34 +38,37 @@ describe('E2E: basic-auth Policy', () => {
         }
       }
     };
-    return cliHelper.bootstrapFolder().then(dirInfo => {
-      return gwHelper.startGatewayInstance({dirInfo, gatewayConfig});
-    }).then(gwInfo => {
-      gatewayProcess = gwInfo.gatewayProcess;
-      gatewayPort = gwInfo.gatewayPort;
-      adminPort = gwInfo.adminPort;
-      configDirectoryPath = gwInfo.dirInfo.configDirectoryPath;
+    return cliHelper.bootstrapFolder()
+      .then(dirInfo => gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }))
+      .then(gwInfo => {
+        gatewayProcess = gwInfo.gatewayProcess;
+        gatewayPort = gwInfo.gatewayPort;
+        adminPort = gwInfo.adminPort;
+        configDirectoryPath = gwInfo.dirInfo.configDirectoryPath;
 
-      return cliHelper.runCLICommand({
-        cliArgs: ['scopes create', 'authorizedScope', 'unauthorizedScope'],
-        adminPort,
-        configDirectoryPath});
-    }).then((scopes) => {
-      const args = [
-        '-p', `username=${username}`,
-        '-p', 'firstname=Kate',
-        '-p', 'lastname=Smith'
-      ];
-      return cliHelper.runCLICommand({
-        cliArgs: ['users create '].concat(args),
-        adminPort,
-        configDirectoryPath});
-    }).then(newUser => {
-      return cliHelper.runCLICommand({
-        cliArgs: ['credentials create -t basic-auth -p "scopes=authorizedScope" -p "password=pass" -c ', username],
-        adminPort,
-        configDirectoryPath});
-    });
+        return cliHelper.runCLICommand({
+          cliArgs: ['scopes create', 'authorizedScope', 'unauthorizedScope'],
+          adminPort,
+          configDirectoryPath
+        });
+      }).then((scopes) => {
+        const args = [
+          '-p', `username=${username}`,
+          '-p', 'firstname=Kate',
+          '-p', 'lastname=Smith'
+        ];
+        return cliHelper.runCLICommand({
+          cliArgs: ['users create '].concat(args),
+          adminPort,
+          configDirectoryPath
+        });
+      }).then(newUser => {
+        return cliHelper.runCLICommand({
+          cliArgs: ['credentials create -t basic-auth -p "scopes=authorizedScope" -p "password=pass" -c ', username],
+          adminPort,
+          configDirectoryPath
+        });
+      });
   });
 
   after('cleanup', (done) => {

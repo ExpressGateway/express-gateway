@@ -10,35 +10,33 @@ let adminPort = null;
 let backendPort = null;
 
 // Set gateway.config or system.config yml files
-module.exports.setYmlConfig = function ({ymlConfigPath, newConfig}) {
+module.exports.setYmlConfig = function ({ ymlConfigPath, newConfig }) {
   fs.writeFileSync(ymlConfigPath, yaml.dump(newConfig));
 };
 
 // Get config by path (gateway.config.yml or system.config.yml)
-module.exports.getYmlConfig = function ({ymlConfigPath}) {
+module.exports.getYmlConfig = function ({ ymlConfigPath }) {
   const content = fs.readFileSync();
   return yaml.load(content);
 };
 
-module.exports.startGatewayInstance = function ({dirInfo, gatewayConfig}) {
+module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
   return findOpenPortNumbers(4)
     .then(ports => {
       gatewayPort = ports[0];
       backendPort = ports[1];
       adminPort = ports[2];
 
-      gatewayConfig.http = {port: gatewayPort};
-      gatewayConfig.admin = {port: adminPort};
+      gatewayConfig.http = { port: gatewayPort };
+      gatewayConfig.admin = { port: adminPort };
       gatewayConfig.serviceEndpoints = gatewayConfig.serviceEndpoints || {};
-      gatewayConfig.serviceEndpoints.backend = {url: `http://localhost:${backendPort}`};
+      gatewayConfig.serviceEndpoints.backend = { url: `http://localhost:${backendPort}` };
       return this.setYmlConfig({
         ymlConfigPath: dirInfo.gatewayConfigPath,
         newConfig: gatewayConfig
       });
     })
-    .then(() => {
-      return generateBackendServer(backendPort);
-    })
+    .then(() => generateBackendServer(backendPort))
     .then(() => {
       return new Promise((resolve, reject) => {
         const childEnv = Object.assign({}, process.env);
@@ -65,7 +63,7 @@ module.exports.startGatewayInstance = function ({dirInfo, gatewayConfig}) {
             .end((err, res) => {
               if (err && res && res.statusCode === 404) {
                 clearInterval(interval);
-                resolve({gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo});
+                resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo });
               } else {
                 if (count >= 25) {
                   gatewayProcess.kill();
