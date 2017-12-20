@@ -1,14 +1,13 @@
 module.exports = function (client) {
   const baseUrl = 'schemas/';
   return {
-    list (type = '', name = '') {
+    list (param = '') {
       let url = baseUrl;
-      if (type) {
-        url += `/${type}`;
+
+      if (param) {
+        url += encodeURIComponent(param);
       }
-      if (name) {
-        url += `/${name}`;
-      }
+
       return client
         .get(url)
         .then(res => res.body);

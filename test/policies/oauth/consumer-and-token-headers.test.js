@@ -49,7 +49,7 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
             {
               'headers': [{
                 action: {
-                  headerPrefix: 'eg-',
+                  headersPrefix: 'eg-',
                   forwardHeaders: {
                     'id': 'consumer.id',
                     'consumer-name': 'consumer.name',

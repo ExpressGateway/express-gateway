@@ -1,12 +1,12 @@
 const { assert } = require('chai');
-const gateway = require('../../lib/gateway');
-const adminHelper = require('../common/admin-helper')();
-const Config = require('../../lib/config/config');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const idGen = require('uuid62');
 const yaml = require('js-yaml');
+const gateway = require('../../lib/gateway');
+const adminHelper = require('../common/admin-helper')();
+const Config = require('../../lib/config/config');
 
 describe('REST: schemas', () => {
   let config;
@@ -44,10 +44,10 @@ describe('REST: schemas', () => {
     it('should list all policy schemas', () => {
       return adminHelper.admin.config.schemas
         .list('policy')
-        .then((schemas) => {
-          const found = schemas.find(schema => schema.name === 'basic-auth');
-          const other = schemas.filter(schema => schema.type !== 'policy');
-          assert.equal(found.name, 'basic-auth');
+        .then((schemasResult) => {
+          const found = schemasResult.find(schemaResult => schemaResult.schema.$id.includes('basic-auth'));
+          const other = schemasResult.filter(schemaResult => schemaResult.type !== 'policy');
+          assert.include(found.schema.$id, 'basic-auth');
           assert.equal(found.type, 'policy');
           assert.isDefined(found.schema);
           assert.equal(other.length, 0);
@@ -56,9 +56,9 @@ describe('REST: schemas', () => {
 
     it('should find basic-auth policy', () => {
       return adminHelper.admin.config.schemas
-        .list('policy', 'basic-auth')
+        .list('http://express-gateway.io/schemas/policies/basic-auth.json')
         .then((schema) => {
-          assert.equal(schema.name, 'basic-auth');
+          assert.include(schema.schema.$id, 'basic-auth');
         });
     });
   });
