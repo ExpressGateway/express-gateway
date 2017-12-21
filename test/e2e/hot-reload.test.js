@@ -13,7 +13,7 @@ const yaml = require('js-yaml');
 const { findOpenPortNumbers } = require('../common/server-helper');
 
 const GATEWAY_STARTUP_WAIT_TIME = 5000;
-const TEST_TIMEOUT = 11000;
+const TEST_TIMEOUT = 10000;
 
 /*
     1) Copy config to a temp directory.

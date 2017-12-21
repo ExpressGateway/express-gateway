@@ -22,7 +22,7 @@ describe('round-robin load @balancing @proxy', () => {
   let backendPorts = null;
 
   before(function (done) {
-    this.timeout(11000);
+    this.timeout(10000);
     tmp.dir((err, tempPath) => {
       if (err) {
         return done(err);
