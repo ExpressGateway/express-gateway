@@ -14,7 +14,7 @@ const rimraf = require('rimraf');
 const tmp = require('tmp');
 const webdriver = require('selenium-webdriver');
 const yaml = require('js-yaml');
-let tempPath = null;
+let tempPath;
 
 require('util.promisify/shim')();
 
@@ -173,13 +173,17 @@ describe('oauth2 authorization code grant type', () => {
   });
 
   function startGatewayInstance (done) {
+    const _cpr = util.promisify(cpr);
+
     return util.promisify(tmp.dir)()
-      .then(temp => {
-        tempPath = temp;
-        return util.promisify(cpr)(baseConfigDirectory, tempPath);
-      })
-      .then(files => {
-        testGatewayConfigPath = path.join(tempPath, 'gateway.config.yml');
+      .then(tmpPath => Promise.all([
+        tmpPath,
+        _cpr(baseConfigDirectory, tmpPath),
+        _cpr(path.join(__dirname, '../../lib/config/models'), path.join(tmpPath, 'models'))
+      ]))
+      .then(([tmpPath]) => {
+        tempPath = tmpPath;
+        testGatewayConfigPath = path.join(tmpPath, 'gateway.config.yml');
         return findOpenPortNumbers(4);
       })
       .then(ports => {
