@@ -12,11 +12,10 @@ describe('Application service tests', function () {
 
     before(function () {
       originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'someGroup', isMutable: false },
-        irrelevantProp: { isMutable: true } // isRequired is false by default
-      };
+      Object.assign(config.models.applications.properties, {
+        group: { type: 'string', default: 'someGroup', isMutable: false },
+        irrelevantProp: { type: 'string', isMutable: true } // isRequired is false by default
+      });
 
       return db.flushdb();
     });
@@ -64,7 +63,7 @@ describe('Application service tests', function () {
         })
         .catch(function (err) {
           should.exist(err);
-          err.message.should.eql('Failed to insert application: data should have required property \'.name\'');
+          err.message.should.eql('Failed to insert application: data should have required property \'name\'');
           done();
         });
     });
@@ -100,8 +99,8 @@ describe('Application service tests', function () {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
         name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'someGroup', isMutable: false },
-        irrelevantProp: { isMutable: true } // isRequired is false by default
+        group: { type: 'string', default: 'someGroup', isMutable: false },
+        irrelevantProp: { type: 'string', isMutable: true } // isRequired is false by default
       };
 
       db.flushdb()
@@ -243,7 +242,7 @@ describe('Application service tests', function () {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
         name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'admin', isMutable: false }
+        group: { type: 'string', default: 'admin', isMutable: false }
       };
 
       return db.flushdb();
@@ -345,7 +344,7 @@ describe('Application service tests', function () {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
         name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'admin', isMutable: false }
+        group: { type: 'string', default: 'admin', isMutable: false }
       };
 
       return db.flushdb();
@@ -486,8 +485,8 @@ describe('Application service tests', function () {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
         name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'someGroup', isMutable: false },
-        irrelevantProp: { isMutable: true } // isRequired is false by default
+        group: { type: 'string', default: 'someGroup', isMutable: false },
+        irrelevantProp: { type: 'string', isMutable: true } // isRequired is false by default
       };
 
       db.flushdb()
