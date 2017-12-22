@@ -41,16 +41,11 @@ describe('Application service tests', function () {
         })
         .then(function (newApp) {
           should.exist(newApp);
-          should.exist(newApp.id);
-          should.exist(newApp.name);
-          should.exist(newApp.isActive);
-          should.exist(newApp.group);
+          should(newApp).have.properties(['id', 'name', 'isActive', 'group', 'createdAt', 'userId']);
           newApp.isActive.should.eql(true);
           newApp.name.should.eql(app.name);
           newApp.group.should.eql('someGroup');
-          should.not.exist(newApp.irrelevantProp);
-          should.exist(newApp.createdAt);
-          should.exist(newApp.userId);
+          should(newApp).not.have.property('irrelevantProp');
           newApp.userId.should.eql(user.id);
         });
     });
@@ -69,11 +64,8 @@ describe('Application service tests', function () {
         .insert(app, user.id)
         .then(function (newApp) {
           should.exist(newApp);
-          should.exist(newApp.id);
-          should.exist(newApp.name);
+          should(newApp).have.properties(['id', 'name', 'isActive', 'createdAt', 'userId']);
           newApp.name.should.eql(app.name);
-          should.exist(newApp.createdAt);
-          should.exist(newApp.userId);
           newApp.userId.should.eql(user.id);
         });
     });
@@ -119,12 +111,9 @@ describe('Application service tests', function () {
         .get(app.id)
         .then(function (_app) {
           should.exist(_app);
-          should.exist(_app.id);
+          should(_app).have.properties(['id', 'name', 'createdAt', 'updatedAt']);
           _app.id.should.eql(app.id);
-          should.exist(_app.name);
           _app.name.should.eql(app.name);
-          should.exist(_app.createdAt);
-          should.exist(_app.updatedAt);
         });
     });
 
@@ -136,12 +125,9 @@ describe('Application service tests', function () {
           data.apps.length.should.eql(1);
           const app = data.apps[0];
           should.exist(app);
-          should.exist(app.id);
+          should(app).have.properties(['id', 'name', 'createdAt', 'updatedAt']);
           app.id.should.eql(app.id);
-          should.exist(app.name);
           app.name.should.eql(app.name);
-          should.exist(app.createdAt);
-          should.exist(app.updatedAt);
         });
     });
 
@@ -228,11 +214,8 @@ describe('Application service tests', function () {
             .then(function (newApp) {
               app = newApp;
               should.exist(newApp);
-              should.exist(newApp.id);
-              should.exist(newApp.name);
+              should(newApp).have.properties(['id', 'name', 'createdAt', 'userId']);
               newApp.name.should.eql(app.name);
-              should.exist(newApp.createdAt);
-              should.exist(newApp.userId);
               newApp.userId.should.eql(user.id);
             })
             .then(() => {
@@ -246,13 +229,10 @@ describe('Application service tests', function () {
                     .get(app.id)
                     .then(function (_app) {
                       should.exist(_app);
-                      should.exist(_app.id);
+                      should(_app).have.properties(['id', 'name', 'createdAt', 'updatedAt']);
                       _app.id.should.eql(app.id);
-                      should.exist(_app.name);
                       _app.name.should.eql(updatedApp.name);
-                      should.exist(_app.createdAt);
                       _app.createdAt.should.eql(app.createdAt);
-                      should.exist(_app.updatedAt);
                     });
                 });
             });
@@ -301,11 +281,8 @@ describe('Application service tests', function () {
         .then(function (newApp) {
           app = newApp;
           should.exist(newApp);
-          should.exist(newApp.id);
-          should.exist(newApp.name);
+          should(newApp).have.properties(['id', 'name', 'createdAt', 'userId']);
           newApp.name.should.eql(app.name);
-          should.exist(newApp.createdAt);
-          should.exist(newApp.userId);
           newApp.userId.should.eql(user.id);
           return applicationService.deactivate(app.id);
         })
@@ -315,15 +292,11 @@ describe('Application service tests', function () {
         })
         .then(function (_app) {
           should.exist(_app);
-          should.exist(_app.id);
+          should(_app).have.properties(['id', 'isActive', 'name', 'createdAt', 'updatedAt']);
           _app.id.should.eql(app.id);
-          should.exist(_app.isActive);
           _app.isActive.should.eql(false);
-          should.exist(_app.name);
           _app.name.should.eql(app.name);
-          should.exist(_app.createdAt);
           _app.createdAt.should.eql(app.createdAt);
-          should.exist(_app.updatedAt);
         });
     });
 
@@ -334,15 +307,11 @@ describe('Application service tests', function () {
           return applicationService.get(app.id);
         }).then(function (_app) {
           should.exist(_app);
-          should.exist(_app.id);
+          should(_app).have.properties(['id', 'isActive', 'name', 'createdAt', 'updatedAt']);
           _app.id.should.eql(app.id);
-          should.exist(_app.isActive);
           _app.isActive.should.eql(true);
-          should.exist(_app.name);
           _app.name.should.eql(app.name);
-          should.exist(_app.createdAt);
           _app.createdAt.should.eql(app.createdAt);
-          should.exist(_app.updatedAt);
         });
     });
 
