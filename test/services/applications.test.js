@@ -97,11 +97,10 @@ describe('Application service tests', function () {
 
     before(function (done) {
       originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
-        name: { type: 'string' },
+      Object.assign(config.models.applications.properties, {
         group: { type: 'string', default: 'someGroup' },
         irrelevantProp: { type: 'string' }
-      };
+      });
 
       db.flushdb()
         .then(function () {
@@ -129,9 +128,8 @@ describe('Application service tests', function () {
         });
     });
 
-    after(function (done) {
+    after(function () {
       config.models.applications.properties = originalAppModelConfig;
-      done();
     });
 
     it('should get app by id', function (done) {
@@ -240,10 +238,9 @@ describe('Application service tests', function () {
 
     before(function () {
       originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
-        name: { type: 'string' },
+      Object.assign(config.models.applications.properties, {
         group: { type: 'string', default: 'admin' }
-      };
+      });
 
       return db.flushdb();
     });
@@ -327,17 +324,16 @@ describe('Application service tests', function () {
 
     before(function () {
       originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
+      Object.assign(config.models.applications.properties, {
         name: { type: 'string' },
         group: { type: 'string', default: 'admin' }
-      };
+      });
 
       return db.flushdb();
     });
 
-    after(function (done) {
+    after(function () {
       config.models.applications.properties = originalAppModelConfig;
-      done();
     });
 
     it('should deactivate an application', function () {
@@ -468,11 +464,10 @@ describe('Application service tests', function () {
 
     before(function (done) {
       originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
-        name: { type: 'string' },
+      Object.assign(config.models.applications.properties, {
         group: { type: 'string', default: 'someGroup' },
         irrelevantProp: { type: 'string' }
-      };
+      });
 
       db.flushdb()
         .then(function () {
@@ -500,9 +495,8 @@ describe('Application service tests', function () {
         });
     });
 
-    after(function (done) {
+    after(function () {
       config.models.applications.properties = originalAppModelConfig;
-      done();
     });
 
     it('should delete app', function (done) {
