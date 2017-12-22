@@ -1,6 +1,7 @@
 const should = require('should');
 const uuid = require('uuid');
 const config = require('../../lib/config');
+const schemas = require('../../lib/schemas');
 const services = require('../../lib/services');
 const applicationService = services.application;
 const userService = services.user;
@@ -15,10 +16,13 @@ describe('Application service tests', function () {
       group: { type: 'string', default: 'someGroup' },
       irrelevantProp: { type: 'string' }
     });
+
+    schemas.register('model', 'application', config.models.applications);
   });
 
   after(function () {
     config.models.applications.properties = originalAppModelConfig;
+    schemas.register('model', 'application', config.models.applications);
   });
 
   describe('Insert tests', function () {
