@@ -7,22 +7,24 @@ const userService = services.user;
 const db = require('../../lib/db');
 
 describe('Application service tests', function () {
+  let originalAppModelConfig;
+
+  before(() => {
+    originalAppModelConfig = Object.assign({}, config.models.applications.properties);
+    Object.assign(config.models.applications.properties, {
+      group: { type: 'string', default: 'someGroup' },
+      irrelevantProp: { type: 'string' }
+    });
+  });
+
+  after(function () {
+    config.models.applications.properties = originalAppModelConfig;
+  });
+
   describe('Insert tests', function () {
-    let user, originalAppModelConfig;
+    before(() => db.flushdb());
 
-    before(() => {
-      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
-      Object.assign(config.models.applications.properties, {
-        group: { type: 'string', default: 'someGroup' },
-        irrelevantProp: { type: 'string' }
-      });
-
-      return db.flushdb();
-    });
-
-    after(function () {
-      config.models.applications.properties = originalAppModelConfig;
-    });
+    let user;
 
     it('should insert an application and application should have default value of properties if not defined, and un-required properties ignored if not defined', function () {
       const _user = createRandomUserObject();
@@ -72,20 +74,12 @@ describe('Application service tests', function () {
   });
 
   describe('Get application tests', function () {
-    let user, app, originalAppModelConfig;
+    let user, app;
 
     before(function () {
-      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
-      Object.assign(config.models.applications.properties, {
-        group: { type: 'string', default: 'someGroup' },
-        irrelevantProp: { type: 'string' }
-      });
-
+      const _user = createRandomUserObject();
       return db.flushdb()
-        .then(function () {
-          const _user = createRandomUserObject();
-          return userService.insert(_user);
-        })
+        .then(() => userService.insert(_user))
         .then(function (newUser) {
           should.exist(newUser);
           user = newUser;
@@ -98,10 +92,6 @@ describe('Application service tests', function () {
           should.exist(newApp);
           app = newApp;
         });
-    });
-
-    after(function () {
-      config.models.applications.properties = originalAppModelConfig;
     });
 
     it('should get app by id', function () {
@@ -180,20 +170,9 @@ describe('Application service tests', function () {
   });
 
   describe('Update tests', function () {
-    let user, app, originalAppModelConfig;
+    let user, app;
 
-    before(function () {
-      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
-      Object.assign(config.models.applications.properties, {
-        group: { type: 'string', default: 'admin' }
-      });
-
-      return db.flushdb();
-    });
-
-    after(function () {
-      config.models.applications.properties = originalAppModelConfig;
-    });
+    before(() => db.flushdb());
 
     it('should update an application', function () {
       const _user = createRandomUserObject();
@@ -242,20 +221,9 @@ describe('Application service tests', function () {
   });
 
   describe('activate/deactivate application tests', function () {
-    let user, app, originalAppModelConfig;
+    let user, app;
 
-    before(function () {
-      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
-      Object.assign(config.models.applications.properties, {
-        group: { type: 'string', default: 'admin' }
-      });
-
-      return db.flushdb();
-    });
-
-    after(function () {
-      config.models.applications.properties = originalAppModelConfig;
-    });
+    before(() => db.flushdb());
 
     it('should deactivate an application', function () {
       const _user = createRandomUserObject();
@@ -362,20 +330,12 @@ describe('Application service tests', function () {
   });
 
   describe('Delete app tests', function () {
-    let user, app, originalAppModelConfig;
+    let user, app;
 
     before(function () {
-      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
-      Object.assign(config.models.applications.properties, {
-        group: { type: 'string', default: 'someGroup' },
-        irrelevantProp: { type: 'string' }
-      });
-
+      const _user = createRandomUserObject();
       return db.flushdb()
-        .then(function () {
-          const _user = createRandomUserObject();
-          return userService.insert(_user);
-        })
+        .then(() => userService.insert(_user))
         .then(function (newUser) {
           should.exist(newUser);
           user = newUser;
@@ -388,10 +348,6 @@ describe('Application service tests', function () {
           should.exist(newApp);
           app = newApp;
         });
-    });
-
-    after(function () {
-      config.models.applications.properties = originalAppModelConfig;
     });
 
     it('should delete app', function () {
