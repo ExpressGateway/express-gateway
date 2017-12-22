@@ -13,8 +13,8 @@ describe('Application service tests', function () {
     before(function () {
       originalAppModelConfig = config.models.applications.properties;
       Object.assign(config.models.applications.properties, {
-        group: { type: 'string', default: 'someGroup', isMutable: false },
-        irrelevantProp: { type: 'string', isMutable: true } // isRequired is false by default
+        group: { type: 'string', default: 'someGroup' },
+        irrelevantProp: { type: 'string' }
       });
 
       return db.flushdb();
@@ -98,9 +98,9 @@ describe('Application service tests', function () {
     before(function (done) {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { type: 'string', default: 'someGroup', isMutable: false },
-        irrelevantProp: { type: 'string', isMutable: true } // isRequired is false by default
+        name: { type: 'string' },
+        group: { type: 'string', default: 'someGroup' },
+        irrelevantProp: { type: 'string' }
       };
 
       db.flushdb()
@@ -241,8 +241,8 @@ describe('Application service tests', function () {
     before(function () {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { type: 'string', default: 'admin', isMutable: false }
+        name: { type: 'string' },
+        group: { type: 'string', default: 'admin' }
       };
 
       return db.flushdb();
@@ -320,21 +320,6 @@ describe('Application service tests', function () {
           done();
         });
     });
-
-    it('should throw an error when updating an immutable property', function (done) {
-      const updatedApp = { group: 'marketing' };
-
-      applicationService
-        .update(app.id, updatedApp)
-        .then(function (newApp) {
-          should.not.exist(newApp);
-        })
-        .catch(function (err) {
-          should.exist(err);
-          err.message.should.eql('invalid property group');
-          done();
-        });
-    });
   });
 
   describe('activate/deactivate application tests', function () {
@@ -343,8 +328,8 @@ describe('Application service tests', function () {
     before(function () {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { type: 'string', default: 'admin', isMutable: false }
+        name: { type: 'string' },
+        group: { type: 'string', default: 'admin' }
       };
 
       return db.flushdb();
@@ -484,9 +469,9 @@ describe('Application service tests', function () {
     before(function (done) {
       originalAppModelConfig = config.models.applications.properties;
       config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { type: 'string', default: 'someGroup', isMutable: false },
-        irrelevantProp: { type: 'string', isMutable: true } // isRequired is false by default
+        name: { type: 'string' },
+        group: { type: 'string', default: 'someGroup' },
+        irrelevantProp: { type: 'string' }
       };
 
       db.flushdb()

@@ -165,11 +165,13 @@ describe('Credential service tests', () => {
       config.models.credentials.oauth2 = {
         passwordKey: 'secret',
         autoGeneratePassword: true,
+        type: 'object',
         properties: {
-          scopes: { isRequired: false },
-          someProperty: { isRequired: true, isMutable: false },
-          otherProperty: { defaultValue: 'someDefaultValue' }
-        }
+          scopes: { type: 'string' },
+          someProperty: { type: 'string' },
+          otherProperty: { type: 'string', default: 'someDefaultValue' }
+        },
+        required: ['someProperty']
       };
 
       return db.flushdb();
@@ -283,13 +285,6 @@ describe('Credential service tests', () => {
         .be.rejectedWith('data should have required property \'.someProperty\'')
         .then(() => credentialService.getCredential(username3, 'oauth2'))
         .then(credential => should.not.exist(credential));
-    });
-
-    it('should not update credential with an update to an immutable property', () => {
-      return should(credentialService.updateCredential(username, 'oauth2', { someProperty: 'something' }))
-        .be.rejectedWith('someProperty is immutable')
-        .then(() => credentialService.getCredential(username, 'oauth2'))
-        .then(credential => should.exist(credential));
     });
 
     it('should not update credential when no properties are specified', () => {
