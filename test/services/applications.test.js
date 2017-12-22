@@ -84,21 +84,19 @@ describe('Application service tests', function () {
       return db.flushdb()
         .then(function () {
           const _user = createRandomUserObject();
-          return userService
-            .insert(_user)
-            .then(function (newUser) {
-              should.exist(newUser);
-              user = newUser;
-              app = {
-                name: 'test-app'
-              };
-              return applicationService
-                .insert(app, user.id)
-                .then(function (newApp) {
-                  should.exist(newApp);
-                  app = newApp;
-                });
-            });
+          return userService.insert(_user);
+        })
+        .then(function (newUser) {
+          should.exist(newUser);
+          user = newUser;
+          app = {
+            name: 'test-app'
+          };
+          return applicationService.insert(app, user.id);
+        }
+        ).then(function (newApp) {
+          should.exist(newApp);
+          app = newApp;
         });
     });
 
@@ -209,32 +207,28 @@ describe('Application service tests', function () {
             name: 'test-app-1'
           };
 
+          return applicationService.insert(app, user.id);
+        })
+        .then(function (newApp) {
+          app = newApp;
+          should.exist(newApp);
+          should(newApp).have.properties(['id', 'name', 'createdAt', 'userId']);
+          newApp.name.should.eql(app.name);
+          newApp.userId.should.eql(user.id);
+          const updatedApp = {
+            name: 'test-app-updated'
+          };
+          return Promise.all([updatedApp, applicationService.update(app.id, updatedApp)]);
+        }).then(([updatedApp, res]) => {
+          res.should.eql(true);
           return applicationService
-            .insert(app, user.id)
-            .then(function (newApp) {
-              app = newApp;
-              should.exist(newApp);
-              should(newApp).have.properties(['id', 'name', 'createdAt', 'userId']);
-              newApp.name.should.eql(app.name);
-              newApp.userId.should.eql(user.id);
-            })
-            .then(() => {
-              const updatedApp = {
-                name: 'test-app-updated'
-              };
-              return applicationService.update(app.id, updatedApp)
-                .then((res) => {
-                  res.should.eql(true);
-                  return applicationService
-                    .get(app.id)
-                    .then(function (_app) {
-                      should.exist(_app);
-                      should(_app).have.properties(['id', 'name', 'createdAt', 'updatedAt']);
-                      _app.id.should.eql(app.id);
-                      _app.name.should.eql(updatedApp.name);
-                      _app.createdAt.should.eql(app.createdAt);
-                    });
-                });
+            .get(app.id)
+            .then(function (_app) {
+              should.exist(_app);
+              should(_app).have.properties(['id', 'name', 'createdAt', 'updatedAt']);
+              _app.id.should.eql(app.id);
+              _app.name.should.eql(updatedApp.name);
+              _app.createdAt.should.eql(app.createdAt);
             });
         });
     });
@@ -253,7 +247,6 @@ describe('Application service tests', function () {
     before(function () {
       originalAppModelConfig = Object.assign({}, config.models.applications.properties);
       Object.assign(config.models.applications.properties, {
-        name: { type: 'string' },
         group: { type: 'string', default: 'admin' }
       });
 
@@ -330,14 +323,11 @@ describe('Application service tests', function () {
         .then(function (newUser) {
           should.exist(newUser);
           user1 = newUser;
-          return applicationService
-            .insert(app1, user1.id)
-            .then(function (newApp) {
-              should.exist(newApp);
-              app1 = newApp;
-            });
+          return applicationService.insert(app1, user1.id);
         })
-        .then(() => {
+        .then((newApp) => {
+          should.exist(newApp);
+          app1 = newApp;
           return applicationService
             .insert(app2, user1.id)
             .then(function (newApp) {
@@ -384,21 +374,19 @@ describe('Application service tests', function () {
       return db.flushdb()
         .then(function () {
           const _user = createRandomUserObject();
-          return userService
-            .insert(_user)
-            .then(function (newUser) {
-              should.exist(newUser);
-              user = newUser;
-              app = {
-                name: 'test-app'
-              };
-              return applicationService
-                .insert(app, user.id)
-                .then(function (newApp) {
-                  should.exist(newApp);
-                  app = newApp;
-                });
-            });
+          return userService.insert(_user);
+        })
+        .then(function (newUser) {
+          should.exist(newUser);
+          user = newUser;
+          app = {
+            name: 'test-app'
+          };
+          return applicationService.insert(app, user.id);
+        })
+        .then(function (newApp) {
+          should.exist(newApp);
+          app = newApp;
         });
     });
 
