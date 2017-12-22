@@ -11,7 +11,7 @@ describe('Application service tests', function () {
     let user, originalAppModelConfig;
 
     before(function () {
-      originalAppModelConfig = config.models.applications.properties;
+      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
       Object.assign(config.models.applications.properties, {
         group: { type: 'string', default: 'someGroup' },
         irrelevantProp: { type: 'string' }
@@ -96,7 +96,7 @@ describe('Application service tests', function () {
     let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppModelConfig = config.models.applications.properties;
+      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
       Object.assign(config.models.applications.properties, {
         group: { type: 'string', default: 'someGroup' },
         irrelevantProp: { type: 'string' }
@@ -237,7 +237,7 @@ describe('Application service tests', function () {
     let user, app, originalAppModelConfig;
 
     before(function () {
-      originalAppModelConfig = config.models.applications.properties;
+      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
       Object.assign(config.models.applications.properties, {
         group: { type: 'string', default: 'admin' }
       });
@@ -323,7 +323,7 @@ describe('Application service tests', function () {
     let user, app, originalAppModelConfig;
 
     before(function () {
-      originalAppModelConfig = config.models.applications.properties;
+      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
       Object.assign(config.models.applications.properties, {
         name: { type: 'string' },
         group: { type: 'string', default: 'admin' }
@@ -463,7 +463,7 @@ describe('Application service tests', function () {
     let user, app, originalAppModelConfig;
 
     before(function (done) {
-      originalAppModelConfig = config.models.applications.properties;
+      originalAppModelConfig = Object.assign({}, config.models.applications.properties);
       Object.assign(config.models.applications.properties, {
         group: { type: 'string', default: 'someGroup' },
         irrelevantProp: { type: 'string' }
