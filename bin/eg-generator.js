@@ -111,7 +111,7 @@ module.exports = class EgGenerator extends Generator {
             shouldPrompt = true;
           }
 
-          missingProperties.push({ name: prop, descriptor: descriptor });
+          missingProperties.push({ name: prop, descriptor });
         }
       });
 
@@ -124,10 +124,11 @@ module.exports = class EgGenerator extends Generator {
           return {
             name: p.name,
             message: `Enter ${chalk.yellow(p.name)}${chalk.green(required)}:`,
-            default: p.default,
+            default: object[p.name] || p.descriptor.default,
             validate: input => !modelSchema.required.includes(p.name) ||
               (!!input && modelSchema.required.includes(p.name)),
             filter: input => input === '' && !modelSchema.required.includes(p.name) ? undefined : input
+
           };
         });
       }
