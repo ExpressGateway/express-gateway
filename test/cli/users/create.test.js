@@ -176,7 +176,10 @@ describe('eg users create', () => {
   });
 
   it('prints error on invalid username from stdin', done => {
-    const user = {};
+    const user = {
+      firstname: 'Clark',
+      lastname: 'Kent'
+    };
 
     env.hijack(namespace, generator => {
       let output = null;
@@ -199,7 +202,7 @@ describe('eg users create', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(error, 'invalid username');
+        assert.equal(error, 'data should have required property \'username\'');
         assert.equal(output, null);
 
         done();

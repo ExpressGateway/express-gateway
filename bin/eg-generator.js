@@ -138,7 +138,7 @@ module.exports = class EgGenerator extends Generator {
         if (!skipPrompt) {
           return this.prompt(questions).then(validateData);
         }
-        return {};
+        throw new Error(error);
       }
       return data;
     };
