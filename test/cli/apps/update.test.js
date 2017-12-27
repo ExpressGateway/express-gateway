@@ -12,12 +12,14 @@ describe('eg apps update', () => {
     ({ program, env } = environment.bootstrap());
     return adminHelper.start();
   });
+
   after(() => adminHelper.stop());
 
   afterEach(() => {
     env.resetHijack();
     return adminHelper.reset();
   });
+
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
@@ -37,6 +39,7 @@ describe('eg apps update', () => {
         app1 = createdApp;
       });
   });
+
   it('updates an app from prompts', done => {
     env.hijack(namespace, generator => {
       let output = null;
