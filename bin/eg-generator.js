@@ -93,13 +93,10 @@ module.exports = class EgGenerator extends Generator {
     return verbose;
   }
 
-  _promptAndValidate (object, schema, options) {
-    options = options || {};
-    options.skipPrompt = options.skipPrompt || false;
-
+  _promptAndValidate (object, schema, { skipPrompt = false } = {}) {
     let questions = [];
 
-    if (!options.skipPrompt) {
+    if (!skipPrompt) {
       let shouldPrompt = false;
       const missingProperties = [];
       const modelSchema = find(schema).schema;
@@ -138,7 +135,7 @@ module.exports = class EgGenerator extends Generator {
       const { isValid, error } = validate(schema, data);
       if (!isValid) {
         this.log.error(error);
-        if (!options.skipPrompt) {
+        if (!skipPrompt) {
           return this.prompt(questions).then(validateData);
         }
         return {};
