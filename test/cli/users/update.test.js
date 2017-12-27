@@ -32,10 +32,6 @@ describe('eg users update', () => {
     env.resetHijack();
   });
 
-  afterEach(() => {
-    env.resetHijack();
-  });
-
   it('updates a user from prompts by username', done => {
     env.hijack(namespace, generator => {
       let output = null;
