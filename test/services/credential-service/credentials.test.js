@@ -250,7 +250,6 @@ describe('Credential service tests', () => {
         .be.rejectedWith('one or more scopes don\'t exist');
     });
 
-<<<<<<< HEAD
     it('should use default property if not defined', () => {
       const username2 = 'otherUser';
       const cred = {
@@ -272,8 +271,6 @@ describe('Credential service tests', () => {
         });
     });
 
-=======
->>>>>>> c5ad559... Re-register schemas for credential tests
     it('should not create credential if a required property is not passed in', () => {
       const username3 = 'anotherUser';
       const cred = {
