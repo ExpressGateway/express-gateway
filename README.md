@@ -66,7 +66,7 @@ All contributions welcome! Please see the [contributor's guide][contributor-guid
 
 #### Sponsors
 Express Gateway is proudly sponsored by...
-- [LunchBadger][lb-url] : Microservices and API Empowerment
+- [LunchBadger][lb-url] : A multicloud platform for microservices and serverless.
 - [Joyent Triton][joyent-url] : The Next Generation of Cloud - Modern, Hybrid and Open
 
 #### License
