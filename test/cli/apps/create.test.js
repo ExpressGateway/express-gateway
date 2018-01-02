@@ -8,6 +8,8 @@ const idGen = require('uuid62');
 const helpers = require('yeoman-test');
 const { checkOutput } = require('../../common/output-helper');
 
+const usrName = idGen.v4();
+
 describe('eg apps create', () => {
   let program, env, user;
   before(() => {
@@ -19,7 +21,7 @@ describe('eg apps create', () => {
   beforeEach(() => {
     env.prepareHijack();
     return adminHelper.admin.users.create({
-      username: idGen.v4(),
+      username: usrName,
       firstname: 'La',
       lastname: 'Deeda'
     })
@@ -133,8 +135,7 @@ describe('eg apps create', () => {
       });
     });
 
-    env.argv = program.parse('apps create -u lala -p "name=appy" ' +
-      '-p "redirectUri=http://localhost:3000/cb"');
+    env.argv = program.parse(`apps create -u ${usrName} -p "name=appy" -p "redirectUri=http://localhost:3000/cb"`);
   });
 
   it('creates an app from properties with user ID', done => {
@@ -204,7 +205,7 @@ describe('eg apps create', () => {
       });
     });
 
-    env.argv = program.parse('apps create -u lala --stdin');
+    env.argv = program.parse(`apps create -u ${usrName} --stdin`);
   });
 
   it('prints only the app id when using the --quiet flag', done => {
@@ -258,7 +259,7 @@ describe('eg apps create', () => {
           output = message;
         };
         generator.log.error = message => {
-          assert.equal(message, 'Failed to insert application: name is required');
+          assert.equal(message, 'data should have required property \'name\'');
         };
         generator.log.ok = message => {
           output = message;
@@ -279,14 +280,18 @@ describe('eg apps create', () => {
   });
 
   it('prints error on invalid user', done => {
-    const app = {};
+    const app = {
+      name: 'appy',
+      redirectUri: 'http://localhost:3000/cb'
+    };
+
     env.hijack(namespace, generator => {
       generator.once('run', () => {
         generator.log = message => {
           done(new Error(message));
         };
         generator.log.error = message => {
-          assert.equal(message, 'Failed to insert application: name is required');
+          assert.equal(message, 'The specified user does not exist');
         };
         generator.log.ok = message => {
           done(new Error(message));
@@ -320,7 +325,6 @@ describe('eg apps create', () => {
       });
     });
 
-    env.argv = program.parse('apps create -u lala -p "name=" ' +
-      '-p "redirectUri=http://example.com/cb"');
+    env.argv = program.parse(`apps create -u ${usrName} -p "name=" -p "redirectUri=http://example.com/cb"`);
   });
 });

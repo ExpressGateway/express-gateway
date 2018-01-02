@@ -1,35 +1,40 @@
 const should = require('should');
 const uuid = require('uuid');
 const config = require('../../lib/config');
+const schemas = require('../../lib/schemas');
 const services = require('../../lib/services');
 const applicationService = services.application;
 const userService = services.user;
 const db = require('../../lib/db');
 
 describe('Application service tests', function () {
+  let originalAppModelConfig;
+
+  before(() => {
+    originalAppModelConfig = Object.assign({}, config.models.applications.properties);
+    Object.assign(config.models.applications.properties, {
+      group: { type: 'string', default: 'someGroup' },
+      irrelevantProp: { type: 'string' }
+    });
+
+    schemas.register('model', 'application', config.models.applications);
+  });
+
+  after(function () {
+    config.models.applications.properties = originalAppModelConfig;
+    schemas.register('model', 'application', config.models.applications);
+  });
+
   describe('Insert tests', function () {
-    let user, originalAppModelConfig;
+    before(() => db.flushdb());
 
-    before(function () {
-      originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'someGroup', isMutable: false },
-        irrelevantProp: { isMutable: true } // isRequired is false by default
-      };
-
-      return db.flushdb();
-    });
-
-    after(function () {
-      config.models.applications.properties = originalAppModelConfig;
-    });
+    let user;
 
     it('should insert an application and application should have default value of properties if not defined, and un-required properties ignored if not defined', function () {
       const _user = createRandomUserObject();
       let app;
 
-      userService
+      return userService
         .insert(_user)
         .then(function (newUser) {
           user = newUser;
@@ -42,157 +47,94 @@ describe('Application service tests', function () {
         })
         .then(function (newApp) {
           should.exist(newApp);
-          should.exist(newApp.id);
-          should.exist(newApp.name);
-          should.exist(newApp.isActive);
-          should.exist(newApp.group);
+          should(newApp).have.properties(['id', 'name', 'isActive', 'group', 'createdAt', 'userId']);
           newApp.isActive.should.eql(true);
           newApp.name.should.eql(app.name);
           newApp.group.should.eql('someGroup');
-          should.not.exist(newApp.irrelevantProp);
-          should.exist(newApp.createdAt);
-          should.exist(newApp.userId);
+          should(newApp).not.have.property('irrelevantProp');
           newApp.userId.should.eql(user.id);
         });
     });
 
-    it('should throw when inserting an app with missing properties that are required', function (done) {
-      applicationService
-        .insert({}, user.id)
-        .then(function (newApp) {
-          should.not.exist(newApp);
-        })
-        .catch(function (err) {
-          should.exist(err);
-          err.message.should.eql('Failed to insert application: name is required');
-          done();
-        });
+    it('should throw when inserting an app with missing properties that are required', function () {
+      return should(applicationService.insert({}, user.id))
+        .be.rejectedWith('data should have required property \'name\'');
     });
 
-    it('should allow inserting multiple applications per user', function (done) {
+    it('should allow inserting multiple applications per user', function () {
       const app = {
         name: 'test-app-2'
       };
 
-      applicationService
+      return applicationService
         .insert(app, user.id)
         .then(function (newApp) {
           should.exist(newApp);
-          should.exist(newApp.id);
-          should.exist(newApp.name);
+          should(newApp).have.properties(['id', 'name', 'isActive', 'createdAt', 'userId']);
           newApp.name.should.eql(app.name);
-          should.exist(newApp.createdAt);
-          should.exist(newApp.userId);
           newApp.userId.should.eql(user.id);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
   });
 
   describe('Get application tests', function () {
-    let user, app, originalAppModelConfig;
+    let user, app;
 
-    before(function (done) {
-      originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'someGroup', isMutable: false },
-        irrelevantProp: { isMutable: true } // isRequired is false by default
-      };
-
-      db.flushdb()
-        .then(function () {
-          const _user = createRandomUserObject();
-          userService
-            .insert(_user)
-            .then(function (newUser) {
-              should.exist(newUser);
-              user = newUser;
-              app = {
-                name: 'test-app'
-              };
-              applicationService
-                .insert(app, user.id)
-                .then(function (newApp) {
-                  should.exist(newApp);
-                  app = newApp;
-                  done();
-                });
-            });
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
+    before(function () {
+      const _user = createRandomUserObject();
+      return db.flushdb()
+        .then(() => userService.insert(_user))
+        .then(function (newUser) {
+          should.exist(newUser);
+          user = newUser;
+          app = {
+            name: 'test-app'
+          };
+          return applicationService.insert(app, user.id);
+        }
+        ).then(function (newApp) {
+          should.exist(newApp);
+          app = newApp;
         });
     });
 
-    after(function (done) {
-      config.models.applications.properties = originalAppModelConfig;
-      done();
-    });
-
-    it('should get app by id', function (done) {
-      applicationService
+    it('should get app by id', function () {
+      return applicationService
         .get(app.id)
         .then(function (_app) {
           should.exist(_app);
-          should.exist(_app.id);
+          should(_app).have.properties(['id', 'name', 'createdAt', 'updatedAt']);
           _app.id.should.eql(app.id);
-          should.exist(_app.name);
           _app.name.should.eql(app.name);
-          should.exist(_app.createdAt);
-          should.exist(_app.updatedAt);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should get all apps', function (done) {
-      applicationService
+    it('should get all apps', function () {
+      return applicationService
         .findAll()
         .then(function (data) {
           should.exist(data.apps);
           data.apps.length.should.eql(1);
           const app = data.apps[0];
           should.exist(app);
-          should.exist(app.id);
+          should(app).have.properties(['id', 'name', 'createdAt', 'updatedAt']);
           app.id.should.eql(app.id);
-          should.exist(app.name);
           app.name.should.eql(app.name);
-          should.exist(app.createdAt);
-          should.exist(app.updatedAt);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should not get app by invalid id', function (done) {
-      applicationService.get('invalid_id')
+    it('should not get app by invalid id', function () {
+      return applicationService.get('invalid_id')
         .then(function (_app) {
           should.exist(_app);
           _app.should.eql(false);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
-    it('should get all apps belonging to a user', function (done) {
+    it('should get all apps belonging to a user', function () {
       let user1, app1, app2;
 
-      userService
+      return userService
         .insert(createRandomUserObject())
         .then(function (newUser) {
           should.exist(newUser);
@@ -226,38 +168,20 @@ describe('Application service tests', function () {
               apps.length.should.eql(2);
               app1.should.oneOf(apps);
               app2.should.oneOf(apps);
-              done();
             });
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
   });
 
   describe('Update tests', function () {
-    let user, app, originalAppModelConfig;
+    let user, app;
 
-    before(function () {
-      originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'admin', isMutable: false }
-      };
+    before(() => db.flushdb());
 
-      return db.flushdb();
-    });
-
-    after(function (done) {
-      config.models.applications.properties = originalAppModelConfig;
-      done();
-    });
-
-    it('should update an application', function (done) {
+    it('should update an application', function () {
       const _user = createRandomUserObject();
 
-      userService
+      return userService
         .insert(_user)
         .then(function (newUser) {
           user = newUser;
@@ -266,95 +190,44 @@ describe('Application service tests', function () {
             name: 'test-app-1'
           };
 
-          applicationService
-            .insert(app, user.id)
-            .then(function (newApp) {
-              app = newApp;
-              should.exist(newApp);
-              should.exist(newApp.id);
-              should.exist(newApp.name);
-              newApp.name.should.eql(app.name);
-              should.exist(newApp.createdAt);
-              should.exist(newApp.userId);
-              newApp.userId.should.eql(user.id);
-            })
-            .then(() => {
-              const updatedApp = {
-                name: 'test-app-updated'
-              };
-              applicationService.update(app.id, updatedApp)
-                .then((res) => {
-                  res.should.eql(true);
-                  applicationService
-                    .get(app.id)
-                    .then(function (_app) {
-                      should.exist(_app);
-                      should.exist(_app.id);
-                      _app.id.should.eql(app.id);
-                      should.exist(_app.name);
-                      _app.name.should.eql(updatedApp.name);
-                      should.exist(_app.createdAt);
-                      _app.createdAt.should.eql(app.createdAt);
-                      should.exist(_app.updatedAt);
-                      done();
-                    });
-                });
-            })
-            .catch(function (err) {
-              should.not.exist(err);
-              done();
+          return applicationService.insert(app, user.id);
+        })
+        .then(function (newApp) {
+          app = newApp;
+          should.exist(newApp);
+          should(newApp).have.properties(['id', 'name', 'createdAt', 'userId']);
+          newApp.name.should.eql(app.name);
+          newApp.userId.should.eql(user.id);
+          const updatedApp = {
+            name: 'test-app-updated'
+          };
+          return Promise.all([updatedApp, applicationService.update(app.id, updatedApp)]);
+        }).then(([updatedApp, res]) => {
+          res.should.eql(true);
+          return applicationService
+            .get(app.id)
+            .then(function (_app) {
+              should.exist(_app);
+              should(_app).have.properties(['id', 'name', 'createdAt', 'updatedAt']);
+              _app.id.should.eql(app.id);
+              _app.name.should.eql(updatedApp.name);
+              _app.createdAt.should.eql(app.createdAt);
             });
         });
     });
 
-    it('should throw an error when updating an app with invalid properties', function (done) {
+    it('should throw an error when updating an app with invalid properties', function () {
       const updatedApp = { invalid: 'someVal' };
 
-      applicationService
-        .update(app.id, updatedApp)
-        .then(function (newApp) {
-          should.not.exist(newApp);
-        })
-        .catch(function (err) {
-          should.exist(err);
-          err.message.should.eql('one or more properties is invalid');
-          done();
-        });
-    });
-
-    it('should throw an error when updating an immutable property', function (done) {
-      const updatedApp = { group: 'marketing' };
-
-      applicationService
-        .update(app.id, updatedApp)
-        .then(function (newApp) {
-          should.not.exist(newApp);
-        })
-        .catch(function (err) {
-          should.exist(err);
-          err.message.should.eql('invalid property group');
-          done();
-        });
+      return should(applicationService
+        .update(app.id, updatedApp)).be.rejectedWith('one or more properties is invalid');
     });
   });
 
   describe('activate/deactivate application tests', function () {
-    let user, app, originalAppModelConfig;
+    let user, app;
 
-    before(function () {
-      originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'admin', isMutable: false }
-      };
-
-      return db.flushdb();
-    });
-
-    after(function (done) {
-      config.models.applications.properties = originalAppModelConfig;
-      done();
-    });
+    before(() => db.flushdb());
 
     it('should deactivate an application', function () {
       const _user = createRandomUserObject();
@@ -373,11 +246,8 @@ describe('Application service tests', function () {
         .then(function (newApp) {
           app = newApp;
           should.exist(newApp);
-          should.exist(newApp.id);
-          should.exist(newApp.name);
+          should(newApp).have.properties(['id', 'name', 'createdAt', 'userId']);
           newApp.name.should.eql(app.name);
-          should.exist(newApp.createdAt);
-          should.exist(newApp.userId);
           newApp.userId.should.eql(user.id);
           return applicationService.deactivate(app.id);
         })
@@ -387,15 +257,11 @@ describe('Application service tests', function () {
         })
         .then(function (_app) {
           should.exist(_app);
-          should.exist(_app.id);
+          should(_app).have.properties(['id', 'isActive', 'name', 'createdAt', 'updatedAt']);
           _app.id.should.eql(app.id);
-          should.exist(_app.isActive);
           _app.isActive.should.eql(false);
-          should.exist(_app.name);
           _app.name.should.eql(app.name);
-          should.exist(_app.createdAt);
           _app.createdAt.should.eql(app.createdAt);
-          should.exist(_app.updatedAt);
         });
     });
 
@@ -406,19 +272,15 @@ describe('Application service tests', function () {
           return applicationService.get(app.id);
         }).then(function (_app) {
           should.exist(_app);
-          should.exist(_app.id);
+          should(_app).have.properties(['id', 'isActive', 'name', 'createdAt', 'updatedAt']);
           _app.id.should.eql(app.id);
-          should.exist(_app.isActive);
           _app.isActive.should.eql(true);
-          should.exist(_app.name);
           _app.name.should.eql(app.name);
-          should.exist(_app.createdAt);
           _app.createdAt.should.eql(app.createdAt);
-          should.exist(_app.updatedAt);
         });
     });
 
-    it('should cascade deactivate app upon deactivating user', function (done) {
+    it('should cascade deactivate app upon deactivating user', function () {
       let user1;
       let app1 = {
         name: 'test-app-1'
@@ -428,19 +290,16 @@ describe('Application service tests', function () {
         name: 'test-app-2'
       };
 
-      userService
+      return userService
         .insert(createRandomUserObject())
         .then(function (newUser) {
           should.exist(newUser);
           user1 = newUser;
-          return applicationService
-            .insert(app1, user1.id)
-            .then(function (newApp) {
-              should.exist(newApp);
-              app1 = newApp;
-            });
+          return applicationService.insert(app1, user1.id);
         })
-        .then(() => {
+        .then((newApp) => {
+          should.exist(newApp);
+          app1 = newApp;
           return applicationService
             .insert(app2, user1.id)
             .then(function (newApp) {
@@ -456,7 +315,7 @@ describe('Application service tests', function () {
             });
         })
         .then(function () {
-          applicationService
+          return applicationService
             .get(app1.id)
             .then(function (_app) {
               should.exist(_app);
@@ -464,73 +323,42 @@ describe('Application service tests', function () {
             });
         })
         .then(function () {
-          applicationService
+          return applicationService
             .get(app2.id)
             .then(function (_app) {
               should.exist(_app);
               _app.isActive.should.eql(false);
-              done();
             });
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
   });
 
   describe('Delete app tests', function () {
-    let user, app, originalAppModelConfig;
+    let user, app;
 
-    before(function (done) {
-      originalAppModelConfig = config.models.applications.properties;
-      config.models.applications.properties = {
-        name: { isRequired: true, isMutable: true },
-        group: { defaultValue: 'someGroup', isMutable: false },
-        irrelevantProp: { isMutable: true } // isRequired is false by default
-      };
-
-      db.flushdb()
-        .then(function () {
-          const _user = createRandomUserObject();
-          userService
-            .insert(_user)
-            .then(function (newUser) {
-              should.exist(newUser);
-              user = newUser;
-              app = {
-                name: 'test-app'
-              };
-              applicationService
-                .insert(app, user.id)
-                .then(function (newApp) {
-                  should.exist(newApp);
-                  app = newApp;
-                  done();
-                });
-            });
+    before(function () {
+      const _user = createRandomUserObject();
+      return db.flushdb()
+        .then(() => userService.insert(_user))
+        .then(function (newUser) {
+          should.exist(newUser);
+          user = newUser;
+          app = {
+            name: 'test-app'
+          };
+          return applicationService.insert(app, user.id);
         })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
+        .then(function (newApp) {
+          should.exist(newApp);
+          app = newApp;
         });
     });
 
-    after(function (done) {
-      config.models.applications.properties = originalAppModelConfig;
-      done();
-    });
-
-    it('should delete app', function (done) {
-      applicationService.remove(app.id)
+    it('should delete app', function () {
+      return applicationService.remove(app.id)
         .then(function (deleted) {
           should.exist(deleted);
           deleted.should.eql(true);
-          done();
-        })
-        .catch(function (err) {
-          should.not.exist(err);
-          done();
         });
     });
 
@@ -543,19 +371,14 @@ describe('Application service tests', function () {
         });
     });
 
-    it('should not delete app with invalid id', function (done) {
-      applicationService.remove('invalid_id')
-        .then(function (deleted) {
-          should.not.exist(deleted);
-          done();
-        })
-        .catch(() => done());
+    it('should not delete app with invalid id', function () {
+      return should(applicationService.remove('invalid_id')).be.rejected();
     });
 
-    it('should delete all apps belonging to a user', function (done) {
+    it('should delete all apps belonging to a user', function () {
       let user1, app1, app2;
 
-      userService
+      return userService
         .insert(createRandomUserObject())
         .then(function (newUser) {
           should.exist(newUser);
@@ -603,15 +426,14 @@ describe('Application service tests', function () {
             .then(function (_app) {
               should.exist(_app);
               _app.should.eql(false);
-              done();
             });
-        }).catch(done);
+        });
     });
 
-    it('should cascade delete app upon deleting user', function (done) {
+    it('should cascade delete app upon deleting user', function () {
       let user1, app1;
 
-      userService
+      return userService
         .insert(createRandomUserObject())
         .then(function (newUser) {
           should.exist(newUser);
@@ -635,18 +457,13 @@ describe('Application service tests', function () {
             });
         })
         .then(function () {
-          applicationService
+          return applicationService
             .get(app1.id)
             .then(function (_app) {
               should.exist(_app);
               _app.should.eql(false);
-              done();
-            })
-            .catch(function (err) {
-              should.not.exist(err);
-              done();
             });
-        }).catch(done);
+        });
     });
   });
 });
@@ -656,6 +473,6 @@ function createRandomUserObject () {
     username: uuid.v4(),
     firstname: uuid.v4(),
     lastname: uuid.v4(),
-    email: uuid.v4()
+    email: `${uuid.v4()}@hello.it`
   };
 }

@@ -32,10 +32,6 @@ describe('eg users update', () => {
     env.resetHijack();
   });
 
-  afterEach(() => {
-    env.resetHijack();
-  });
-
   it('updates a user from prompts by username', done => {
     env.hijack(namespace, generator => {
       let output = null;
@@ -52,8 +48,9 @@ describe('eg users update', () => {
         helpers.mockPrompt(generator, {
           firstname: 'FirstName',
           lastname: 'LastName',
-          email: '_', // can't have empty values,
-          redirectUri: '_' // limitation of yeoman-test.DummyPrompt
+          username: user.username,
+          email: user.email,
+          redirectUri: user.redirectUri
         });
       });
 
@@ -90,8 +87,9 @@ describe('eg users update', () => {
         helpers.mockPrompt(generator, {
           firstname: 'X1',
           lastname: 'L1',
-          email: '_', // can't have empty values,
-          redirectUri: '_' // limitation of yeoman-test.DummyPrompt
+          username: user.username,
+          email: user.email,
+          redirectUri: user.redirectUri
         });
       });
 
