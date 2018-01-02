@@ -291,7 +291,7 @@ describe('eg apps create', () => {
           done(new Error(message));
         };
         generator.log.error = message => {
-          assert.equal(message, 'Failed to insert application: name is required');
+          assert.equal(message, 'The specified user does not exist');
         };
         generator.log.ok = message => {
           done(new Error(message));
