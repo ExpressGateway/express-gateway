@@ -114,7 +114,7 @@ describe('hot-reload', () => {
     });
 
     beforeEach(function (done) {
-      watcher = chokidar.watch(testGatewayConfigPath, { awaitWriteFinish: true });
+      watcher = chokidar.watch(testGatewayConfigPath, { awaitWriteFinish: true, ignoreInitial: true });
       watcher.on('ready', done);
     });
 
