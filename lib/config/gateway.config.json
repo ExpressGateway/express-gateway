@@ -1,0 +1,108 @@
+{
+  "$id": "http://express-gateway.io/models/gateway.config.json",
+  "type": "object",
+  "properties": {
+    "http": {
+      "type": "object",
+      "properties": {
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "https": {
+      "type": "object",
+      "properties": {
+        "port": {
+          "type": "number"
+        },
+        "tls": {
+          "type": "object",
+          "additioanlProperties": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "cert": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "admin": {
+      "type": "object",
+      "properties": {
+        "port": {
+          "type": "number"
+        },
+        "hostname": {
+          "type": "string"
+        }
+      }
+    },
+    "apiEndpoints": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "serviceEndpoints": {
+    "type": "object",
+    "additionalProperties": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "policies": {
+    "type": "array",
+    "items": {
+      "type": "string"
+    }
+  },
+  "pipelines": {
+    "type": "object",
+    "additionalProperties": {
+      "type": "object",
+      "properties": {
+        "apiEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "policies": {
+          "type": "array",
+          "items": {}
+        }
+      }
+    }
+  }
+}

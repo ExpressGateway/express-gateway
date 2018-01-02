@@ -1,0 +1,107 @@
+{
+  "$id": "http://express-gateway.io/models/system.config.json",
+  "type": "object",
+  "properties": {
+    "db": {
+      "type": "object",
+      "properties": {
+        "redis": {
+          "type": "object",
+          "properties": {
+            "emulate": {
+              "type": "boolean",
+              "default": "true"
+            }
+          },
+          "required": [
+            "emulate"
+          ]
+        }
+      },
+      "required": [
+        "redis"
+      ]
+    },
+    "crypto": {
+      "type": "object",
+      "properties": {
+        "cipherKey": {
+          "type": "string",
+          "default": "sensitiveKey"
+        },
+        "algorithm": {
+          "type": "string",
+          "default": "aes256"
+        },
+        "saltRounds": {
+          "type": "number",
+          "default": 10
+        }
+      },
+      "required": [
+        "cipherKey",
+        "algorithm",
+        "saltRounds"
+      ]
+    },
+    "session": {
+      "type": "object"
+    },
+    "accessTokens": {
+      "type": "object",
+      "properties": {
+        "tokenType": {
+          "type": "string",
+          "enum": [
+            "jwt",
+            "opaque"
+          ],
+          "default": "opaque"
+        },
+        "timeToExpiry": {
+          "type": "number",
+          "default": 720000
+        }
+      },
+      "required": [
+        "tokenType",
+        "timeToExpiry"
+      ]
+    },
+    "refreshTokens": {
+      "type": "object",
+      "properties": {
+        "timeToExpiry": {
+          "type": "number",
+          "default": 720000
+        }
+      },
+      "required": [
+        "timeToExpiry"
+      ]
+    },
+    "authorizationCodes": {
+      "type": "object",
+      "properties": {
+        "timeToExpiry": {
+          "type": "number",
+          "default": 300000
+        }
+      },
+      "required": [
+        "timeToExpiry"
+      ]
+    },
+    "plugins": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "db",
+    "crypto",
+    "session",
+    "accessTokens",
+    "refreshTokens",
+    "authorizationCodes"
+  ]
+}
