@@ -58,7 +58,7 @@ describe('Application service tests', function () {
 
     it('should throw when inserting an app with missing properties that are required', function () {
       return should(applicationService.insert({}, user.id))
-        .be.rejectedWith('Failed to insert application: data should have required property \'name\'');
+        .be.rejectedWith('data should have required property \'name\'');
     });
 
     it('should allow inserting multiple applications per user', function () {
