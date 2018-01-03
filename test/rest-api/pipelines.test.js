@@ -21,8 +21,7 @@ describe('REST: pipelines', () => {
   describe('when no pipelines defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: { port: 0 },
-        pipelines: null
+        admin: { port: 0 }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();

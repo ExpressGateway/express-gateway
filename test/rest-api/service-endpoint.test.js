@@ -21,8 +21,7 @@ describe('REST: service endpoints', () => {
   describe('when no service endpoints defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: { port: 0 },
-        serviceEndpoints: null
+        admin: { port: 0 }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
