@@ -101,11 +101,7 @@
             "type": "array",
             "items": {}
           }
-        },
-        "required": [
-          "apiEndpoints",
-          "policies"
-        ]
+        }
       }
     }
   }
