@@ -62,46 +62,50 @@
           }
         }
       }
-    }
-  },
-  "serviceEndpoints": {
-    "type": "object",
-    "additionalProperties": {
+    },
+    "serviceEndpoints": {
       "type": "object",
-      "properties": {
-        "url": {
-          "type": "string"
-        },
-        "urls": {
-          "type": "array",
-          "items": {
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "url": {
             "type": "string"
+          },
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       }
-    }
-  },
-  "policies": {
-    "type": "array",
-    "items": {
-      "type": "string"
-    }
-  },
-  "pipelines": {
-    "type": "object",
-    "additionalProperties": {
+    },
+    "policies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pipelines": {
       "type": "object",
-      "properties": {
-        "apiEndpoints": {
-          "type": "array",
-          "items": {
-            "type": "string"
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "apiEndpoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "policies": {
+            "type": "array",
+            "items": {}
           }
         },
-        "policies": {
-          "type": "array",
-          "items": {}
-        }
+        "required": [
+          "apiEndpoints",
+          "policies"
+        ]
       }
     }
   }
