@@ -88,6 +88,10 @@ workflows:
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
+      - node-9:
+          filters:
+            tags:
+              only: /v\d+(\.\d+){2}/
       - node-8-real-redis:
           filters:
             tags:
