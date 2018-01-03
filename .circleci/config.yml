@@ -100,5 +100,6 @@ workflows:
               ignore: /.*/
           requires:
             - node-8
+            - node-9
             - node-6
             - node-8-real-redis
