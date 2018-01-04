@@ -59,6 +59,10 @@
             "items": {
               "type": "string"
             }
+          },
+          "pathRegex": {
+            "type": "string",
+            "format": "regex"
           }
         }
       }
