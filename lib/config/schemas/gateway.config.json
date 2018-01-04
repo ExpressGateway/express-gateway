@@ -63,6 +63,12 @@
           "pathRegex": {
             "type": "string",
             "format": "regex"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       }
