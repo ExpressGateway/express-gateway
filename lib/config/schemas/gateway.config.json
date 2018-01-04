@@ -69,6 +69,15 @@
             "items": {
               "type": "string"
             }
+          },
+          "methods": {
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "array"
+            }
           }
         }
       }
