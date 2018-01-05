@@ -15,16 +15,6 @@ const { findOpenPortNumbers } = require('../common/server-helper');
 const GATEWAY_STARTUP_WAIT_TIME = 5000;
 const TEST_TIMEOUT = 10000;
 
-/*
-    1) Copy config to a temp directory.
-    2) Execute a child process with `process.env.EG_CONFIG_DIR` set to the temp directory.
-    3) Watch the temp directory config file from the test.
-    4) Do a baseline request to make sure the original gateway config is working.
-    5) Write a new gateway config
-    6) When the test watcher fires, make another HTTP request to confirm the new config is working.
-    7) Clean up the temp directory.
-*/
-
 const baseConfigDirectory = path.join(__dirname, '..', 'fixtures', 'hot-reload');
 
 describe('hot-reload', () => {
@@ -114,7 +104,7 @@ describe('hot-reload', () => {
     });
 
     beforeEach(function (done) {
-      watcher = chokidar.watch(testGatewayConfigPath, { awaitWriteFinish: true });
+      watcher = chokidar.watch(testGatewayConfigPath, { awaitWriteFinish: true, ignoreInitial: true });
       watcher.on('ready', done);
     });
 
@@ -157,7 +147,7 @@ describe('hot-reload', () => {
             });
         });
         // make config invalid
-        fs.writeFileSync(testGatewayConfigPath, yaml.dump('{er:t4'));
+        fs.writeFileSync(testGatewayConfigPath, '{er:t4');
       });
     });
   });

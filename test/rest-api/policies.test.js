@@ -21,12 +21,11 @@ describe('REST: policies', () => {
   describe('when no policies defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: {port: 0},
-        policies: null
+        admin: { port: 0 }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
-      return adminHelper.start({config});
+      return adminHelper.start({ config });
     });
     it('should activate new policy', () => {
       return adminHelper.admin.config.policies
@@ -42,12 +41,12 @@ describe('REST: policies', () => {
   describe('when policies defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: {port: 0},
+        admin: { port: 0 },
         policies: ['example', 'hello']
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
-      return adminHelper.start({config});
+      return adminHelper.start({ config });
     });
     it('should create a new api endpoint', () => {
       return adminHelper.admin.config.policies
