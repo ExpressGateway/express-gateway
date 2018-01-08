@@ -52,13 +52,13 @@ module.exports.up = function () {
                   newModel.required.push(propertyName);
                 }
               });
+            }
 
-              if (modelName === 'users') {
-                newModel.required.push('username');
-                newModel.properties.username = {
-                  type: 'string'
-                };
-              }
+            if (modelName === 'users') {
+              newModel.required.push('username');
+              newModel.properties.username = {
+                type: 'string'
+              };
             }
 
             return { modelName, modelDefinition: newModel };
@@ -69,7 +69,7 @@ module.exports.up = function () {
             )
           )
         )
-    ));
+    ).then(() => Promise.resolve()));
 };
 
 module.exports.down = function (next) {
