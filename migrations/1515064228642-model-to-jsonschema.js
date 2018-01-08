@@ -1,4 +1,5 @@
 require('util.promisify/shim')();
+const log = require('migrate/lib/log');
 const path = require('path');
 const fs = require('fs');
 const util = require('util');
@@ -10,14 +11,18 @@ const access = util.promisify(fs.access);
 module.exports.up = function () {
   let modelPath;
   if (process.env.EG_CONFIG_DIR) {
+    log('modelPath', 'EG_CONFIG_DIR set.');
     modelPath = path.join(process.env.EG_CONFIG_DIR, 'models');
   } else {
+    log('modelPath', 'EG_CONFIG_DIR not set. Guessing the config dir…');
     modelPath = path.join(__dirname, '../../../', 'config/models');
   }
 
+  log('modelPath', `set to: ${modelPath}`);
+
   return access(modelPath)
     .then(() => Promise.all(
-      [copyFile(path.resolve('./lib/config/models/credentials.json'), path.join(modelPath, 'credentials.json'))]
+      [copyFile(path.join(__dirname, '../lib/config/models/credentials.json'), path.join(modelPath, 'credentials.json'))]
         .concat(['users', 'applications']
           .map(model => ({ modelName: model, modelDefinition: require(path.join(modelPath, model)) }))
           .map(({ modelName, modelDefinition }) => {
@@ -45,20 +50,20 @@ module.exports.up = function () {
                 if (propertyValue.isRequired) {
                   newModel.required.push(propertyName);
                 }
-
-                if (modelName === 'users') {
-                  newModel.required.push('username');
-                  newModel.properties.username = {
-                    type: 'string'
-                  };
-                }
               });
+
+              if (modelName === 'users') {
+                newModel.required.push('username');
+                newModel.properties.username = {
+                  type: 'string'
+                };
+              }
             }
 
             return { modelName, modelDefinition: newModel };
           }).map(({ modelName, modelDefinition }) =>
             writeFile(
-              path.join(process.env.EG_CONFIG_DIR, 'models', path.format({ name: modelName, ext: '.json' })),
+              path.join(modelPath, path.format({ name: modelName, ext: '.json' })),
               JSON.stringify(modelDefinition, null, 2)
             )
           )
