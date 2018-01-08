@@ -25,7 +25,7 @@ module.exports.up = function () {
     .then(() => Promise.all(
       [copyFile(path.join(__dirname, '../lib/config/models/credentials.json'), path.join(modelPath, 'credentials.json'))]
         .concat(['users', 'applications']
-          .map(model => ({ modelName: model, modelDefinition: require(path.join(modelPath, model)) }))
+          .map(model => ({ modelName: model, modelDefinition: require(path.join(modelPath, path.format({ name: model, ext: '.js' }))) }))
           .map(({ modelName, modelDefinition }) => {
             const newModel = {
               $id: `http://express-gateway.io/models/${modelName}.json`,
