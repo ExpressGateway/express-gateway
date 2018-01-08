@@ -69,7 +69,10 @@ module.exports.up = function () {
             )
           )
         )
-    ).then(() => Promise.resolve()));
+    ).then(() => {
+      log('Complete', 'You can now remove the old .js files');
+      Promise.resolve();
+    }));
 };
 
 module.exports.down = function (next) {
