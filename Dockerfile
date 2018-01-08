@@ -16,9 +16,4 @@ RUN npm install express-gateway@$VERSION && \
 
 EXPOSE 8080
 
-# HTTPS
-# EXPOSE 8443
-
-# Admin API
-# EXPOSE 9876
 CMD [ "npm", "run", "start" ]
