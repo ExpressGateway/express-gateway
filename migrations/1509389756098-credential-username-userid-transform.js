@@ -1,17 +1,17 @@
-const log = require('migrate/lib/log');
-
-const userService = require('../lib/services/consumers/user.service');
-const credentialService = require('../lib/services/credentials/credential.service');
-const credentialDao = require('../lib/services/credentials/credential.dao');
-
 /*
-  This migration will use the services to deactivate all credentials that are still active and coupled to the username
-  instead of the consumer ID. For each deactived credential, an identical new one will be issued and linked to the user
-  id, making sure the clients will continue to work correctly, as the Admin API's been already modified to change the
-  way it looks up the data.
+This migration will use the services to deactivate all credentials that are still active and coupled to the username
+instead of the consumer ID. For each deactived credential, an identical new one will be issued and linked to the user
+id, making sure the clients will continue to work correctly, as the Admin API's been already modified to change the
+way it looks up the data.
 */
 
 module.exports.up = function () {
+  const log = require('migrate/lib/log');
+
+  const userService = require('../lib/services/consumers/user.service');
+  const credentialService = require('../lib/services/credentials/credential.service');
+  const credentialDao = require('../lib/services/credentials/credential.dao');
+
   return new Promise((resolve, reject) => {
     userService.findAll() // Grab all the users
       .then(({ users }) => {

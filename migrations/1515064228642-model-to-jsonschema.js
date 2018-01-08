@@ -1,14 +1,15 @@
-require('util.promisify/shim')();
-const log = require('migrate/lib/log');
-const path = require('path');
-const fs = require('fs');
-const util = require('util');
-
-const writeFile = util.promisify(fs.writeFile);
-const copyFile = util.promisify(fs.copyFile);
-const access = util.promisify(fs.access);
 
 module.exports.up = function () {
+  require('util.promisify/shim')();
+  const log = require('migrate/lib/log');
+  const path = require('path');
+  const fs = require('fs');
+  const util = require('util');
+
+  const writeFile = util.promisify(fs.writeFile);
+  const copyFile = util.promisify(fs.copyFile);
+  const access = util.promisify(fs.access);
+
   let modelPath;
   if (process.env.EG_CONFIG_DIR) {
     log('modelPath', 'EG_CONFIG_DIR set.');
