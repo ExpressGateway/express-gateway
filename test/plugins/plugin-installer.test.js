@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
-const assert = require('chai').assert;
+const should = require('should');
 const cpr = require('cpr');
 const rimraf = require('rimraf');
 const tmp = require('tmp');
@@ -64,8 +64,8 @@ describe('PluginInstaller#runNPMInstallation', () => {
       env: Object.assign({}, process.env)
     })
       .then(({ packageName, pluginManifest }) => {
-        assert.equal(packageName, PACKAGE_NAME);
-        assert(pluginManifest);
+        should(packageName).be.eql(PACKAGE_NAME);
+        should(pluginManifest).ok();
       });
   });
 
@@ -91,13 +91,13 @@ describe('PluginInstaller#runNPMInstallation', () => {
       const comparison =
         Object.assign({ package: PACKAGE_NAME }, pluginOptions);
 
-      assert.deepEqual(systemConfig.plugins.test, comparison);
+      should(systemConfig.plugins.test).be.deepEqual(comparison);
 
       const gatewayConfigData = fs.readFileSync(config.gatewayConfigPath);
       const gatewayConfig = yaml.load(gatewayConfigData.toString());
 
-      assert(gatewayConfig.policies.indexOf('policy1') > -1);
-      assert(gatewayConfig.policies.indexOf('policy2') > -1);
+      should(gatewayConfig.policies.indexOf('policy1')).be.greaterThan(-1);
+      should(gatewayConfig.policies.indexOf('policy2')).be.greaterThan(-1);
     });
   });
 });

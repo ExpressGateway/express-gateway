@@ -74,10 +74,6 @@
     "express-rate-limit": "^2.11.0",
     "express-session": "^1.15.6",
     "find-up": "2.1.0",
-<<<<<<< HEAD
-=======
-    "glob": "7.1.2",
->>>>>>> remove has-flag
     "http-proxy": "1.16.2",
     "ioredis": "^3.2.2",
     "ioredis-mock": "^3.6.1",

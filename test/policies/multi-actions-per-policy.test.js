@@ -1,5 +1,5 @@
 const serverHelper = require('../common/server-helper');
-const assert = require('chai').assert;
+const should = require('should');
 const config = require('../../lib/config');
 const request = require('supertest');
 const port1 = 5998;
@@ -67,7 +67,7 @@ describe('multi step policy ', () => {
         if (error) {
           done(error);
         }
-        assert.ok(res.text.indexOf(port1) >= 0);
+        should(res.text.indexOf(port1)).be.greaterThanOrEqual(0);
         done();
       });
   });
@@ -80,7 +80,7 @@ describe('multi step policy ', () => {
         if (err) {
           done(err);
         }
-        assert.ok(res.text.indexOf(port2) >= 0);
+        should(res.text.indexOf(port2)).be.greaterThanOrEqual(0);
         done();
       });
   });

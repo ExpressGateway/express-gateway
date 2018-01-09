@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
-const assert = require('chai').assert;
+const should = require('should');
 const cpr = require('cpr');
 const rimraf = require('rimraf');
 const tmp = require('tmp');
@@ -82,7 +82,7 @@ describe('E2E: eg plugins install', () => {
       }
     };
 
-    assert.deepEqual(systemConfig.plugins, expected);
+    should(systemConfig.plugins).be.deepEqual(expected);
     done();
   });
 });
