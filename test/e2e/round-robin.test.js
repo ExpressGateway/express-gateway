@@ -117,21 +117,21 @@ describe('round-robin load @balancing @proxy', () => {
     request
       .get(`http://localhost:${gatewayPort}/round-robin`)
       .end((err, res) => {
-        should(err).be.undefined();
+        if (err) return done(err);
         should(res.statusCode).be.eql(200);
         should(res.text).be.eql(`Hello from port ${port1}`);
 
         request
           .get(`http://localhost:${gatewayPort}/round-robin`)
           .end((err, res) => {
-            should(err).be.undefined();
+            if (err) return done(err);
             should(res.statusCode).be.eql(200);
             should(res.text).be.eql(`Hello from port ${port2}`);
 
             request
               .get(`http://localhost:${gatewayPort}/round-robin`)
               .end((err, res) => {
-                should(err).be.undefined();
+                if (err) return done(err);
                 should(res.statusCode).be.eql(200);
                 should(res.text).be.eql(`Hello from port ${port1}`);
                 done();
