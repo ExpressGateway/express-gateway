@@ -91,6 +91,7 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - node-8
             - node-6
+            - node-8
             - node-8-real-redis
+            - node-9
