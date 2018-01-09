@@ -1,50 +1,27 @@
+require('util.promisify/shim')();
 const { exec } = require('child_process');
 const path = require('path');
 const util = require('util');
-const tmp = require('tmp');
-
-require('util.promisify/shim')();
+const dir = util.promisify(require('tmp').dir);
+const _cpr = util.promisify(require('cpr'));
 
 const modulePath = path.resolve(__dirname, '..', '..', 'bin', 'index.js');
 
 module.exports.bootstrapFolder = function (options) {
-  return util.promisify(tmp.dir)()
-    .then(tempDir => {
-      const execOptions = {
-        env: Object.assign({}, process.env)
-      };
-
-      delete execOptions.env.EG_CONFIG_DIR;
-
-      const cmd = `node ${modulePath} gateway create ` +
-        `-t getting-started -n test -d ${tempDir}`;
-
-      return new Promise((resolve, reject) => {
-        const child = exec(cmd, execOptions, function (error, stdout, stderr) {
-          if (error !== null) {
-            reject(error);
-          }
-        });
-
-        child.on('error', err => {
-          reject(err);
-        });
-
-        child.on('exit', code => {
-          if (code === 0) {
-            resolve({
-              basePath: tempDir,
-              configDirectoryPath: path.join(tempDir, 'config'),
-              gatewayConfigPath: path.join(tempDir, 'config', 'gateway.config.yml'),
-              systemConfigPath: path.join(tempDir, 'config', 'system.config.yml')
-            });
-          }
-        });
-      });
-    });
+  return dir()
+    .then(tempDir => Promise.all([
+      tempDir,
+      _cpr(path.join(__dirname, '../../bin/generators/gateway/templates/getting-started/'), tempDir),
+      _cpr(path.join(__dirname, '../../lib/config/models'), path.join(tempDir, 'config', 'models'))
+    ])).then(([tempDir]) => ({
+      basePath: tempDir,
+      configDirectoryPath: path.join(tempDir, 'config'),
+      gatewayConfigPath: path.join(tempDir, 'config', 'gateway.config.yml'),
+      systemConfigPath: path.join(tempDir, 'config', 'system.config.yml')
+    }));
 };
 
-module.exports.runCLICommand = function ({adminPort, adminUrl, configDirectoryPath, cliArgs, cliExecOptions}) {
+module.exports.runCLICommand = function ({ adminPort, adminUrl, configDirectoryPath, cliArgs, cliExecOptions }) {
   // TODO: it should not depend on configFolder, API only, now the last dependency is models
   cliExecOptions = Object.assign({
     env: process.env
