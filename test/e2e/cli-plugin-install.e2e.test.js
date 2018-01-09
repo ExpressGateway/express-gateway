@@ -44,7 +44,7 @@ describe('E2E: eg plugins install', () => {
         const _cpr = util.promisify(cpr);
         return Promise.all([
           _cpr(gatewayDirectory, tempPath),
-          _cpr(path.join(__dirname, '../../lib/config/models'), path.join(tempPath, 'models'))
+          _cpr(path.join(__dirname, '../../lib/config/models'), path.join(tempPath, 'config', 'models'))
         ]);
       })
       .then(([files]) => {

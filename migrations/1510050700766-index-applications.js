@@ -1,14 +1,14 @@
-const log = require('migrate/lib/log');
-const db = require('../lib/db');
-const config = require('../lib/config');
-const userService = require('../lib/services/consumers/user.service');
-const applicationDao = require('../lib/services/consumers/application.dao');
-
 /*
-  This migration index all the applications by adding the relative key in the current Redis instance.
+This migration index all the applications by adding the relative key in the current Redis instance.
 */
 
 module.exports.up = function () {
+  const log = require('migrate/lib/log');
+  const db = require('../lib/db');
+  const config = require('../lib/config');
+  const userService = require('../lib/services/consumers/user.service');
+  const applicationDao = require('../lib/services/consumers/application.dao');
+
   return new Promise((resolve, reject) => {
     userService.findAll() // Grab all the users
       .then(({ users }) => {

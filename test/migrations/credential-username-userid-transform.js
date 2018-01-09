@@ -2,6 +2,7 @@ const migrate = require('migrate');
 const tmp = require('tmp');
 const idGen = require('uuid62');
 const db = require('../../lib/db');
+const fs = require('fs');
 const { assert } = require('chai');
 const userService = require('../../lib/services/consumers/user.service');
 const credentialService = require('../../lib/services/credentials/credential.service');
@@ -28,6 +29,15 @@ describe('Migrations', () => {
 
     before('I then run the migration script', (done) => {
       tmpFile = tmp.fileSync();
+      fs.writeFileSync(tmpFile.name, JSON.stringify({
+        lastRun: '1509389756097-model-to-jsonschema.js',
+        migrations: [
+          {
+            title: '1509389756097-model-to-jsonschema.js',
+            timestamp: 1515423465439
+          }
+        ]
+      }, null, 2));
       migrate.load({ stateStore: tmpFile.name }, (err, set) => {
         if (err) {
           return done(err);
