@@ -120,7 +120,7 @@ describe('oauth2 authorization code grant type', () => {
         .get(`http://localhost:${gatewayPort}`)
         .end((err, res) => {
           // Verify Unauthorized when calling without access token.
-          should(!!err).be.undefined();
+          should(err).not.be.undefined();
           should(res.unauthorized).not.be.undefined();
           should(res.statusCode).be.eql(401);
           resolve();
@@ -236,7 +236,7 @@ describe('oauth2 authorization code grant type', () => {
               .end((err, res) => {
                 should(err).not.be.undefined();
                 should(res.clientError).not.be.undefined();
-                should(res.statusCode).be.eql(404);
+                should(res.statusCode).be.eql(401);
                 resolve();
               });
           }, 4000);
