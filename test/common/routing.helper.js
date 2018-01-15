@@ -50,8 +50,20 @@ module.exports = function () {
 
       config.unwatch();
 
-      app && app.close();
-      httpsApp && httpsApp.close();
+      return Promise.all([app, httpsApp].map((app) => {
+        if (!app) {
+          return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+          app.close((err) => {
+            if (err) {
+              return reject(err);
+            }
+            return resolve();
+          });
+        });
+      }));
     },
     validate404: function (testCase) {
       testCase.test = testCase.test || {};
