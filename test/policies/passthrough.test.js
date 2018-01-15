@@ -102,7 +102,6 @@ describe('Functional Tests @auth Policies @passthrough', () => {
   });
 
   after('cleanup', () => {
-    app.close();
     config.gatewayConfig = originalGatewayConfig;
     return helper.cleanup();
   });

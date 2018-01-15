@@ -126,7 +126,6 @@ describe('Functional Tests keyAuth Policy', () => {
   });
 
   after('cleanup', () => {
-    app.close();
     config.gatewayConfig = originalGatewayConfig;
     return helper.cleanup();
   });

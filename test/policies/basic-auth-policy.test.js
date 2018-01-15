@@ -96,7 +96,6 @@ describe('Functional Tests basic auth Policy', () => {
   });
 
   after('cleanup', () => {
-    app.close();
     config.gatewayConfig = originalGatewayConfig;
     return helper.cleanup();
   });
