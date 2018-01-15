@@ -30,7 +30,7 @@ describe('When scopes defined for apiEndpoint', () => {
         policy: () => (req, res) => res.json({ url: req.url, scopes, apiEndpoint: req.egContext.apiEndpoint })
       }]
     };
-    helper.setup({ config, plugins });
+    return helper.setup({ config, plugins });
   });
 
   after('cleanup', helper.cleanup);

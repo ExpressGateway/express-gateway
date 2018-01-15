@@ -35,7 +35,7 @@ describe('rate-limit by host', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
   after('cleanup', () => {

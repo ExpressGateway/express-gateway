@@ -30,7 +30,7 @@ describe('path resolution for specific and general domains', () => {
         };
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin';
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
       after('cleanup', helper.cleanup);
@@ -73,7 +73,7 @@ describe('path resolution for specific and general domains', () => {
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/*';
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
       after('cleanup', helper.cleanup);
@@ -116,7 +116,7 @@ describe('path resolution for specific and general domains', () => {
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/:id';
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
       after('cleanup', helper.cleanup);
@@ -159,7 +159,7 @@ describe('path resolution for specific and general domains', () => {
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/:group/:id';
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
       after('cleanup', helper.cleanup);
@@ -215,7 +215,7 @@ describe('path resolution for specific and general domains', () => {
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = ['/admin', '/admin/*'];
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
       after('cleanup', helper.cleanup);

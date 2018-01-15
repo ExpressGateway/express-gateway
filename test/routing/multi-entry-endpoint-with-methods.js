@@ -29,7 +29,7 @@ describe('Multi entry api endpoint with methods', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
   after('cleanup', () => {

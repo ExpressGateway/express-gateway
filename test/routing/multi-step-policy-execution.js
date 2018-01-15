@@ -51,7 +51,7 @@ describe('default config with multi step (multi action) policy', () => {
         }
       }
     };
-    helper.setup({ config, plugins });
+    return helper.setup({ config, plugins });
   });
 
   after('cleanup', helper.cleanup);

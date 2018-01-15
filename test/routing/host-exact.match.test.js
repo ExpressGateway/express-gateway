@@ -25,7 +25,7 @@ describe('exact host name configuration host:acme.com paths:default(*)', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
   after('cleanup', () => {

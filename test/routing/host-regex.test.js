@@ -25,7 +25,7 @@ describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
   after('cleanup', () => {

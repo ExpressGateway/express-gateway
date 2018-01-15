@@ -25,7 +25,7 @@ describe('@terminate', () => {
       }
     };
     config.gatewayConfig = configTemplate;
-    helper.setup({ config });
+    return helper.setup({ config });
   });
 
   after('cleanup', helper.cleanup);

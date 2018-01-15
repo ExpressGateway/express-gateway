@@ -34,7 +34,7 @@ describe('rate-limit policy only for example.com host', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
   after('cleanup', () => {

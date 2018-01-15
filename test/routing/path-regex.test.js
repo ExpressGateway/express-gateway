@@ -5,11 +5,13 @@ const Config = require('../../lib/config/config');
   describe('pathRegex resolution for host:' + host, () => {
     const helper = testHelper();
     const config = new Config();
-    const plugins = { policies: [ {
-      name: 'testRegex',
-      policy: () => (req, res) => {
-        res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
-      }}]
+    const plugins = {
+      policies: [{
+        name: 'testRegex',
+        policy: () => (req, res) => {
+          res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
+        }
+      }]
     };
 
     before('setup', () => {
@@ -27,13 +29,10 @@ const Config = require('../../lib/config/config');
         }
       };
 
-      helper.setup({config, plugins});
+      return helper.setup({ config, plugins });
     });
 
-    after('cleanup', (done) => {
-      helper.cleanup();
-      done();
-    });
+    after('cleanup', helper.cleanup);
 
     it('mathing regex animals.com/id-123', helper.validateSuccess({
       setup: {

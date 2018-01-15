@@ -72,7 +72,7 @@ let serverError;
 
 describe('sni', () => {
   let servers, helper, originalGatewayConfig;
-  before('setup', (done) => {
+  before('setup', () => {
     originalGatewayConfig = config.gatewayConfig;
 
     helper = testHelper();
@@ -109,7 +109,7 @@ describe('sni', () => {
       }
     };
 
-    helper.setup()
+    return helper.setup()
       .then(_servers => {
         servers = _servers;
 
@@ -120,8 +120,6 @@ describe('sni', () => {
         servers.httpsApp.on('secureConnection', (tlsSocket) => {
           serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized };
         });
-
-        done();
       });
   });
 

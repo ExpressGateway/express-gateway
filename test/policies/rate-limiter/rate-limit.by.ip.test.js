@@ -26,7 +26,7 @@ describe('rate-limit policy', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
   after('cleanup', () => {

@@ -27,7 +27,7 @@ describe('Multi entry api endpoint with default host', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
   after('cleanup', () => {

@@ -26,7 +26,7 @@ describe('When uses defaults (capture all hosts and paths)', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
   after('cleanup', () => {

@@ -30,7 +30,7 @@ const config = require('../../lib/config');
       config.gatewayConfig.apiEndpoints.test_regex.host = hostBind;
       config.gatewayConfig.apiEndpoints.test_path.host = hostBind;
 
-      helper.setup();
+      return helper.setup();
     });
 
     after('cleanup', () => {
