@@ -46,13 +46,15 @@ describe('Functional Tests @auth Policies @passthrough', () => {
               action: {
                 passThrough: true
               }
-            }]},
+            }]
+          },
           {
             'basic-auth': [{
               action: {
                 passThrough: true
               }
-            }]},
+            }]
+          },
           {
             'oauth2': [{
               action: {
@@ -90,7 +92,7 @@ describe('Functional Tests @auth Policies @passthrough', () => {
         user = userRes;
         return serverHelper.generateBackendServer();
       })
-      .then(({port}) => {
+      .then(({ port }) => {
         config.gatewayConfig.serviceEndpoints.backend.url += port;
         return helper.setup();
       })
@@ -99,11 +101,10 @@ describe('Functional Tests @auth Policies @passthrough', () => {
       });
   });
 
-  after('cleanup', (done) => {
+  after('cleanup', () => {
     app.close();
     config.gatewayConfig = originalGatewayConfig;
-    helper.cleanup();
-    done();
+    return helper.cleanup();
   });
 
   it('should authenticate with no headers', function (done) {

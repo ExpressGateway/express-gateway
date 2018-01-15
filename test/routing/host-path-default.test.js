@@ -29,10 +29,9 @@ describe('When uses defaults (capture all hosts and paths)', () => {
     helper.setup();
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    done();
+    return helper.cleanup();
   });
 
   ['/random/17/3', '/', '/admin'].forEach(url => {

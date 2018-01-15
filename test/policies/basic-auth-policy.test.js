@@ -95,11 +95,10 @@ describe('Functional Tests basic auth Policy', () => {
       });
   });
 
-  after('cleanup', (done) => {
+  after('cleanup', () => {
     app.close();
     config.gatewayConfig = originalGatewayConfig;
-    helper.cleanup();
-    done();
+    return helper.cleanup();
   });
 
   it('should not authenticate token for requests without token header', function () {

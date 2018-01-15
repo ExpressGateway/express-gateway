@@ -125,11 +125,10 @@ describe('Functional Tests keyAuth Policy', () => {
       });
   });
 
-  after('cleanup', (done) => {
+  after('cleanup', () => {
     app.close();
     config.gatewayConfig = originalGatewayConfig;
-    helper.cleanup();
-    done();
+    return helper.cleanup();
   });
 
   it('should not authenticate key for requests without authorization header', function (done) {

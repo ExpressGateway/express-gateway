@@ -32,10 +32,9 @@ describe('Multi entry api endpoint with methods', () => {
     helper.setup();
   });
 
-  after('cleanup', (done) => {
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    helper.cleanup();
-    done();
+    return helper.cleanup();
   });
 
   it('should serve POST when pathRegex matched', helper.validateSuccess({

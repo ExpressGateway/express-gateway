@@ -120,10 +120,9 @@ describe('Functional Tests oAuth2.0 Policy', () => {
       });
   });
 
-  after('cleanup', (done) => {
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    helper.cleanup();
-    done();
+    return helper.cleanup();
   });
 
   it('should not authenticate token for requests without token header', function (done) {

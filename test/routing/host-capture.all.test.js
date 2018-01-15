@@ -33,10 +33,9 @@ const config = require('../../lib/config');
       helper.setup();
     });
 
-    after('cleanup', (done) => {
-      helper.cleanup();
+    after('cleanup', () => {
       config.gatewayConfig = originalGatewayConfig;
-      done();
+      return helper.cleanup();
     });
 
     it('should serve for random host and pathRegex matched', helper.validateSuccess({

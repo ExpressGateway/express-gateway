@@ -30,10 +30,9 @@ describe('Multi entry api endpoint with default host', () => {
     helper.setup();
   });
 
-  after('cleanup', (done) => {
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    helper.cleanup();
-    done();
+    return helper.cleanup();
   });
 
   it('should serve for random host and pathRegex matched', helper.validateSuccess({

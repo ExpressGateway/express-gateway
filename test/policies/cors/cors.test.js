@@ -36,12 +36,12 @@ describe('cors', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
   after('cleanup', () => {
-    helper.cleanup();
     config.gatewayConfig = originalGatewayConfig;
+    return helper.cleanup();
   });
 
   it('should allow first request for host', helper.validateOptions({

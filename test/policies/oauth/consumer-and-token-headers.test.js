@@ -150,10 +150,9 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
   });
 
   after('cleanup', (done) => {
-    helper.cleanup();
     config.gatewayConfig = originalGatewayConfig;
     backendServer.close();
-    done();
+    return helper.cleanup();
   });
 
   it('should authenticate token for requests with scopes if requester is authorized', function () {

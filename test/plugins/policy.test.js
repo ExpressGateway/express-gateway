@@ -58,9 +58,7 @@ describe('gateway policy with plugins', () => {
     });
   });
 
-  after('cleanup', () => {
-    helper.cleanup();
-  });
+  after('cleanup', helper.cleanup);
 
   it('should allow first request for host', helper.validateSuccess({
     setup: {
@@ -83,7 +81,7 @@ describe('gateway policy schema with plugins', () => {
 
   afterEach('cleanup', () => {
     gatewaySrv.close();
-    helper.cleanup();
+    return helper.cleanup();
   });
 
   it('should setup policy with valid schema', function () {
