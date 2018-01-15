@@ -1,4 +1,3 @@
-
 module.exports.up = function () {
   require('util.promisify/shim')();
   const log = require('migrate/lib/log');
@@ -7,8 +6,22 @@ module.exports.up = function () {
   const util = require('util');
 
   const writeFile = util.promisify(fs.writeFile);
-  const copyFile = util.promisify(fs.copyFile);
   const access = util.promisify(fs.access);
+
+  function copyFile (source, target) {
+    const rd = fs.createReadStream(source);
+    const wr = fs.createWriteStream(target);
+    return new Promise(function (resolve, reject) {
+      rd.on('error', reject);
+      wr.on('error', reject);
+      wr.on('finish', resolve);
+      rd.pipe(wr);
+    }).catch(function (error) {
+      rd.destroy();
+      wr.end();
+      throw error;
+    });
+  }
 
   let modelPath;
   if (process.env.EG_CONFIG_DIR) {
@@ -23,10 +36,18 @@ module.exports.up = function () {
 
   return access(modelPath)
     .then(() => Promise.all(
-      [copyFile(path.join(__dirname, '../lib/config/models/credentials.json'), path.join(modelPath, 'credentials.json'))]
+      [copyFile(path.join(__dirname, '../lib/config/models/credentials.json'), path.join(modelPath, 'credentials.json')).catch(() => { })]
         .concat(['users', 'applications']
-          .map(model => ({ modelName: model, modelDefinition: require(path.join(modelPath, path.format({ name: model, ext: '.js' }))) }))
-          .map(({ modelName, modelDefinition }) => {
+          .reduce((acc, model) => {
+            try {
+              acc.push({ modelName: model, modelDefinition: require(path.join(modelPath, path.format({ name: model, ext: '.js' }))) });
+              return acc;
+            } catch (e) {
+              log('Model search', `Error while loading ${model} — ${e}`);
+              return acc;
+            }
+          }, []
+          ).map(({ modelName, modelDefinition }) => {
             const newModel = {
               $id: `http://express-gateway.io/models/${modelName}.json`,
               type: 'object',
@@ -71,8 +92,10 @@ module.exports.up = function () {
         )
     ).then(() => {
       log('Complete', 'You can now remove the old .js files');
-      Promise.resolve();
-    }));
+      return Promise.resolve();
+    })).catch((e) => {
+      log.error(`An error occurred: ${e}`);
+    });
 };
 
 module.exports.down = function (next) {
