@@ -27,12 +27,12 @@ module.exports = function () {
   }
   return {
     addPolicy: (name, handler) => { // TODO: make it plugin
-      policies.register({policy: handler, name});
+      policies.register({ policy: handler, name });
     },
-    setup: ({config, plugins} = {}) => {
+    setup: ({ config, plugins } = {}) => {
       originalPolicies = policies;
 
-      return gateway({config, plugins})
+      return gateway({ config, plugins })
         .then(apps => {
           app = apps.app;
           httpsApp = apps.httpsApp;
@@ -47,6 +47,9 @@ module.exports = function () {
         config.gatewayConfig = originalGatewayConfig;
       }
       policies = originalPolicies;
+
+      config.unwatch();
+
       app && app.close();
       httpsApp && httpsApp.close();
     },
