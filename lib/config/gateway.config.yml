@@ -14,13 +14,29 @@ serviceEndpoints:
     url: 'http://localhost:9876' # btw this is EG admin API
 policies:
   - proxy
-  - key-auth
+  - log
+  - run-pipeline
 pipelines:
+  log1:
+    policies:
+      - log:
+        - action:
+               message: '${req.url} ${egContext.req.method} 11111'
+  log2:
+    policies:
+      - log:
+        - action:
+               message: '${req.url} ${egContext.req.method} 2222'
   adminAPI:
     apiEndpoints:
       - api
     policies:
       # - key-auth: # uncomment to enable key-auth 
+      - run-pipeline:
+        - action:
+            name: log1
+        - action:
+            name: log2
       - proxy:
           - action:
               serviceEndpoint: backend
