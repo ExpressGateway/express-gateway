@@ -5,7 +5,7 @@ http:
 #   tls: {}
 admin: # remove this section to disable admin API
   port: 9876
-  hostname: localhost # use 0.0.0.0 to listen on all IPv4 interfaces 
+  hostname: localhost # use 0.0.0.0 to listen on all IPv4 interfaces
 apiEndpoints:
   api:
     host: '*'
@@ -20,7 +20,7 @@ pipelines:
     apiEndpoints:
       - api
     policies:
-      # - key-auth: # uncomment to enable key-auth 
+      # - key-auth: # uncomment to enable key-auth
       - proxy:
           - action:
               serviceEndpoint: backend
