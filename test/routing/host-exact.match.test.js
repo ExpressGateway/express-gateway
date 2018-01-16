@@ -25,13 +25,12 @@ describe('exact host name configuration host:acme.com paths:default(*)', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    done();
+    return helper.cleanup();
   });
 
   it('should serve acme.com/', helper.validateSuccess({

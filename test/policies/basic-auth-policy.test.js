@@ -15,7 +15,7 @@ describe('Functional Tests basic auth Policy', () => {
   const helper = testHelper();
   let user, app;
 
-  before('setup', (done) => {
+  before('setup', () => {
     config.gatewayConfig = {
       http: { port: 0 },
       serviceEndpoints: {
@@ -58,8 +58,8 @@ describe('Functional Tests basic auth Policy', () => {
       }
     };
 
-    db.flushdb()
-      .then(function () {
+    return db.flushdb()
+      .then(() => {
         const user1 = {
           username: 'irfanbaqui',
           firstname: 'irfan',
@@ -72,34 +72,20 @@ describe('Functional Tests basic auth Policy', () => {
             should.exist(_fromDbUser1);
             user = _fromDbUser1;
 
-            credentialService.insertScopes('authorizedScope', 'unauthorizedScope')
-              .then(() => {
-                return credentialService.insertCredential(user.id, 'basic-auth', { password: 'user-secret', scopes: ['authorizedScope'] })
-                  .then((userRes) => {
-                    should.exist(userRes);
-                    return serverHelper.generateBackendServer(6067)
-                      .then(() => {
-                        helper.setup()
-                          .then(apps => {
-                            app = apps.app;
-                            done();
-                          });
-                      });
-                  });
-              });
-          });
-      })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
+            return credentialService.insertScopes('authorizedScope', 'unauthorizedScope');
+          })
+          .then(() => credentialService.insertCredential(user.id, 'basic-auth', { password: 'user-secret', scopes: ['authorizedScope'] }))
+          .then((userRes) => {
+            should.exist(userRes);
+            return serverHelper.generateBackendServer(6067);
+          })
+          .then(helper.setup).then(apps => { app = apps.app; });
       });
   });
 
-  after('cleanup', (done) => {
-    app.close();
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    helper.cleanup();
-    done();
+    return helper.cleanup();
   });
 
   it('should not authenticate token for requests without token header', function () {

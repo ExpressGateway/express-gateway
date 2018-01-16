@@ -10,10 +10,11 @@ describe('Functional Tests oAuth2.0 Policy', () => {
   before('setup', () => {
     config.systemConfig = {
       db: {
-        redis: { emulate: true }},
+        redis: { emulate: true }
+      },
       session: {
         storeProvider: '../../../test/common/session-provider',
-        storeOptions: {test: 45},
+        storeOptions: { test: 45 },
         saveUninitialized: true,
         resave: true,
         secret: 'secret'
@@ -42,13 +43,12 @@ describe('Functional Tests oAuth2.0 Policy', () => {
         }
       }
     };
-    return helper.setup({config});
+    return helper.setup({ config });
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
+  after('cleanup', () => {
     fakeSessionProvider.reset();
-    done();
+    return helper.cleanup();
   });
 
   it('should init session provider', function () {

@@ -25,13 +25,12 @@ describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    done();
+    return helper.cleanup();
   });
 
   describe('regex host name configuration /[a-z]{3}.parrots.com/', () => {

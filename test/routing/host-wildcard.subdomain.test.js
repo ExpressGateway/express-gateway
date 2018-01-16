@@ -27,10 +27,9 @@ describe('exact host name configuration', () => {
     helper.setup();
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    done();
+    return helper.cleanup();
   });
 
   it('abc.acme.com/', helper.validateSuccess({

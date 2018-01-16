@@ -35,13 +35,12 @@ describe('rate-limit by host', () => {
       }
     };
 
-    helper.setup();
+    return helper.setup();
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    done();
+    return helper.cleanup();
   });
 
   hosts.forEach(host => {

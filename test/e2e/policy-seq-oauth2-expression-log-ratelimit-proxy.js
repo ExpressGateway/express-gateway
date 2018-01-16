@@ -184,12 +184,11 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
       });
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
     logger.info.restore();
     backendServer.close();
-    done();
+    return helper.cleanup();
   });
 
   it('should execute oauth2, proxy, log, expression, rate-limit policies and return 200', function (done) {

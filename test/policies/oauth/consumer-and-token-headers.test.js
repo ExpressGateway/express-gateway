@@ -97,9 +97,7 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
           credentialService.insertCredential(user.id, 'basic-auth', { password: 'password', scopes: ['authorizedScope'] })
         ]);
       })
-      .then(res => {
-        return helper.setup();
-      })
+      .then(res => helper.setup())
       .then(apps => {
         app = apps.app;
         request = session(app);
@@ -149,11 +147,10 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
       });
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
+  after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
     backendServer.close();
-    done();
+    return helper.cleanup();
   });
 
   it('should authenticate token for requests with scopes if requester is authorized', function () {

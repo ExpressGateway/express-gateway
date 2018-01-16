@@ -72,7 +72,7 @@ let serverError;
 
 describe('sni', () => {
   let servers, helper, originalGatewayConfig;
-  before('setup', (done) => {
+  before('setup', () => {
     originalGatewayConfig = config.gatewayConfig;
 
     helper = testHelper();
@@ -109,7 +109,7 @@ describe('sni', () => {
       }
     };
 
-    helper.setup()
+    return helper.setup()
       .then(_servers => {
         servers = _servers;
 
@@ -120,8 +120,6 @@ describe('sni', () => {
         servers.httpsApp.on('secureConnection', (tlsSocket) => {
           serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized };
         });
-
-        done();
       });
   });
 
@@ -151,16 +149,15 @@ describe('sni', () => {
       });
     });
   });
-  after('check', (done) => {
+  after('check', () => {
     testCases.forEach((tc) => {
       assert.deepStrictEqual(tc.actual.serverResult, tc.expected.serverResult);
       assert.equal(tc.actual.clientResult, tc.expected.clientResult);
       assert.equal(tc.actual.clientError, tc.expected.clientError);
       assert.equal(tc.actual.serverError, tc.expected.serverError);
     });
-    helper.cleanup();
     config.gatewayConfig = originalGatewayConfig;
-    done();
+    return helper.cleanup();
   });
 });
 

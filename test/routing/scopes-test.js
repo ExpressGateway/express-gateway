@@ -27,16 +27,13 @@ describe('When scopes defined for apiEndpoint', () => {
     const plugins = {
       policies: [{
         name: 'scopeTest',
-        policy: () => (req, res) => res.json({url: req.url, scopes, apiEndpoint: req.egContext.apiEndpoint})
-      } ]
+        policy: () => (req, res) => res.json({ url: req.url, scopes, apiEndpoint: req.egContext.apiEndpoint })
+      }]
     };
-    helper.setup({config, plugins});
+    return helper.setup({ config, plugins });
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
-    done();
-  });
+  after('cleanup', helper.cleanup);
 
   it('should set scopes to egContext', helper.validateSuccess({
     setup: {

@@ -34,7 +34,6 @@ config.gatewayConfig = {
 };
 
 describe('gateway policy with plugins', () => {
-  let gatewaySrv;
   const helper = testHelper();
 
   before('fires up a new gateway instance', function () {
@@ -53,14 +52,11 @@ describe('gateway policy with plugins', () => {
       config
     }).then(srv => {
       helper.setupApp(srv.app);
-      gatewaySrv = srv.app;
       return srv;
     });
   });
 
-  after('cleanup', () => {
-    helper.cleanup();
-  });
+  after('cleanup', helper.cleanup);
 
   it('should allow first request for host', helper.validateSuccess({
     setup: {
@@ -71,20 +67,12 @@ describe('gateway policy with plugins', () => {
       url: '/'
     }
   }));
-
-  after('close gateway srv', () => {
-    gatewaySrv.close();
-  });
 });
 
 describe('gateway policy schema with plugins', () => {
-  let gatewaySrv;
   const helper = testHelper();
 
-  afterEach('cleanup', () => {
-    gatewaySrv.close();
-    helper.cleanup();
-  });
+  after('cleanup', helper.cleanup);
 
   it('should setup policy with valid schema', function () {
     return gateway({
@@ -110,8 +98,6 @@ describe('gateway policy schema with plugins', () => {
       config
     }).then(srv => {
       helper.setupApp(srv.app);
-      gatewaySrv = srv.app;
-      return srv;
     });
   });
 

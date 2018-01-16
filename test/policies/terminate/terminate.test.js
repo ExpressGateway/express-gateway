@@ -25,13 +25,10 @@ describe('@terminate', () => {
       }
     };
     config.gatewayConfig = configTemplate;
-    helper.setup({ config });
+    return helper.setup({ config });
   });
 
-  after('cleanup', (done) => {
-    helper.cleanup();
-    done();
-  });
+  after('cleanup', helper.cleanup);
 
   it('should terminate: ', helper.validateError({
     setup: {

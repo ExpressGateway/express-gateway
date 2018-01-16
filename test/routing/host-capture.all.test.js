@@ -30,13 +30,12 @@ const config = require('../../lib/config');
       config.gatewayConfig.apiEndpoints.test_regex.host = hostBind;
       config.gatewayConfig.apiEndpoints.test_path.host = hostBind;
 
-      helper.setup();
+      return helper.setup();
     });
 
-    after('cleanup', (done) => {
-      helper.cleanup();
+    after('cleanup', () => {
       config.gatewayConfig = originalGatewayConfig;
-      done();
+      return helper.cleanup();
     });
 
     it('should serve for random host and pathRegex matched', helper.validateSuccess({

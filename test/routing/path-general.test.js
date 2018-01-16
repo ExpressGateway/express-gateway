@@ -30,13 +30,10 @@ describe('path resolution for specific and general domains', () => {
         };
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin';
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
-      after('cleanup', (done) => {
-        helper.cleanup();
-        done();
-      });
+      after('cleanup', helper.cleanup);
 
       ['/admin/', '/admin'].forEach(function (url) {
         it('should serve exact matched url', helper.validateSuccess({
@@ -76,13 +73,10 @@ describe('path resolution for specific and general domains', () => {
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/*';
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
-      after('cleanup', (done) => {
-        helper.cleanup();
-        done();
-      });
+      after('cleanup', helper.cleanup);
 
       ['/admin/new', '/admin/new/1', '/admin/', '/admin/new/1/test'].forEach(function (url) {
         it('should serve matched url: ' + url, helper.validateSuccess({
@@ -122,13 +116,10 @@ describe('path resolution for specific and general domains', () => {
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/:id';
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
-      after('cleanup', (done) => {
-        helper.cleanup();
-        done();
-      });
+      after('cleanup', helper.cleanup);
 
       ['/admin/new', '/admin/4040040', '/admin/1'].forEach(function (url) {
         it('should serve matched url: ' + url, helper.validateSuccess({
@@ -168,13 +159,10 @@ describe('path resolution for specific and general domains', () => {
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = '/admin/:group/:id';
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
-      after('cleanup', (done) => {
-        helper.cleanup();
-        done();
-      });
+      after('cleanup', helper.cleanup);
 
       ['/admin/new/1', '/admin/another/2'].forEach(function (url) {
         it('should serve matched url: ' + url, helper.validateSuccess({
@@ -227,13 +215,10 @@ describe('path resolution for specific and general domains', () => {
       before('setup', () => {
         config.gatewayConfig = configTemplate;
         config.gatewayConfig.apiEndpoints.test.paths = ['/admin', '/admin/*'];
-        helper.setup({ config, plugins });
+        return helper.setup({ config, plugins });
       });
 
-      after('cleanup', (done) => {
-        helper.cleanup();
-        done();
-      });
+      after('cleanup', helper.cleanup);
 
       ['/admin', '/admin/new', '/admin/', '/admin/new/1', '/admin/new/1/test'].forEach(function (url) {
         it('should serve matched url: ' + url, helper.validateSuccess({

@@ -27,12 +27,12 @@ module.exports = function () {
   }
   return {
     addPolicy: (name, handler) => { // TODO: make it plugin
-      policies.register({policy: handler, name});
+      policies.register({ policy: handler, name });
     },
-    setup: ({config, plugins} = {}) => {
+    setup: ({ config, plugins } = {}) => {
       originalPolicies = policies;
 
-      return gateway({config, plugins})
+      return gateway({ config, plugins })
         .then(apps => {
           app = apps.app;
           httpsApp = apps.httpsApp;
@@ -47,8 +47,23 @@ module.exports = function () {
         config.gatewayConfig = originalGatewayConfig;
       }
       policies = originalPolicies;
-      app && app.close();
-      httpsApp && httpsApp.close();
+
+      config.unwatch();
+
+      return Promise.all([app, httpsApp].map((app) => {
+        if (!app) {
+          return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+          app.close((err) => {
+            if (err) {
+              return reject(err);
+            }
+            return resolve();
+          });
+        });
+      }));
     },
     validate404: function (testCase) {
       testCase.test = testCase.test || {};
