@@ -42,10 +42,12 @@
         "cipherKey",
         "algorithm",
         "saltRounds"
-      ]
+      ],
+      "default": {}
     },
     "session": {
-      "type": "object"
+      "type": "object",
+      "default": {}
     },
     "accessTokens": {
       "type": "object",
@@ -66,7 +68,8 @@
       "required": [
         "tokenType",
         "timeToExpiry"
-      ]
+      ],
+      "default": {}
     },
     "refreshTokens": {
       "type": "object",
@@ -78,7 +81,8 @@
       },
       "required": [
         "timeToExpiry"
-      ]
+      ],
+      "default": {}
     },
     "authorizationCodes": {
       "type": "object",
@@ -90,7 +94,8 @@
       },
       "required": [
         "timeToExpiry"
-      ]
+      ],
+      "default": {}
     },
     "plugins": {
       "type": "object"
