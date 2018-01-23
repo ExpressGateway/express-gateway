@@ -2,7 +2,7 @@ const { fork } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const assert = require('chai').assert;
+const should = require('should');
 const chokidar = require('chokidar');
 const cpr = require('cpr');
 const request = require('superagent');
@@ -85,8 +85,8 @@ describe('hot-reload', () => {
                     request
                       .get(`http://localhost:${originalGatewayPort}`)
                       .end((err, res) => {
-                        assert(err);
-                        assert(res.unauthorized);
+                        should(err).not.be.undefined();
+                        should(res.unauthorized).not.be.undefined();
                         done();
                       });
                   }, GATEWAY_STARTUP_WAIT_TIME);
@@ -120,9 +120,9 @@ describe('hot-reload', () => {
             request
               .get(`http://localhost:${originalGatewayPort}`)
               .end((err, res) => {
-                assert(err);
-                assert(res.clientError);
-                assert.equal(res.statusCode, 404);
+                should(err).not.be.undefined();
+                should(res.clientError).not.be.undefined();
+                should(res.statusCode).be.eql(404);
                 done();
               });
           }, GATEWAY_STARTUP_WAIT_TIME);
@@ -140,9 +140,9 @@ describe('hot-reload', () => {
           request
             .get(`http://localhost:${originalGatewayPort}`)
             .end((err, res) => {
-              assert(err);
-              assert(res.clientError);
-              assert.equal(res.statusCode, 404);
+              should(err).not.be.undefined();
+              should(res.clientError).not.be.undefined();
+              should(res.statusCode).be.eql(404);
               done();
             });
         });

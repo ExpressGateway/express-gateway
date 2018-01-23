@@ -1,4 +1,4 @@
-const assert = require('chai').assert;
+const should = require('should');
 const gateway = require('../../lib/gateway');
 const Config = require('../../lib/config/config');
 const testHelper = require('../common/routing.helper');
@@ -43,7 +43,7 @@ describe('gateway policy with plugins', () => {
           name: 'test-policy',
           policy: function (actionParams) {
             return (req, res, next) => {
-              assert(actionParams.p1, 42);
+              should(actionParams.p1).be.eql(42);
               res.json({ hello: 'ok', url: req.url, actionParams });
             };
           }
@@ -89,7 +89,7 @@ describe('gateway policy schema with plugins', () => {
           },
           policy: function (actionParams) {
             return (req, res, next) => {
-              assert(actionParams.p1, 42);
+              should(actionParams.p1).be.eql(42);
               res.json({ hello: 'ok', url: req.url, actionParams });
             };
           }
@@ -111,7 +111,7 @@ describe('gateway policy schema with plugins', () => {
       ]
     }
     );
-    return assert.throws(() => gateway({
+    return should.throws(() => gateway({
       plugins: {
         policies: [{
           name: 'test-policy-2',
@@ -123,7 +123,7 @@ describe('gateway policy schema with plugins', () => {
             required: ['p2']
           },
           policy: function () {
-            assert.fail();
+            should.fail();
           }
         }]
       },
