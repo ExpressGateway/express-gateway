@@ -55,7 +55,10 @@
             "type": "string"
           },
           "paths": {
-            "type": "array",
+            "type": [
+              "string",
+              "array"
+            ],
             "items": {
               "type": "string"
             }
@@ -84,7 +87,10 @@
       }
     },
     "serviceEndpoints": {
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": {
         "type": "object",
         "properties": {
@@ -109,7 +115,8 @@
     "pipelines": {
       "type": [
         "object",
-        "array"
+        "array",
+        "null"
       ],
       "additionalProperties": {
         "type": "object",
