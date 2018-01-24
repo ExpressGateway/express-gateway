@@ -178,10 +178,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
               });
           });
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .catch(done);
   });
 
   after('cleanup', () => {
