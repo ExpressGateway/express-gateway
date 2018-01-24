@@ -155,9 +155,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
 
                 request
                   .post('/oauth2/authorize/decision')
-                  .query({
-                    transaction_id: res.headers.transaction_id
-                  })
+                  .query({ transaction_id: res.headers.transaction_id })
                   .expect(302)
                   .end(function (err, res) {
                     should.not.exist(err);
