@@ -53,10 +53,8 @@ jobs:
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: npm publish
-      - run: "docker build -t expressgateway/express-gateway:${CIRCLE_TAG} --build-arg VERSION=latest - < Dockerfile"
-      - run: |
-              "docker build -t expressgateway/express-gateway:${CIRCLE_TAG}-getting-started --build-arg VERSION=latest \
-               --build-arg TYPE=getting-started - < Dockerfile"
+      - run: "docker build -t expressgateway/express-gateway:${CIRCLE_TAG} --build-arg VERSION=latest ."
+      - run: "docker build -t expressgateway/express-gateway:${CIRCLE_TAG}-getting-started --build-arg VERSION=latest --build-arg TYPE=getting-started ."
       - run: "docker tag expressgateway/express-gateway:${CIRCLE_TAG} expressgateway/express-gateway:latest"
       - run: "docker tag expressgateway/express-gateway:${CIRCLE_TAG}-getting-started expressgateway/express-gateway:latest-getting-started"
       - run: "docker push expressgateway/express-gateway:${CIRCLE_TAG}"
