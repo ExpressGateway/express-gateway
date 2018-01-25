@@ -5,19 +5,20 @@ const Config = require('../../lib/config/config');
 const request = require('supertest');
 
 const config = new Config();
-config.loadGatewayConfig();
+config.loadConfig('gateway');
 
 describe('gateway routing with plugins', () => {
   let gatewaySrv, httpSrvFromEvent;
   before('fires up a new gateway instance', function () {
-    eventBus.on('http-ready', ({httpServer}) => {
+    eventBus.on('http-ready', ({ httpServer }) => {
       httpSrvFromEvent = httpServer;
     });
     return gateway({
       plugins: {
         gatewayRoutes: [function (gatewayExpressInstance) {
-          gatewayExpressInstance.all('/test', (req, res) => res.json({enabled: true}));
-        }]},
+          gatewayExpressInstance.all('/test', (req, res) => res.json({ enabled: true }));
+        }]
+      },
       config
     }).then(srv => {
       gatewaySrv = srv.app;

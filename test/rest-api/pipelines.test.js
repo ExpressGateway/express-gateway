@@ -24,7 +24,7 @@ describe('REST: pipelines', () => {
         admin: { port: 0 }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
-      config.loadGatewayConfig();
+      config.loadConfig('gateway');
       return adminHelper.start({ config });
     });
     it('should create a new pipeline', () => {
@@ -55,7 +55,7 @@ describe('REST: pipelines', () => {
         }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
-      config.loadGatewayConfig();
+      config.loadConfig('gateway');
       return adminHelper.start({ config });
     });
     it('should create a new pipeline', () => {

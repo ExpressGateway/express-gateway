@@ -25,7 +25,7 @@ describe('REST: api endpoints', () => {
         apiEndpoints: null
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
-      config.loadGatewayConfig();
+      config.loadConfig('gateway');
       return adminHelper.start({ config });
     });
     it('should create a new api endpoint', () => {
@@ -54,7 +54,7 @@ describe('REST: api endpoints', () => {
         }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
-      config.loadGatewayConfig();
+      config.loadConfig('gateway');
       return adminHelper.start({ config });
     });
     it('should create a new api endpoint', () => {

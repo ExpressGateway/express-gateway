@@ -24,7 +24,7 @@ describe('REST: policies', () => {
         admin: { port: 0 }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
-      config.loadGatewayConfig();
+      config.loadConfig('gateway');
       return adminHelper.start({ config });
     });
     it('should activate new policy', () => {
@@ -45,7 +45,7 @@ describe('REST: policies', () => {
         policies: ['example', 'hello']
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
-      config.loadGatewayConfig();
+      config.loadConfig('gateway');
       return adminHelper.start({ config });
     });
     it('should create a new api endpoint', () => {

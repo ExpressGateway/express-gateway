@@ -24,7 +24,7 @@ describe('REST: service endpoints', () => {
         admin: { port: 0 }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
-      config.loadGatewayConfig();
+      config.loadConfig('gateway');
       return adminHelper.start({ config });
     });
     it('should create a new service endpoint', () => {
@@ -53,7 +53,7 @@ describe('REST: service endpoints', () => {
         }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
-      config.loadGatewayConfig();
+      config.loadConfig('gateway');
       return adminHelper.start({ config });
     });
     it('should create a new service endpoint', () => {

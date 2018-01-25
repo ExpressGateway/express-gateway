@@ -37,7 +37,7 @@ describe('REST: schemas', () => {
         admin: { port: 0 }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
-      config.loadGatewayConfig();
+      config.loadConfig('gateway');
       return adminHelper.start({ config });
     });
 
