@@ -5,7 +5,7 @@ const Config = require('../../lib/config/config');
 const request = require('supertest');
 
 const config = new Config();
-config.loadConfig('gateway');
+config.loadGatewayConfig();
 
 describe('gateway routing with plugins', () => {
   let gatewaySrv, httpSrvFromEvent;
