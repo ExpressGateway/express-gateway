@@ -34,6 +34,7 @@ describe('PluginInstaller#runNPMInstallation', () => {
       })
       .then(files => {
         const configPath = path.join(tempPath, 'config');
+        fs.writeFileSync(path.join(tempPath, 'package.json'), JSON.stringify({ name: '', version: '1.0.0', main: 'server.js' }));
         config.systemConfigPath = path.join(configPath, 'system.config.yml');
         config.gatewayConfigPath = path.join(configPath, 'gateway.config.yml');
       });
