@@ -10,26 +10,13 @@ const yaml = require('js-yaml');
 
 require('util.promisify/shim')();
 
-const { runCLICommand } = require('../common/cli.helper');
-
-const gatewayDirectory = path.join(
-  __dirname,
-  '..',
-  'fixtures',
-  'plugin-installer'
-);
-
 const PACKAGE_NAME = 'express-gateway-plugin-test';
 
-const pluginDirectory = path.join(
-  __dirname,
-  '..',
-  'fixtures',
-  PACKAGE_NAME
-);
+const gatewayDirectory = path.join(__dirname, '../../lib/config');
+const pluginDirectory = path.join(__dirname, '../fixtures', PACKAGE_NAME);
+const { runCLICommand } = require('../common/cli.helper');
 
 let tempPath = null;
-let configPath = null;
 
 const config = {
   systemConfigPath: null,
@@ -42,26 +29,19 @@ describe('E2E: eg plugins install', () => {
       .then(temp => {
         tempPath = temp;
         const _cpr = util.promisify(cpr);
-        return Promise.all([
-          _cpr(gatewayDirectory, tempPath),
-          _cpr(path.join(__dirname, '../../lib/config/models'), path.join(tempPath, 'config', 'models'))
-        ]);
-      })
-      .then(([files]) => {
-        configPath = path.join(tempPath, 'config');
-        config.systemConfigPath = path.join(configPath, 'system.config.yml');
-        config.gatewayConfigPath = path.join(configPath, 'gateway.config.yml');
+        return _cpr(gatewayDirectory, tempPath);
       })
       .then(() => {
+        config.systemConfigPath = path.join(tempPath, 'system.config.yml');
+        config.gatewayConfigPath = path.join(tempPath, 'gateway.config.yml');
+
         return runCLICommand({
           cliArgs: ['plugins', 'install', pluginDirectory, '-n', '-g',
             '-o', '"foo=bar"',
             '-o', '"baz=4444"'],
           adminPort: 0,
-          configDirectoryPath: configPath,
-          cliExecOptions: {
-            cwd: tempPath
-          }
+          configDirectoryPath: tempPath,
+          cliExecOptions: { cwd: tempPath }
         });
       });
   });
@@ -70,7 +50,7 @@ describe('E2E: eg plugins install', () => {
     rimraf(tempPath, done);
   });
 
-  it('installs a plugin with a directory package specifier', done => {
+  it('installs a plugin with a directory package specifier', () => {
     const systemConfigData = fs.readFileSync(config.systemConfigPath);
     const systemConfig = yaml.load(systemConfigData.toString());
 
@@ -83,6 +63,5 @@ describe('E2E: eg plugins install', () => {
     };
 
     should(systemConfig.plugins).be.deepEqual(expected);
-    done();
   });
 });
