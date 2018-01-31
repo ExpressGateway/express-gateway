@@ -11,25 +11,12 @@ const yaml = require('js-yaml');
 require('util.promisify/shim')();
 
 const PluginInstaller = require('../../lib/plugin-installer');
-
-const gatewayDirectory = path.join(
-  __dirname,
-  '..',
-  'fixtures',
-  'plugin-installer'
-);
-
 const PACKAGE_NAME = 'express-gateway-plugin-test';
 
-const pluginDirectory = path.join(
-  __dirname,
-  '..',
-  'fixtures',
-  PACKAGE_NAME
-);
+const gatewayDirectory = path.join(__dirname, '../../lib/config');
+const pluginDirectory = path.join(__dirname, '../fixtures', PACKAGE_NAME);
 
 let tempPath = null;
-let configPath = null;
 
 const config = {
   systemConfigPath: null,
@@ -43,10 +30,11 @@ describe('PluginInstaller#runNPMInstallation', () => {
     return util.promisify(tmp.dir)()
       .then(temp => {
         tempPath = temp;
-        return util.promisify(cpr)(gatewayDirectory, tempPath);
+        return util.promisify(cpr)(gatewayDirectory, path.join(tempPath, 'config'), { filter: file => file.includes('.yml') });
       })
       .then(files => {
-        configPath = path.join(tempPath, 'config');
+        const configPath = path.join(tempPath, 'config');
+        fs.writeFileSync(path.join(tempPath, 'package.json'), JSON.stringify({ name: '', version: '1.0.0', main: 'server.js' }));
         config.systemConfigPath = path.join(configPath, 'system.config.yml');
         config.gatewayConfigPath = path.join(configPath, 'gateway.config.yml');
       });
@@ -86,7 +74,7 @@ describe('PluginInstaller#runNPMInstallation', () => {
       enablePlugin: true,
       addPoliciesToWhitelist: true
     }).then(() => {
-      const systemConfigData = fs.readFileSync(config.systemConfigPath);
+      const systemConfigData = fs.readFileSync(config.systemConfigPath, 'utf8');
       const systemConfig = yaml.load(systemConfigData.toString());
       const comparison =
         Object.assign({ package: PACKAGE_NAME }, pluginOptions);
