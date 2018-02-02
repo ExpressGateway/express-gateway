@@ -1,19 +1,16 @@
 FROM node:8-alpine
 
-ARG VERSION
-ARG TYPE=basic
+LABEL maintainer Vincenzo Chianese, vincenzo@express-gateway.io
 
+ENV EG_VERSION 1.7.1
 ENV NODE_ENV production
-# this will enable polling, hot-reload will work on docker or network volumes
+# Enable chokidar polling so hot-reload mechanism can work on docker or network volumes
 ENV CHOKIDAR_USEPOLLING true
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN npm install express-gateway@$EG_VERSION
 
-RUN npm install express-gateway@$VERSION && \
-    ./node_modules/.bin/eg gateway create -n gateway -d . -t $TYPE && \
-    npm cache clean --force
+WORKDIR /node_modules/express-gateway
 
-EXPOSE 8080
+EXPOSE 8080 9876
 
-CMD [ "npm", "run", "start" ]
+CMD [ "node", "lib", "index.js" ]
