@@ -12,9 +12,6 @@ COPY package.json package-lock.json /usr/src/app/
 RUN npm install
 COPY . /usr/src/app
 
-EXPOSE 8080
-
-# Admin API
-EXPOSE 9876
+EXPOSE 8080 9876
 
 CMD [ "npm", "run", "start" ]
