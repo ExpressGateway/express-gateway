@@ -1,6 +1,6 @@
 const superagent = require('superagent');
 
-module.exports = function ({baseUrl, verbose, headers}) {
+module.exports = function ({ baseUrl, verbose, headers }) {
   if (baseUrl[baseUrl.length - 1] !== '/') { // ensure trailing slash
     baseUrl += '/';
   }
@@ -27,7 +27,7 @@ module.exports = function ({baseUrl, verbose, headers}) {
     }
   };
   // eslint-disable-next-line no-console
-  const debug = (verbose) ? console.error.bind(console) : () => {};
+  const debug = (verbose) ? console.error.bind(console) : () => { };
   const client = new Proxy(superagent, {
     get: function (request, name) {
       if (methods.indexOf(name) >= 0) {
