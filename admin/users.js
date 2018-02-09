@@ -1,5 +1,5 @@
 module.exports = function (client) {
-  const baseUrl = `users/`;
+  const baseUrl = '/users/';
   return {
     create (user) {
       return client
@@ -16,14 +16,14 @@ module.exports = function (client) {
     activate (id) {
       return client
         .put(baseUrl + id + '/status')
-        .send({status: true})
+        .send({ status: true })
         .then(res => res.body);
     },
 
     deactivate (id) {
       return client
         .put(baseUrl + id + '/status')
-        .send({status: false})
+        .send({ status: false })
         .then(res => res.body);
     },
 

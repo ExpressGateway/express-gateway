@@ -1,5 +1,5 @@
 module.exports = function (client) {
-  const baseUrl = `pipelines/`;
+  const baseUrl = '/pipelines/';
   return {
     create (name, endpointConfig) {
       return client

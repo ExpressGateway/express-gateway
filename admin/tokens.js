@@ -1,5 +1,5 @@
 module.exports = function (client) {
-  const baseUrl = `tokens/`;
+  const baseUrl = '/tokens/';
   return {
     revoke (token) {
       return client

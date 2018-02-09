@@ -1,5 +1,5 @@
 module.exports = function (client) {
-  const baseUrl = `scopes/`;
+  const baseUrl = '/scopes/';
   return {
     create (scope) {
       return client
