@@ -13,7 +13,7 @@ module.exports = class EgGenerator extends Generator {
     this.admin = require('../admin')({
       baseUrl: this._getAdminClientBaseURL(),
       verbose: this._getAdminClientVerboseFlag(),
-      headers: this.argv ? this.argv.H : null
+      headers: this.argv && this.argv.H ? this.processHeaders(this.argv.H) : null
     });
   }
 
@@ -91,6 +91,21 @@ module.exports = class EgGenerator extends Generator {
     }
 
     return verbose;
+  }
+
+  processHeaders (headers) {
+    let ArrayHeaders;
+    if (!Array.isArray(headers)) {
+      ArrayHeaders = [headers];
+    } else {
+      ArrayHeaders = headers;
+    }
+
+    return ArrayHeaders.reduce((prev, header) => {
+      const [headerName, headerValue] = header.split(':');
+      prev[headerName] = headerValue;
+      return prev;
+    }, {});
   }
 
   _promptAndValidate (object, schema, { skipPrompt = false } = {}) {
