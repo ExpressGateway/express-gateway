@@ -95,6 +95,7 @@
     "proxy-agent": "^2.1.0",
     "semver": "^5.4.1",
     "superagent": "^3.8.2",
+    "superagent-logger": "^1.1.0",
     "superagent-prefix": "0.0.2",
     "swagger-ui-express": "^2.0.13",
     "util.promisify": "^1.0.0",

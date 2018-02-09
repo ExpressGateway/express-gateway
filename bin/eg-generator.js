@@ -94,16 +94,15 @@ module.exports = class EgGenerator extends Generator {
   }
 
   processHeaders (headers) {
-    let ArrayHeaders;
-    if (!Array.isArray(headers)) {
-      ArrayHeaders = [headers];
-    } else {
-      ArrayHeaders = headers;
-    }
+    const ArrayHeaders = Array.isArray(headers) ? headers : [headers];
 
     return ArrayHeaders.reduce((prev, header) => {
       const [headerName, headerValue] = header.split(':');
-      prev[headerName] = headerValue;
+
+      if (headerValue) {
+        prev[headerName] = headerValue;
+      }
+
       return prev;
     }, {});
   }
