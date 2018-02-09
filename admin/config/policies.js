@@ -1,5 +1,5 @@
 module.exports = function (client) {
-  const baseUrl = 'policies/';
+  const baseUrl = '/policies/';
   return {
     activate (name) {
       return client

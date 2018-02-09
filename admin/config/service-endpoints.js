@@ -1,5 +1,5 @@
 module.exports = function (client) {
-  const baseUrl = `service-endpoints/`;
+  const baseUrl = '/service-endpoints/';
   return {
     create (name, endpointConfig) {
       return client

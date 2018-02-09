@@ -1,5 +1,5 @@
 module.exports = function (client) {
-  const baseUrl = 'schemas/';
+  const baseUrl = '/schemas/';
   return {
     list (param = '') {
       let url = baseUrl;

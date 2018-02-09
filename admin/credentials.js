@@ -1,5 +1,5 @@
 module.exports = function (client) {
-  const baseUrl = `credentials/`;
+  const baseUrl = '/credentials/';
   return {
     create (consumerId, type, credential) {
       return client
