@@ -11,7 +11,7 @@ module.exports = function (client) {
     deactivate (credentialId, type) {
       validate(credentialId, type);
       return client
-        .put(baseUrl + type + '/' + credentialId + '/status')
+        .put(`${baseUrl}${encodeURIComponent(type)}/${encodeURIComponent(credentialId)}/status`)
         .send({ status: false })
         .then(res => res.body);
     },
@@ -19,7 +19,7 @@ module.exports = function (client) {
     activate (credentialId, type) {
       validate(credentialId, type);
       return client
-        .put(baseUrl + type + '/' + credentialId + '/status')
+        .put(`${baseUrl}${encodeURIComponent(type)}/${encodeURIComponent(credentialId)}/status`)
         .send({ status: true })
         .then(res => res.body);
     },
@@ -34,28 +34,28 @@ module.exports = function (client) {
     list (consumerId) {
       if (!consumerId) throw new Error('Consumer Id is required');
       return client
-        .get(`${baseUrl}${consumerId}`)
+        .get(`${baseUrl}${encodeURIComponent(consumerId)}`)
         .then(res => res.body);
     },
 
     addScope (credentialId, type, scope) {
       validate(credentialId, type);
       return client
-        .put(`${baseUrl}${type}/${credentialId}/scopes/${scope}`)
+        .put(`${baseUrl}${encodeURIComponent(type)}/${encodeURIComponent(credentialId)}/scopes/${scope}`)
         .then(res => res.body);
     },
 
     removeScope (credentialId, type, scope) {
       validate(credentialId, type);
       return client
-        .del(`${baseUrl}${type}/${credentialId}/scopes/${scope}`)
+        .del(`${baseUrl}${encodeURIComponent(type)}/${encodeURIComponent(credentialId)}/scopes/${scope}`)
         .then(res => res.body);
     },
 
     setScopes (credentialId, type, scopes) {
       validate(credentialId, type);
       return client
-        .put(`${baseUrl}${type}/${credentialId}/scopes/`)
+        .put(`${baseUrl}${encodeURIComponent(type)}/${encodeURIComponent(credentialId)}/scopes/`)
         .send({ scopes })
         .then(res => res.body);
     }

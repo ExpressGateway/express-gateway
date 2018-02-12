@@ -10,27 +10,27 @@ module.exports = function (client) {
     },
     update (appId, app) {
       return client
-        .put(baseUrl + appId)
+        .put(`${baseUrl}${encodeURIComponent(appId)}`)
         .send(app)
         .then(res => res.body);
     },
     activate (id) {
       return client
-        .put(baseUrl + id + '/status')
+        .put(`${baseUrl}${encodeURIComponent(id)}/status`)
         .send({ status: true })
         .then(res => res.body);
     },
 
     deactivate (id) {
       return client
-        .put(baseUrl + id + '/status')
+        .put(`${baseUrl}${encodeURIComponent(id)}/status`)
         .send({ status: false })
         .then(res => res.body);
     },
 
     info (id) {
       return client
-        .get(baseUrl + id)
+        .get(`${baseUrl}${encodeURIComponent(id)}`)
         .then(res => res.body);
     },
     list () { // TODO: add pagination
@@ -41,7 +41,7 @@ module.exports = function (client) {
 
     remove (id) {
       return client
-        .del(baseUrl + id)
+        .del(`${baseUrl}${encodeURIComponent(id)}`)
         .then(res => res.body);
     }
 
