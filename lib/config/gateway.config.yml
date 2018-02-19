@@ -15,14 +15,12 @@ serviceEndpoints:
 policies:
   - proxy
   - key-auth
-  - oauth2
 pipelines:
   adminAPI:
     apiEndpoints:
       - api
     policies:
       # - key-auth: # uncomment to enable key-auth
-      - oauth2: {}
       - proxy:
           - action:
               serviceEndpoint: backend
