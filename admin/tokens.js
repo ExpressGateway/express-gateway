@@ -3,7 +3,7 @@ module.exports = function (client) {
   return {
     revoke (token) {
       return client
-        .del(baseUrl + token)
+        .del(`${baseUrl}${encodeURIComponent(token)}`)
         .then(res => res.body);
     }
   };

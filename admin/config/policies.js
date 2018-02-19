@@ -3,13 +3,13 @@ module.exports = function (client) {
   return {
     activate (name) {
       return client
-        .put(baseUrl + name)
+        .put(`${baseUrl}${encodeURIComponent(name)}`)
         .then(res => res.body);
     },
 
     deactivate (name) {
       return client
-        .delete(baseUrl + name)
+        .delete(`${baseUrl}${encodeURIComponent(name)}`)
         .then(res => res.body);
     },
 

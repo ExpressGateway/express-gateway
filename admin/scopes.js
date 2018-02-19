@@ -9,12 +9,12 @@ module.exports = function (client) {
     },
     remove (scope) {
       return client
-        .del(baseUrl + scope)
+        .del(`${baseUrl}${encodeURIComponent(scope)}`)
         .then(res => res.body);
     },
     info (scope) {
       return client
-        .get(baseUrl + scope)
+        .get(`${baseUrl}${encodeURIComponent(scope)}`)
         .then(res => res.body);
     },
     list () {
