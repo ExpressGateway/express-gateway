@@ -1,6 +1,6 @@
 db:
   redis:
-    emulate: true
+    emulate: ${EG_DB_EMULATE:-true}
     host: localhost
     port: 6379
     namespace: EG
@@ -10,7 +10,7 @@ cli:
 
 #plugins:
   # express-gateway-plugin-example:
-  #   param1: 'param from system.config' 
+  #   param1: 'param from system.config'
 
 crypto:
   cipherKey: sensitiveKey
