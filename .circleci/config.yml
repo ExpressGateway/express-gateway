@@ -36,7 +36,7 @@ jobs:
       - image: redis:alpine
     working_directory: ~/repo
     environment:
-      - EG_DB_EMULATE: 0
+      - EG_DB_EMULATE: false
     steps:
       - checkout
       - run: npm install
