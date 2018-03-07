@@ -80,7 +80,7 @@ describe('@proxy policy', () => {
         });
       });
 
-      after(app.close);
+      after((done) => app.close(done));
 
       it('responds with a bad gateway error', () => {
         return expectedResponse(app, 502, /text\/html/);
