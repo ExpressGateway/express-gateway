@@ -38,8 +38,8 @@ describe('@e2e @proxy through proxy', () => {
       });
 
       const server = srv.listen(0, () => {
-        process.env.http_proxy = 'http://localhost:' + server.address().port;
-        gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }).then(({gatewayProcess}) => {
+        process.env.HTTP_PROXY = 'http://localhost:' + server.address().port;
+        gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }).then(({ gatewayProcess }) => {
           gw = gatewayProcess;
           done();
         });
@@ -47,10 +47,10 @@ describe('@e2e @proxy through proxy', () => {
     });
   });
   after('cleanup', () => {
-    delete process.env.http_proxy;
+    delete process.env.HTTP_PROXY;
     gw.kill();
   });
-  it('should respect http_proxy env var and send through proxy', () => {
+  it('should respect HTTP_PROXY env var and send through proxy', () => {
     return request
       .get(`http://localhost:${gatewayConfig.http.port}/test`)
       .then((res) => {
