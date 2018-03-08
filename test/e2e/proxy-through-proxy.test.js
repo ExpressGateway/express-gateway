@@ -56,7 +56,8 @@ describe('@e2e @proxy through proxy', () => {
   after('cleanup', (done) => {
     delete process.env.HTTP_PROXY;
     gw.kill();
-    proxy.close(() => { srv.close(done); });
+    proxy.close();
+    srv.close(done);
   });
 
   it('should respect HTTP_PROXY env var and send through proxy', () => {
