@@ -63,6 +63,25 @@
         "timeToExpiry": {
           "type": "number",
           "default": 720000
+        },
+        "issuer": {
+          "type": "string"
+        },
+        "audience": {
+          "type": [
+            "string",
+            "array"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "subject": {
+          "type": "string"
+        },
+        "algorithm": {
+          "type": "string",
+          "default": "HS256"
         }
       },
       "required": [
