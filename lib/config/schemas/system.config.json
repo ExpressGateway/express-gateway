@@ -63,6 +63,10 @@
         "timeToExpiry": {
           "type": "number",
           "default": 720000
+        },
+        "algorithm": {
+          "type": "string",
+          "default": "HS256"
         }
       },
       "required": [
