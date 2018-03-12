@@ -15,9 +15,9 @@ module.exports = class extends eg.Generator {
           .usage(`Usage: $0 ${process.argv[2]} create [options]`)
           .example(`$0 ${process.argv[2]} create -c jdoe -t key-auth`)
           .example(`echo '{"consumer":"jdoe", "type": "key-auth"}'` +
-          `| $0 ${process.argv[2]} create --stdin`)
+            `| $0 ${process.argv[2]} create --stdin`)
           .example(`echo '{"consumer":"jdoe", "type": "key-auth", "scopes":["existingScope"]}'` +
-          `| $0 ${process.argv[2]} create --stdin`)
+            `| $0 ${process.argv[2]} create --stdin`)
           .example(`cat all_apps.json | $0 ${process.argv[2]} create --stdin`)
           .example(`$0 ${process.argv[2]} create -u jdoe -p 'scopes=existingScope'`)
           .string(['p', 'c', 't'])
@@ -90,10 +90,13 @@ module.exports = class extends eg.Generator {
     }
 
     return this._promptAndValidate(credential, SCHEMA)
-      .then((credential) => this.admin.credentials.create(argv.consumer, argv.type, credential))
-      .then(newCredential => {
-        this._output(newCredential);
+      .then((credential) => {
+        if (credential.scopes) {
+          credential.scopes = Array.isArray(credential.scopes) ? credential.scopes : [credential.scopes];
+        }
+        return this.admin.credentials.create(argv.consumer, argv.type, credential);
       })
+      .then((data) => this._output(data))
       .catch(err => {
         this.log.error((err.response && err.response.error && err.response.error.text) || err.message);
       });
