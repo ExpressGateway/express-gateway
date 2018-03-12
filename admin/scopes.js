@@ -1,10 +1,10 @@
 module.exports = function (client) {
   const baseUrl = '/scopes/';
   return {
-    create (scope) {
+    create (scopes) {
       return client
         .post(baseUrl)
-        .send({ scope })
+        .send({ scopes })
         .then(res => res.body);
     },
     remove (scope) {
