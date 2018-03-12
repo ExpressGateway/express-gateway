@@ -27,10 +27,7 @@ describe('eg credential:scopes add', () => {
         cred1 = createdCred;
         scope1 = idGen.v4();
         scope2 = idGen.v4();
-        return Promise.all([
-          adminHelper.admin.scopes.create(scope1),
-          adminHelper.admin.scopes.create(scope2)
-        ]);
+        return adminHelper.admin.scopes.create([scope1, scope2]);
       });
   });
 

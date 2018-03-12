@@ -17,17 +17,12 @@ describe('eg credential:scopes set', () => {
     scope1 = idGen.v4();
     scope2 = idGen.v4();
     scope3 = idGen.v4();
-    return Promise.all([
-      adminHelper.admin.scopes.create(scope1),
-      adminHelper.admin.scopes.create(scope2),
-      adminHelper.admin.scopes.create(scope3)
-    ]).then(() => {
-      return adminHelper.admin.users.create({
+    return adminHelper.admin.scopes.create([scope1, scope2, scope3])
+      .then(() => adminHelper.admin.users.create({
         username: idGen.v4(),
         firstname: 'f',
         lastname: 'l'
-      });
-    })
+      }))
       .then(createdUser => {
         user = createdUser;
         return adminHelper.admin.credentials.create(user.id, 'key-auth', {

@@ -17,8 +17,7 @@ describe('eg scopes remove', () => {
     env.prepareHijack();
     scopeName = idGen.v4();
     scopeName2 = idGen.v4();
-    return adminHelper.admin.scopes.create(scopeName)
-      .then(() => adminHelper.admin.scopes.create(scopeName2));
+    return adminHelper.admin.scopes.create([scopeName, scopeName2]);
   });
 
   afterEach(() => {
