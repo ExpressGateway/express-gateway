@@ -105,7 +105,7 @@ describe('Functional Tests keyAuth Policy', () => {
       })
       .then(u => {
         dbuser1 = u;
-        return credentialService.insertScopes('authorizedScope', 'unauthorizedScope');
+        return credentialService.insertScopes(['authorizedScope', 'unauthorizedScope']);
       })
       .then(() => {
         return credentialService.insertCredential(dbuser1.id, 'key-auth', {

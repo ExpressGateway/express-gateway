@@ -48,7 +48,7 @@ describe('Functional Test Implicit grant', function () {
                 should.exist(_fromDbApp);
                 fromDbApp = _fromDbApp;
 
-                return credentialService.insertScopes('someScope')
+                return credentialService.insertScopes(['someScope'])
                   .then(() => {
                     return Promise.all([credentialService.insertCredential(fromDbUser1.id, 'basic-auth', { password: 'user-secret' }),
                       credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })])

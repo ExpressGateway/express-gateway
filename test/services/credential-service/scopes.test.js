@@ -8,7 +8,7 @@ describe('Scope tests', function () {
 
   it('should insert a scope', function (done) {
     credentialService
-      .insertScopes('someScope')
+      .insertScopes(['someScope'])
       .then(function (res) {
         should.exist(res);
         res.should.eql(true);

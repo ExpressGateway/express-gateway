@@ -46,7 +46,7 @@ describe('Functional Test Client Password grant', function () {
                 should.exist(_fromDbApp);
                 fromDbApp = _fromDbApp;
 
-                credentialService.insertScopes('someScope')
+                credentialService.insertScopes(['someScope'])
                   .then(() => {
                     Promise.all([
                       credentialService.insertCredential(fromDbUser1.id, 'basic-auth', { password: 'user-secret' }),

@@ -72,7 +72,7 @@ describe('Functional Tests basic auth Policy', () => {
             should.exist(_fromDbUser1);
             user = _fromDbUser1;
 
-            return credentialService.insertScopes('authorizedScope', 'unauthorizedScope');
+            return credentialService.insertScopes(['authorizedScope', 'unauthorizedScope']);
           })
           .then(() => credentialService.insertCredential(user.id, 'basic-auth', { password: 'user-secret', scopes: ['authorizedScope'] }))
           .then((userRes) => {

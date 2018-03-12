@@ -36,7 +36,7 @@ describe('Functional Test Client Credentials grant', function () {
                 should.exist(_app);
                 application = _app;
 
-                return credentialService.insertScopes('someScope')
+                return credentialService.insertScopes(['someScope'])
                   .then(() => {
                     credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })
                       .then(res => {
