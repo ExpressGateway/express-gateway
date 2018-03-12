@@ -28,7 +28,7 @@ module.exports = class extends eg.Generator {
         }
       })
       .catch(err => {
-        this.log.error(err.message);
+        this.log.error(err.response.text);
       });
   };
 };
