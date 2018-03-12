@@ -181,7 +181,7 @@ describe('Credential service tests', () => {
 
     it('should not insert a credential with scopes if the scopes are not defined', () => {
       return should(credentialService.insertCredential(username, 'oauth2', _credential))
-        .be.rejectedWith('one or more scopes don\'t exist');
+        .be.rejectedWith('One or more scopes don\'t exist');
     });
 
     it('should insert a credential with scopes if the scopes are defined', () => {
@@ -247,7 +247,7 @@ describe('Credential service tests', () => {
 
     it('should not add scopes to existing credential if the scopes are not defined', () => {
       return should(credentialService.addScopesToCredential(username, 'oauth2', ['undefinedScope']))
-        .be.rejectedWith('one or more scopes don\'t exist');
+        .be.rejectedWith('One or more scopes don\'t exist');
     });
 
     it('should use default property if not defined', () => {
