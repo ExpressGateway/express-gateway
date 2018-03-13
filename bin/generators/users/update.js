@@ -16,6 +16,7 @@ module.exports = class extends eg.Generator {
           .describe('p', 'User property in the form [-p \'foo=bar\']')
           .alias('p', 'property')
           .group(['p'], 'Options:')
+          .positional('user_id', { type: 'string' })
     });
   }
 
