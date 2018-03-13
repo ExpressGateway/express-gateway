@@ -140,6 +140,7 @@ exports.bootstrap = (eg, adapter) => {
     .demandCommand()
     .recommendCommands()
     .strict()
+    .alias('h', 'help')
     .wrap(Math.min(90, yargs.terminalWidth()));
 
   return { program, env };

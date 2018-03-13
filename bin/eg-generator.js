@@ -56,8 +56,7 @@ module.exports = class EgGenerator extends Generator {
       .describe('H', 'Header to send with each request to Express Gateway Admin API KEY:VALUE format')
       .alias('v', 'verbose')
       .describe('v', 'Verbose output, will show request to Admin API')
-      .group(['no-color', 'q'], 'Options:')
-      .help('h');
+      .group(['no-color', 'q'], 'Options:');
   }
 
   _getAdminClientBaseURL () {
