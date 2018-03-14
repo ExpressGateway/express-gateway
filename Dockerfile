@@ -2,7 +2,7 @@ FROM node:8-alpine
 
 LABEL maintainer Vincenzo Chianese, vincenzo@express-gateway.io
 
-ENV EG_VERSION 1.7.2
+ARG EG_VERSION
 ENV NODE_ENV production
 ENV NODE_PATH /usr/local/share/.config/yarn/global/node_modules/
 ENV EG_CONFIG_DIR /var/lib/eg
