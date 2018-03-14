@@ -164,7 +164,6 @@ describe('Credential service tests', () => {
 
     before(() => {
       Object.assign(config.models.credentials.properties.oauth2.properties, {
-        scopes: { type: 'array', items: { tyep: 'string' } },
         someProperty: { type: 'string' },
         otherProperty: { type: 'string', default: 'someDefaultValue' }
       });
