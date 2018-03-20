@@ -63,7 +63,7 @@ module.exports = class EgGenerator extends Generator {
     const gatewayConfig = config.gatewayConfig;
     const systemConfig = config.systemConfig;
 
-    let baseURL = 'http://localhost:9876/'; // fallback default
+    let baseURL = 'http://localhost:9876'; // fallback default
 
     if (process.env.EG_ADMIN_URL) {
       baseURL = process.env.EG_ADMIN_URL;
@@ -74,7 +74,7 @@ module.exports = class EgGenerator extends Generator {
       const hostname = adminConfig.hostname || 'localhost';
       const port = adminConfig.port || 9876;
 
-      baseURL = `http://${hostname}:${port}/`;
+      baseURL = `http://${hostname}:${port}`;
     }
 
     return baseURL;
