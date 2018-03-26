@@ -19,7 +19,7 @@ const chainFile = path.join(__dirname, '../../fixtures/certs/chain', 'chain.pem'
 let backendServerPort;
 
 function expectedResponse (app, status, contentType) {
-  return request(app).get('/endpoint').expect(status).expect('Content-Type', contentType);
+  return request(`http://localhost:${app.address().port}`).get('/endpoint').expect(status).expect('Content-Type', contentType);
 }
 
 describe('@proxy policy', () => {
