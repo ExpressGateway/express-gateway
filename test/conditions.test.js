@@ -146,6 +146,24 @@ describe('method', function () {
     });
 });
 
+describe('tlsClientAuthenticated', function () {
+  const req = Object.create(express.request);
+
+  it('should return true if request is client authenticated', function () {
+    req.client = { authorized: true };
+    should(req.matchEGCondition({
+      name: 'tlsClientAuthenticated'
+    })).be.true();
+  });
+
+  it('should return true if request is client authenticated', function () {
+    req.client.authorized = false;
+    should(req.matchEGCondition({
+      name: 'tlsClientAuthenticated'
+    })).be.false();
+  });
+});
+
 describe('req.matchEGCondition', function () {
   const req = Object.create(express.request);
   it('correctly handles complex conditional rule', function () {
