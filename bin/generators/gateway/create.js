@@ -2,6 +2,7 @@
 
 const chalk = require('chalk');
 const path = require('path');
+const os = require('os');
 const eg = require('../../eg');
 
 module.exports = class extends eg.Generator {
@@ -136,5 +137,8 @@ module.exports = class extends eg.Generator {
     console.log('');
     console.log(`To start ${chalk.green(this.name)}, run the following commands:`);
     console.log(`    cd ${relativePath} && npm start`);
+    console.log(os.EOL);
+    console.log(`To receive additional support, visit our ${chalk.hex('D32E59')('Gitter channel')}:
+                  ${chalk.green('https://gitter.im/ExpressGateway/express-gateway')}`);
   }
 };
