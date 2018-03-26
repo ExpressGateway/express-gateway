@@ -146,20 +146,20 @@ describe('method', function () {
     });
 });
 
-describe('clientAuthorized', function () {
+describe('tlsClientAuthenticated', function () {
   const req = Object.create(express.request);
 
   it('should return true if request is client authenticated', function () {
     req.client = { authorized: true };
     should(req.matchEGCondition({
-      name: 'clientAuthorized'
+      name: 'tlsClientAuthenticated'
     })).be.true();
   });
 
   it('should return true if request is client authenticated', function () {
     req.client.authorized = false;
     should(req.matchEGCondition({
-      name: 'clientAuthorized'
+      name: 'tlsClientAuthenticated'
     })).be.false();
   });
 });
