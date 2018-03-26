@@ -19,7 +19,7 @@ const chainFile = path.join(__dirname, '../../fixtures/certs/chain', 'chain.pem'
 let backendServerPort;
 
 function expectedResponse (app, status, contentType) {
-  return request(app).get('/endpoint').expect(status).expect('Content-Type', contentType);
+  return request(`http://localhost:${app.address().port}`).get('/endpoint').expect(status).expect('Content-Type', contentType);
 }
 
 describe('@proxy policy', () => {
@@ -80,9 +80,7 @@ describe('@proxy policy', () => {
         });
       });
 
-      after((done) => {
-        app.close(done);
-      });
+      after((done) => app.close(done));
 
       it('responds with a bad gateway error', () => {
         return expectedResponse(app, 502, /text\/html/);
@@ -142,10 +140,10 @@ describe('@proxy policy', () => {
   });
 });
 
-function setupGateway (serviceOptions = {}, policyOptions = {}) {
-  return findOpenPortNumbers(1).then((ports) => {
+const setupGateway = (serviceOptions = {}, policyOptions = {}) =>
+  findOpenPortNumbers(1).then(([port]) => {
     config.gatewayConfig = {
-      http: { port: ports[0] },
+      http: { port },
       apiEndpoints: {
         test: {}
       },
@@ -170,4 +168,3 @@ function setupGateway (serviceOptions = {}, policyOptions = {}) {
 
     return gateway();
   });
-}
