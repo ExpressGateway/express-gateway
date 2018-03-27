@@ -48,8 +48,8 @@ describe('REST: service endpoints', () => {
       const initialConfig = {
         admin: { port: 0 },
         serviceEndpoints: {
-          example: { url: 'example.com' },
-          hello: { url: 'hello.com' }
+          example: { url: 'http://example.com' },
+          hello: { url: 'http://hello.com' }
         }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
@@ -67,8 +67,8 @@ describe('REST: service endpoints', () => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
           assert.equal(cfg.serviceEndpoints.test.url, testEndpoint.url);
-          assert.equal(cfg.serviceEndpoints.example.url, 'example.com');
-          assert.equal(cfg.serviceEndpoints.hello.url, 'hello.com');
+          assert.equal(cfg.serviceEndpoints.example.url, 'http://example.com');
+          assert.equal(cfg.serviceEndpoints.hello.url, 'http://hello.com');
           assert(cfg.serviceEndpoints.test.customId);
         });
     });
@@ -100,15 +100,15 @@ describe('REST: service endpoints', () => {
       return adminHelper.admin.config.serviceEndpoints
         .info('example')
         .then((endpoint) => {
-          assert.equal(endpoint.url, 'example.com');
+          assert.equal(endpoint.url, 'http://example.com');
         });
     });
     it('should list all endpoints', () => {
       return adminHelper.admin.config.serviceEndpoints
         .list()
         .then((endpoints) => {
-          assert.equal(endpoints.example.url, 'example.com');
-          assert.equal(endpoints.hello.url, 'hello.com');
+          assert.equal(endpoints.example.url, 'http://example.com');
+          assert.equal(endpoints.hello.url, 'http://hello.com');
           assert.equal(Object.keys(endpoints).length, 2);
         });
     });

@@ -5,58 +5,70 @@ const request = require('superagent');
 const gwHelper = require('../common/gateway.helper');
 const cliHelper = require('../common/cli.helper');
 
-describe('@e2e @proxy through proxy', () => {
-  const gatewayConfig = {
-    apiEndpoints: {
-      api: {
-        path: '/test'
+['HTTP_PROXY', 'http_proxy'].forEach((envVariable) => {
+  describe('@e2e @proxy through proxy', () => {
+    const gatewayConfig = {
+      apiEndpoints: {
+        api: {
+          path: '/test'
+        }
+      },
+      policies: ['proxy'],
+      pipelines: {
+        pipeline1: {
+          apiEndpoints: ['api'],
+          policies: [{
+            proxy: {
+              action: { serviceEndpoint: 'backend' }
+            }
+          }]
+        }
       }
-    },
-    policies: ['proxy'],
-    pipelines: {
-      pipeline1: {
-        apiEndpoints: ['api'],
-        policies: [{
-          proxy: {
-            action: { serviceEndpoint: 'backend' }
+    };
+
+    const proxiedUrls = {};
+    let gw;
+    let proxy;
+    let srv;
+
+    before('init', (done) => {
+      cliHelper.bootstrapFolder().then(dirInfo => {
+        proxy = httpProxy.createProxyServer({ changeOrigin: true });
+
+        srv = http.createServer(function (req, res) {
+          proxiedUrls[req.url] = true;
+          proxy.web(req, res, { target: req.url });
+        });
+
+        const server = srv.listen(0, (err) => {
+          if (err) {
+            return done(err);
           }
-        }]
-      }
-    }
-  };
-  const proxiedUrls = {};
-  let gw;
-  before('init', (done) => {
-    cliHelper.bootstrapFolder().then(dirInfo => {
-      const proxy = httpProxy.createProxyServer({
-        changeOrigin: true
-      });
 
-      const srv = http.createServer(function (req, res) {
-        proxiedUrls[req.url] = true;
-        proxy.web(req, res, { target: req.url });
-      });
-
-      const server = srv.listen(0, () => {
-        process.env.http_proxy = 'http://localhost:' + server.address().port;
-        gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }).then(({gatewayProcess}) => {
-          gw = gatewayProcess;
-          done();
+          process.env[envVariable] = `http://localhost:${server.address().port}`;
+          gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }).then(({ gatewayProcess }) => {
+            gw = gatewayProcess;
+            done();
+          }).catch(done);
         });
       });
     });
-  });
-  after('cleanup', () => {
-    delete process.env.http_proxy;
-    gw.kill();
-  });
-  it('should respect http_proxy env var and send through proxy', () => {
-    return request
-      .get(`http://localhost:${gatewayConfig.http.port}/test`)
-      .then((res) => {
-        assert.ok(res.text);
-        // we need to ensure that request went through proxy, not directly
-        assert.ok(proxiedUrls[`${gatewayConfig.serviceEndpoints.backend.url}/test`], 'Proxy was not called');
-      });
+
+    after('cleanup', (done) => {
+      delete process.env[envVariable];
+      gw.kill();
+      proxy.close();
+      srv.close(done);
+    });
+
+    it(`should respect ${envVariable} env var and send through proxy`, () => {
+      return request
+        .get(`http://localhost:${gatewayConfig.http.port}/test`)
+        .then((res) => {
+          assert.ok(res.text);
+          // we need to ensure that request went through proxy, not directly
+          assert.ok(proxiedUrls[`${gatewayConfig.serviceEndpoints.backend.url}/test`], 'Proxy was not called');
+        });
+    });
   });
 });
