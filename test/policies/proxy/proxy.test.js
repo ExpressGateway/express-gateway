@@ -18,10 +18,6 @@ const chainFile = path.join(__dirname, '../../fixtures/certs/chain', 'chain.pem'
 
 let backendServerPort;
 
-function expectedResponse (app, status, contentType) {
-  return request(app).get('/endpoint').expect(status).expect('Content-Type', contentType);
-}
-
 describe('@proxy policy', () => {
   const defaultProxyOptions = {
     target: {
@@ -77,9 +73,7 @@ describe('@proxy policy', () => {
 
       after((done) => app.close(done));
 
-      it('responds with a bad gateway error', () => {
-        return expectedResponse(app, 502, /text\/html/);
-      });
+      it('responds with a bad gateway error', () => expectResponse(app, 502, /text\/html/));
     });
 
     describe('When proxy options are specified on the policy action', () => {
@@ -93,9 +87,7 @@ describe('@proxy policy', () => {
         app.close(done);
       });
 
-      it('passes options to proxy', () => {
-        return expectedResponse(app, 200, /json/);
-      });
+      it('passes options to proxy', () => expectResponse(app, 200, /json/));
     });
   });
 });
@@ -127,3 +119,6 @@ const setupGateway = (proxyOptions) =>
 
     return gateway();
   });
+
+const expectResponse = (app, status, contentType) =>
+  request(app).get('/endpoint').expect(status).expect('Content-Type', contentType);
