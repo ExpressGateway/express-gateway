@@ -116,7 +116,7 @@ const setupGateway = (proxyOptions) =>
           apiEndpoints: ['test'],
           policies: [{
             proxy: [{
-              action: { ...proxyOptions, serviceEndpoint: 'backend' }
+              action: Object.assign({}, proxyOptions, { serviceEndpoint: 'backend' })
             }]
           }]
         }
