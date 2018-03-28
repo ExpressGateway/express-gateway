@@ -62,20 +62,15 @@ describe('@proxy policy', () => {
   });
 
   describe('proxyOptions', () => {
-    it('raises an error when incorrect TLS file paths are provided', (done) => {
+    it('raises an error when incorrect TLS file paths are provided', () => {
       const serviceOptions = { target: { keyFile: '/non/existent/file.key' } };
 
-      setupGateway(serviceOptions).catch(err => {
-        should(err.message).match(/no such file or directory/);
-        done();
-      });
+      return should(setupGateway(serviceOptions)).be.rejectedWith('ENOENT: no such file or directory, open \'/non/existent/file.key\'');
     });
 
     describe('when incorrect proxy options are provided', () => {
       before(() => {
-        const serviceOptions = { target: { certFile: invalidClientCertFile } };
-
-        return setupGateway(serviceOptions).then(apps => {
+        return setupGateway({ target: { certFile: invalidClientCertFile } }).then(apps => {
           app = apps.app;
         });
       });
@@ -87,7 +82,7 @@ describe('@proxy policy', () => {
       });
     });
 
-    describe('when proxy options are specified on the serviceEndpoint', () => {
+    describe('When proxy options are specified on the policy action', () => {
       before(() => {
         return setupGateway(defaultProxyOptions).then(apps => {
           app = apps.app;
@@ -102,45 +97,10 @@ describe('@proxy policy', () => {
         return expectedResponse(app, 200, /json/);
       });
     });
-
-    describe('When proxy options are specified on the policy action', () => {
-      describe('and no proxy options are specified on the serviceEndpoint', () => {
-        before(() => {
-          return setupGateway({}, defaultProxyOptions).then(apps => {
-            app = apps.app;
-          });
-        });
-
-        after((done) => {
-          app.close(done);
-        });
-
-        it('passes options to proxy', () => {
-          return expectedResponse(app, 200, /json/);
-        });
-      });
-
-      describe('and proxy options are also specified on the serviceEndpoint', () => {
-        before(() => {
-          const serviceOptions = { target: { certFile: invalidClientCertFile } };
-          return setupGateway(serviceOptions, defaultProxyOptions).then(apps => {
-            app = apps.app;
-          });
-        });
-
-        after((done) => {
-          app.close(done);
-        });
-
-        it('uses both configurations, with policy proxy options taking precedence', () => {
-          return expectedResponse(app, 200, /json/);
-        });
-      });
-    });
   });
 });
 
-const setupGateway = (serviceOptions = {}, policyOptions = {}) =>
+const setupGateway = (proxyOptions) =>
   findOpenPortNumbers(1).then(([port]) => {
     config.gatewayConfig = {
       http: { port },
@@ -149,8 +109,7 @@ const setupGateway = (serviceOptions = {}, policyOptions = {}) =>
       },
       serviceEndpoints: {
         backend: {
-          url: `https://localhost:${backendServerPort}`,
-          proxyOptions: serviceOptions
+          url: `https://localhost:${backendServerPort}`
         }
       },
       policies: ['proxy'],
@@ -159,7 +118,7 @@ const setupGateway = (serviceOptions = {}, policyOptions = {}) =>
           apiEndpoints: ['test'],
           policies: [{
             proxy: [{
-              action: { proxyOptions: policyOptions, serviceEndpoint: 'backend' }
+              action: { proxyOptions, serviceEndpoint: 'backend' }
             }]
           }]
         }
