@@ -2,6 +2,7 @@ const idGen = require('uuid62');
 const request = require('supertest');
 const should = require('should');
 const jwt = require('jsonwebtoken');
+const clone = require('clone');
 
 const db = require('../../../lib/db');
 
@@ -14,8 +15,8 @@ const serverHelper = require('../../common/server-helper');
 const config = require('../../../lib/config');
 const testHelper = require('../../common/routing.helper')();
 
-const originalGatewayConfig = JSON.parse(JSON.stringify(config.gatewayConfig));
-const originalSystemConfig = JSON.parse(JSON.stringify(config.systemConfig));
+const originalGatewayConfig = clone(config.gatewayConfig);
+const originalSystemConfig = clone(config.systemConfig);
 
 let gateway;
 let backend;

@@ -58,6 +58,8 @@ describe('@proxy policy', () => {
   });
 
   describe('proxyOptions', () => {
+    afterEach((done) => app ? app.close(done) : done());
+
     it('raises an error when incorrect TLS file paths are provided', () => {
       const serviceOptions = { target: { keyFile: '/non/existent/file.key' } };
 
@@ -71,8 +73,6 @@ describe('@proxy policy', () => {
         });
       });
 
-      after((done) => app.close(done));
-
       it('responds with a bad gateway error', () => expectResponse(app, 502, /text\/html/));
     });
 
@@ -83,8 +83,14 @@ describe('@proxy policy', () => {
         });
       });
 
-      after((done) => {
-        app.close(done);
+      it('passes options to proxy', () => expectResponse(app, 200, /json/));
+    });
+
+    describe('When proxy options are specified on the proxyOptions deprecated parameter', () => {
+      before(() => {
+        return setupGateway({ proxyOptions: defaultProxyOptions }).then(apps => {
+          app = apps.app;
+        });
       });
 
       it('passes options to proxy', () => expectResponse(app, 200, /json/));
@@ -110,13 +116,12 @@ const setupGateway = (proxyOptions) =>
           apiEndpoints: ['test'],
           policies: [{
             proxy: [{
-              action: { proxyOptions, serviceEndpoint: 'backend' }
+              action: { ...proxyOptions, serviceEndpoint: 'backend' }
             }]
           }]
         }
       }
     };
-
     return gateway();
   });
 
