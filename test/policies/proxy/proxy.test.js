@@ -95,10 +95,20 @@ describe('@proxy policy', () => {
 
       it('passes options to proxy', () => expectResponse(app, 200, /json/));
     });
+
+    describe('When proxy options are specified on the serviceEndpoint', () => {
+      before(() => {
+        return setupGateway(undefined, defaultProxyOptions).then(apps => {
+          app = apps.app;
+        });
+      });
+
+      it('passes options to proxy', () => expectResponse(app, 200, /json/));
+    });
   });
 });
 
-const setupGateway = (proxyOptions) =>
+const setupGateway = (proxyOptions = {}, serviceProxyOptions = {}) =>
   findOpenPortNumbers(1).then(([port]) => {
     config.gatewayConfig = {
       http: { port },
@@ -107,7 +117,8 @@ const setupGateway = (proxyOptions) =>
       },
       serviceEndpoints: {
         backend: {
-          url: `https://localhost:${backendServerPort}`
+          url: `https://localhost:${backendServerPort}`,
+          proxyOptions: serviceProxyOptions
         }
       },
       policies: ['proxy'],
