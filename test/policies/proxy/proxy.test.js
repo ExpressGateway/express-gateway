@@ -37,6 +37,14 @@ describe('@proxy policy', () => {
       backendServerPort = ports[0];
 
       expressApp.all('*', function (req, res) {
+        if (req.headers['x-test']) {
+          res.setHeader('x-test', req.header('x-test'));
+        }
+
+        if (req.headers['x-forwarded-for']) {
+          res.setHeader('x-forwarded-for', req.header('x-forwarded-for'));
+        }
+
         res.status(200).json();
       });
 
@@ -104,6 +112,22 @@ describe('@proxy policy', () => {
       });
 
       it('passes options to proxy', () => expectResponse(app, 200, /json/));
+    });
+
+    describe('When proxy options are scattered on all the supported properties', () => {
+      before(() => {
+        return setupGateway(Object.assign(defaultProxyOptions, { proxyOptions: { xfwd: true } }), { headers: { 'X-Test': 'testValue' } }).then(apps => {
+          app = apps.app;
+        });
+      });
+
+      it('passes options to proxy', () =>
+        request(app)
+          .get('/endpoint')
+          .expect(200)
+          .expect('x-test', 'testValue')
+          .expect('x-forwarded-for', '::ffff:127.0.0.1')
+      );
     });
   });
 });
