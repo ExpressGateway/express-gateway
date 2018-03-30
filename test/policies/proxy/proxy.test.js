@@ -2,9 +2,11 @@ const path = require('path');
 const fs = require('fs');
 const request = require('supertest');
 const should = require('should');
+const sinon = require('sinon');
 
 const config = require('../../../lib/config');
 const gateway = require('../../../lib/gateway');
+const logger = require('../../../lib/logger').policy;
 const { findOpenPortNumbers } = require('../../common/server-helper');
 
 const originalGatewayConfig = config.gatewayConfig;
@@ -95,13 +97,20 @@ describe('@proxy policy', () => {
     });
 
     describe('When proxy options are specified on the proxyOptions deprecated parameter', () => {
+      let loggerSpy;
       before(() => {
+        loggerSpy = sinon.spy(logger, 'warn');
         return setupGateway({ proxyOptions: defaultProxyOptions }).then(apps => {
           app = apps.app;
         });
       });
 
-      it('passes options to proxy', () => expectResponse(app, 200, /json/));
+      after(() => loggerSpy.restore());
+
+      it('passes options to proxy but emit a warning', () => {
+        expectResponse(app, 200, /json/);
+        should(loggerSpy.called).be.true();
+      });
     });
 
     describe('When proxy options are specified on the serviceEndpoint', () => {
