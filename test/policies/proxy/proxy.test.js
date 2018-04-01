@@ -73,7 +73,7 @@ describe('@proxy policy', () => {
     it('raises an error when incorrect TLS file paths are provided', () => {
       const serviceOptions = { target: { keyFile: '/non/existent/file.key' } };
 
-      return should(setupGateway(serviceOptions)).be.rejectedWith('ENOENT: no such file or directory, open \'/non/existent/file.key\'');
+      return should(setupGateway(serviceOptions)).be.rejectedWith(/no such file or directory/);
     });
 
     describe('when incorrect proxy options are provided', () => {
