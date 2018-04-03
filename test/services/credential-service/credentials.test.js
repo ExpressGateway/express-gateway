@@ -1,5 +1,4 @@
 const should = require('should');
-const clone = require('clone');
 const config = require('../../../lib/config');
 const services = require('../../../lib/services');
 const schemas = require('../../../lib/schemas');
@@ -155,7 +154,7 @@ describe('Credential service tests', () => {
   });
 
   describe('Credential Property tests', () => {
-    const originalModelConfig = clone(config.models.credentials);
+    const originalModelConfig = JSON.parse(JSON.stringify(config.models.credentials));
     const username = 'someUser';
     const _credential = {
       secret: 'password',
