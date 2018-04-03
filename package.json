@@ -67,6 +67,7 @@
     "bcryptjs": "^2.4.3",
     "chalk": "^2.3.2",
     "chokidar": "^2.0.2",
+    "clone": "^1.0.4",
     "color-convert": "^1.9.1",
     "connect-ensure-login": "0.1.1",
     "cors": "^2.8.4",

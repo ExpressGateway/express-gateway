@@ -2,9 +2,11 @@ const path = require('path');
 const fs = require('fs');
 const request = require('supertest');
 const should = require('should');
+const sinon = require('sinon');
 
 const config = require('../../../lib/config');
 const gateway = require('../../../lib/gateway');
+const logger = require('../../../lib/logger').policy;
 const { findOpenPortNumbers } = require('../../common/server-helper');
 
 const originalGatewayConfig = config.gatewayConfig;
@@ -17,10 +19,6 @@ const clientCertFile = path.join(__dirname, '../../fixtures/certs/client', 'clie
 const chainFile = path.join(__dirname, '../../fixtures/certs/chain', 'chain.pem');
 
 let backendServerPort;
-
-function expectedResponse (app, status, contentType) {
-  return request(app).get('/endpoint').expect(status).expect('Content-Type', contentType);
-}
 
 describe('@proxy policy', () => {
   const defaultProxyOptions = {
@@ -41,6 +39,14 @@ describe('@proxy policy', () => {
       backendServerPort = ports[0];
 
       expressApp.all('*', function (req, res) {
+        if (req.headers['x-test']) {
+          res.setHeader('x-test', req.header('x-test'));
+        }
+
+        if (req.headers['x-forwarded-for']) {
+          res.setHeader('x-forwarded-for', req.header('x-forwarded-for'));
+        }
+
         res.status(200).json();
       });
 
@@ -62,85 +68,80 @@ describe('@proxy policy', () => {
   });
 
   describe('proxyOptions', () => {
-    it('raises an error when incorrect TLS file paths are provided', (done) => {
+    afterEach((done) => app ? app.close(done) : done());
+
+    it('raises an error when incorrect TLS file paths are provided', () => {
       const serviceOptions = { target: { keyFile: '/non/existent/file.key' } };
 
-      setupGateway(serviceOptions).catch(err => {
-        should(err.message).match(/no such file or directory/);
-        done();
-      });
+      return should(setupGateway(serviceOptions)).be.rejectedWith(/no such file or directory/);
     });
 
     describe('when incorrect proxy options are provided', () => {
       before(() => {
-        const serviceOptions = { target: { certFile: invalidClientCertFile } };
-
-        return setupGateway(serviceOptions).then(apps => {
+        return setupGateway({ target: { certFile: invalidClientCertFile } }).then(apps => {
           app = apps.app;
         });
       });
 
-      after((done) => app.close(done));
-
-      it('responds with a bad gateway error', () => {
-        return expectedResponse(app, 502, /text\/html/);
-      });
+      it('responds with a bad gateway error', () => expectResponse(app, 502, /text\/html/));
     });
 
-    describe('when proxy options are specified on the serviceEndpoint', () => {
+    describe('When proxy options are specified on the policy action', () => {
       before(() => {
         return setupGateway(defaultProxyOptions).then(apps => {
           app = apps.app;
         });
       });
 
-      after((done) => {
-        app.close(done);
+      it('passes options to proxy', () => expectResponse(app, 200, /json/));
+    });
+
+    describe('When proxy options are specified on the proxyOptions deprecated parameter', () => {
+      let loggerSpy;
+      before(() => {
+        loggerSpy = sinon.spy(logger, 'warn');
+        return setupGateway({ proxyOptions: defaultProxyOptions }).then(apps => {
+          app = apps.app;
+        });
       });
 
-      it('passes options to proxy', () => {
-        return expectedResponse(app, 200, /json/);
+      after(() => loggerSpy.restore());
+
+      it('passes options to proxy but emit a warning', () => {
+        expectResponse(app, 200, /json/);
+        should(loggerSpy.called).be.true();
       });
     });
 
-    describe('When proxy options are specified on the policy action', () => {
-      describe('and no proxy options are specified on the serviceEndpoint', () => {
-        before(() => {
-          return setupGateway({}, defaultProxyOptions).then(apps => {
-            app = apps.app;
-          });
-        });
-
-        after((done) => {
-          app.close(done);
-        });
-
-        it('passes options to proxy', () => {
-          return expectedResponse(app, 200, /json/);
+    describe('When proxy options are specified on the serviceEndpoint', () => {
+      before(() => {
+        return setupGateway(undefined, defaultProxyOptions).then(apps => {
+          app = apps.app;
         });
       });
 
-      describe('and proxy options are also specified on the serviceEndpoint', () => {
-        before(() => {
-          const serviceOptions = { target: { certFile: invalidClientCertFile } };
-          return setupGateway(serviceOptions, defaultProxyOptions).then(apps => {
-            app = apps.app;
-          });
-        });
+      it('passes options to proxy', () => expectResponse(app, 200, /json/));
+    });
 
-        after((done) => {
-          app.close(done);
-        });
-
-        it('uses both configurations, with policy proxy options taking precedence', () => {
-          return expectedResponse(app, 200, /json/);
+    describe('When proxy options are scattered on all the supported properties', () => {
+      before(() => {
+        return setupGateway(Object.assign(defaultProxyOptions, { proxyOptions: { xfwd: true } }), { headers: { 'X-Test': 'testValue' } }).then(apps => {
+          app = apps.app;
         });
       });
+
+      it('passes options to proxy', () =>
+        request(app)
+          .get('/endpoint')
+          .expect(200)
+          .expect('x-test', 'testValue')
+          .expect('x-forwarded-for', '::ffff:127.0.0.1')
+      );
     });
   });
 });
 
-const setupGateway = (serviceOptions = {}, policyOptions = {}) =>
+const setupGateway = (proxyOptions = {}, serviceProxyOptions = {}) =>
   findOpenPortNumbers(1).then(([port]) => {
     config.gatewayConfig = {
       http: { port },
@@ -150,7 +151,7 @@ const setupGateway = (serviceOptions = {}, policyOptions = {}) =>
       serviceEndpoints: {
         backend: {
           url: `https://localhost:${backendServerPort}`,
-          proxyOptions: serviceOptions
+          proxyOptions: serviceProxyOptions
         }
       },
       policies: ['proxy'],
@@ -159,12 +160,14 @@ const setupGateway = (serviceOptions = {}, policyOptions = {}) =>
           apiEndpoints: ['test'],
           policies: [{
             proxy: [{
-              action: { proxyOptions: policyOptions, serviceEndpoint: 'backend' }
+              action: Object.assign({}, proxyOptions, { serviceEndpoint: 'backend' })
             }]
           }]
         }
       }
     };
-
     return gateway();
   });
+
+const expectResponse = (app, status, contentType) =>
+  request(app).get('/endpoint').expect(status).expect('Content-Type', contentType);
