@@ -2,70 +2,63 @@ const session = require('supertest-session');
 const should = require('should');
 const url = require('url');
 const qs = require('querystring');
-const app = require('./bootstrap');
 
+const app = require('./bootstrap');
+const db = require('../../lib/db');
 const services = require('../../lib/services');
+const checkTokenResponse = require('./checkTokenResponse');
+
 const credentialService = services.credential;
 const userService = services.user;
 const applicationService = services.application;
 const tokenService = services.token;
-const db = require('../../lib/db');
 
 describe('Functional Test Authorization Code grant', function () {
   let fromDbUser1, fromDbApp, refreshToken;
 
-  before(function (done) {
+  const user1 = {
+    username: 'irfanbaqui',
+    firstname: 'irfan',
+    lastname: 'baqui',
+    email: 'irfan@eg.com'
+  };
+
+  const user2 = {
+    username: 'somejoe',
+    firstname: 'joe',
+    lastname: 'smith',
+    email: 'joe@eg.com'
+  };
+
+  const app1 = {
+    name: 'irfan_app',
+    redirectUri: 'https://some.host.com/some/route'
+  };
+
+  before(() =>
     db.flushdb()
-      .then(() => {
-        const user1 = {
-          username: 'irfanbaqui',
-          firstname: 'irfan',
-          lastname: 'baqui',
-          email: 'irfan@eg.com'
-        };
+      .then(() => Promise.all([userService.insert(user1), userService.insert(user2)]))
+      .then(([_fromDbUser1, _fromDbUser2]) => {
+        should.exist(_fromDbUser1);
+        should.exist(_fromDbUser2);
 
-        const user2 = {
-          username: 'somejoe',
-          firstname: 'joe',
-          lastname: 'smith',
-          email: 'joe@eg.com'
-        };
-
-        Promise.all([userService.insert(user1), userService.insert(user2)])
-          .then(([_fromDbUser1, _fromDbUser2]) => {
-            should.exist(_fromDbUser1);
-            should.exist(_fromDbUser2);
-
-            fromDbUser1 = _fromDbUser1;
-
-            const app1 = {
-              name: 'irfan_app',
-              redirectUri: 'https://some.host.com/some/route'
-            };
-
-            applicationService.insert(app1, fromDbUser1.id)
-              .then(_fromDbApp => {
-                should.exist(_fromDbApp);
-                fromDbApp = _fromDbApp;
-
-                return credentialService.insertScopes(['someScope'])
-                  .then(() => {
-                    return Promise.all([credentialService.insertCredential(fromDbUser1.id, 'basic-auth', { password: 'user-secret' }),
-                      credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })])
-                      .then(([userRes, appRes]) => {
-                        should.exist(userRes);
-                        should.exist(appRes);
-                        done();
-                      });
-                  });
-              });
-          });
+        fromDbUser1 = _fromDbUser1;
+        return applicationService.insert(app1, fromDbUser1.id);
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
-  });
+      .then(_fromDbApp => {
+        should.exist(_fromDbApp);
+        fromDbApp = _fromDbApp;
+
+        return credentialService.insertScopes(['someScope']);
+      }).then(() =>
+        Promise.all([
+          credentialService.insertCredential(fromDbUser1.id, 'basic-auth', { password: 'user-secret' }),
+          credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })
+        ])
+      ).then(([userRes, appRes]) => {
+        should.exist(userRes);
+        should.exist(appRes);
+      }));
 
   it('should grant access token if requesting without scopes', function (done) {
     const request = session(app);
@@ -126,13 +119,8 @@ describe('Functional Test Authorization Code grant', function () {
                       })
                       .expect(200)
                       .end(function (err, res) {
-                        should.not.exist(err);
-                        should.exist(res.body.access_token);
-                        should.exist(res.body.refresh_token);
-                        res.body.access_token.length.should.be.greaterThan(15);
-                        res.body.refresh_token.length.should.be.greaterThan(15);
-                        should.exist(res.body.token_type);
-                        res.body.token_type.should.eql('Bearer');
+                        if (err) return done(err);
+                        checkTokenResponse(res.body);
                         done();
                       });
                   });
@@ -201,13 +189,8 @@ describe('Functional Test Authorization Code grant', function () {
                       })
                       .expect(200)
                       .end(function (err, res) {
-                        should.not.exist(err);
-                        should.exist(res.body.access_token);
-                        should.exist(res.body.refresh_token);
-                        res.body.access_token.length.should.be.greaterThan(15);
-                        res.body.refresh_token.length.should.be.greaterThan(15);
-                        should.exist(res.body.token_type);
-                        res.body.token_type.should.eql('Bearer');
+                        if (err) return done(err);
+                        checkTokenResponse(res.body, ['refresh_token']);
                         refreshToken = res.body.refresh_token;
                         tokenService.get(res.body.access_token)
                           .then(token => {
@@ -237,11 +220,8 @@ describe('Functional Test Authorization Code grant', function () {
       })
       .expect(200)
       .end((err, res) => {
-        should.not.exist(err);
-        should.exist(res.body.access_token);
-        res.body.access_token.length.should.be.greaterThan(15);
-        should.exist(res.body.token_type);
-        res.body.token_type.should.eql('Bearer');
+        if (err) return done(err);
+        checkTokenResponse(res.body);
         tokenService.get(res.body.access_token)
           .then(token => {
             should.exist(token);
@@ -287,10 +267,7 @@ describe('Functional Test Authorization Code grant', function () {
                 scope: 'someScope, unauthorizedScope'
               })
               .expect(403)
-              .end(function (err) {
-                should.not.exist(err);
-                done();
-              });
+              .end(done);
           });
       });
   });
