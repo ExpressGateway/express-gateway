@@ -73,7 +73,7 @@ describe('Functional Test Client Password grant', function () {
 
     request
       .post('/oauth2/token')
-      .set('Authorization', 'basic ' + credentials)
+      .set('Authorization', `basic ${credentials}`)
       .set('content-type', 'application/x-www-form-urlencoded')
       .type('form')
       .send({
