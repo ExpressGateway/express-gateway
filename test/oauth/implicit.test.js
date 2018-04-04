@@ -14,58 +14,51 @@ const db = require('../../lib/db');
 describe('Functional Test Implicit grant', function () {
   let fromDbUser1, fromDbApp;
 
-  before(function (done) {
+  const user1 = {
+    username: 'irfanbaqui',
+    firstname: 'irfan',
+    lastname: 'baqui',
+    email: 'irfan@eg.com'
+  };
+
+  const user2 = {
+    username: 'somejoe',
+    firstname: 'joe',
+    lastname: 'smith',
+    email: 'joe@eg.com'
+  };
+
+  before(() =>
     db.flushdb()
-      .then(() => {
-        const user1 = {
-          username: 'irfanbaqui',
-          firstname: 'irfan',
-          lastname: 'baqui',
-          email: 'irfan@eg.com'
+      .then(() => Promise.all([userService.insert(user1), userService.insert(user2)]))
+      .then(([_fromDbUser1, _fromDbUser2]) => {
+        should.exist(_fromDbUser1);
+        should.exist(_fromDbUser2);
+
+        fromDbUser1 = _fromDbUser1;
+
+        const app1 = {
+          name: 'irfan_app',
+          redirectUri: 'https://some.host.com/some/route'
         };
 
-        const user2 = {
-          username: 'somejoe',
-          firstname: 'joe',
-          lastname: 'smith',
-          email: 'joe@eg.com'
-        };
-
-        Promise.all([userService.insert(user1), userService.insert(user2)])
-          .then(([_fromDbUser1, _fromDbUser2]) => {
-            should.exist(_fromDbUser1);
-            should.exist(_fromDbUser2);
-
-            fromDbUser1 = _fromDbUser1;
-
-            const app1 = {
-              name: 'irfan_app',
-              redirectUri: 'https://some.host.com/some/route'
-            };
-
-            applicationService.insert(app1, fromDbUser1.id)
-              .then(_fromDbApp => {
-                should.exist(_fromDbApp);
-                fromDbApp = _fromDbApp;
-
-                return credentialService.insertScopes(['someScope'])
-                  .then(() => {
-                    return Promise.all([credentialService.insertCredential(fromDbUser1.id, 'basic-auth', { password: 'user-secret' }),
-                      credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })])
-                      .then(([userRes, appRes]) => {
-                        should.exist(userRes);
-                        should.exist(appRes);
-                        done();
-                      });
-                  });
-              });
-          });
+        return applicationService.insert(app1, fromDbUser1.id);
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
-  });
+      .then(_fromDbApp => {
+        should.exist(_fromDbApp);
+        fromDbApp = _fromDbApp;
+
+        return credentialService.insertScopes(['someScope']);
+      })
+      .then(() => Promise.all([
+        credentialService.insertCredential(fromDbUser1.id, 'basic-auth', { password: 'user-secret' }),
+        credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })
+      ]))
+      .then(([userRes, appRes]) => {
+        should.exist(userRes);
+        should.exist(appRes);
+      })
+  );
 
   it('should grant access token when requesting without scopes', function (done) {
     const request = session(app);
@@ -228,10 +221,7 @@ describe('Functional Test Implicit grant', function () {
                 scope: 'someScope, someUnauthorizedScope'
               })
               .expect(403)
-              .end(function (err) {
-                should.not.exist(err);
-                done();
-              });
+              .end(done);
           });
       });
   });
