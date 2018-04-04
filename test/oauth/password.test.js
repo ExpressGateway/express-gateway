@@ -1,13 +1,15 @@
 const session = require('supertest-session');
 const should = require('should');
-const app = require('./bootstrap');
 
+const app = require('./bootstrap');
 const services = require('../../lib/services');
+const db = require('../../lib/db');
+const checkTokenResponse = require('./checkTokenResponse');
+
 const credentialService = services.credential;
 const userService = services.user;
 const applicationService = services.application;
 const tokenService = services.token;
-const db = require('../../lib/db');
 
 describe('Functional Test Client Password grant', function () {
   let fromDbUser1, fromDbApp, refreshToken;
@@ -74,11 +76,8 @@ describe('Functional Test Client Password grant', function () {
       })
       .expect(200)
       .end(function (err, res) {
-        should.not.exist(err);
-        const token = res.body;
-        should.exist(token);
-        should.exist(token.access_token);
-        token.token_type.should.equal('Bearer');
+        if (err) return done(err);
+        checkTokenResponse(res.body);
         done();
       });
   });
@@ -100,19 +99,15 @@ describe('Functional Test Client Password grant', function () {
       })
       .expect(200)
       .end(function (err, res) {
-        should.not.exist(err);
-        const token = res.body;
-        should.exist(token);
-        should.exist(token.access_token);
-        should.exist(token.refresh_token);
-        token.token_type.should.equal('Bearer');
-        refreshToken = token.refresh_token;
+        if (err) return done(err);
+        checkTokenResponse(res.body, ['refresh_token']);
+        refreshToken = res.body.refresh_token;
 
-        tokenService.get(token.access_token)
+        tokenService.get(res.body.access_token)
           .then(fromDbToken => {
             should.exist(fromDbToken);
             fromDbToken.scopes.should.eql(['someScope']);
-            [fromDbToken.id, fromDbToken.tokenDecrypted].should.eql(token.access_token.split('|'));
+            [fromDbToken.id, fromDbToken.tokenDecrypted].should.eql(res.body.access_token.split('|'));
             done();
           });
       });
@@ -132,11 +127,8 @@ describe('Functional Test Client Password grant', function () {
       })
       .expect(200)
       .end((err, res) => {
-        should.not.exist(err);
-        should.exist(res.body.access_token);
-        res.body.access_token.length.should.be.greaterThan(15);
-        should.exist(res.body.token_type);
-        res.body.token_type.should.eql('Bearer');
+        if (done) return done(err);
+        checkTokenResponse(res.body);
         tokenService.get(res.body.access_token)
           .then(token => {
             should.exist(token);
@@ -163,9 +155,6 @@ describe('Functional Test Client Password grant', function () {
         scope: 'someScope unauthorizedScope'
       })
       .expect(401)
-      .end(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .end(done);
   });
 });
