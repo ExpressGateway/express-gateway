@@ -1,57 +1,64 @@
 const session = require('supertest-session');
 const should = require('should');
+
 const app = require('./bootstrap');
+const checkTokenResponse = require('./checkTokenResponse');
 const services = require('../../lib/services');
+const db = require('../../lib/db');
+
 const credentialService = services.credential;
 const userService = services.user;
 const applicationService = services.application;
 const tokenService = services.token;
-const db = require('../../lib/db');
 
 describe('Functional Test Client Credentials grant', function () {
-  let user, application;
+  let fromDbUser1, fromDbApp;
 
-  before(function (done) {
+  const user1 = {
+    username: 'irfanbaqui',
+    firstname: 'irfan',
+    lastname: 'baqui',
+    email: 'irfan@eg.com'
+  };
+
+  const user2 = {
+    username: 'somejoe',
+    firstname: 'joe',
+    lastname: 'smith',
+    email: 'joe@eg.com'
+  };
+
+  before(() =>
     db.flushdb()
-      .then(() => {
-        const user1 = {
-          username: 'irfanbaqui',
-          firstname: 'irfan',
-          lastname: 'baqui',
-          email: 'irfan@eg.com'
+      .then(() => Promise.all([userService.insert(user1), userService.insert(user2)]))
+      .then(([_fromDbUser1, _fromDbUser2]) => {
+        should.exist(_fromDbUser1);
+        should.exist(_fromDbUser2);
+
+        fromDbUser1 = _fromDbUser1;
+
+        const app1 = {
+          name: 'irfan_app',
+          redirectUri: 'https://some.host.com/some/route'
         };
 
-        userService.insert(user1)
-          .then(_user => {
-            should.exist(_user);
-            user = _user;
-
-            const app1 = {
-              name: 'irfan_app',
-              redirectUri: 'https://some.host.com/some/route'
-            };
-
-            applicationService.insert(app1, user.id)
-              .then(_app => {
-                should.exist(_app);
-                application = _app;
-
-                return credentialService.insertScopes(['someScope'])
-                  .then(() => {
-                    credentialService.insertCredential(application.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })
-                      .then(res => {
-                        should.exist(res);
-                        done();
-                      });
-                  });
-              });
-          });
+        return applicationService.insert(app1, fromDbUser1.id);
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
-  });
+      .then(_fromDbApp => {
+        should.exist(_fromDbApp);
+        fromDbApp = _fromDbApp;
+
+        return credentialService.insertScopes(['someScope']);
+      })
+      .then(() => Promise.all([
+        credentialService.insertCredential(fromDbUser1.id, 'basic-auth', { password: 'user-secret' }),
+        credentialService.insertCredential(fromDbApp.id, 'oauth2', { secret: 'app-secret', scopes: ['someScope'] })
+      ]))
+      .then(([userRes, appRes]) => {
+        should.exist(userRes);
+        should.exist(appRes);
+      })
+  );
 
   it('should grant access token for requests without scopes', function (done) {
     const request = session(app);
@@ -60,16 +67,13 @@ describe('Functional Test Client Credentials grant', function () {
       .post('/oauth2/token')
       .send({
         grant_type: 'client_credentials',
-        client_id: application.id,
+        client_id: fromDbApp.id,
         client_secret: 'app-secret'
       })
       .expect(200)
       .end(function (err, res) {
-        should.not.exist(err);
-        const token = res.body;
-        should.exist(token);
-        should.exist(token.access_token);
-        token.token_type.should.equal('Bearer');
+        if (err) return done(err);
+        checkTokenResponse(res.body);
         done();
       });
   });
@@ -81,17 +85,14 @@ describe('Functional Test Client Credentials grant', function () {
       .post('/oauth2/token')
       .send({
         grant_type: 'client_credentials',
-        client_id: application.id,
+        client_id: fromDbApp.id,
         client_secret: 'app-secret',
         scope: 'someScope'
       })
       .expect(200)
       .end(function (err, res) {
         should.not.exist(err);
-        const token = res.body;
-        should.exist(token);
-        should.exist(token.access_token);
-        token.token_type.should.equal('Bearer');
+        checkTokenResponse(res.body);
         tokenService.get(res.body.access_token)
           .then(token => {
             should.exist(token);
@@ -109,14 +110,11 @@ describe('Functional Test Client Credentials grant', function () {
       .post('/oauth2/token')
       .send({
         grant_type: 'client_credentials',
-        client_id: application.id,
+        client_id: fromDbApp.id,
         client_secret: 'app-secret',
         scope: 'someScope unauthorizedScope'
       })
       .expect(401)
-      .end(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .end(done);
   });
 });
