@@ -8,9 +8,9 @@ const { checkTokenResponse, createOAuthScenario } = require('./testUtils');
 const tokenService = services.token;
 
 describe('Functional Test Client Password grant', function () {
-  let fromDbApp, refreshToken;
+  let fromDbApp, fromDbUser, refreshToken;
 
-  before(() => createOAuthScenario().then(([user, app]) => { fromDbApp = app; }));
+  before(() => createOAuthScenario().then(([user, app]) => { fromDbUser = user; fromDbApp = app; }));
 
   it('should grant access token when no scopes are specified', function (done) {
     const request = session(app);
@@ -23,7 +23,7 @@ describe('Functional Test Client Password grant', function () {
       .type('form')
       .send({
         grant_type: 'password',
-        username: 'irfanbaqui',
+        username: fromDbUser.username,
         password: 'user-secret'
       })
       .expect(200)
@@ -45,7 +45,7 @@ describe('Functional Test Client Password grant', function () {
       .type('form')
       .send({
         grant_type: 'password',
-        username: 'irfanbaqui',
+        username: fromDbUser.username,
         password: 'user-secret',
         scope: 'someScope'
       })
@@ -102,7 +102,7 @@ describe('Functional Test Client Password grant', function () {
       .type('form')
       .send({
         grant_type: 'password',
-        username: 'irfanbaqui',
+        username: fromDbUser.username,
         password: 'user-secret',
         scope: 'someScope unauthorizedScope'
       })

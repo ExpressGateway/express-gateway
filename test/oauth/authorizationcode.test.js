@@ -10,9 +10,9 @@ const { checkTokenResponse, createOAuthScenario } = require('./testUtils');
 const tokenService = services.token;
 
 describe('Functional Test Authorization Code grant', function () {
-  let fromDbApp, refreshToken;
+  let fromDbApp, fromDbUser, refreshToken;
 
-  before(() => createOAuthScenario().then(([user, app]) => { fromDbApp = app; }));
+  before(() => createOAuthScenario().then(([user, app]) => { fromDbUser = user; fromDbApp = app; }));
 
   it('should grant access token if requesting without scopes', function (done) {
     const request = session(app);
@@ -32,7 +32,7 @@ describe('Functional Test Authorization Code grant', function () {
         request
           .post('/login')
           .query({
-            username: 'irfanbaqui',
+            username: fromDbUser.username,
             password: 'user-secret'
           })
           .expect(302)
@@ -101,7 +101,7 @@ describe('Functional Test Authorization Code grant', function () {
         request
           .post('/login')
           .query({
-            username: 'irfanbaqui',
+            username: fromDbUser.username,
             password: 'user-secret'
           })
           .expect(302)
@@ -204,7 +204,7 @@ describe('Functional Test Authorization Code grant', function () {
         request
           .post('/login')
           .query({
-            username: 'irfanbaqui',
+            username: fromDbUser.username,
             password: 'user-secret'
           })
           .expect(302)

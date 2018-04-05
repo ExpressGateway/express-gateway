@@ -1,4 +1,5 @@
 const should = require('should');
+const uuid = require('uuid62');
 
 const services = require('../../lib/services');
 const db = require('../../lib/db');
@@ -16,7 +17,7 @@ module.exports = {
 
   createOAuthScenario: () => {
     const user1 = {
-      username: 'irfanbaqui',
+      username: uuid.v4(),
       firstname: 'irfan',
       lastname: 'baqui',
       email: 'irfan@eg.com'
