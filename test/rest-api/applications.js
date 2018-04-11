@@ -55,4 +55,12 @@ describe('REST: Applications', () => {
       })).be.fulfilled();
     });
   });
+
+  describe('Use start and count parameters', () => {
+    before(() => Promise.all(Array(100).map(i => adminHelper.admin.apps.create({ username, name: idGen.v4() }))));
+
+    it('should return a numeric value for nextKey', () =>
+      adminHelper.admin.apps.list().then((data) => should(data).have.property('nextKey').Number())
+    );
+  });
 });
