@@ -32,9 +32,10 @@ module.exports = function (client) {
         .get(`${baseUrl}${encodeURIComponent(id)}`)
         .then(res => res.body);
     },
-    list () { // TODO: add pagination
+    list ({ start, count }) { // TODO: add pagination
       return client
         .get(baseUrl)
+        .query({ start, count })
         .then(res => {
           return res.body;
         });
