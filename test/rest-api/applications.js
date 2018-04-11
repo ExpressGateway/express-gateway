@@ -45,8 +45,12 @@ describe('REST: Applications', () => {
       adminHelper.admin.apps.list().then((data) => should(data).have.property('nextKey').Number().not.eql(0))
     );
 
+    it('should respect the start parameter', () =>
+      adminHelper.admin.apps.list({ start: 20 }).then((data) => should(data.apps[0].name).not.eql('appy1'))
+    );
+
     it('should respect a count parameter', () =>
-      adminHelper.admin.apps.list({ count: 500 }).then((data) => should(data).have.property('nextKey').Number().not.eql(0))
+      adminHelper.admin.apps.list({ count: 3 }).then((data) => should(data.apps.length).lessThanOrEqual(3))
     );
   });
 });
