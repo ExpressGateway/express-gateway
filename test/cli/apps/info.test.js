@@ -60,7 +60,6 @@ describe('eg apps info', () => {
 
         generator.once('end', () => {
           const app = JSON.parse(output);
-          assert.equal(app.id, app.id);
           assert.equal(app.name, 'appy');
           assert.equal(app.redirectUri, 'http://localhost:3000/cb');
           assert.equal(app.isActive, true);
