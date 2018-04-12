@@ -1,4 +1,4 @@
-const assert = require('assert');
+const should = require('should');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:info';
@@ -60,10 +60,11 @@ describe('eg apps info', () => {
 
         generator.once('end', () => {
           const app = JSON.parse(output);
-          assert.equal(app.name, 'appy');
-          assert.equal(app.redirectUri, 'http://localhost:3000/cb');
-          assert.equal(app.isActive, true);
-          assert.equal(app.userId, user.id);
+          should(app).have.property('name', 'appy');
+          should(app).have.property('redirectUri', 'http://localhost:3000/cb');
+          should(app).have.property('isActive', true);
+          should(app).have.property('userId', user.id);
+          should(app).have.property('username');
 
           done();
         });
