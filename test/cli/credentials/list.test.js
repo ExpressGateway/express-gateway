@@ -1,4 +1,4 @@
-const assert = require('assert');
+const should = require('should');
 const idGen = require('uuid62');
 const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
@@ -8,18 +8,20 @@ describe('eg credentials list -c ', () => {
   let program, env, username;
 
   const createdTypes = {
-    inc (type, isActive) {
+    inc (cred, type, isActive) {
       if (isActive) {
         this.active[type] = (this.active[type] || 0) + 1;
       } else {
         this.archive[type] = (this.archive[type] || 0) + 1;
       }
       this.all[type] = (this.all[type] || 0) + 1;
+      this.raw.push(cred);
     },
     reset () {
       this.active = {};
       this.archive = {};
       this.all = {};
+      this.raw = [];
     }
   };
 
@@ -44,56 +46,58 @@ describe('eg credentials list -c ', () => {
     return credentials
       .create(username, type, options)
       .then((credential) => {
-        createdTypes.inc(type, isActive);
+        createdTypes.inc(credential, type, isActive);
 
         if (type === 'key-auth') {
-          const { keyId } = credential;
-          createdKeyAuthKeys.add(keyId, isActive);
+          createdKeyAuthKeys.add(credential.id, isActive);
+        }
 
-          if (!isActive) {
-            return credentials.deactivate(keyId, type);
-          }
+        if (!isActive) {
+          return credentials.deactivate(credential.id, type);
         }
       });
   };
 
-  before(() => adminHelper.start());
+  before(() => {
+    createdTypes.reset();
+    createdKeyAuthKeys.reset();
+
+    return adminHelper
+      .start()
+      .then(() => adminHelper.admin.users.create({
+        username: idGen.v4(),
+        firstname: 'La',
+        lastname: 'Deeda'
+      }))
+      .then(user => {
+        username = user.username;
+        return Promise.all([
+          createCredential(user.username, 'key-auth'),
+          createCredential(user.username, 'basic-auth', { password: 'test1' }),
+          createCredential(user.username, 'oauth2', { secret: 'eg1' }),
+          createCredential(user.username, 'key-auth', {}, false),
+          createCredential(user.username, 'key-auth', {}, false),
+          createCredential(user.username, 'key-auth', {}, false)
+        ]);
+      });
+  });
+
   after(() => adminHelper.stop());
 
   beforeEach(() => {
     ({ program, env } = environment.bootstrap());
-    createdTypes.reset();
-    createdKeyAuthKeys.reset();
-
     env.prepareHijack();
-
-    return adminHelper
-      .reset()
-      .then(() => {
-        return adminHelper
-          .admin
-          .users
-          .create({
-            username: idGen.v4(),
-            firstname: 'La',
-            lastname: 'Deeda'
-          })
-          .then(user => {
-            username = user.username;
-            return Promise.all([
-              createCredential(user.username, 'key-auth'),
-              createCredential(user.username, 'basic-auth', { password: 'test1' }),
-              createCredential(user.username, 'oauth2', { secret: 'eg1' }),
-              createCredential(user.username, 'key-auth', {}, false),
-              createCredential(user.username, 'key-auth', {}, false),
-              createCredential(user.username, 'key-auth', {}, false)
-            ]);
-          });
-      });
   });
 
   afterEach(() => {
     env.resetHijack();
+  });
+
+  it('should have the id property, but not the secret ones', () => {
+    createdTypes.raw.forEach(cred => {
+      should(cred).not.have.properties('secret', 'password');
+      should(cred).have.property('id');
+    });
   });
 
   it('should show active credentials', done => {
@@ -117,8 +121,8 @@ describe('eg credentials list -c ', () => {
         keyAuthKeys.sort();
         createdKeyAuthKeys.all.sort();
 
-        assert.deepEqual(types, createdTypes.active);
-        assert.deepEqual(keyAuthKeys, createdKeyAuthKeys.active);
+        should(types).deepEqual(createdTypes.active);
+        should(keyAuthKeys).deepEqual(createdKeyAuthKeys.active);
         done();
       });
     });
@@ -147,8 +151,8 @@ describe('eg credentials list -c ', () => {
         keyAuthKeys.sort();
         createdKeyAuthKeys.archive.sort();
 
-        assert.deepEqual(types, createdTypes.archive);
-        assert.deepEqual(keyAuthKeys, createdKeyAuthKeys.archive);
+        should(types).deepEqual(createdTypes.archive);
+        should(keyAuthKeys).deepEqual(createdKeyAuthKeys.archive);
         done();
       });
     });
@@ -177,8 +181,8 @@ describe('eg credentials list -c ', () => {
         keyAuthKeys.sort();
         createdKeyAuthKeys.all.sort();
 
-        assert.deepEqual(types, createdTypes.all);
-        assert.deepEqual(keyAuthKeys, createdKeyAuthKeys.all);
+        should(types).deepEqual(createdTypes.all);
+        should(keyAuthKeys).deepEqual(createdKeyAuthKeys.all);
         done();
       });
     });
