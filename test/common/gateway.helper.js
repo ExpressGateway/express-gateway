@@ -50,7 +50,7 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
         const gatewayProcess = fork(modulePath, [], {
           cwd: dirInfo.basePath,
           env: childEnv,
-          stdio: 'pipe'
+          stdio: ['pipe', 'pipe', 'pipe', 'ipc']
         });
 
         gatewayProcess.on('error', reject);
