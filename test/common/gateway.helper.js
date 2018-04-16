@@ -49,30 +49,23 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
           'lib', 'index.js');
         const gatewayProcess = fork(modulePath, [], {
           cwd: dirInfo.basePath,
-          env: childEnv
+          env: childEnv,
+          stdio: ['pipe', 'pipe', 'pipe', 'ipc']
         });
 
-        gatewayProcess.on('error', err => {
-          reject(err);
-        });
-        let count = 0;
-        const interval = setInterval(() => {
-          count++; // Waiting for process to start, ignoring conn refused errors
+        gatewayProcess.on('error', reject);
+        gatewayProcess.stdout.on('data', () => {
           request
             .get(`http://localhost:${gatewayPort}/not-found`)
             .end((err, res) => {
-              if (err && res && res.statusCode === 404) {
-                clearInterval(interval);
+              if (res && res.statusCode === 404) {
                 resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo });
               } else {
-                if (count >= 25) {
-                  gatewayProcess.kill();
-                  clearInterval(interval);
-                  reject(new Error('Failed to start Express Gateway'));
-                }
+                gatewayProcess.kill();
+                reject(err);
               }
             });
-        }, 300);
+        });
       });
     });
 };
