@@ -1,9 +1,8 @@
 const url = require('url');
 const should = require('should');
 const express = require('express');
-const phantomjs = require('phantomjs-prebuilt');
 const request = require('superagent');
-const webdriver = require('selenium-webdriver');
+const puppeteer = require('puppeteer');
 
 const cliHelper = require('../common/cli.helper');
 const gwHelper = require('../common/gateway.helper');
@@ -23,8 +22,6 @@ describe('oauth2 authorization code grant type', () => {
   let gatewayProcess = null;
 
   let gatewayPort, adminPort, redirectPort, redirectServer, backendServer;
-
-  let redirectParams = null;
 
   before(function () {
     const gatewayConfig = {
@@ -149,15 +146,6 @@ describe('oauth2 authorization code grant type', () => {
       }
     });
 
-    const phantomCaps = webdriver.Capabilities.phantomjs();
-    phantomCaps.set('phantomjs.binary.path', phantomjs.path);
-
-    const driver = new webdriver.Builder()
-      .withCapabilities(phantomCaps)
-      .build();
-
-    const By = webdriver.By;
-
     const checkUnauthorized = new Promise((resolve, reject) => {
       request
         .get(`http://localhost:${gatewayPort}`)
@@ -171,29 +159,23 @@ describe('oauth2 authorization code grant type', () => {
     });
 
     return checkUnauthorized
-      .then(() => driver.get(authURL))
-      .then(() => driver
-        .findElement(By.name('username'))
-        .sendKeys(username)
-      )
-      .then(() => driver
-        .findElement(By.name('password'))
-        .sendKeys(password)
-      )
-      .then(() => driver
-        .findElement(By.xpath('//form//input[@type="submit"]'))
-        .click()
-      )
-      .then(() => driver
-        .findElement(By.id('allow'))
-        .click()
-      )
-      .then(() => {
+      .then(() => puppeteer.launch({ slowMo: 50 }))
+      .then(browser => Promise.all([browser, browser.pages()]))
+      .then(([browser, [page]]) => Promise.all([browser, page, page.goto(authURL)]))
+      .then(([browser, page]) => Promise.all([browser, page, page.type('[name="username"]', username)]))
+      .then(([browser, page]) => Promise.all([browser, page, page.type('[name="password"]', password)]))
+      .then(([browser, page]) => Promise.all([browser, page, page.click('[type="submit"]')]))
+      .then(([browser, page]) => Promise.all([browser, page, page.click('#allow')]))
+      .then(([browser, page]) => Promise.all([page.url(), browser.close()]))
+      .then(([pageUrl]) => {
+        const parsedPageUrl = url.parse(pageUrl, true);
+        const { code } = parsedPageUrl.query;
+
         const params = {
           grant_type: 'authorization_code',
           client_id: clientID,
           client_secret: clientSecret,
-          code: redirectParams.code,
+          code,
           redirect_uri: `http://localhost:${redirectPort}/cb`
         };
 
@@ -207,8 +189,7 @@ describe('oauth2 authorization code grant type', () => {
           .get(`http://localhost:${gatewayPort}`)
           .set('Authorization', `Bearer ${accessToken}`);
       })
-      .then(res => should(res.statusCode).be.eql(200))
-      .then(() => driver.quit());
+      .then(res => should(res.statusCode).be.eql(200));
   });
 
   function createUser (args, done) {
@@ -238,11 +219,7 @@ describe('oauth2 authorization code grant type', () => {
   function generateRedirectServer (port) {
     const app = express();
 
-    app.get('/cb', (req, res) => {
-      const parsed = url.parse(req.url, true);
-      redirectParams = parsed.query;
-      res.sendStatus(200);
-    });
+    app.get('/cb', (req, res) => res.sendStatus(200));
 
     return new Promise((resolve) => {
       const runningApp = app.listen(port, () => {
