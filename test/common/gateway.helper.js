@@ -59,13 +59,13 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
         gatewayProcess.stdout.on('data', () => {
           request
             .get(`http://localhost:${gatewayPort}/not-found`)
+            .ok(res => true)
             .end((err, res) => {
-              if (res && (res.statusCode === 404 || res.statusCode === 401)) {
-                resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo, backendServer: app });
-              } else {
+              if (err) {
                 gatewayProcess.kill();
                 reject(err);
               }
+              resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo, backendServer: app });
             });
         });
       });
