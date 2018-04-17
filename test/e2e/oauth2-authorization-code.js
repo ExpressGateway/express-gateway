@@ -1,27 +1,16 @@
-const { fork } = require('child_process');
-const { runCLICommand } = require('../common/cli.helper');
-const fs = require('fs');
-const path = require('path');
 const url = require('url');
-const util = require('util');
-
 const should = require('should');
-const cpr = require('cpr');
 const express = require('express');
 const phantomjs = require('phantomjs-prebuilt');
 const request = require('superagent');
-const rimraf = require('rimraf');
-const tmp = require('tmp');
 const webdriver = require('selenium-webdriver');
-const yaml = require('js-yaml');
+
+const cliHelper = require('../common/cli.helper');
+const gwHelper = require('../common/gateway.helper');
+
 let tempPath;
 
-require('util.promisify/shim')();
-
-const { findOpenPortNumbers, generateBackendServer } =
-  require('../common/server-helper');
-
-const baseConfigDirectory = path.join(__dirname, '..', 'fixtures', 'authorization-code');
+const { findOpenPortNumbers } = require('../common/server-helper');
 
 describe('oauth2 authorization code grant type', () => {
   const username = 'kate';
@@ -31,20 +20,74 @@ describe('oauth2 authorization code grant type', () => {
   let clientID = null;
   let clientSecret = null;
 
-  let testGatewayConfigPath = null;
-  let testGatewayConfigData = null;
-
   let gatewayProcess = null;
 
-  let gatewayPort = null;
-  let adminPort = null;
-  let backendPort = null;
-  let redirectPort = null;
+  let gatewayPort, adminPort, redirectPort, redirectServer, backendServer;
 
   let redirectParams = null;
 
   before(function () {
-    return startGatewayInstance()
+    const gatewayConfig = {
+      http: {},
+      admin: {},
+      apiEndpoints: {
+        api: {
+          host: 'localhost'
+        },
+        ping: {
+          path: '/not-found'
+        }
+      },
+      policies: ['oauth2', 'proxy'],
+      pipelines: {
+        ping: {
+          apiEndpoints: ['ping'],
+          policies: [
+            {
+              proxy: [
+                {
+                  action: {
+                    serviceEndpoint: 'backend',
+                    changeOrigin: true
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        default: {
+          apiEndpoints: ['api'],
+          policies: [
+            {
+              oauth2: null
+            },
+            {
+              proxy: [
+                {
+                  action: {
+                    serviceEndpoint: 'backend',
+                    changeOrigin: true
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    };
+
+    return findOpenPortNumbers(1)
+      .then(([port]) => { redirectPort = port; return generateRedirectServer(redirectPort); })
+      .then((server) => { redirectServer = server; })
+      .then(cliHelper.bootstrapFolder)
+      .then(dirInfo => gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }))
+      .then(gwInfo => {
+        tempPath = gwInfo.dirInfo.configDirectoryPath;
+        gatewayProcess = gwInfo.gatewayProcess;
+        backendServer = gwInfo.backendServer;
+        gatewayPort = gwInfo.gatewayPort;
+        adminPort = gwInfo.adminPort;
+      })
       .then(() => {
         const args = [
           '-p', `username=${username}`,
@@ -89,7 +132,7 @@ describe('oauth2 authorization code grant type', () => {
 
   after(done => {
     gatewayProcess.kill();
-    rimraf(path.join(testGatewayConfigPath, '..'), done);
+    backendServer.close(() => redirectServer.close(done));
   });
 
   it('authorizes a valid user', () => {
@@ -157,95 +200,19 @@ describe('oauth2 authorization code grant type', () => {
         return request
           .post(`http://localhost:${gatewayPort}/oauth2/token`)
           .send(params)
-          .then(res => {
-            return res.body.access_token;
-          });
+          .then(res => res.body.access_token);
       })
       .then(accessToken => {
         return request
           .get(`http://localhost:${gatewayPort}`)
           .set('Authorization', `Bearer ${accessToken}`);
       })
-      .then(res => {
-        should(res.statusCode).be.eql(200);
-      })
+      .then(res => should(res.statusCode).be.eql(200))
       .then(() => driver.quit());
   });
 
-  function startGatewayInstance (done) {
-    const _cpr = util.promisify(cpr);
-
-    return util.promisify(tmp.dir)()
-      .then(tmpPath => Promise.all([
-        tmpPath,
-        _cpr(baseConfigDirectory, tmpPath),
-        _cpr(path.join(__dirname, '../../lib/config/models'), path.join(tmpPath, 'models'))
-      ]))
-      .then(([tmpPath]) => {
-        tempPath = tmpPath;
-        testGatewayConfigPath = path.join(tmpPath, 'gateway.config.yml');
-        return findOpenPortNumbers(4);
-      })
-      .then(ports => {
-        gatewayPort = ports[0];
-        backendPort = ports[1];
-        adminPort = ports[2];
-        redirectPort = ports[3];
-
-        return util.promisify(fs.readFile)(testGatewayConfigPath);
-      })
-      .then(configData => {
-        testGatewayConfigData = yaml.load(configData);
-
-        testGatewayConfigData.http.port = gatewayPort;
-        testGatewayConfigData.admin.port = adminPort;
-
-        testGatewayConfigData.serviceEndpoints.backend.url =
-          `http://localhost:${backendPort}`;
-
-        return generateBackendServer(backendPort);
-      })
-      .then(() => generateRedirectServer(redirectPort))
-      .then(() => {
-        return util.promisify(fs.writeFile)(testGatewayConfigPath,
-          yaml.dump(testGatewayConfigData));
-      })
-      .then(() => {
-        return new Promise((resolve, reject) => {
-          const childEnv = Object.assign({}, process.env);
-          childEnv.EG_CONFIG_DIR = tempPath;
-
-          // Tests, by default have config watch disabled.
-          // Need to remove this paramter in the child process.
-          delete childEnv.EG_DISABLE_CONFIG_WATCH;
-
-          const modulePath = path.join(__dirname, '..', '..',
-            'lib', 'index.js');
-          gatewayProcess = fork(modulePath, [], {
-            cwd: tempPath,
-            env: childEnv
-          });
-
-          gatewayProcess.on('error', err => {
-            reject(err);
-          });
-
-          setTimeout(() => {
-            request
-              .get(`http://localhost:${gatewayPort}/not-found`)
-              .end((err, res) => {
-                should(err).not.be.undefined();
-                should(res.clientError).not.be.undefined();
-                should(res.statusCode).be.eql(401);
-                resolve();
-              });
-          }, 4000);
-        });
-      });
-  }
-
   function createUser (args, done) {
-    return runCLICommand({
+    return cliHelper.runCLICommand({
       cliArgs: ['users', 'create'].concat(args),
       adminPort,
       configDirectoryPath: tempPath
@@ -253,7 +220,7 @@ describe('oauth2 authorization code grant type', () => {
   }
 
   function createCredential (args, done) {
-    return runCLICommand({
+    return cliHelper.runCLICommand({
       cliArgs: ['credentials', 'create'].concat(args),
       adminPort,
       configDirectoryPath: tempPath
@@ -261,7 +228,7 @@ describe('oauth2 authorization code grant type', () => {
   }
 
   function createApp (args, done) {
-    return runCLICommand({
+    return cliHelper.runCLICommand({
       cliArgs: ['apps', 'create'].concat(args),
       adminPort,
       configDirectoryPath: tempPath
@@ -278,8 +245,8 @@ describe('oauth2 authorization code grant type', () => {
     });
 
     return new Promise((resolve) => {
-      app.listen(port, () => {
-        resolve(app);
+      const runningApp = app.listen(port, () => {
+        resolve(runningApp);
       });
     });
   }

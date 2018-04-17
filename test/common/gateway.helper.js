@@ -3,6 +3,8 @@ const fs = require('fs');
 const { fork } = require('child_process');
 const path = require('path');
 const request = require('superagent');
+const util = require('util');
+const _cpr = util.promisify(require('cpr'));
 const { generateBackendServer, findOpenPortNumbers } = require('../common/server-helper');
 let gatewayPort = null;
 let adminPort = null;
@@ -35,6 +37,7 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
         newConfig: gatewayConfig
       });
     })
+    .then(() => _cpr(path.join(__dirname, '../../lib/config/models'), path.join(dirInfo.configDirectoryPath, 'models'), { overwrite: true }))
     .then(() => generateBackendServer(backendPort))
     .then(({ app }) => {
       return new Promise((resolve, reject) => {
@@ -57,7 +60,7 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
           request
             .get(`http://localhost:${gatewayPort}/not-found`)
             .end((err, res) => {
-              if (res && res.statusCode === 404) {
+              if (res && (res.statusCode === 404 || res.statusCode === 401)) {
                 resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo, backendServer: app });
               } else {
                 gatewayProcess.kill();
