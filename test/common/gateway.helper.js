@@ -37,7 +37,7 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
       });
     })
     .then(() => generateBackendServer(backendPort))
-    .then(() => {
+    .then(({ app }) => {
       return new Promise((resolve, reject) => {
         const childEnv = Object.assign({}, process.env);
         childEnv.EG_CONFIG_DIR = dirInfo.configDirectoryPath;
@@ -59,7 +59,7 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
             .get(`http://localhost:${gatewayPort}/not-found`)
             .end((err, res) => {
               if (res && res.statusCode === 404) {
-                resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo });
+                resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo, backendServer: app });
               } else {
                 gatewayProcess.kill();
                 reject(err);
