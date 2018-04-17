@@ -3,8 +3,7 @@ const fs = require('fs');
 const { fork } = require('child_process');
 const path = require('path');
 const request = require('superagent');
-const { generateBackendServer, findOpenPortNumbers } =
-  require('../common/server-helper');
+const { generateBackendServer, findOpenPortNumbers } = require('../common/server-helper');
 let gatewayPort = null;
 let adminPort = null;
 let backendPort = null;
