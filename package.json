@@ -90,6 +90,7 @@
     "passport-http-bearer": "1.0.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "1.0.0",
+    "passport-localapikey-update": "^0.6.0",
     "passport-oauth2-client-password": "0.1.2",
     "proxy-agent": "^3.0.1",
     "semver": "^5.5.0",
