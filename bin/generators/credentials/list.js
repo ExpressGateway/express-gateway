@@ -17,9 +17,10 @@ module.exports = class extends eg.Generator {
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} list [options]`)
+          .example(`$0 ${process.argv[2]} list`)
           .example(`$0 ${process.argv[2]} list -c 7498d1a9-7f90-4438-a9b7-0ba4c6022353`)
           .group(['c', 'f'], 'Options:')
-          .string('c').alias('c', 'consumerId').nargs('c', 1).required('c')
+          .string('c').alias('c', 'consumerId')
           .describe('c', 'Consumer ID: can be User ID or username or app ID')
 
           .array('f')
