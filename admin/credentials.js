@@ -31,8 +31,7 @@ module.exports = function (client) {
         .then(res => res.body);
     },
 
-    list (consumerId) {
-      if (!consumerId) throw new Error('Consumer Id is required');
+    list (consumerId = '') {
       return client
         .get(`${baseUrl}${encodeURIComponent(consumerId)}`)
         .then(res => res.body);

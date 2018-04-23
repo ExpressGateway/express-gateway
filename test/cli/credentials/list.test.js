@@ -4,7 +4,7 @@ const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:credentials:list';
 
-describe('eg credentials list -c ', () => {
+describe('eg credentials list', () => {
   let program, env, username;
 
   const createdTypes = {
@@ -42,8 +42,7 @@ describe('eg credentials list -c ', () => {
   };
 
   const createCredential = (username, type, options = {}, isActive = true) => {
-    const { credentials } = adminHelper.admin;
-    return credentials
+    return adminHelper.admin.credentials
       .create(username, type, options)
       .then((credential) => {
         createdTypes.inc(credential, type, isActive);
@@ -53,7 +52,7 @@ describe('eg credentials list -c ', () => {
         }
 
         if (!isActive) {
-          return credentials.deactivate(credential.id, type);
+          return adminHelper.admin.credentials.deactivate(credential.id, type);
         }
       });
   };
@@ -79,7 +78,15 @@ describe('eg credentials list -c ', () => {
           createCredential(user.username, 'key-auth', {}, false),
           createCredential(user.username, 'key-auth', {}, false)
         ]);
-      });
+      })
+      .then(() => adminHelper.admin.users.create({
+        username: idGen.v4(),
+        firstname: 'Clark',
+        lastname: 'Kent'
+      }))
+      .then(user =>
+        adminHelper.admin.credentials.create(user.username, 'key-auth', {})
+      );
   });
 
   after(() => adminHelper.stop());
@@ -188,5 +195,27 @@ describe('eg credentials list -c ', () => {
     });
 
     env.argv = program.parse(`credentials list -f archived active -c ${username}`);
+  });
+
+  it('should show all credentials if consumer is not provided', done => {
+    const types = {};
+    env.hijack(namespace, generator => {
+      generator.once('run', () => {
+        generator.log.error = message => {
+          done(new Error(message));
+        };
+        generator.stdout = msg => {
+          const crd = JSON.parse(msg);
+          types[crd.type] = (types[crd.type] || 0) + 1;
+        };
+      });
+
+      generator.once('end', () => {
+        should(types).have.property('key-auth', 5);
+        done();
+      });
+    });
+
+    env.argv = program.parse('credentials list -f active archived');
   });
 });
