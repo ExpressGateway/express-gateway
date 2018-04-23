@@ -4,7 +4,7 @@ const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:credentials:list';
 
-describe('eg credentials list -c ', () => {
+describe('eg credentials list', () => {
   let program, env, username;
 
   const createdTypes = {
@@ -216,6 +216,6 @@ describe('eg credentials list -c ', () => {
       });
     });
 
-    env.argv = program.parse(`credentials list`);
+    env.argv = program.parse('credentials list -f active archived');
   });
 });
