@@ -6,7 +6,7 @@ const idGen = require('uuid62');
 const username = idGen.v4();
 const headerName = 'Authorization';
 
-let gatewayPort, adminPort, configDirectoryPath, gatewayProcess, backendServer;
+let gatewayPort, adminPort, configDirectoryPath, gatewayProcess, backendServers;
 let keyCred;
 
 const proxyPolicy = {
@@ -74,7 +74,7 @@ describe('E2E: key-auth Policy', () => {
       return gwHelper.startGatewayInstance({ dirInfo, gatewayConfig });
     }).then(gwInfo => {
       gatewayProcess = gwInfo.gatewayProcess;
-      backendServer = gwInfo.backendServer;
+      backendServers = gwInfo.backendServers;
       gatewayPort = gwInfo.gatewayPort;
       adminPort = gwInfo.adminPort;
       configDirectoryPath = gwInfo.dirInfo.configDirectoryPath;
@@ -108,7 +108,7 @@ describe('E2E: key-auth Policy', () => {
 
   after((done) => {
     gatewayProcess.kill();
-    backendServer.close(done);
+    backendServers[0].close(done);
   });
 
   it('should not authenticate key for requests without authorization header', function () {

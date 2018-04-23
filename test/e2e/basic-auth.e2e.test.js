@@ -1,7 +1,7 @@
 const cliHelper = require('../common/cli.helper');
 const gwHelper = require('../common/gateway.helper');
 const request = require('supertest');
-let gatewayPort, adminPort, configDirectoryPath, gatewayProcess, backendServer;
+let gatewayPort, adminPort, configDirectoryPath, gatewayProcess, backendServers;
 const username = 'test';
 const proxyPolicy = {
   proxy: { action: { serviceEndpoint: 'backend' } }
@@ -41,7 +41,7 @@ describe('E2E: basic-auth Policy', () => {
       .then(dirInfo => gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }))
       .then(gwInfo => {
         gatewayProcess = gwInfo.gatewayProcess;
-        backendServer = gwInfo.backendServer;
+        backendServers = gwInfo.backendServers;
         gatewayPort = gwInfo.gatewayPort;
         adminPort = gwInfo.adminPort;
         configDirectoryPath = gwInfo.dirInfo.configDirectoryPath;
@@ -73,7 +73,7 @@ describe('E2E: basic-auth Policy', () => {
 
   after((done) => {
     gatewayProcess.kill();
-    backendServer.close(done);
+    backendServers[0].close(done);
   });
 
   it('should not authenticate token for requests without token header', function () {

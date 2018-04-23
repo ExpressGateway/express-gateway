@@ -8,7 +8,7 @@ const _cpr = util.promisify(require('cpr'));
 const { generateBackendServer, findOpenPortNumbers } = require('../common/server-helper');
 let gatewayPort = null;
 let adminPort = null;
-let backendPort = null;
+let backendPorts = null;
 
 // Set gateway.config or system.config yml files
 module.exports.setYmlConfig = function ({ ymlConfigPath, newConfig }) {
@@ -21,25 +21,26 @@ module.exports.getYmlConfig = function ({ ymlConfigPath }) {
   return yaml.load(content);
 };
 
-module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
-  return findOpenPortNumbers(3)
+module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig, backendServers = 1 }) {
+  return findOpenPortNumbers(2 + backendServers)
     .then(ports => {
       gatewayPort = ports[0];
       adminPort = ports[1];
-      backendPort = ports[2];
+      backendPorts = ports[2];
 
       gatewayConfig.http = { port: gatewayPort };
       gatewayConfig.admin = { port: adminPort };
       gatewayConfig.serviceEndpoints = gatewayConfig.serviceEndpoints || {};
-      gatewayConfig.serviceEndpoints.backend = { url: `http://localhost:${backendPort}` };
+      gatewayConfig.serviceEndpoints.backend.urls = backendPorts.map(backendPort => `http://localhost:${backendPort}`);
+
       return this.setYmlConfig({
         ymlConfigPath: dirInfo.gatewayConfigPath,
         newConfig: gatewayConfig
       });
     })
     .then(() => _cpr(path.join(__dirname, '../../lib/config/models'), path.join(dirInfo.configDirectoryPath, 'models'), { overwrite: true }))
-    .then(() => generateBackendServer(backendPort))
-    .then(({ app }) => {
+    .then(() => Promise.all(backendPorts.map(backendPort => generateBackendServer(backendPort))))
+    .then((backendServers) => {
       return new Promise((resolve, reject) => {
         const childEnv = Object.assign({}, process.env);
         childEnv.EG_CONFIG_DIR = dirInfo.configDirectoryPath;
@@ -65,7 +66,7 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
                 gatewayProcess.kill();
                 reject(err);
               }
-              resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo, backendServer: app });
+              resolve({ gatewayProcess, gatewayPort, adminPort, backendPorts, dirInfo, backendServers });
             });
         });
       });

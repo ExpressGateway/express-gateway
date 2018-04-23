@@ -44,9 +44,9 @@ const cliHelper = require('../common/cli.helper');
           }
 
           process.env[envVariable] = `http://localhost:${server.address().port}`;
-          gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }).then(({ gatewayProcess, backendServer }) => {
+          gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }).then(({ gatewayProcess, backendServers }) => {
             gw = gatewayProcess;
-            bs = backendServer;
+            bs = backendServers;
             done();
           }).catch(done);
         });
@@ -57,7 +57,7 @@ const cliHelper = require('../common/cli.helper');
       delete process.env[envVariable];
       gw.kill();
       proxy.close();
-      srv.close(() => bs.close(done));
+      srv.close(() => bs[0].close(done));
     });
 
     it(`should respect ${envVariable} env var and send through proxy`, () => {
