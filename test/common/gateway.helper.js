@@ -22,11 +22,11 @@ module.exports.getYmlConfig = function ({ ymlConfigPath }) {
 };
 
 module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
-  return findOpenPortNumbers(4)
+  return findOpenPortNumbers(3)
     .then(ports => {
       gatewayPort = ports[0];
-      backendPort = ports[1];
-      adminPort = ports[2];
+      adminPort = ports[1];
+      backendPort = ports[2];
 
       gatewayConfig.http = { port: gatewayPort };
       gatewayConfig.admin = { port: adminPort };
