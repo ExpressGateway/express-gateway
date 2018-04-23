@@ -66,7 +66,7 @@ const cliHelper = require('../common/cli.helper');
         .then((res) => {
           assert.ok(res.text);
           // we need to ensure that request went through proxy, not directly
-          assert.ok(proxiedUrls[`${gatewayConfig.serviceEndpoints.backend.url}/test`], 'Proxy was not called');
+          assert.ok(proxiedUrls[`${gatewayConfig.serviceEndpoints.backend.urls[0]}/test`], 'Proxy was not called');
         });
     });
   });

@@ -24,14 +24,14 @@ module.exports.getYmlConfig = function ({ ymlConfigPath }) {
 module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig, backendServers = 1 }) {
   return findOpenPortNumbers(2 + backendServers)
     .then(ports => {
-      gatewayPort = ports[0];
-      adminPort = ports[1];
-      backendPorts = ports[2];
+      gatewayPort = ports.shift();
+      adminPort = ports.shift();
+      backendPorts = ports;
 
       gatewayConfig.http = { port: gatewayPort };
       gatewayConfig.admin = { port: adminPort };
       gatewayConfig.serviceEndpoints = gatewayConfig.serviceEndpoints || {};
-      gatewayConfig.serviceEndpoints.backend.urls = backendPorts.map(backendPort => `http://localhost:${backendPort}`);
+      gatewayConfig.serviceEndpoints.backend = { urls: backendPorts.map(backendPort => `http://localhost:${backendPort}`) };
 
       return this.setYmlConfig({
         ymlConfigPath: dirInfo.gatewayConfigPath,
@@ -66,7 +66,14 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig, backen
                 gatewayProcess.kill();
                 reject(err);
               }
-              resolve({ gatewayProcess, gatewayPort, adminPort, backendPorts, dirInfo, backendServers });
+              resolve({
+                gatewayProcess,
+                gatewayPort,
+                adminPort,
+                backendPorts,
+                dirInfo,
+                backendServers: backendServers.map(bs => bs.app)
+              });
             });
         });
       });

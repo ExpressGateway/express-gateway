@@ -2,41 +2,24 @@ const should = require('should');
 const request = require('superagent');
 const fs = require('fs');
 const path = require('path');
+const yaml = require('js-yaml');
 
 const cliHelper = require('../common/cli.helper');
 const gwHelper = require('../common/gateway.helper');
 
-const yaml = require('js-yaml');
-
-const { generateBackendServer, findOpenPortNumbers } = require('../common/server-helper');
-
 describe('round-robin load @balancing @proxy', () => {
-  let gatewayConfig;
-  let gatewayProcess;
-  const backendServers = [];
-  let gatewayPort;
+  let gatewayConfig, gatewayProcess, backendServers, gatewayPort;
 
   before(function () {
-    return findOpenPortNumbers(4).then(ports => {
-      gatewayConfig = yaml.load(fs.readFileSync(path.resolve('lib/config/gateway.config.yml')));
+    gatewayConfig = yaml.load(fs.readFileSync(path.resolve('lib/config/gateway.config.yml')));
 
-      gatewayPort = gatewayConfig.http.port = ports[0];
-
-      gatewayConfig.serviceEndpoints.backend.urls = [
-        `http://localhost:${ports[2]}`,
-        `http://localhost:${ports[3]}`
-      ];
-
-      return cliHelper.bootstrapFolder()
-        .then(dirInfo => gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }))
-        .then(gwInfo => {
-          gatewayProcess = gwInfo.gatewayProcess;
-          backendServers.push(gwInfo.backendServer);
-          gatewayPort = gwInfo.gatewayPort;
-          return generateBackendServer(ports[3]);
-        })
-        .then(server => backendServers.push(server));
-    });
+    return cliHelper.bootstrapFolder()
+      .then(dirInfo => gwHelper.startGatewayInstance({ dirInfo, gatewayConfig, backendServers: 2 }))
+      .then(gwInfo => {
+        gatewayProcess = gwInfo.gatewayProcess;
+        backendServers = gwInfo.backendServers;
+        gatewayPort = gwInfo.gatewayPort;
+      });
   });
 
   after((done) => {
