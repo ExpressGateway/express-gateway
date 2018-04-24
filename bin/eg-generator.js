@@ -77,6 +77,10 @@ module.exports = class EgGenerator extends Generator {
       baseURL = `http://${hostname}:${port}`;
     }
 
+    if (baseURL.endsWith('/')) {
+      baseURL = baseURL.substr(0, baseURL.length - 1);
+    }
+
     return baseURL;
   }
 
