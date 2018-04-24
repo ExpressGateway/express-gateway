@@ -29,6 +29,15 @@ describe('REST: Applications', () => {
     );
   });
 
+  describe('Insert an application with an user that does not exist', () => {
+    it('should return an error on the second attemp', () =>
+      should(adminHelper.admin.apps.create('IDoNotExist', {
+        name: 'appy1',
+        redirectUri: 'http://localhost:3000/cb'
+      })).be.rejectedWith({ status: 409 })
+    );
+  });
+
   describe('Get an application by name', () => {
     it('should return the app if looking for it by name', () =>
       adminHelper.admin.apps.info('appy1').then((app) => {
