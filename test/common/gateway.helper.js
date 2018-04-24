@@ -3,8 +3,9 @@ const fs = require('fs');
 const { fork } = require('child_process');
 const path = require('path');
 const request = require('superagent');
-const { generateBackendServer, findOpenPortNumbers } =
-  require('../common/server-helper');
+const util = require('util');
+const _cpr = util.promisify(require('cpr'));
+const { generateBackendServer, findOpenPortNumbers } = require('../common/server-helper');
 let gatewayPort = null;
 let adminPort = null;
 let backendPort = null;
@@ -36,8 +37,9 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
         newConfig: gatewayConfig
       });
     })
+    .then(() => _cpr(path.join(__dirname, '../../lib/config/models'), path.join(dirInfo.configDirectoryPath, 'models'), { overwrite: true }))
     .then(() => generateBackendServer(backendPort))
-    .then(() => {
+    .then(({ app }) => {
       return new Promise((resolve, reject) => {
         const childEnv = Object.assign({}, process.env);
         childEnv.EG_CONFIG_DIR = dirInfo.configDirectoryPath;
@@ -57,13 +59,13 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig }) {
         gatewayProcess.stdout.on('data', () => {
           request
             .get(`http://localhost:${gatewayPort}/not-found`)
+            .ok(res => true)
             .end((err, res) => {
-              if (res && res.statusCode === 404) {
-                resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo });
-              } else {
+              if (err) {
                 gatewayProcess.kill();
                 reject(err);
               }
+              resolve({ gatewayProcess, gatewayPort, adminPort, backendPort, dirInfo, backendServer: app });
             });
         });
       });
