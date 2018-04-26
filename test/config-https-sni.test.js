@@ -62,7 +62,7 @@ const testCases = [{
   expected: {
     serverError: 'cannot start TLS SNI - no cert configured',
     serverResult: null,
-    clientError: 'socket hang up',
+    clientError: 'ECONNRESET',
     clientResult: false
   }
 }];
@@ -142,7 +142,7 @@ describe('sni', () => {
 
       client.on('error', function (err) {
         tc.actual.clientResult = false;
-        tc.actual.clientError = err.message;
+        tc.actual.clientError = err.code;
         tc.actual.serverError = serverError;
         tc.actual.serverResult = serverResult;
         done();
