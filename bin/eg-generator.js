@@ -77,6 +77,12 @@ module.exports = class EgGenerator extends Generator {
       baseURL = `http://${hostname}:${port}`;
     }
 
+    /*
+      This bad hack is required because of the weird way superagent is managing urls. Hopefully this is not
+      going to be here forever — we'll replace the client with Axios hopefully.
+      Ref: https://github.com/ExpressGateway/express-gateway/issues/672
+    */
+
     if (baseURL.endsWith('/')) {
       baseURL = baseURL.substr(0, baseURL.length - 1);
     }
