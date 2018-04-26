@@ -33,7 +33,7 @@ jobs:
   "node-8-real-redis":
     docker:
       - image: circleci/node:8-browsers
-      - image: redis:alpine
+      - image: circleci/redis
     working_directory: ~/repo
     environment:
       - EG_DB_EMULATE: false
