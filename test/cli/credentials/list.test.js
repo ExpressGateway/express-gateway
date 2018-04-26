@@ -207,6 +207,7 @@ describe('eg credentials list', () => {
         generator.stdout = msg => {
           const crd = JSON.parse(msg);
           types[crd.type] = (types[crd.type] || 0) + 1;
+          should(crd).have.property('consumerId');
         };
       });
 
