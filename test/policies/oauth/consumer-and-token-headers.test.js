@@ -4,7 +4,7 @@ const qs = require('querystring');
 const url = require('url');
 const express = require('express');
 const sinon = require('sinon');
-const assert = require('assert');
+const should = require('should');
 
 const services = require('../../../lib/services/index');
 const credentialService = services.credential;
@@ -50,7 +50,6 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
                     'id': 'consumer.id',
                     'consumer-name': 'consumer.name',
                     'consumer-type': 'consumer.type',
-                    'requestID': 'requestID',
                     'scopes': 'consumer.token.scopes'
                   }
                 }
@@ -160,15 +159,15 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
       .set('Authorization', 'bearer ' + token)
       .expect(200)
       .then(() => {
-        assert(spy.calledOnce);
         const headers = spy.getCall(0).args[0];
-        assert.equal(headers['eg-consumer-id'], application.id);
-        assert.equal(headers['eg-consumer-name'], application.name);
-        assert.equal(headers['eg-consumer-type'], 'application');
-        assert.ok(headers['eg-requestid']);
-        assert.equal(headers['eg-scopes'], 'authorizedScope');
+        should(spy.calledOnce).true();
+        should(headers).have.property('eg-consumer-id', application.id);
+        should(headers).have.property('eg-consumer-name', application.name);
+        should(headers).have.property('eg-consumer-type', 'application');
+        should(headers).have.property('eg-request-id');
+        should(headers).have.property('eg-scopes', 'authorizedScope');
 
-        assert(Object.keys(spy.getCall(0).args[0]).indexOf('authorization') === -1);
+        should(Object.keys(spy.getCall(0).args[0])).not.containEql('authorization');
       });
   });
 });
