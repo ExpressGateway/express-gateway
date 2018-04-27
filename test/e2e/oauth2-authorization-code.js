@@ -21,7 +21,7 @@ describe('oauth2 authorization code grant type', () => {
 
   let gatewayProcess = null;
 
-  let gatewayPort, adminPort, redirectPort, redirectServer, backendServers;
+  let gatewayPort, adminPort, redirectPort, redirectServer, backendServer;
 
   before(function () {
     const gatewayConfig = {
@@ -81,7 +81,7 @@ describe('oauth2 authorization code grant type', () => {
       .then(gwInfo => {
         tempPath = gwInfo.dirInfo.configDirectoryPath;
         gatewayProcess = gwInfo.gatewayProcess;
-        backendServers = gwInfo.backendServers;
+        backendServer = gwInfo.backendServers[0];
         gatewayPort = gwInfo.gatewayPort;
         adminPort = gwInfo.adminPort;
       })
@@ -129,7 +129,7 @@ describe('oauth2 authorization code grant type', () => {
 
   after(done => {
     gatewayProcess.kill();
-    backendServers[0].close(() => redirectServer.close(done));
+    backendServer.close(() => redirectServer.close(done));
   });
 
   it('authorizes a valid user', () => {
