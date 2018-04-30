@@ -70,22 +70,13 @@ workflows:
   version: 2
   build:
     jobs:
-      - node-6:
+      - node-6: &testingFilters
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
-      - node-8:
-          filters:
-            tags:
-              only: /v\d+(\.\d+){2}/
-      - node-10:
-          filters:
-            tags:
-              only: /v\d+(\.\d+){2}/
-      - node-8-real-redis:
-          filters:
-            tags:
-              only: /v\d+(\.\d+){2}/
+      - node-8: *testingFilters
+      - node-9: *testingFilters
+      - node-8-real-redis: *testingFilters
       - release:
           filters:
             tags:
@@ -101,3 +92,4 @@ workflows:
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
+      - packer: *testingFilters
