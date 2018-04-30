@@ -60,11 +60,12 @@ jobs:
 
   packer:
     docker:
-      - image: hashicorp/packer:light
+      - image: hashicorp/packer:full
     working_directory: ~/repo
 
     steps:
-      - run: packer validate example.json
+      - checkout
+      - run: packer validate ./.circleci/aws.json
 
 workflows:
   version: 2
