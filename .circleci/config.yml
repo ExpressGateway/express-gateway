@@ -42,7 +42,7 @@ jobs:
       - run: npm install
       - run: npm test
 
-  deploy:
+  release:
     docker:
       - image: circleci/node:8
     working_directory: ~/repo
@@ -57,6 +57,14 @@ jobs:
       - run: "docker tag expressgateway/express-gateway:${CIRCLE_TAG} expressgateway/express-gateway:latest"
       - run: "docker push expressgateway/express-gateway:${CIRCLE_TAG}"
       - run: "docker push expressgateway/express-gateway:latest"
+
+  packer:
+    docker:
+      - image: hashicorp/packer:light
+    working_directory: ~/repo
+
+    steps:
+      - run: packer validate example.json
 
 workflows:
   version: 2
@@ -78,7 +86,7 @@ workflows:
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
-      - deploy:
+      - release:
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
@@ -89,3 +97,7 @@ workflows:
             - node-8
             - node-8-real-redis
             - node-10
+      - packer:
+          filters:
+            tags:
+              only: /v\d+(\.\d+){2}/
