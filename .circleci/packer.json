@@ -13,27 +13,35 @@
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+          "name": "amzn-ami*-ebs",
           "root-device-type": "ebs"
         },
         "owners": [
-          "099720109477"
+          "137112412989",
+          "591542846629",
+          "801119661308",
+          "102837901569",
+          "013907871322",
+          "206029621532",
+          "286198878708",
+          "443319210888"
         ],
         "most_recent": true
       },
       "instance_type": "t2.micro",
-      "ssh_username": "ubuntu",
-      "ami_name": "express-gateway {{timestamp}}"
+      "ssh_username": "ec2-user",
+      "ami_name": "express-gateway {{timestamp}}",
+      "ami_description": "Amazon Linux with Express Gateway"
     }
   ],
   "provisioners": [
     {
       "type": "shell",
       "inline": [
-        "curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -",
-        "sudo apt-get install -y nodejs",
-        "sudo apt-get install -y build-essential",
-        "npm install express-gateway"
+        "curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash",
+        ". ~/.nvm/nvm.sh",
+        "nvm install --lts",
+        "npm install -g express-gateway"
       ]
     }
   ]
