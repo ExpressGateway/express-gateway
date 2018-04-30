@@ -44,9 +44,9 @@ const cliHelper = require('../common/cli.helper');
           }
 
           process.env[envVariable] = `http://localhost:${server.address().port}`;
-          gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }).then(({ gatewayProcess, backendServer }) => {
+          gwHelper.startGatewayInstance({ dirInfo, gatewayConfig }).then(({ gatewayProcess, backendServers }) => {
             gw = gatewayProcess;
-            bs = backendServer;
+            bs = backendServers[0];
             done();
           }).catch(done);
         });
@@ -66,7 +66,7 @@ const cliHelper = require('../common/cli.helper');
         .then((res) => {
           assert.ok(res.text);
           // we need to ensure that request went through proxy, not directly
-          assert.ok(proxiedUrls[`${gatewayConfig.serviceEndpoints.backend.url}/test`], 'Proxy was not called');
+          assert.ok(proxiedUrls[`${gatewayConfig.serviceEndpoints.backend.urls[0]}/test`], 'Proxy was not called');
         });
     });
   });

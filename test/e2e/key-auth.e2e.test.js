@@ -74,7 +74,7 @@ describe('E2E: key-auth Policy', () => {
       return gwHelper.startGatewayInstance({ dirInfo, gatewayConfig });
     }).then(gwInfo => {
       gatewayProcess = gwInfo.gatewayProcess;
-      backendServer = gwInfo.backendServer;
+      backendServer = gwInfo.backendServers[0];
       gatewayPort = gwInfo.gatewayPort;
       adminPort = gwInfo.adminPort;
       configDirectoryPath = gwInfo.dirInfo.configDirectoryPath;

@@ -81,7 +81,7 @@ describe('oauth2 authorization code grant type', () => {
       .then(gwInfo => {
         tempPath = gwInfo.dirInfo.configDirectoryPath;
         gatewayProcess = gwInfo.gatewayProcess;
-        backendServer = gwInfo.backendServer;
+        backendServer = gwInfo.backendServers[0];
         gatewayPort = gwInfo.gatewayPort;
         adminPort = gwInfo.adminPort;
       })
