@@ -1,14 +1,15 @@
 {
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
-    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}"
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "eg_version": "{{env `CIRCLE_TAG`}}"
   },
   "builders": [
     {
       "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
-      "region": "us-east-1",
+      "region": "us-west-2",
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
@@ -23,6 +24,17 @@
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
       "ami_name": "express-gateway {{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -",
+        "sudo apt-get install -y nodejs",
+        "sudo apt-get install -y build-essential",
+        "npm install express-gateway"
+      ]
     }
   ]
 }

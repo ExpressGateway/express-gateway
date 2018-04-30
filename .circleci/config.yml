@@ -65,7 +65,7 @@ jobs:
 
     steps:
       - checkout
-      - run: packer build ./.circleci/aws.json
+      - run: packer build ./.circleci/packer.json
 
 workflows:
   version: 2
