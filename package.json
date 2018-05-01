@@ -140,6 +140,6 @@
     "boolean-negation": false
   },
   "optionalDependencies": {
-    "bcrypt": "^1.0.3"
+    "bcrypt": "^2.0.1"
   }
 }
