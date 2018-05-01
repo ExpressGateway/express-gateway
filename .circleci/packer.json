@@ -30,7 +30,7 @@
       },
       "instance_type": "t2.micro",
       "ssh_username": "ec2-user",
-      "ami_name": "express-gateway {{timestamp}}",
+      "ami_name": "express-gateway {{eg_version}}",
       "ami_description": "Amazon Linux with Express Gateway"
     }
   ],
