@@ -1,4 +1,4 @@
-const { fork } = require('child_process');
+const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -24,6 +24,21 @@ describe('hot-reload', () => {
     let childProcess = null;
     let originalGatewayPort = null;
     let watcher = null;
+
+    function startServer (options) {
+      return new Promise(
+        (resolve, reject) => {
+          childProcess = spawn('node', [options.modulePath], {cwd: options.cwd, env: options.env});
+          childProcess.stdout.on('data', (data) => {
+            const chk = /gateway http server listening on/g;
+            if (chk.test(data)) {
+              resolve();
+            } else {
+              reject(new Error('server didn\'t start'));
+            }
+          });
+        });
+    }
 
     before(function (done) {
       this.timeout(TEST_TIMEOUT);
@@ -71,23 +86,23 @@ describe('hot-reload', () => {
                   delete childEnv.EG_DISABLE_CONFIG_WATCH;
 
                   const modulePath = path.join(__dirname, '../..', 'lib', 'index.js');
-                  childProcess = fork(modulePath, [], {
+                  const options = {
+                    modulePath,
                     cwd: tempPath,
                     env: childEnv
-                  });
-
-                  childProcess.on('error', done);
-
-                  // Not ideal, but we need to make sure the process is running.
-                  setTimeout(() => {
-                    request
-                      .get(`http://localhost:${originalGatewayPort}`)
-                      .end((err, res) => {
-                        should(err).not.be.undefined();
-                        should(res.unauthorized).not.be.undefined();
-                        done();
-                      });
-                  }, GATEWAY_STARTUP_WAIT_TIME);
+                  };
+                  startServer(options)
+                    .then(res => {
+                      request
+                        .get(`http://localhost:${originalGatewayPort}`)
+                        .end((err, res) => {
+                          should(err).not.be.undefined();
+                          should(res.unauthorized).not.be.undefined();
+                          if (err) { return done(err); };
+                          return done();
+                        });
+                    })
+                    .catch(done);
                 });
               });
             }).catch(done);
