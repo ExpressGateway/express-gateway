@@ -1,4 +1,4 @@
-const { fork } = require('child_process');
+const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -25,6 +25,24 @@ describe('hot-reload', () => {
     let originalGatewayPort = null;
     let watcher = null;
 
+    function startServer (options) {
+      return new Promise((resolve, reject) => {
+        childProcess = spawn('node', [options.modulePath], {
+          cwd: options.cwd,
+          env: options.env
+        });
+        childProcess.stdout.on('data', data => {
+          const chk = /gateway http server listening on/g;
+          if (chk.test(data)) {
+            resolve();
+          }
+        });
+        childProcess.on('exit', data => {
+          reject(new Error('server didn\'t start'));
+        });
+      });
+    }
+
     before(function (done) {
       this.timeout(TEST_TIMEOUT);
       tmp.dir((err, tempPath) => {
@@ -32,67 +50,92 @@ describe('hot-reload', () => {
           return done(err);
         }
 
-        cpr(baseConfigDirectory, tempPath, { filter: file => file.includes('.yml') }, (err, files) => {
-          if (err) {
-            return done(err);
-          }
-
-          cpr(path.join(__dirname, '../../lib/config/models'), path.join(tempPath, 'models'), (err, files) => {
+        cpr(
+          baseConfigDirectory,
+          tempPath,
+          { filter: file => file.includes('.yml') },
+          (err, files) => {
             if (err) {
               return done(err);
             }
 
-            testGatewayConfigPath = path.join(tempPath, 'gateway.config.yml');
-
-            findOpenPortNumbers(2).then(([httpPort, adminPort]) => {
-              fs.readFile(testGatewayConfigPath, (err, configData) => {
+            cpr(
+              path.join(__dirname, '../../lib/config/models'),
+              path.join(tempPath, 'models'),
+              (err, files) => {
                 if (err) {
                   return done(err);
                 }
 
-                testGatewayConfigData = yaml.load(configData);
+                testGatewayConfigPath = path.join(
+                  tempPath,
+                  'gateway.config.yml'
+                );
 
-                testGatewayConfigData.http.port = httpPort;
-                testGatewayConfigData.admin.port = adminPort;
-                testGatewayConfigData.serviceEndpoints.backend.url = `http://localhost:${adminPort}`;
+                findOpenPortNumbers(2)
+                  .then(([httpPort, adminPort]) => {
+                    fs.readFile(testGatewayConfigPath, (err, configData) => {
+                      if (err) {
+                        return done(err);
+                      }
 
-                originalGatewayPort = httpPort;
+                      testGatewayConfigData = yaml.load(configData);
 
-                fs.writeFile(testGatewayConfigPath, yaml.dump(testGatewayConfigData), (err) => {
-                  if (err) {
-                    return done(err);
-                  }
+                      testGatewayConfigData.http.port = httpPort;
+                      testGatewayConfigData.admin.port = adminPort;
+                      testGatewayConfigData.serviceEndpoints.backend.url = `http://localhost:${adminPort}`;
 
-                  const childEnv = Object.assign({}, process.env);
-                  childEnv.EG_CONFIG_DIR = tempPath;
+                      originalGatewayPort = httpPort;
 
-                  // Tests, by default have config watch disabled.
-                  // Need to remove this paramter in the child process.
-                  delete childEnv.EG_DISABLE_CONFIG_WATCH;
+                      fs.writeFile(
+                        testGatewayConfigPath,
+                        yaml.dump(testGatewayConfigData),
+                        err => {
+                          if (err) {
+                            return done(err);
+                          }
 
-                  const modulePath = path.join(__dirname, '../..', 'lib', 'index.js');
-                  childProcess = fork(modulePath, [], {
-                    cwd: tempPath,
-                    env: childEnv
-                  });
+                          const childEnv = Object.assign({}, process.env);
+                          childEnv.EG_CONFIG_DIR = tempPath;
 
-                  childProcess.on('error', done);
+                          // Tests, by default have config watch disabled.
+                          // Need to remove this paramter in the child process.
+                          delete childEnv.EG_DISABLE_CONFIG_WATCH;
 
-                  // Not ideal, but we need to make sure the process is running.
-                  setTimeout(() => {
-                    request
-                      .get(`http://localhost:${originalGatewayPort}`)
-                      .end((err, res) => {
-                        should(err).not.be.undefined();
-                        should(res.unauthorized).not.be.undefined();
-                        done();
-                      });
-                  }, GATEWAY_STARTUP_WAIT_TIME);
-                });
-              });
-            }).catch(done);
-          });
-        });
+                          const modulePath = path.join(
+                            __dirname,
+                            '../..',
+                            'lib',
+                            'index.js'
+                          );
+                          const options = {
+                            modulePath,
+                            cwd: tempPath,
+                            env: childEnv
+                          };
+                          startServer(options)
+                            .then(res => {
+                              request
+                                .get(`http://localhost:${originalGatewayPort}`)
+                                .end((err, res) => {
+                                  should(err).not.be.undefined();
+                                  should(res.unauthorized).not.be.undefined();
+                                  if (err) {
+                                    return done(err);
+                                  }
+                                  return done();
+                                });
+                            })
+                            .catch(done);
+                        }
+                      );
+                    });
+                  })
+                  .catch(done);
+              }
+            );
+          }
+        );
       });
     });
 
@@ -102,7 +145,10 @@ describe('hot-reload', () => {
     });
 
     beforeEach(function (done) {
-      watcher = chokidar.watch(testGatewayConfigPath, { awaitWriteFinish: true, ignoreInitial: true });
+      watcher = chokidar.watch(testGatewayConfigPath, {
+        awaitWriteFinish: true,
+        ignoreInitial: true
+      });
       watcher.on('ready', done);
     });
 
@@ -113,7 +159,7 @@ describe('hot-reload', () => {
     describe('reloads valid gateway.config.yml', function () {
       it('will respond with a 404 - proxy policy', function (done) {
         this.timeout(TEST_TIMEOUT);
-        watcher.once('change', (evt) => {
+        watcher.once('change', evt => {
           setTimeout(() => {
             request
               .get(`http://localhost:${originalGatewayPort}`)
@@ -127,7 +173,10 @@ describe('hot-reload', () => {
         });
 
         testGatewayConfigData.pipelines.adminAPI.policies.shift();
-        fs.writeFileSync(testGatewayConfigPath, yaml.dump(testGatewayConfigData));
+        fs.writeFileSync(
+          testGatewayConfigPath,
+          yaml.dump(testGatewayConfigData)
+        );
       });
     });
 
