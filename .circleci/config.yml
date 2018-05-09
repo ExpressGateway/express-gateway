@@ -20,9 +20,9 @@ jobs:
       - run: npm install
       - run: npm test
 
-  "node-9":
+  "node-10":
     docker:
-      - image: circleci/node:9-browsers
+      - image: circleci/node:10-browsers
     working_directory: ~/repo
 
     steps:
@@ -70,7 +70,7 @@ workflows:
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
-      - node-9:
+      - node-10:
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
@@ -88,4 +88,4 @@ workflows:
             - node-6
             - node-8
             - node-8-real-redis
-            - node-9
+            - node-10
