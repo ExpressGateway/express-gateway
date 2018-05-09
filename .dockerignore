@@ -1,6 +1,9 @@
-node_modules/
+.git
 .circleci
+.nyc_output
 .github
 .vscode
+node_modules
+coverage
 logo
 test
