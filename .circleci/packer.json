@@ -1,0 +1,48 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "eg_version": "{{env `CIRCLE_TAG`}}"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "us-west-2",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "amzn-ami*-ebs",
+          "root-device-type": "ebs"
+        },
+        "owners": [
+          "137112412989",
+          "591542846629",
+          "801119661308",
+          "102837901569",
+          "013907871322",
+          "206029621532",
+          "286198878708",
+          "443319210888"
+        ],
+        "most_recent": true
+      },
+      "instance_type": "t2.micro",
+      "ssh_username": "ec2-user",
+      "ami_name": "express-gateway {{eg_version}}",
+      "ami_description": "Amazon Linux with Express Gateway"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash",
+        ". ~/.nvm/nvm.sh",
+        "nvm install --lts",
+        "npm install -g express-gateway"
+      ]
+    }
+  ]
+}
