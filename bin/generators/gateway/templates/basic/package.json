@@ -2,7 +2,7 @@
   "name": "express-gateway-instance",
   "description": "Express Gateway Instance Bootstraped from Command Line",
   "repository": {},
-  "license": "MIT",
+  "license": "UNLICENSED",
   "version": "1.0.0",
   "main": "server.js"
 }
