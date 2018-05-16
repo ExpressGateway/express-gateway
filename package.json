@@ -36,7 +36,6 @@
     "lint": "eslint --fix .",
     "pretest": "eslint .",
     "precommit": "lint-staged",
-    "postinstall": "node scripts/json-schema-migration.js",
     "test": "npm run mocha:istanbul",
     "test:all": "cross-env EG_HTTP_PORT=0 EG_CONFIG_DIR=lib/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive test --timeout 60000 --exit",
     "test:unit": "cross-env EG_HTTP_PORT=0 EG_CONFIG_DIR=lib/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive \"./test/{,!(e2e)/**/}*.test.js\" --timeout 5000 --exit",
