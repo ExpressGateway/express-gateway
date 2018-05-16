@@ -1,5 +1,44 @@
 {
   "$id": "http://express-gateway.io/models/gateway.config.json",
+  "definitions": {
+    "baseApiEndpoint": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "paths": {
+          "type": [
+            "string",
+            "array"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "pathRegex": {
+          "type": "string",
+          "format": "regex"
+        },
+        "scopes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "methods": {
+          "type": [
+            "string",
+            "array"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
   "type": "object",
   "properties": {
     "http": {
@@ -56,41 +95,17 @@
         "null"
       ],
       "additionalProperties": {
-        "type": "object",
-        "properties": {
-          "host": {
-            "type": "string"
+        "anyOf": [
+          {
+            "$ref": "#/definitions/baseApiEndpoint"
           },
-          "paths": {
-            "type": [
-              "string",
-              "array"
-            ],
-            "items": {
-              "type": "string"
-            }
-          },
-          "pathRegex": {
-            "type": "string",
-            "format": "regex"
-          },
-          "scopes": {
+          {
             "type": "array",
-            "uniqueItems": true,
             "items": {
-              "type": "string"
-            }
-          },
-          "methods": {
-            "type": [
-              "string",
-              "array"
-            ],
-            "items": {
-              "type": "array"
+              "$ref": "#/definitions/baseApiEndpoint"
             }
           }
-        }
+        ]
       }
     },
     "serviceEndpoints": {

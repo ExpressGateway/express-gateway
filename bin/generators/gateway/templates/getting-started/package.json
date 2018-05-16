@@ -1,5 +1,8 @@
 {
-  "name": "",
+  "name": "express-gateway-instance",
+  "description": "Express Gateway Instance Bootstraped from Command Line",
+  "repository": {},
+  "license": "MIT",
   "version": "1.0.0",
   "main": "server.js"
 }

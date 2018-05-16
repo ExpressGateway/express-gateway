@@ -76,7 +76,7 @@ workflows:
             tags:
               only: /v\d+(\.\d+){2}/
       - node-8: *testingFilters
-      - node-9: *testingFilters
+      - node-10: *testingFilters
       - node-8-real-redis: *testingFilters
       - release: &releaseFilters
           filters:
