@@ -11,7 +11,7 @@ ENV CHOKIDAR_USEPOLLING true
 
 VOLUME /var/lib/eg
 
-RUN yarn global add express-gateway@$EG_VERSION --ignore-optional
+RUN yarn global add express-gateway@$EG_VERSION
 
 COPY ./bin/generators/gateway/templates/basic/config /var/lib/eg
 COPY ./lib/config/models /var/lib/eg/models
