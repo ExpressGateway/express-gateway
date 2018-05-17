@@ -5,7 +5,7 @@ jobs:
       - image: circleci/node:6-browsers
     working_directory: ~/repo
 
-    steps:
+    steps: &steps
       - checkout
       - run: npm install
       - run: npm test
@@ -15,20 +15,14 @@ jobs:
       - image: circleci/node:8-browsers
     working_directory: ~/repo
 
-    steps:
-      - checkout
-      - run: npm install
-      - run: npm test
+    steps: *steps
 
   "node-10":
     docker:
       - image: circleci/node:10-browsers
     working_directory: ~/repo
 
-    steps:
-      - checkout
-      - run: npm install
-      - run: npm test
+    steps: *steps
 
   "node-8-real-redis":
     docker:
@@ -37,10 +31,7 @@ jobs:
     working_directory: ~/repo
     environment:
       - EG_DB_EMULATE: false
-    steps:
-      - checkout
-      - run: npm install
-      - run: npm test
+    steps: *steps
 
   release:
     docker:
