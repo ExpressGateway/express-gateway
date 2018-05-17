@@ -1,3 +1,5 @@
 dist/
 coverage
 admin/node_modules
+bin/generators/gateway/templates/basic/server.js
+bin/generators/gateway/templates/getting-started/server.js
