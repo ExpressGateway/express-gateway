@@ -1,11 +1,16 @@
 {
-  "extends": "standard",
+  "extends": [
+    "standard",
+    "plugin:node/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings"
+  ],
   "env": {
     "es6": true,
     "node": true
   },
   "plugins": [
-    "markdown",
+    "import",
     "promise",
     "node"
   ],

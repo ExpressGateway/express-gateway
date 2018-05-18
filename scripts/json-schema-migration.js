@@ -1,3 +1,4 @@
+/*eslint-disable */
 const migrate = require('migrate');
 const readline = require('readline');
 const path = require('path');

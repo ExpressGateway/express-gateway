@@ -1,3 +1,5 @@
+/*eslint-disable */
+
 module.exports.up = function () {
   require('util.promisify/shim')();
   const log = require('migrate/lib/log');
@@ -8,7 +10,7 @@ module.exports.up = function () {
   const writeFile = util.promisify(fs.writeFile);
   const access = util.promisify(fs.access);
 
-  function copyFile (source, target) {
+  function copyFile(source, target) {
     const rd = fs.createReadStream(source);
     const wr = fs.createWriteStream(target);
     return new Promise(function (resolve, reject) {

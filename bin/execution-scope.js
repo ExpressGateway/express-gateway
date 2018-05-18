@@ -34,16 +34,10 @@ exports.executeInScope = env => {
     const childEnv = process.env;
     childEnv.EG_LOCAL_EXEC = true;
 
-    try {
-      execFileSync(localBin, process.argv.slice(2), {
-        cwd: env.cwd,
-        env: childEnv,
-        stdio: 'inherit'
-      });
-    } catch (err) {
-      process.exit(err.status);
-    }
-
-    process.exit();
+    execFileSync(localBin, process.argv.slice(2), {
+      cwd: env.cwd,
+      env: childEnv,
+      stdio: 'inherit'
+    });
   }
 };
