@@ -118,6 +118,10 @@
     },
     "plugins": {
       "type": "object"
+    },
+    "oauth2": {
+      "type": "object"
+      ,"default": {}
     }
   },
   "required": [
