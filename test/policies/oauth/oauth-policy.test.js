@@ -114,10 +114,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
               });
           });
       })
-      .catch(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .catch(done);
   });
 
   after('cleanup', () => {
@@ -131,10 +128,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
     request
       .get('/authorizedPath')
       .expect(401)
-      .end(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .end(done);
   });
 
   it('should not authenticate token for requests if requester doesn\'t have authorized scopes', function (done) {
@@ -143,10 +137,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
     request
       .get('/unauthorizedPath')
       .expect(401)
-      .end(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .end(done);
   });
 
   it('should authenticate token for requests with scopes if requester is authorized', function (done) {
@@ -156,10 +147,7 @@ describe('Functional Tests oAuth2.0 Policy', () => {
       .get('/authorizedPath')
       .set('Authorization', 'bearer ' + token.access_token)
       .expect(200)
-      .end(function (err, res) {
-        should.not.exist(err);
-        done();
-      });
+      .end(done);
   });
 
   it('should not authenticate invalid token', function (done) {
@@ -169,9 +157,6 @@ describe('Functional Tests oAuth2.0 Policy', () => {
       .get('/authorizedPath')
       .set('Authorization', 'bearer some-bogus-token')
       .expect(401)
-      .end(function (err) {
-        should.not.exist(err);
-        done();
-      });
+      .end(done);
   });
 });
