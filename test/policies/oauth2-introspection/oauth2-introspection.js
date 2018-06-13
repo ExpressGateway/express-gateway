@@ -1,6 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const should = require('should');
+const sinon = require('sinon');
 const serverHelper = require('../../common/server-helper');
 const config = require('../../../lib/config');
 const testHelper = require('../../common/routing.helper')();
@@ -8,10 +9,10 @@ const testHelper = require('../../common/routing.helper')();
 const originalGatewayConfig = JSON.parse(JSON.stringify(config.gatewayConfig));
 const originalSystemConfig = JSON.parse(JSON.stringify(config.systemConfig));
 
-let callCount = 0;
 let gateway;
 let introspectApp;
 let backend;
+let introspectEndpointSpy;
 
 const gatewayConfig = (port) => ({
   http: { port: 0 },
@@ -50,8 +51,7 @@ describe('oAuth2 Introspection Policy', () => {
       .then(([port, introspectPort]) => {
         config.gatewayConfig = gatewayConfig(port);
         const app = express();
-        app.post('/introspect', express.urlencoded({ extended: true }), (req, res) => {
-          callCount++;
+        introspectEndpointSpy = sinon.spy((req, res) => {
           if (req.header('authorization') !== 'YXBpMTpzZWNyZXQ=') {
             return res.sendStatus(401);
           }
@@ -62,6 +62,7 @@ describe('oAuth2 Introspection Policy', () => {
 
           return res.json({ active: true });
         });
+        app.post('/introspect', express.urlencoded({ extended: true }), introspectEndpointSpy);
         return new Promise((resolve, reject) => {
           introspectApp = app.listen(7777, (err) => {
             if (err) return reject(err);
@@ -102,7 +103,7 @@ describe('oAuth2 Introspection Policy', () => {
       .set('Authorization', `YXBpMTpzZWNyZXQ=`)
       .type('form')
       .send({ token: 'example_token_value' })
-      .then(() => should(callCount).equal(3))
+      .then(() => should(introspectEndpointSpy.callCount).equal(3))
   );
 
   after('cleanup', (done) => {
