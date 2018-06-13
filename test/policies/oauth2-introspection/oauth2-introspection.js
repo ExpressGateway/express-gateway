@@ -14,11 +14,11 @@ let introspectApp;
 let backend;
 let introspectEndpointSpy;
 
-const gatewayConfig = (port) => ({
+const gatewayConfig = (backendPort, introspectionPort) => ({
   http: { port: 0 },
   serviceEndpoints: {
     backend: {
-      url: `http://localhost:${port}`
+      url: `http://localhost:${backendPort}`
     }
   },
   apiEndpoints: {
@@ -34,7 +34,7 @@ const gatewayConfig = (port) => ({
         {
           'oauth2-introspect': {
             action: {
-              endpoint: 'http://localhost:7777/introspect',
+              endpoint: `http://localhost:${introspectionPort}/introspect`,
               authorization_value: 'YXBpMTpzZWNyZXQ='
             }
           }
@@ -48,8 +48,8 @@ const gatewayConfig = (port) => ({
 describe('oAuth2 Introspection Policy', () => {
   before(() => {
     return serverHelper.findOpenPortNumbers(2)
-      .then(([port, introspectPort]) => {
-        config.gatewayConfig = gatewayConfig(port);
+      .then(([port, introspectionPort]) => {
+        config.gatewayConfig = gatewayConfig(port, introspectionPort);
         const app = express();
         introspectEndpointSpy = sinon.spy((req, res) => {
           if (req.header('authorization') !== 'YXBpMTpzZWNyZXQ=') {
@@ -64,7 +64,7 @@ describe('oAuth2 Introspection Policy', () => {
         });
         app.post('/introspect', express.urlencoded({ extended: true }), introspectEndpointSpy);
         return new Promise((resolve, reject) => {
-          introspectApp = app.listen(7777, (err) => {
+          introspectApp = app.listen(introspectionPort, (err) => {
             if (err) return reject(err);
             resolve();
           });
