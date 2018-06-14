@@ -82,28 +82,23 @@ describe('oAuth2 Introspection Policy', () => {
   it('should return 401 when invalid token is provided', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `YXBpMTpzZWNyZXQ=`)
-      .type('form')
-      .send({ token: 'invalid' })
+      .set('Authorization', `Bearer nasino`)
       .expect(401)
   );
 
   it('should return 200 when valid token and authvalue are provided', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `YXBpMTpzZWNyZXQ=`)
-      .type('form')
-      .send({ token: 'example_token_value' })
+      .set('Authorization', `Bearer example_token_value`)
       .expect(200)
   );
 
   it('should not call the introspection endpoint again because the token is valid already', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `YXBpMTpzZWNyZXQ=`)
-      .type('form')
-      .send({ token: 'example_token_value' })
-      .then(() => should(introspectEndpointSpy.callCount).equal(3))
+      .set('Authorization', `Bearer example_token_value`)
+      .expect(200)
+      .then(() => should(introspectEndpointSpy.callCount).equal(2))
   );
 
   after('cleanup', (done) => {
