@@ -23,7 +23,8 @@ const gatewayConfig = (backendPort, introspectionPort) => ({
   },
   apiEndpoints: {
     authorizedEndpoint: {
-      host: '*'
+      host: '*',
+      scopes: ['read', 'write']
     }
   },
   policies: ['oauth2-introspect', 'proxy'],
@@ -51,16 +52,26 @@ describe('oAuth2 Introspection Policy', () => {
       .then(([port, introspectionPort]) => {
         config.gatewayConfig = gatewayConfig(port, introspectionPort);
         const app = express();
+
+        const returnToken = sinon
+          .stub()
+          .onFirstCall().callsFake(res => {
+            res.json({ active: true });
+          })
+          .callsFake(res => {
+            res.json({ active: true, scopes: 'read write' });
+          });
+
         introspectEndpointSpy = sinon.spy((req, res) => {
           if (req.header('authorization') !== 'YXBpMTpzZWNyZXQ=') {
             return res.sendStatus(401);
           }
 
-          if (req.body.token !== 'example_token_value') {
+          if (!['token_value_1', 'token_value_2'].includes(req.body.token)) {
             return res.json({ active: false });
           }
 
-          return res.json({ active: true });
+          returnToken(res);
         });
         app.post('/introspect', express.urlencoded({ extended: true }), introspectEndpointSpy);
         return new Promise((resolve, reject) => {
@@ -73,32 +84,39 @@ describe('oAuth2 Introspection Policy', () => {
       .then(() => testHelper.setup()).then(({ app }) => { gateway = app; });
   });
 
-  it('should return 401 when invalid authorization value is provided', () =>
+  it('should return 401 when no token is provided', () =>
     request(gateway)
       .get('/')
       .expect(401)
   );
 
-  it('should return 401 when invalid token is provided', () =>
+  it('should return 401 when an invalid token is sent', () =>
     request(gateway)
       .get('/')
       .set('Authorization', `Bearer nasino`)
       .expect(401)
   );
 
-  it('should return 200 when valid token and authvalue are provided', () =>
+  it('should return 401 when a valid token is sent, but not sufficient scopes', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `Bearer example_token_value`)
+      .set('Authorization', `Bearer token_value_1`)
+      .expect(401)
+  );
+
+  it('should return 200 when valid token and sufficient scopes are provided', () =>
+    request(gateway)
+      .get('/')
+      .set('Authorization', `Bearer token_value_2`)
       .expect(200)
   );
 
   it('should not call the introspection endpoint again because the token is valid already', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `Bearer example_token_value`)
+      .set('Authorization', `Bearer token_value_2`)
       .expect(200)
-      .then(() => should(introspectEndpointSpy.callCount).equal(2))
+      .then(() => should(introspectEndpointSpy.callCount).equal(3))
   );
 
   it('should call the introspection endpoint again because a different token is sent', () =>
@@ -106,7 +124,7 @@ describe('oAuth2 Introspection Policy', () => {
       .get('/')
       .set('Authorization', `Bearer hola`)
       .expect(401)
-      .then(() => should(introspectEndpointSpy.callCount).equal(3))
+      .then(() => should(introspectEndpointSpy.callCount).equal(4))
   );
 
   after('cleanup', (done) => {
