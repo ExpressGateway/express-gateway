@@ -101,6 +101,14 @@ describe('oAuth2 Introspection Policy', () => {
       .then(() => should(introspectEndpointSpy.callCount).equal(2))
   );
 
+  it('should call the introspection endpoint again because a different token is sent', () =>
+    request(gateway)
+      .get('/')
+      .set('Authorization', `Bearer hola`)
+      .expect(401)
+      .then(() => should(introspectEndpointSpy.callCount).equal(3))
+  );
+
   after('cleanup', (done) => {
     config.systemConfig = originalSystemConfig;
     config.gatewayConfig = originalGatewayConfig;
