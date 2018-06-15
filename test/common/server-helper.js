@@ -11,7 +11,7 @@ const generateBackendServer = port => {
   });
   return new Promise((resolve) => {
     const runningApp = app.listen(port || 0, () => {
-      logger.log('running test stub server at ' + runningApp.address().port);
+      logger.info('running test stub server at ' + runningApp.address().port);
       resolve({
         app: runningApp,
         port: runningApp.address().port
