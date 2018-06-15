@@ -66,8 +66,8 @@ describe('@log policy', () => {
   });
 
   afterEach(function () {
-    logger.info.reset();
-    logger.error.reset();
+    logger.info.resetHistory();
+    logger.error.resetHistory();
   });
 
   after(function () {

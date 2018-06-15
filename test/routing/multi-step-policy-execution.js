@@ -57,7 +57,7 @@ describe('default config with multi step (multi action) policy', () => {
   after('cleanup', helper.cleanup);
 
   beforeEach('reset', () => {
-    spy.reset();
+    spy.resetHistory();
   });
 
   ['/random/17/3', '/', '/admin'].forEach(url => {
