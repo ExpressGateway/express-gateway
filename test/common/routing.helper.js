@@ -1,6 +1,5 @@
 const request = require('supertest');
 const should = require('should');
-const logger = require('../../lib/logger').test;
 const gateway = require('../../lib/gateway');
 const config = require('../../lib/config');
 let policies = require('../../lib/policies');
@@ -75,10 +74,7 @@ module.exports = function () {
         testScenario
           .expect(testCase.test.errorCode)
           .expect('Content-Type', /text\/html/)
-          .end((err, res) => {
-            if (err) { logger.error(res.body); }
-            err ? done(err) : done();
-          });
+          .end((err, res) => { done(err); });
       };
     },
     validateOptions: (testCase) => {
@@ -97,9 +93,7 @@ module.exports = function () {
           }
         }
         testScenario.expect(204)
-          .end((err, res) => {
-            err ? done(err) : done();
-          });
+          .end((err, res) => { done(err); });
       };
     },
     validateSuccess: (testCase) => {
@@ -120,10 +114,7 @@ module.exports = function () {
               should(res.body.apiEndpoint.scopes).be.deepEqual(testCase.test.scopes);
             }
           })
-          .end((err, res) => {
-            if (err) { logger.error(res.body); }
-            err ? done(err) : done();
-          });
+          .end((err, res) => { done(err); });
       };
     },
     validateParams: (testCase) => {
@@ -133,10 +124,7 @@ module.exports = function () {
           .expect((res) => {
             should(res.body.params).be.deepEqual(testCase.test.params);
           })
-          .end((err, res) => {
-            if (err) { logger.error(res.body); }
-            err ? done(err) : done();
-          });
+          .end((err, res) => { done(err); });
       };
     }
   };
