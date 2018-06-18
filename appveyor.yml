@@ -1,15 +1,14 @@
 environment:
   matrix:
-    - nodejs_version: "6"
-    - nodejs_version: "8"
-    - nodejs_version: "10"
+    - nodejs_version: "6.14.3"
+    - nodejs_version: "8.11.3"
+    - nodejs_version: "10.4.1"
+
 install:
-  - ps: Install-Product node $env:nodejs_version
+  - ps: choco install nodejs
   - npm install
 build: off
 test_script:
-  - node --version
-  - npm --version
   - npm run test:all
 version: "{build}"
 
