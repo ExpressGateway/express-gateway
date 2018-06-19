@@ -60,8 +60,8 @@ const gatewayConfig = (backendPort) => ({
 
 describe('body modifier Policy', () => {
   before(() => {
-    return serverHelper.findOpenPortNumbers(2)
-      .then(([port, backendPort]) => {
+    return serverHelper.findOpenPortNumbers(1)
+      .then(([backendPort]) => {
         config.gatewayConfig = gatewayConfig(backendPort);
         const app = express();
 
@@ -81,7 +81,7 @@ describe('body modifier Policy', () => {
       .then(() => testHelper.setup()).then(({ app }) => { gateway = app; });
   });
 
-  it('should remove some properties and add some others', () =>
+  it('should remove some properties and add some others when sending content', () =>
     request(gateway)
       .post('/')
       .send({ name: 'Clark', surname: 'Kent' })
