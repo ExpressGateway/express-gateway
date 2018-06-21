@@ -70,7 +70,7 @@ describe('Auth tests', function () {
     });
 
     it('should authorize Credential with scopes', () => {
-      return authService.authorizeCredential(userFromDb.id, 'oauth2', ['someScope1', 'someScope2'])
+      return authService.checkScopesOnCredential(userFromDb.id, 'oauth2', ['someScope1', 'someScope2'])
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(true);
@@ -78,7 +78,7 @@ describe('Auth tests', function () {
     });
 
     it('should not authorize Credential with invalid scopes', () => {
-      return authService.authorizeCredential(userFromDb.id, 'oauth2', ['otherScope', 'someScope2'])
+      return authService.checkScopesOnCredential(userFromDb.id, 'oauth2', ['otherScope', 'someScope2'])
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(false);
@@ -92,7 +92,7 @@ describe('Auth tests', function () {
           should.exist(res);
           res.should.eql(true);
         })
-        .then(() => authService.authorizeCredential(userFromDb.id, 'oauth2', ['otherScope', 'someScope2']))
+        .then(() => authService.checkScopesOnCredential(userFromDb.id, 'oauth2', ['otherScope', 'someScope2']))
         .then((authResponse) => {
           should.exist(authResponse);
           authResponse.should.eql(false);
