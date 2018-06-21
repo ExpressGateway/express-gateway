@@ -51,9 +51,7 @@ describe('Functional Test Implicit grant', function () {
                 should.not.exist(err);
                 request
                   .post('/oauth2/authorize/decision')
-                  .query({
-                    transaction_id: res.headers.transaction_id
-                  })
+                  .query({ transaction_id: res.headers.transaction_id })
                   .expect(302)
                   .end(function (err, res) {
                     should.not.exist(err);
@@ -115,9 +113,7 @@ describe('Functional Test Implicit grant', function () {
                 should.not.exist(err);
                 request
                   .post('/oauth2/authorize/decision')
-                  .query({
-                    transaction_id: res.headers.transaction_id
-                  })
+                  .query({ transaction_id: res.headers.transaction_id })
                   .expect(302)
                   .end(function (err, res) {
                     should.not.exist(err);

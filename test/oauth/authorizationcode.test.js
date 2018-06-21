@@ -49,9 +49,7 @@ describe('Functional Test Authorization Code grant', function () {
           .expect(200);
       }).then(res => request
         .post('/oauth2/authorize/decision')
-        .query({
-          transaction_id: res.headers.transaction_id
-        })
+        .query({ transaction_id: res.headers.transaction_id })
         .expect(302)
       ).then(res => {
         should.exist(res.headers.location);
@@ -110,9 +108,7 @@ describe('Functional Test Authorization Code grant', function () {
       }).then(res => {
         return request
           .post('/oauth2/authorize/decision')
-          .query({
-            transaction_id: res.headers.transaction_id
-          })
+          .query({ transaction_id: res.headers.transaction_id })
           .expect(302);
       }).then(res => {
         should.exist(res.headers.location);

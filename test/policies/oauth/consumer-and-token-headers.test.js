@@ -123,9 +123,7 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
       .then((res) => {
         return request
           .post('/oauth2/authorize/decision')
-          .query({
-            transaction_id: res.headers.transaction_id
-          })
+          .query({ transaction_id: res.headers.transaction_id })
           .expect(302);
       })
       .then((res) => {
