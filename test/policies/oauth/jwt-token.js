@@ -93,11 +93,15 @@ describe('oAuth2 policy', () => {
           lastname: 'Kent',
           email: 'test@example.com'
         }))
-        .then(user => credentialService.insertCredential(user.id, 'basic-auth', {}).then(cred => { Object.assign(userCred, { password: cred.password, username: user.username }); return user; }))
-        .then(user => appService.insert({ name: 'appy', 'redirectUri': 'http://haha.com' }, user.id))
-        .then(app => credentialService.insertCredential(app.id, 'oauth2', appCredential))
-        .then(credential => credentialService.addScopesToCredential(credential.id, 'oauth2', ['read', 'write']).then(() => credential))
-        .then(credential => Object.assign(appCredential, credential))
+        .then(user => Promise.all([
+          appService.insert({ name: 'appy', 'redirectUri': 'http://haha.com' }, user.id),
+          credentialService.insertCredential(user.id, 'basic-auth', {}).then(cred => { Object.assign(userCred, { password: cred.password, username: user.username }); return cred; })
+        ]))
+        .then(([app, userCredential]) => Promise.all([
+          credentialService.insertCredential(app.id, 'oauth2', appCredential),
+          credentialService.addScopesToCredential(userCredential.id, 'basic-auth', ['read', 'write'])
+        ]))
+        .then(([credential]) => Object.assign(appCredential, credential))
         .then(() => serverHelper.findOpenPortNumbers(1))
         .then(([port]) => {
           config.systemConfig.accessTokens.tokenType = 'jwt';
