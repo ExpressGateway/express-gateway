@@ -66,7 +66,7 @@ describe('Functional Test Client Credentials grant', function () {
         client_secret: 'app-secret',
         scope: 'someScope unauthorizedScope'
       })
-      .expect(401)
+      .expect(403)
       .end(done);
   });
 });

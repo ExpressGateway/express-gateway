@@ -53,7 +53,11 @@ module.exports = {
         should.exist(userRes);
         should.exist(appRes);
 
-        return [fromDbUser, fromDbApp];
+        return Promise.all([
+          fromDbUser,
+          fromDbApp,
+          credentialService.addScopesToCredential(userRes.id, 'basic-auth', ['someScope'])
+        ]);
       });
   }
 };
