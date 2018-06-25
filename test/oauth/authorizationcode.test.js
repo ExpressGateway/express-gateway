@@ -193,8 +193,13 @@ describe('Functional Test Authorization Code grant', function () {
             redirect_uri: fromDbApp.redirectUri,
             response_type: 'code',
             client_id: fromDbApp.id,
-            scope: 'someScope unauthorizedScope'
+            scope: 'someScope unauthorizedScopes'
           })
+          .expect(200);
+      }).then(res => {
+        return request
+          .post('/oauth2/authorize/decision')
+          .query({ transaction_id: res.headers.transaction_id })
           .expect(403);
       });
   });
