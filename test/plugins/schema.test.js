@@ -7,10 +7,12 @@ const pluginsLoader = require('../../lib/plugins');
 const pluginName = 'express-gateway-plugin-test';
 const pluginDirectory = path.join(__dirname, '../fixtures', pluginName);
 const testPlugin = require(pluginDirectory);
+
 testPlugin.schema = {
   '$id': `http://express-gateway.io/schemas/plugin/${pluginName}.json`,
   'required': ['schema-test-param']
 };
+
 testPlugin.init = (pluginContext) => {
   pluginContext.registerPolicy('schema-test-policy');
 };
@@ -30,7 +32,7 @@ describe('Plugin schema validation on load', () => {
     };
 
     const loadedPlugins = pluginsLoader.load(missingParameterConfig);
-    should(loadedPlugins).a.property('policies').be.empty();
+    should(loadedPlugins).have.property('policies').empty();
   });
 
   it('loads plugin and registers policy successfully', () => {
@@ -48,6 +50,6 @@ describe('Plugin schema validation on load', () => {
     };
 
     const loadedPlugins = pluginsLoader.load(config);
-    should(loadedPlugins).have.a.property('policies', ['schema-test-policy']);
+    should(loadedPlugins).have.property('policies', ['schema-test-policy']);
   });
 });
