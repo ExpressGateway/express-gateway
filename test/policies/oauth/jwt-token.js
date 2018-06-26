@@ -153,6 +153,20 @@ describe('oAuth2 policy', () => {
       jwtTokenChecks(() => _response);
     });
 
+    describe('should do the same with client credential flow', () => {
+      before(() => request(gateway)
+        .post('/oauth2/token')
+        .send({
+          grant_type: 'client_credentials',
+          client_id: appCredential.id,
+          client_secret: appCredential.secret,
+          scope: ['read', 'write'].join(' ')
+        }).expect(200).then((response) => { _response = response.body; })
+      );
+
+      jwtTokenChecks(() => _response);
+    });
+
     after('cleanup', (done) => {
       config.systemConfig = originalSystemConfig;
       config.gatewayConfig = originalGatewayConfig;
