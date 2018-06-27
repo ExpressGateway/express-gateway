@@ -32,12 +32,12 @@ module.exports = function (client) {
         .get(`${baseUrl}${encodeURIComponent(id)}`)
         .then(res => res.body);
     },
-    list (params) {
+    list (params = {}) {
       let results = [];
 
       const fetchNext = (res) => {
         results = results.concat(res.body.users);
-        if (res.body.nextKey !== 0) {
+        if (params.all && res.body.nextKey !== 0) {
           return client
             .get(baseUrl)
             .query(Object.assign({}, params, { start: res.body.nextKey }))

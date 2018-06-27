@@ -142,7 +142,7 @@ describe('eg users list', () => {
           done();
         });
       });
-      env.argv = program.parse('users list');
+      env.argv = program.parse('users list -a');
     });
   });
 });

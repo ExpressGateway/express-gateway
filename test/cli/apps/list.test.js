@@ -106,7 +106,7 @@ describe('eg apps list', () => {
           done();
         });
       });
-      env.argv = program.parse('apps list -q');
+      env.argv = program.parse('apps list -q -a');
     });
   });
 });
