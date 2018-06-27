@@ -35,13 +35,13 @@ module.exports = function (client) {
     list (params) {
       let results = [];
 
-      const fetchNext = (res, queryParams = {}) => {
+      const fetchNext = (res) => {
         results = results.concat(res.body.users);
         if (res.body.nextKey !== 0) {
           return client
             .get(baseUrl)
-            .query(Object.assign(queryParams, { start: res.body.nextKey }))
-            .then(res => fetchNext(res, queryParams));
+            .query(Object.assign({}, params, { start: res.body.nextKey }))
+            .then(fetchNext);
         }
         return { users: results };
       };
@@ -49,7 +49,7 @@ module.exports = function (client) {
       return client
         .get(baseUrl)
         .query(params)
-        .then(res => fetchNext(res, params));
+        .then(fetchNext);
     },
 
     remove (id) {

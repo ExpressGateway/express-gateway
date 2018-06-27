@@ -35,10 +35,23 @@ module.exports = function (client) {
     },
 
     list (params) {
+      let results = [];
+
+      const fetchNext = (res) => {
+        results = results.concat(res.body.apps);
+        if (res.body.nextKey !== 0) {
+          return client
+            .get(baseUrl)
+            .query(Object.assign({}, params, { start: res.body.nextKey }))
+            .then(fetchNext);
+        }
+        return { apps: results };
+      };
+
       return client
         .get(baseUrl)
         .query(params)
-        .then(res => res.body);
+        .then(fetchNext);
     },
 
     remove (id) {

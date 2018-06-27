@@ -1,11 +1,21 @@
 const assert = require('assert');
-const adminHelper = require('../../common/admin-helper')();
 const idGen = require('uuid62');
+const adminHelper = require('../../common/admin-helper')();
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:apps:list';
 
+const generateUser = () => adminHelper.admin.users.create({
+  username: idGen.v4(),
+  firstname: 'La',
+  lastname: 'Deeda'
+});
+const generateApp = (userId) => adminHelper.admin.apps.create(userId, {
+  name: idGen.v4(),
+  redirectUri: 'http://localhost:3000/cb'
+});
+
 describe('eg apps list', () => {
-  let program, env, user1, app1, app2;
+  let program, env, app1, app2;
 
   before(() => {
     ({ program, env } = environment.bootstrap());
@@ -15,26 +25,9 @@ describe('eg apps list', () => {
 
   beforeEach(() => {
     env.prepareHijack();
-    return adminHelper.admin.users.create({
-      username: idGen.v4(),
-      firstname: 'La',
-      lastname: 'Deeda'
-    }).then(user => {
-      user1 = user;
-      return adminHelper.admin.apps.create(user1.id, {
-        name: idGen.v4(),
-        redirectUri: 'http://localhost:3000/cb'
-      });
-    }).then(app => {
-      app1 = app;
-      return adminHelper.admin.apps.create(user1.id, {
-        name: idGen.v4(),
-        redirectUri: 'http://localhost:3000/cb'
-      });
-    })
-      .then(app => {
-        app2 = app;
-      });
+    return generateUser()
+      .then(user => Promise.all([user, generateApp(user.id), generateApp(user.id)]))
+      .then(([firstApp, secondApp]) => { app1 = firstApp; app2 = secondApp; });
   });
 
   afterEach(() => {
@@ -91,5 +84,29 @@ describe('eg apps list', () => {
     });
 
     env.argv = program.parse('apps list --quiet ');
+  });
+
+  describe('page navigation', () => {
+    before(() => generateUser().then(user => Promise.all(Array(100).fill().map(() => generateApp(user.id)))));
+    it('should show all the apps when they fill multiple pages', done => {
+      env.hijack(namespace, generator => {
+        const output = {};
+
+        generator.once('run', () => {
+          generator.log.error = message => {
+            done(new Error(message));
+          };
+          generator.stdout = message => {
+            output[message] = true;
+          };
+        });
+
+        generator.once('end', () => {
+          assert.equal(Object.keys(output).length, 102);
+          done();
+        });
+      });
+      env.argv = program.parse('apps list -q');
+    });
   });
 });
