@@ -45,7 +45,7 @@ module.exports = function (client) {
             .query(Object.assign({}, params, { start: res.body.nextKey }))
             .then(fetchNext);
         }
-        return { apps: results };
+        return { apps: results, nextKey: res.body.nextKey };
       };
 
       return client

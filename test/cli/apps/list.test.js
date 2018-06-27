@@ -26,7 +26,7 @@ describe('eg apps list', () => {
   beforeEach(() => {
     env.prepareHijack();
     return generateUser()
-      .then(user => Promise.all([user, generateApp(user.id), generateApp(user.id)]))
+      .then(user => Promise.all([generateApp(user.id), generateApp(user.id)]))
       .then(([firstApp, secondApp]) => { app1 = firstApp; app2 = secondApp; });
   });
 

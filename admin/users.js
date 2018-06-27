@@ -43,7 +43,7 @@ module.exports = function (client) {
             .query(Object.assign({}, params, { start: res.body.nextKey }))
             .then(fetchNext);
         }
-        return { users: results };
+        return { users: results, nextKey: res.body.nextKey };
       };
 
       return client
