@@ -40,7 +40,7 @@ module.exports = function (client) {
         if (params.all && res.body.nextKey !== 0) {
           return client
             .get(baseUrl)
-            .query(Object.assign({}, params, { start: res.body.nextKey }))
+            .query({ start: res.body.nextKey, count: params.count })
             .then(fetchNext);
         }
         return { users: results, nextKey: res.body.nextKey };
