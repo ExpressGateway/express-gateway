@@ -33,12 +33,23 @@ module.exports = function (client) {
         .then(res => res.body);
     },
     list (params) {
+      let results = [];
+
+      const fetchNext = (res, queryParams = {}) => {
+        results = results.concat(res.body.users);
+        if (res.body.nextKey !== 0) {
+          return client
+            .get(baseUrl)
+            .query(Object.assign(queryParams, { start: res.body.nextKey }))
+            .then(res => fetchNext(res, queryParams));
+        }
+        return { users: results };
+      };
+
       return client
         .get(baseUrl)
         .query(params)
-        .then(res => {
-          return res.body;
-        });
+        .then(res => fetchNext(res, params));
     },
 
     remove (id) {
