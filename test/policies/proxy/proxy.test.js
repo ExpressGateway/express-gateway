@@ -38,7 +38,7 @@ describe('@proxy policy', () => {
 
       backendServerPort = ports[0];
 
-      expressApp.all('*', function (req, res) {
+      expressApp.all('*', express.json(), function (req, res) {
         if (req.headers['x-test']) {
           res.setHeader('x-test', req.header('x-test'));
         }
@@ -47,7 +47,7 @@ describe('@proxy policy', () => {
           res.setHeader('x-forwarded-for', req.header('x-forwarded-for'));
         }
 
-        res.status(200).json();
+        res.status(200).json(req.body);
       });
 
       backendServer = https.createServer({
@@ -138,6 +138,65 @@ describe('@proxy policy', () => {
           .expect('x-forwarded-for', '::ffff:127.0.0.1')
       );
     });
+  });
+
+  describe('requestStream property', () => {
+    before(() => {
+      return gateway({
+        plugins: {
+          policies: [{
+            name: 'change-stream',
+            policy: () => {
+              const s = new (require('stream').Readable)();
+              const payload = JSON.stringify({ payload: 'value1', testField: 'value2' });
+              s.push(payload);
+              s.push(null);
+              return (req, res, next) => {
+                req.egContext.requestStream = s;
+                req.headers['content-length'] = Buffer.byteLength(payload);
+                next();
+              };
+            }
+          }]
+        },
+        config: {
+          gatewayConfig: {
+            http: { port: 0 },
+            apiEndpoints: {
+              test: {}
+            },
+            serviceEndpoints: {
+              backend: {
+                url: `https://localhost:${backendServerPort}`
+              }
+            },
+            policies: ['proxy', 'change-stream'],
+            pipelines: {
+              pipeline1: {
+                apiEndpoints: ['test'],
+                policies: [{
+                  'change-stream': {}
+                }, {
+                  proxy: [{
+                    action: Object.assign({}, defaultProxyOptions, { serviceEndpoint: 'backend' })
+                  }]
+                }]
+              }
+            }
+          }
+        }
+      }).then(apps => {
+        app = apps.app;
+      });
+    });
+
+    it('should return a different body when requestStream is set', () =>
+      request(app)
+        .get('/endpoint')
+        .type('json')
+        .send({ testValue: 'testBody' })
+        .expect(200, { payload: 'value1', testField: 'value2' })
+    );
   });
 });
 
