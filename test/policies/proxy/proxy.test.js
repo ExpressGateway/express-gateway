@@ -73,7 +73,7 @@ describe('@proxy policy', () => {
     it('raises an error when incorrect TLS file paths are provided', () => {
       const serviceOptions = { target: { keyFile: '/non/existent/file.key' } };
 
-      return should(setupGateway(serviceOptions)).be.rejectedWith(/no such file or directory/);
+      return should(() => setupGateway(serviceOptions)).throw(/no such file or directory/);
     });
 
     describe('when incorrect proxy options are provided', () => {
@@ -185,9 +185,7 @@ describe('@proxy policy', () => {
             }
           }
         }
-      }).then(apps => {
-        app = apps.app;
-      });
+      }).then(apps => { app = apps.app; });
     });
 
     it('should return a different body when requestStream is set', () =>
@@ -200,33 +198,32 @@ describe('@proxy policy', () => {
   });
 });
 
-const setupGateway = (proxyOptions = {}, serviceProxyOptions = {}) =>
-  findOpenPortNumbers(1).then(([port]) => {
-    config.gatewayConfig = {
-      http: { port },
-      apiEndpoints: {
-        test: {}
-      },
-      serviceEndpoints: {
-        backend: {
-          url: `https://localhost:${backendServerPort}`,
-          proxyOptions: serviceProxyOptions
-        }
-      },
-      policies: ['proxy'],
-      pipelines: {
-        pipeline1: {
-          apiEndpoints: ['test'],
-          policies: [{
-            proxy: [{
-              action: Object.assign({}, proxyOptions, { serviceEndpoint: 'backend' })
-            }]
-          }]
-        }
+const setupGateway = (proxyOptions = {}, serviceProxyOptions = {}) => {
+  config.gatewayConfig = {
+    http: { port: 0 },
+    apiEndpoints: {
+      test: {}
+    },
+    serviceEndpoints: {
+      backend: {
+        url: `https://localhost:${backendServerPort}`,
+        proxyOptions: serviceProxyOptions
       }
-    };
-    return gateway();
-  });
+    },
+    policies: ['proxy'],
+    pipelines: {
+      pipeline1: {
+        apiEndpoints: ['test'],
+        policies: [{
+          proxy: [{
+            action: Object.assign({}, proxyOptions, { serviceEndpoint: 'backend' })
+          }]
+        }]
+      }
+    }
+  };
+  return gateway();
+};
 
 const expectResponse = (app, status, contentType) =>
   request(app).get('/endpoint').expect(status).expect('Content-Type', contentType);
