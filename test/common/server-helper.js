@@ -1,6 +1,5 @@
 const net = require('net');
 const express = require('express');
-const logger = require('../../lib/logger').test;
 
 const generateBackendServer = port => {
   const app = express();
@@ -11,7 +10,6 @@ const generateBackendServer = port => {
   });
   return new Promise((resolve) => {
     const runningApp = app.listen(port || 0, () => {
-      logger.log('running test stub server at ' + runningApp.address().port);
       resolve({
         app: runningApp,
         port: runningApp.address().port
