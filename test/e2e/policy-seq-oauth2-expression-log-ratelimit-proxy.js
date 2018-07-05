@@ -6,7 +6,7 @@ const express = require('express');
 const sinon = require('sinon');
 const assert = require('assert');
 
-const logger = require('../../lib/policies/log/winston-logger');
+const logger = require('../../lib/policies/log/instance');
 const services = require('../../lib/services');
 const credentialService = services.credential;
 const userService = services.user;
