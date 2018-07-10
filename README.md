@@ -101,4 +101,4 @@ Copyright © LunchBadger, Inc. and Express Gateway Contributors
 [contributor-guide]: https://github.com/ExpressGateway/express-gateway/blob/master/Contributing.md
 [lb-url]: https://www.lunchbadger.com
 [joyent-url]: https://www.joyent.com
-[apache-license]: https://github.com/expressgateway/express-gateway/blob/master/LICENSE.md
+[apache-license]: https://github.com/expressgateway/express-gateway/blob/master/LICENSE
