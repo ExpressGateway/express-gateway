@@ -10,7 +10,7 @@ module.exports = class extends eg.Generator {
       builder: yargs =>
         yargs
           .usage(`Usage: $0 ${process.argv[2]} list [options]`)
-          .boolean('a').alias('a', 'all').describe('a', 'Show all the elements instead of stopping to the fist page')
+          .boolean('a').alias('a', 'all').describe('a', 'List all the users instead of stopping to the fist page')
           .example(`$0 ${process.argv[2]} list`)
     });
   }
