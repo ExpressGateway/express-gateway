@@ -46,7 +46,7 @@ Need help or have a question?
 - [Frequently Asked Questions (FAQ)][eg-faq]
 
 #### Commercial Support
-Express Gateway is commerically supported [LunchBadger][lb-url].  For more information about support plans please contact [info@express-gateway.io][eg-support].
+Express Gateway is commercially supported [LunchBadger][lb-url].  For more information about support plans please contact [info@express-gateway.io][eg-support].
 
 #### Community
 Express has a large vibrant community that we hope to extend further with Express Gateway's API gateway use case for Express and its middleware.
