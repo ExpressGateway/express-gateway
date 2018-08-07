@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json /usr/src/app/
 RUN npm install
 COPY . /usr/src/app
+
 EXPOSE 8080 9876
-RUN npm install -g express-gateway-plugin-rewrite
 
 CMD [ "node", "lib", "index.js" ]
