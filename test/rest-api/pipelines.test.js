@@ -30,7 +30,7 @@ describe('REST: pipelines', () => {
     it('should create a new pipeline', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
-        policies: [{ action: 'proxy' }],
+        policies: [{ proxy: {} }],
         customId: idGen.v4() // NOTE: save operation should allow custom props
       };
       return adminHelper.admin.config.pipelines
@@ -62,7 +62,7 @@ describe('REST: pipelines', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
         customId: idGen.v4(), // NOTE: save operation should allow custom props
-        policies: [{ action: 'proxy' }]
+        policies: [{ proxy: {} }]
       };
       return adminHelper.admin.config.pipelines
         .create('test', testPipeline)
@@ -79,7 +79,7 @@ describe('REST: pipelines', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
         customId: idGen.v4(), // NOTE: save operation should allow custom props
-        policies: [{ action: 'proxy' }]
+        policies: [{ proxy: {} }]
       };
       return adminHelper.admin.config.pipelines
         .update('example', testPipeline)
