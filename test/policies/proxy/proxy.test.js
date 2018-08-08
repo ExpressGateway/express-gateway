@@ -47,7 +47,7 @@ describe('@proxy policy', () => {
           res.setHeader('x-forwarded-for', req.header('x-forwarded-for'));
         }
 
-        res.status(200).json(req.body);
+        res.status(200).json(Object.assign({ url: req.url }, req.body));
       });
 
       backendServer = https.createServer({
@@ -193,7 +193,46 @@ describe('@proxy policy', () => {
         .get('/endpoint')
         .type('json')
         .send({ testValue: 'testBody' })
-        .expect(200, { payload: 'value1', testField: 'value2' })
+        .expect(200, { payload: 'value1', testField: 'value2', url: '/endpoint' })
+    );
+  });
+
+  describe('strip Path capabilities', () => {
+    before(() => {
+      return gateway({
+        config: {
+          gatewayConfig: {
+            http: { port: 0 },
+            apiEndpoints: {
+              test: { path: '/hello/v1/api/endpoint*' }
+            },
+            serviceEndpoints: {
+              backend: {
+                url: `https://localhost:${backendServerPort}`
+              }
+            },
+            policies: ['proxy'],
+            pipelines: {
+              pipeline1: {
+                apiEndpoints: ['test'],
+                policies: [{
+                  proxy: [{
+                    action: Object.assign({ stripPath: true }, defaultProxyOptions, { serviceEndpoint: 'backend' })
+                  }]
+                }]
+              }
+            }
+          }
+        }
+      }).then(apps => { app = apps.app; });
+    });
+
+    it('should be proxied with all the query parameters', () =>
+      request(app)
+        .get('/hello/v1/api/endpoint/something')
+        .query({ a: 2, b: 3, c: 10 })
+        .type('json')
+        .expect(200, { url: '/something?a=2&b=3&c=10' })
     );
   });
 });
