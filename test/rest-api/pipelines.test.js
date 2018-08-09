@@ -50,8 +50,8 @@ describe('REST: pipelines', () => {
       const initialConfig = {
         admin: { port: 0 },
         pipelines: {
-          example: { apiEndpoints: ['example'] },
-          hello: { apiEndpoints: ['hello'] }
+          example: { apiEndpoints: ['example'], policies: [{ terminate: {} }] },
+          hello: { apiEndpoints: ['hello'], policies: [{ terminate: {} }] }
         }
       };
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
