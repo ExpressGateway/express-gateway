@@ -21,8 +21,12 @@ describe('REST: pipelines', () => {
   describe('when no pipelines defined', () => {
     beforeEach(() => {
       const initialConfig = {
-        admin: { port: 0 }
+        admin: { port: 0 },
+        apiEndpoints: { api: { host: '*' } },
+        policies: ['proxy', 'terminate'],
+        serviceEndpoints: { backend: { url: 'http://localhost:1010' } }
       };
+
       fs.writeFileSync(config.gatewayConfigPath, yaml.dump(initialConfig));
       config.loadGatewayConfig();
       return adminHelper.start({ config });
@@ -31,7 +35,7 @@ describe('REST: pipelines', () => {
     it('should create a new pipeline', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
-        policies: [{ proxy: {} }],
+        policies: [{ proxy: { action: { serviceEndpoint: 'backend' } } }],
         customId: idGen.v4() // NOTE: save operation should allow custom props
       };
       return adminHelper.admin.config.pipelines
@@ -50,6 +54,9 @@ describe('REST: pipelines', () => {
     beforeEach(() => {
       const initialConfig = {
         admin: { port: 0 },
+        apiEndpoints: { api: { host: '*' } },
+        serviceEndpoints: { backend: { url: 'http://localhost:1010' } },
+        policies: ['proxy', 'terminate'],
         pipelines: {
           example: { apiEndpoints: ['example'], policies: [{ terminate: {} }] },
           hello: { apiEndpoints: ['hello'], policies: [{ terminate: {} }] }
@@ -64,8 +71,9 @@ describe('REST: pipelines', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
         customId: idGen.v4(), // NOTE: save operation should allow custom props
-        policies: [{ proxy: {} }]
+        policies: [{ proxy: { action: { serviceEndpoint: 'backend' } } }]
       };
+
       return adminHelper.admin.config.pipelines
         .create('test', testPipeline)
         .then(() => {
@@ -82,7 +90,7 @@ describe('REST: pipelines', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
         customId: idGen.v4(), // NOTE: save operation should allow custom props
-        policies: ['proxy']
+        policies: ['proxy', 'terminate']
       };
       return adminHelper.admin.config.pipelines
         .create('invalid', testPipeline)
@@ -112,7 +120,7 @@ describe('REST: pipelines', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
         customId: idGen.v4(), // NOTE: save operation should allow custom props
-        policies: [{ proxy: {} }]
+        policies: [{ proxy: { action: { serviceEndpoint: 'backend' } } }]
       };
       return adminHelper.admin.config.pipelines
         .update('example', testPipeline)
