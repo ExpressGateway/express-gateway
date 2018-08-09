@@ -27,6 +27,7 @@ describe('REST: pipelines', () => {
       config.loadGatewayConfig();
       return adminHelper.start({ config });
     });
+
     it('should create a new pipeline', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
@@ -58,6 +59,7 @@ describe('REST: pipelines', () => {
       config.loadGatewayConfig();
       return adminHelper.start({ config });
     });
+
     it('should create a new pipeline', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
@@ -75,11 +77,27 @@ describe('REST: pipelines', () => {
           should(cfg.pipelines.test).have.property('customId');
         });
     });
-    it('should not create a new pipeline when invalid', () => {
+
+    it('should not create a new pipeline when the general gateway.config is invalid', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
         customId: idGen.v4(), // NOTE: save operation should allow custom props
         policies: ['proxy']
+      };
+      return adminHelper.admin.config.pipelines
+        .create('invalid', testPipeline)
+        .catch(() => {
+          const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
+          const cfg = yaml.load(data);
+          should(cfg.pipelines).not.have.property('invalid');
+        });
+    });
+
+    it('should not create a new pipeline when the a specified policy is invalid', () => {
+      const testPipeline = {
+        apiEndpoints: ['api'],
+        customId: idGen.v4(), // NOTE: save operation should allow custom props
+        policies: [{ proxy: {} }]
       };
       return adminHelper.admin.config.pipelines
         .create('invalid', testPipeline)
@@ -115,6 +133,7 @@ describe('REST: pipelines', () => {
           should(cfg.pipelines.example).not.ok();
         });
     });
+
     it('should show existing pipeline', () => {
       return adminHelper.admin.config.pipelines
         .info('example')
@@ -122,6 +141,7 @@ describe('REST: pipelines', () => {
           should(endpoint.apiEndpoints).be.deepEqual(['example']);
         });
     });
+
     it('should list all pipelines', () => {
       return adminHelper.admin.config.pipelines
         .list()
