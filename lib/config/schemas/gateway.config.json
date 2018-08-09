@@ -37,6 +37,29 @@
           }
         }
       }
+    },
+    "conditionAction": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "action": {
+          "type": "object",
+          "default": {}
+        },
+        "condition": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      }
     }
   },
   "type": "object",
@@ -173,26 +196,19 @@
             "items": [
               {
                 "type": "object",
-                "properties": {
-                  "action": {
-                    "type": "object"
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "condition": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      }
+                "maxProperties": 1,
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/conditionAction"
                     },
-                    "required": [
-                      "name"
-                    ]
-                  }
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/conditionAction"
+                      }
+                    }
+                  ]
                 }
               }
             ]
