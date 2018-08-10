@@ -82,7 +82,6 @@
     "json-schema-merge-allof": "^0.6.0",
     "json-schema-ref-parser": "^5.0.3",
     "jsonwebtoken": "^8.3.0",
-    "migrate": "^1.5.0",
     "minimatch": "^3.0.4",
     "oauth2orize": "^1.11.0",
     "parent-require": "^1.0.0",
