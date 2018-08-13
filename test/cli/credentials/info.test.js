@@ -50,8 +50,8 @@ describe('eg credentials info', () => {
 
       generator.once('end', () => {
         const c = JSON.parse(output);
-        assert.equal(c.keyId, cred.keyId);
-        assert.equal(c.isActive, true);
+        assert.strictEqual(c.keyId, cred.keyId);
+        assert.strictEqual(c.isActive, true);
 
         done();
       });

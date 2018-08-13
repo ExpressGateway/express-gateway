@@ -61,9 +61,9 @@ describe('eg apps update', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.name, 'AppName');
-            assert.equal(app.redirectUri, 'http://example.com/cb');
-            assert.equal(output, `Updated ${app1.id}`);
+            assert.strictEqual(app.name, 'AppName');
+            assert.strictEqual(app.redirectUri, 'http://example.com/cb');
+            assert.strictEqual(output, `Updated ${app1.id}`);
             done();
           });
       });
@@ -88,9 +88,9 @@ describe('eg apps update', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.name, 'AppName1');
-            assert.equal(app.redirectUri, 'http://example.com/cb');
-            assert.equal(output, `Updated ${app1.id}`);
+            assert.strictEqual(app.name, 'AppName1');
+            assert.strictEqual(app.redirectUri, 'http://example.com/cb');
+            assert.strictEqual(output, `Updated ${app1.id}`);
             done();
           });
       });
@@ -116,9 +116,9 @@ describe('eg apps update', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.name, 'AppName2');
-            assert.equal(app.redirectUri, 'http://example.com/cb');
-            assert.equal(output, `${app1.id}`);
+            assert.strictEqual(app.name, 'AppName2');
+            assert.strictEqual(app.redirectUri, 'http://example.com/cb');
+            assert.strictEqual(output, `${app1.id}`);
             done();
           });
       });
@@ -140,12 +140,12 @@ describe('eg apps update', () => {
           output = message;
         };
         generator.log.error = message => {
-          assert.equal(message, 'App not found: asdf');
+          assert.strictEqual(message, 'App not found: asdf');
         };
       });
 
       generator.once('end', () => {
-        assert.equal(output, null);
+        assert.strictEqual(output, null);
 
         done();
       });
@@ -166,7 +166,7 @@ describe('eg apps update', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(error, 'invalid property option: name=');
+        assert.strictEqual(error, 'invalid property option: name=');
         done();
       });
     });

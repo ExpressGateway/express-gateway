@@ -196,7 +196,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
       .end(function (err) {
         should.not.exist(err);
         assert(spy.calledOnce);
-        assert.equal(logger.info.getCall(0).args[0], '/authorizedPath/67 GET');
+        assert.strictEqual(logger.info.getCall(0).args[0], '/authorizedPath/67 GET');
         should.not.exist(logger.info.getCall(1));
         done();
       });
@@ -212,7 +212,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
       .end(function (err) {
         should.not.exist(err);
         assert(spy.calledOnce);
-        assert.equal(logger.info.getCall(1).args[0], '/authorizedPath/67 GET');
+        assert.strictEqual(logger.info.getCall(1).args[0], '/authorizedPath/67 GET');
         done();
       });
   });

@@ -152,9 +152,9 @@ describe('sni', () => {
   after('check', () => {
     testCases.forEach((tc) => {
       assert.deepStrictEqual(tc.actual.serverResult, tc.expected.serverResult);
-      assert.equal(tc.actual.clientResult, tc.expected.clientResult);
-      assert.equal(tc.actual.clientError, tc.expected.clientError);
-      assert.equal(tc.actual.serverError, tc.expected.serverError);
+      assert.strictEqual(tc.actual.clientResult, tc.expected.clientResult);
+      assert.strictEqual(tc.actual.clientError, tc.expected.clientError);
+      assert.strictEqual(tc.actual.serverError, tc.expected.serverError);
     });
     config.gatewayConfig = originalGatewayConfig;
     return helper.cleanup();

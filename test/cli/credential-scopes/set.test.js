@@ -31,7 +31,7 @@ describe('eg credential:scopes set', () => {
       })
       .then(createdCred => {
         cred1 = createdCred;
-        assert.equal(cred1.scopes[0], scope3);
+        assert.strictEqual(cred1.scopes[0], scope3);
       });
   });
 
@@ -56,7 +56,7 @@ describe('eg credential:scopes set', () => {
       generator.once('end', () => {
         return adminHelper.admin.credentials.info(cred1.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.isActive, true);
+            assert.strictEqual(cred.isActive, true);
             assert.ok(output[`Scopes ${scope1},${scope2} set for ` + cred1.keyId]);
             assert.ok(cred.scopes.indexOf(scope1) >= 0);
             assert.ok(cred.scopes.indexOf(scope2) >= 0);
@@ -83,7 +83,7 @@ describe('eg credential:scopes set', () => {
       generator.once('end', () => {
         return adminHelper.admin.credentials.info(cred1.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.isActive, true);
+            assert.strictEqual(cred.isActive, true);
             assert.ok(cred.scopes.indexOf(scope1) >= 0);
             assert.ok(cred.scopes.indexOf(scope2) >= 0);
             assert.ok(cred.scopes.indexOf(scope3) < 0);

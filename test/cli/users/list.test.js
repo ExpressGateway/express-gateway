@@ -109,8 +109,8 @@ describe('eg users list', () => {
         generator.once('end', () => {
           const args = superagent.Request.prototype.set.lastCall.args;
           // .set('X','Y') (headerName,value)
-          assert.equal(args[0], 'X');
-          assert.equal(args[1], 'Y');
+          assert.strictEqual(args[0], 'X');
+          assert.strictEqual(args[1], 'Y');
           assert.ok(output[user1.username]);
           assert.ok(output[user2.username]);
           done();

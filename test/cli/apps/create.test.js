@@ -60,14 +60,14 @@ describe('eg apps create', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
             const app = data.apps[0];
-            assert.equal(app.name, 'appy');
-            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+            assert.strictEqual(app.name, 'appy');
+            assert.strictEqual(app.redirectUri, 'http://localhost:3000/cb');
 
-            assert.equal(text, `Created ${app.id}`);
+            assert.strictEqual(text, `Created ${app.id}`);
 
             const stdoutApp = JSON.parse(output);
-            assert.equal(stdoutApp.name, 'appy');
-            assert.equal(stdoutApp.redirectUri, 'http://localhost:3000/cb');
+            assert.strictEqual(stdoutApp.name, 'appy');
+            assert.strictEqual(stdoutApp.redirectUri, 'http://localhost:3000/cb');
             done();
           }).catch(done);
       });
@@ -98,10 +98,10 @@ describe('eg apps create', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
             const app = data.apps[0];
-            assert.equal(app.name, 'appy');
-            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+            assert.strictEqual(app.name, 'appy');
+            assert.strictEqual(app.redirectUri, 'http://localhost:3000/cb');
 
-            assert.equal(output, `Created ${app.id}`);
+            assert.strictEqual(output, `Created ${app.id}`);
             done();
           }).catch(done);
       });
@@ -127,9 +127,9 @@ describe('eg apps create', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
             const app = data.apps[0];
-            assert.equal(app.name, 'appy');
-            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
-            assert.equal(output, `Created ${app.id}`);
+            assert.strictEqual(app.name, 'appy');
+            assert.strictEqual(app.redirectUri, 'http://localhost:3000/cb');
+            assert.strictEqual(output, `Created ${app.id}`);
             done();
           }).catch(done);
       });
@@ -155,9 +155,9 @@ describe('eg apps create', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
             const app = data.apps[0];
-            assert.equal(app.name, 'appy');
-            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
-            assert.equal(output, `Created ${app.id}`);
+            assert.strictEqual(app.name, 'appy');
+            assert.strictEqual(app.redirectUri, 'http://localhost:3000/cb');
+            assert.strictEqual(output, `Created ${app.id}`);
             done();
           }).catch(done);
       });
@@ -196,10 +196,10 @@ describe('eg apps create', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
             const app = data.apps[0];
-            assert.equal(app.name, 'appy');
-            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+            assert.strictEqual(app.name, 'appy');
+            assert.strictEqual(app.redirectUri, 'http://localhost:3000/cb');
 
-            assert.equal(output, `Created ${app.id}`);
+            assert.strictEqual(output, `Created ${app.id}`);
             done();
           }).catch(done);
       });
@@ -225,10 +225,10 @@ describe('eg apps create', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
             const app = data.apps[0];
-            assert.equal(app.name, 'appy');
-            assert.equal(app.redirectUri, 'http://localhost:3000/cb');
+            assert.strictEqual(app.name, 'appy');
+            assert.strictEqual(app.redirectUri, 'http://localhost:3000/cb');
 
-            assert.equal(output, `${app.id}`);
+            assert.strictEqual(output, `${app.id}`);
             done();
           }).catch(done);
       });
@@ -245,7 +245,7 @@ describe('eg apps create', () => {
 
     const usage = output.errors[output.errors.length - 1];
 
-    assert.equal(usage, 'must include --stdin or -u, --user');
+    assert.strictEqual(usage, 'must include --stdin or -u, --user');
   });
 
   it('prints error on invalid JSON from stdin', done => {
@@ -259,7 +259,7 @@ describe('eg apps create', () => {
           output = message;
         };
         generator.log.error = message => {
-          assert.equal(message, 'data should have required property \'name\'');
+          assert.strictEqual(message, 'data should have required property \'name\'');
         };
         generator.log.ok = message => {
           output = message;
@@ -271,7 +271,7 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(output, null);
+        assert.strictEqual(output, null);
         done();
       });
     });
@@ -291,7 +291,7 @@ describe('eg apps create', () => {
           done(new Error(message));
         };
         generator.log.error = message => {
-          assert.equal(message, 'The specified user does not exist');
+          assert.strictEqual(message, 'The specified user does not exist');
         };
         generator.log.ok = message => {
           done(new Error(message));
@@ -320,7 +320,7 @@ describe('eg apps create', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(error, 'invalid property option: name=');
+        assert.strictEqual(error, 'invalid property option: name=');
         done();
       });
     });

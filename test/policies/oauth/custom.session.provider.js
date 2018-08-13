@@ -53,6 +53,6 @@ describe('Functional Tests oAuth2.0 Policy', () => {
 
   it('should init session provider', function () {
     const opts = fakeSessionProvider.getOptions();
-    assert.equal(opts.test, 45);
+    assert.strictEqual(opts.test, 45);
   });
 });

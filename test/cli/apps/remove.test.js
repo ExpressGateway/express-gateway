@@ -58,10 +58,10 @@ describe('eg apps remove', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(output, 'Removed ' + app1.id);
+            assert.strictEqual(output, 'Removed ' + app1.id);
             done(new Error(app));
           }).catch((err) => {
-            assert.equal(err.message, 'Not Found');
+            assert.strictEqual(err.message, 'Not Found');
             done();
           });
       });
@@ -86,7 +86,7 @@ describe('eg apps remove', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.list()
           .then(res => {
-            assert.equal(res.apps.length, 0);
+            assert.strictEqual(res.apps.length, 0);
             assert.ok(output['Removed ' + app1.id]);
             assert.ok(output['Removed ' + app1.id]);
             done();
@@ -113,10 +113,10 @@ describe('eg apps remove', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(output, app1.id);
+            assert.strictEqual(output, app1.id);
             done(new Error(app));
           }).catch((err) => {
-            assert.equal(err.message, 'Not Found');
+            assert.strictEqual(err.message, 'Not Found');
             done();
           });
       });

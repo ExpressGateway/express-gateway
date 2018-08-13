@@ -38,7 +38,7 @@ describe('REST: api endpoints', () => {
         .then(() => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
-          assert.equal(cfg.apiEndpoints.test.host, testEndpoint.host);
+          assert.strictEqual(cfg.apiEndpoints.test.host, testEndpoint.host);
           assert(cfg.apiEndpoints.test.customId);
         });
     });
@@ -67,9 +67,9 @@ describe('REST: api endpoints', () => {
         .then(() => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
-          assert.equal(cfg.apiEndpoints.test.host, testEndpoint.host);
-          assert.equal(cfg.apiEndpoints.example.host, 'example.com');
-          assert.equal(cfg.apiEndpoints.hello.host, 'hello.com');
+          assert.strictEqual(cfg.apiEndpoints.test.host, testEndpoint.host);
+          assert.strictEqual(cfg.apiEndpoints.example.host, 'example.com');
+          assert.strictEqual(cfg.apiEndpoints.hello.host, 'hello.com');
           assert(cfg.apiEndpoints.test.customId);
         });
     });
@@ -83,7 +83,7 @@ describe('REST: api endpoints', () => {
         .then(() => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
-          assert.equal(cfg.apiEndpoints.example.host, testEndpoint.host);
+          assert.strictEqual(cfg.apiEndpoints.example.host, testEndpoint.host);
           assert(cfg.apiEndpoints.example.customId);
         });
     });
@@ -101,16 +101,16 @@ describe('REST: api endpoints', () => {
       return adminHelper.admin.config.apiEndpoints
         .info('example')
         .then((endpoint) => {
-          assert.equal(endpoint.host, 'example.com');
+          assert.strictEqual(endpoint.host, 'example.com');
         });
     });
     it('should list all endpoints', () => {
       return adminHelper.admin.config.apiEndpoints
         .list()
         .then((endpoints) => {
-          assert.equal(endpoints.example.host, 'example.com');
-          assert.equal(endpoints.hello.host, 'hello.com');
-          assert.equal(Object.keys(endpoints).length, 2);
+          assert.strictEqual(endpoints.example.host, 'example.com');
+          assert.strictEqual(endpoints.hello.host, 'hello.com');
+          assert.strictEqual(Object.keys(endpoints).length, 2);
         });
     });
   });

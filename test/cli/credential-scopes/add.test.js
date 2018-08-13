@@ -52,7 +52,7 @@ describe('eg credential:scopes add', () => {
       generator.once('end', () => {
         return adminHelper.admin.credentials.info(cred1.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.isActive, true);
+            assert.strictEqual(cred.isActive, true);
             assert.ok(output[`Scope ${scope1} added to ` + cred1.keyId]);
             assert.ok(output[`Scope ${scope2} added to ` + cred1.keyId]);
             assert.ok(cred.scopes.indexOf(scope1) >= 0);
@@ -79,7 +79,7 @@ describe('eg credential:scopes add', () => {
       generator.once('end', () => {
         return adminHelper.admin.credentials.info(cred1.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.isActive, true);
+            assert.strictEqual(cred.isActive, true);
             assert.ok(cred.scopes.indexOf(scope1) >= 0);
             assert.ok(cred.scopes.indexOf(scope2) >= 0);
             done();

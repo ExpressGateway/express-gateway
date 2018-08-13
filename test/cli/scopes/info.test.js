@@ -38,7 +38,7 @@ describe('eg scopes info', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(output, scopeName);
+        assert.strictEqual(output, scopeName);
         done();
       });
     });
@@ -61,7 +61,7 @@ describe('eg scopes info', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(output, scopeName);
+        assert.strictEqual(output, scopeName);
         done();
       });
     });

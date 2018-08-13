@@ -28,7 +28,7 @@ describe('eg apps list [no apps]', () => {
           done(new Error(message));
         };
         generator.stdout = message => {
-          assert.equal(message, 'You have no apps');
+          assert.strictEqual(message, 'You have no apps');
         };
       });
 

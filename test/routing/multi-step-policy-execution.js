@@ -74,9 +74,9 @@ describe('default config with multi step (multi action) policy', () => {
         }
       })((err) => {
         assert(spy.calledThrice);
-        assert.equal(spy.getCall(0).args[0].param, 1);
-        assert.equal(spy.getCall(1).args[0].param, 2);
-        assert.equal(spy.getCall(2).args[0].param, 3);
+        assert.strictEqual(spy.getCall(0).args[0].param, 1);
+        assert.strictEqual(spy.getCall(1).args[0].param, 2);
+        assert.strictEqual(spy.getCall(2).args[0].param, 3);
         done(err);
       });
     });

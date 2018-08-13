@@ -52,8 +52,8 @@ describe('eg users remove', () => {
         return adminHelper.admin.users.info(users[0].username)
           .catch(err => {
             assert.ok(err);
-            assert.equal(output, 'Removed ' + users[0].username);
-            assert.equal(error, null);
+            assert.strictEqual(output, 'Removed ' + users[0].username);
+            assert.strictEqual(error, null);
             done();
           });
       });
@@ -79,7 +79,7 @@ describe('eg users remove', () => {
         return adminHelper.admin.users.info(users[1].id)
           .catch(err => {
             assert.ok(err);
-            assert.equal(output, 'Removed ' + users[1].id);
+            assert.strictEqual(output, 'Removed ' + users[1].id);
             done();
           });
       });
@@ -136,7 +136,7 @@ describe('eg users remove', () => {
         return adminHelper.admin.users.info(users[2].id)
           .catch(err => {
             assert.ok(err);
-            assert.equal(output, users[2].id);
+            assert.strictEqual(output, users[2].id);
             done();
           });
       });
