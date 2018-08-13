@@ -25,7 +25,15 @@
       "always"
     ],
     "no-console": "warn",
-    "prefer-const": "error"
+    "prefer-const": "error",
+    "node/no-unsupported-features/node-builtins": [
+      "error",
+      {
+        "ignores": [
+          "util.promisify"
+        ]
+      }
+    ]
   },
   "root": true
 }
