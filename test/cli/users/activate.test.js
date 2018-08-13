@@ -55,9 +55,9 @@ describe('eg users activate', () => {
       generator.once('end', () => {
         return adminHelper.admin.users.info(userName)
           .then(user => {
-            assert.equal(user.isActive, true);
-            assert.equal(output, 'Activated ' + userName);
-            assert.equal(error, null);
+            assert.strictEqual(user.isActive, true);
+            assert.strictEqual(output, 'Activated ' + userName);
+            assert.strictEqual(error, null);
             done();
           }).catch(done);
       });
@@ -83,9 +83,9 @@ describe('eg users activate', () => {
       generator.once('end', () => {
         return adminHelper.admin.users.info(userId)
           .then(user => {
-            assert.equal(user.isActive, true);
-            assert.equal(output, 'Activated ' + userId);
-            assert.equal(error, null);
+            assert.strictEqual(user.isActive, true);
+            assert.strictEqual(output, 'Activated ' + userId);
+            assert.strictEqual(error, null);
             done();
           }).catch(done);
       });
@@ -111,12 +111,12 @@ describe('eg users activate', () => {
         return adminHelper.admin.users.list()
           .then(data => {
             const users = data.users;
-            assert.equal(users[0].isActive, true);
-            assert.equal(users[1].isActive, true);
+            assert.strictEqual(users[0].isActive, true);
+            assert.strictEqual(users[1].isActive, true);
 
             assert.ok(output['Activated ' + userName]);
             assert.ok(output['Activated ' + userName2]);
-            assert.equal(Object.keys(output).length, 2);
+            assert.strictEqual(Object.keys(output).length, 2);
             done();
           }).catch(done);
       });
@@ -140,8 +140,8 @@ describe('eg users activate', () => {
       generator.once('end', () => {
         return adminHelper.admin.users.info(userName)
           .then(user => {
-            assert.equal(user.isActive, true);
-            assert.equal(output, userName);
+            assert.strictEqual(user.isActive, true);
+            assert.strictEqual(output, userName);
             done();
           }).catch(done);
       });

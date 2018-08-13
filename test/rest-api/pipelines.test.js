@@ -38,8 +38,8 @@ describe('REST: pipelines', () => {
         .then(() => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
-          assert.deepEqual(cfg.pipelines.test.apiEndpoints, testPipeline.apiEndpoints);
-          assert.deepEqual(cfg.pipelines.test.policies, testPipeline.policies);
+          assert.strictDeepEqual(cfg.pipelines.test.apiEndpoints, testPipeline.apiEndpoints);
+          assert.strictDeepEqual(cfg.pipelines.test.policies, testPipeline.policies);
           assert(cfg.pipelines.test.customId);
         });
     });
@@ -69,9 +69,9 @@ describe('REST: pipelines', () => {
         .then(() => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
-          assert.deepEqual(cfg.pipelines.test.apiEndpoints, testPipeline.apiEndpoints);
-          assert.deepEqual(cfg.pipelines.example.apiEndpoints, ['example']);
-          assert.deepEqual(cfg.pipelines.hello.apiEndpoints, ['hello']);
+          assert.strictDeepEqual(cfg.pipelines.test.apiEndpoints, testPipeline.apiEndpoints);
+          assert.strictDeepEqual(cfg.pipelines.example.apiEndpoints, ['example']);
+          assert.strictDeepEqual(cfg.pipelines.hello.apiEndpoints, ['hello']);
           assert(cfg.pipelines.test.customId);
         });
     });
@@ -86,7 +86,7 @@ describe('REST: pipelines', () => {
         .then(() => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
-          assert.deepEqual(cfg.pipelines.example.apiEndpoints, testPipeline.apiEndpoints);
+          assert.strictDeepEqual(cfg.pipelines.example.apiEndpoints, testPipeline.apiEndpoints);
           assert(cfg.pipelines.example.customId);
         });
     });
@@ -104,16 +104,16 @@ describe('REST: pipelines', () => {
       return adminHelper.admin.config.pipelines
         .info('example')
         .then((endpoint) => {
-          assert.deepEqual(endpoint.apiEndpoints, ['example']);
+          assert.strictDeepEqual(endpoint.apiEndpoints, ['example']);
         });
     });
     it('should list all pipelines', () => {
       return adminHelper.admin.config.pipelines
         .list()
         .then((pipelines) => {
-          assert.deepEqual(pipelines.example.apiEndpoints, ['example']);
-          assert.deepEqual(pipelines.hello.apiEndpoints, ['hello']);
-          assert.equal(Object.keys(pipelines).length, 2);
+          assert.strictDeepEqual(pipelines.example.apiEndpoints, ['example']);
+          assert.strictDeepEqual(pipelines.hello.apiEndpoints, ['hello']);
+          assert.strictEqual(Object.keys(pipelines).length, 2);
         });
     });
   });

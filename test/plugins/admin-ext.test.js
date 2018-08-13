@@ -35,7 +35,7 @@ describe('admin with plugins', () => {
   });
   it('should fire admin-ready event', () => {
     assert.ok(adminSrvFromEvent);
-    assert.equal(adminSrvFromEvent, adminSrv);
+    assert.strictEqual(adminSrvFromEvent, adminSrv);
   });
 
   after('close admin srv', () => {

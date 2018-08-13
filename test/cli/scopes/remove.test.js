@@ -39,7 +39,7 @@ describe('eg scopes remove', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(output, 'Removed ' + scopeName);
+        assert.strictEqual(output, 'Removed ' + scopeName);
         return adminHelper.admin.scopes.info(scopeName).catch(() => {
           done();
         });
@@ -90,7 +90,7 @@ describe('eg scopes remove', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(output, scopeName);
+        assert.strictEqual(output, scopeName);
         return adminHelper.admin.scopes.info(scopeName).catch(() => {
           done();
         });

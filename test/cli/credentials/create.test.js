@@ -52,14 +52,14 @@ describe('eg credentials create', () => {
 
       generator.once('end', () => {
         const loggedCred = JSON.parse(output);
-        assert.equal(text, 'Created ' + loggedCred.keyId);
+        assert.strictEqual(text, 'Created ' + loggedCred.keyId);
 
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
           .then(cred => {
             assert.ok(cred.keyId);
             assert.ok(cred.keySecret);
             assert.ok(cred.isActive);
-            assert.equal(cred.consumerId, user.id);
+            assert.strictEqual(cred.consumerId, user.id);
             done();
           }).catch(done);
       });
@@ -89,14 +89,14 @@ describe('eg credentials create', () => {
 
       generator.once('end', () => {
         const loggedCred = JSON.parse(output);
-        assert.equal(text, 'Created ' + loggedCred.keyId);
+        assert.strictEqual(text, 'Created ' + loggedCred.keyId);
 
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.keyId, '888');
-            assert.equal(cred.keySecret, '999');
+            assert.strictEqual(cred.keyId, '888');
+            assert.strictEqual(cred.keySecret, '999');
             assert.ok(cred.isActive);
-            assert.equal(cred.consumerId, user.id);
+            assert.strictEqual(cred.consumerId, user.id);
             done();
           }).catch(done);
       });
@@ -130,13 +130,13 @@ describe('eg credentials create', () => {
 
       generator.once('end', () => {
         const loggedCred = JSON.parse(output);
-        assert.equal(text, 'Created ' + loggedCred.keyId);
+        assert.strictEqual(text, 'Created ' + loggedCred.keyId);
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.keyId, cmd.keyId);
-            assert.equal(cred.keySecret, cmd.keySecret);
+            assert.strictEqual(cred.keyId, cmd.keyId);
+            assert.strictEqual(cred.keySecret, cmd.keySecret);
             assert.ok(cred.isActive);
-            assert.equal(cred.consumerId, user.id);
+            assert.strictEqual(cred.consumerId, user.id);
             done();
           }).catch(done);
       });
@@ -170,13 +170,13 @@ describe('eg credentials create', () => {
 
       generator.once('end', () => {
         const loggedCred = JSON.parse(output);
-        assert.equal(text, 'Created ' + loggedCred.keyId);
+        assert.strictEqual(text, 'Created ' + loggedCred.keyId);
         return adminHelper.admin.credentials.info(loggedCred.keyId, 'key-auth')
           .then(cred => {
             assert.ok(cred.keyId);
             assert.ok(cred.keySecret);
             assert.ok(cred.isActive);
-            assert.equal(cred.consumerId, user.id);
+            assert.strictEqual(cred.consumerId, user.id);
             done();
           }).catch(done);
       });
@@ -205,8 +205,8 @@ describe('eg credentials create', () => {
             assert.ok(cred.keyId);
             assert.ok(cred.keySecret);
             assert.ok(cred.isActive);
-            assert.equal(cred.consumerId, user.id);
-            assert.equal(output, cred.keyId + ':' + cred.keySecret);
+            assert.strictEqual(cred.consumerId, user.id);
+            assert.strictEqual(output, cred.keyId + ':' + cred.keySecret);
 
             done();
           }).catch(done);
@@ -240,8 +240,8 @@ describe('eg credentials create', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(error, 'invalid username');
-        assert.equal(output, null);
+        assert.strictEqual(error, 'invalid username');
+        assert.strictEqual(output, null);
         done();
       });
     });

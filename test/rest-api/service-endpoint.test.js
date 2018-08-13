@@ -37,7 +37,7 @@ describe('REST: service endpoints', () => {
         .then(() => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
-          assert.equal(cfg.serviceEndpoints.test.url, testEndpoint.url);
+          assert.strictEqual(cfg.serviceEndpoints.test.url, testEndpoint.url);
           assert(cfg.serviceEndpoints.test.customId);
         });
     });
@@ -66,9 +66,9 @@ describe('REST: service endpoints', () => {
         .then(() => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
-          assert.equal(cfg.serviceEndpoints.test.url, testEndpoint.url);
-          assert.equal(cfg.serviceEndpoints.example.url, 'http://example.com');
-          assert.equal(cfg.serviceEndpoints.hello.url, 'http://hello.com');
+          assert.strictEqual(cfg.serviceEndpoints.test.url, testEndpoint.url);
+          assert.strictEqual(cfg.serviceEndpoints.example.url, 'http://example.com');
+          assert.strictEqual(cfg.serviceEndpoints.hello.url, 'http://hello.com');
           assert(cfg.serviceEndpoints.test.customId);
         });
     });
@@ -82,7 +82,7 @@ describe('REST: service endpoints', () => {
         .then(() => {
           const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
           const cfg = yaml.load(data);
-          assert.equal(cfg.serviceEndpoints.example.url, testEndpoint.url);
+          assert.strictEqual(cfg.serviceEndpoints.example.url, testEndpoint.url);
           assert(cfg.serviceEndpoints.example.customId);
         });
     });
@@ -100,16 +100,16 @@ describe('REST: service endpoints', () => {
       return adminHelper.admin.config.serviceEndpoints
         .info('example')
         .then((endpoint) => {
-          assert.equal(endpoint.url, 'http://example.com');
+          assert.strictEqual(endpoint.url, 'http://example.com');
         });
     });
     it('should list all endpoints', () => {
       return adminHelper.admin.config.serviceEndpoints
         .list()
         .then((endpoints) => {
-          assert.equal(endpoints.example.url, 'http://example.com');
-          assert.equal(endpoints.hello.url, 'http://hello.com');
-          assert.equal(Object.keys(endpoints).length, 2);
+          assert.strictEqual(endpoints.example.url, 'http://example.com');
+          assert.strictEqual(endpoints.hello.url, 'http://hello.com');
+          assert.strictEqual(Object.keys(endpoints).length, 2);
         });
     });
   });

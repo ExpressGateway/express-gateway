@@ -61,8 +61,8 @@ describe('eg apps activate', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.isActive, true);
-            assert.equal(output, 'Activated ' + app1.id);
+            assert.strictEqual(app.isActive, true);
+            assert.strictEqual(output, 'Activated ' + app1.id);
             done();
           }).catch(done);
       });
@@ -88,12 +88,12 @@ describe('eg apps activate', () => {
         return adminHelper.admin.apps.list()
           .then(data => {
             const apps = data.apps;
-            assert.equal(apps[0].isActive, true);
-            assert.equal(apps[1].isActive, true);
+            assert.strictEqual(apps[0].isActive, true);
+            assert.strictEqual(apps[1].isActive, true);
 
             assert.ok(output['Activated ' + app1.id]);
             assert.ok(output['Activated ' + app2.id]);
-            assert.equal(Object.keys(output).length, 2);
+            assert.strictEqual(Object.keys(output).length, 2);
             done();
           }).catch(done);
       });
@@ -117,8 +117,8 @@ describe('eg apps activate', () => {
       generator.once('end', () => {
         return adminHelper.admin.apps.info(app1.id)
           .then(app => {
-            assert.equal(app.isActive, true);
-            assert.equal(output, app1.id);
+            assert.strictEqual(app.isActive, true);
+            assert.strictEqual(output, app1.id);
             done();
           }).catch(done);
       });

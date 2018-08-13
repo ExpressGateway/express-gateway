@@ -49,8 +49,8 @@ describe('eg credentials deactivate', () => {
       generator.once('end', () => {
         return adminHelper.admin.credentials.info(cred1.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.isActive, false);
-            assert.equal(output, 'Deactivated ' + cred1.keyId);
+            assert.strictEqual(cred.isActive, false);
+            assert.strictEqual(output, 'Deactivated ' + cred1.keyId);
             done();
           }).catch(done);
       });
@@ -75,8 +75,8 @@ describe('eg credentials deactivate', () => {
       generator.once('end', () => {
         return adminHelper.admin.credentials.info(cred1.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.isActive, false);
-            assert.equal(output, cred1.keyId);
+            assert.strictEqual(cred.isActive, false);
+            assert.strictEqual(output, cred1.keyId);
             done();
           }).catch(done);
       });

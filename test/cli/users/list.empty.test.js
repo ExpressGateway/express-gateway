@@ -28,7 +28,7 @@ describe('eg users list [no users]', () => {
           done(new Error(message));
         };
         generator.log = message => {
-          assert.equal(message, 'You have no users');
+          assert.strictEqual(message, 'You have no users');
         };
       });
 

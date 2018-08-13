@@ -48,11 +48,11 @@ describe('eg users info', () => {
       generator.once('end', () => {
         const user = JSON.parse(output);
 
-        assert.equal(user.firstname, 'La');
-        assert.equal(user.lastname, 'Deeda');
+        assert.strictEqual(user.firstname, 'La');
+        assert.strictEqual(user.lastname, 'Deeda');
         assert(user.isActive);
 
-        assert.equal(error, null);
+        assert.strictEqual(error, null);
 
         done();
       });
@@ -76,8 +76,8 @@ describe('eg users info', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(output, userId);
-        assert.equal(error, null);
+        assert.strictEqual(output, userId);
+        assert.strictEqual(error, null);
 
         done();
       });

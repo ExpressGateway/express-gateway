@@ -50,8 +50,8 @@ describe('eg credentials activate', () => {
       generator.once('end', () => {
         return adminHelper.admin.credentials.info(cred1.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.isActive, true);
-            assert.equal(output, 'Activated ' + cred1.keyId);
+            assert.strictEqual(cred.isActive, true);
+            assert.strictEqual(output, 'Activated ' + cred1.keyId);
             done();
           }).catch(done);
       });
@@ -76,8 +76,8 @@ describe('eg credentials activate', () => {
       generator.once('end', () => {
         return adminHelper.admin.credentials.info(cred1.keyId, 'key-auth')
           .then(cred => {
-            assert.equal(cred.isActive, true);
-            assert.equal(output, cred1.keyId);
+            assert.strictEqual(cred.isActive, true);
+            assert.strictEqual(output, cred1.keyId);
             done();
           });
       });

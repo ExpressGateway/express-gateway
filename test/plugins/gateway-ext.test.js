@@ -35,7 +35,7 @@ describe('gateway routing with plugins', () => {
   });
   it('should fire http-ready event', () => {
     assert.ok(httpSrvFromEvent);
-    assert.equal(httpSrvFromEvent, gatewaySrv);
+    assert.strictEqual(httpSrvFromEvent, gatewaySrv);
   });
 
   after('close gateway srv', () => {

@@ -57,11 +57,11 @@ describe('eg users update', () => {
       generator.once('end', () => {
         return adminHelper.admin.users.info(user.username)
           .then(user => {
-            assert.equal(user.firstname, 'FirstName');
-            assert.equal(user.lastname, 'LastName');
+            assert.strictEqual(user.firstname, 'FirstName');
+            assert.strictEqual(user.lastname, 'LastName');
 
-            assert.equal(output, 'Updated ' + user.username);
-            assert.equal(error, null);
+            assert.strictEqual(output, 'Updated ' + user.username);
+            assert.strictEqual(error, null);
 
             done();
           });
@@ -96,11 +96,11 @@ describe('eg users update', () => {
       generator.once('end', () => {
         return adminHelper.admin.users.info(user.username)
           .then(user => {
-            assert.equal(user.firstname, 'X1');
-            assert.equal(user.lastname, 'L1');
+            assert.strictEqual(user.firstname, 'X1');
+            assert.strictEqual(user.lastname, 'L1');
 
-            assert.equal(output, 'Updated ' + user.id);
-            assert.equal(error, null);
+            assert.strictEqual(output, 'Updated ' + user.id);
+            assert.strictEqual(error, null);
 
             done();
           });
@@ -127,11 +127,11 @@ describe('eg users update', () => {
       generator.once('end', () => {
         return adminHelper.admin.users.info(user.username)
           .then(user => {
-            assert.equal(user.firstname, 'C1');
-            assert.equal(user.lastname, 'D1');
+            assert.strictEqual(user.firstname, 'C1');
+            assert.strictEqual(user.lastname, 'D1');
 
-            assert.equal(output, 'Updated ' + user.username);
-            assert.equal(error, null);
+            assert.strictEqual(output, 'Updated ' + user.username);
+            assert.strictEqual(error, null);
 
             done();
           });
@@ -159,11 +159,11 @@ describe('eg users update', () => {
       generator.once('end', () => {
         return adminHelper.admin.users.info(user.id)
           .then(user => {
-            assert.equal(user.firstname, 'T1');
-            assert.equal(user.lastname, 'T2');
+            assert.strictEqual(user.firstname, 'T1');
+            assert.strictEqual(user.lastname, 'T2');
 
-            assert.equal(output, 'Updated ' + user.id);
-            assert.equal(error, null);
+            assert.strictEqual(output, 'Updated ' + user.id);
+            assert.strictEqual(error, null);
 
             done();
           });
@@ -191,11 +191,11 @@ describe('eg users update', () => {
       generator.once('end', () => {
         return adminHelper.admin.users.info(user.id)
           .then(user => {
-            assert.equal(user.firstname, 'H1');
-            assert.equal(user.lastname, 'H2');
+            assert.strictEqual(user.firstname, 'H1');
+            assert.strictEqual(user.lastname, 'H2');
 
-            assert.equal(output, user.id);
-            assert.equal(error, null);
+            assert.strictEqual(output, user.id);
+            assert.strictEqual(error, null);
 
             done();
           });
@@ -224,8 +224,8 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(output, null);
-        assert.equal(error, 'User not found: asdf');
+        assert.strictEqual(output, null);
+        assert.strictEqual(error, 'User not found: asdf');
 
         done();
       });
@@ -246,7 +246,7 @@ describe('eg users update', () => {
       });
 
       generator.once('end', () => {
-        assert.equal(error, 'invalid property option: username=');
+        assert.strictEqual(error, 'invalid property option: username=');
         done();
       });
     });

@@ -41,17 +41,17 @@ describe.skip('configured DB options', () => {
         };
         require(dbPath);
 
-        assert.equal(
+        assert.strictEqual(
           spy.getCall(0).args[0].tls.key.toString(),
           fs.readFileSync(clientKeyFile).toString()
         );
 
-        assert.equal(
+        assert.strictEqual(
           spy.getCall(0).args[0].tls.cert.toString(),
           fs.readFileSync(clientCertFile).toString()
         );
 
-        assert.equal(
+        assert.strictEqual(
           spy.getCall(0).args[0].tls.ca.toString(),
           fs.readFileSync(chainFile).toString()
         );
