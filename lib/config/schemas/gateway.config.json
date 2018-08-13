@@ -37,6 +37,29 @@
           }
         }
       }
+    },
+    "conditionAction": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "action": {
+          "type": "object",
+          "default": {}
+        },
+        "condition": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      }
     }
   },
   "type": "object",
@@ -157,7 +180,11 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
+          "apiEndpoint": {
+            "type": "string"
+          },
           "apiEndpoints": {
+            "minItems": 1,
             "type": "array",
             "items": {
               "type": "string"
@@ -165,34 +192,31 @@
           },
           "policies": {
             "type": "array",
+            "minItems": 1,
             "items": [
               {
                 "type": "object",
-                "properties": {
-                  "action": {
-                    "type": "object"
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "condition": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      }
+                "maxProperties": 1,
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/conditionAction"
                     },
-                    "required": [
-                      "name"
-                    ]
-                  }
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/conditionAction"
+                      }
+                    }
+                  ]
                 }
               }
             ]
           }
-        }
+        },
+        "required": [
+          "policies"
+        ]
       }
     }
   }

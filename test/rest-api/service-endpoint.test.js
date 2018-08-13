@@ -29,7 +29,7 @@ describe('REST: service endpoints', () => {
     });
     it('should create a new service endpoint', () => {
       const testEndpoint = {
-        url: 'express-gateway.io',
+        url: 'https://express-gateway.io',
         customId: idGen.v4()
       };
       return adminHelper.admin.config.serviceEndpoints
@@ -58,7 +58,7 @@ describe('REST: service endpoints', () => {
     });
     it('should create a new service endpoint', () => {
       const testEndpoint = {
-        url: 'express-gateway.io',
+        url: 'https://express-gateway.io',
         customId: idGen.v4() // NOTE: save operation should allow custom props
       };
       return adminHelper.admin.config.serviceEndpoints
@@ -74,7 +74,7 @@ describe('REST: service endpoints', () => {
     });
     it('should update existing endpoint', () => {
       const testEndpoint = {
-        url: 'express-gateway.io',
+        url: 'https://express-gateway.io',
         customId: idGen.v4()
       };
       return adminHelper.admin.config.serviceEndpoints
