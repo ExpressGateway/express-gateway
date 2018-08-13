@@ -204,7 +204,8 @@ describe('@proxy policy', () => {
           gatewayConfig: {
             http: { port: 0 },
             apiEndpoints: {
-              test: { path: '/hello/v1/api/endpoint*' }
+              testStar: { path: '/hello/v1/api/endpointStar*' },
+              test: { path: '/hello/v1/api/endpoint' }
             },
             serviceEndpoints: {
               backend: {
@@ -214,6 +215,14 @@ describe('@proxy policy', () => {
             policies: ['proxy'],
             pipelines: {
               pipeline1: {
+                apiEndpoints: ['testStar'],
+                policies: [{
+                  proxy: [{
+                    action: Object.assign({ stripPath: true }, defaultProxyOptions, { serviceEndpoint: 'backend' })
+                  }]
+                }]
+              },
+              pipeline2: {
                 apiEndpoints: ['test'],
                 policies: [{
                   proxy: [{
@@ -221,18 +230,27 @@ describe('@proxy policy', () => {
                   }]
                 }]
               }
+
             }
           }
         }
       }).then(apps => { app = apps.app; });
     });
 
-    it('should be proxied with all the query parameters', () =>
+    it('should be proxied with all the query parameters when hitting a star path', () =>
       request(app)
-        .get('/hello/v1/api/endpoint/something')
+        .get('/hello/v1/api/endpointStar/something')
         .query({ a: 2, b: 3, c: 10 })
         .type('json')
         .expect(200, { url: '/something?a=2&b=3&c=10' })
+    );
+
+    it('should be proxied with all the query parameters when hitting a normal path', () =>
+      request(app)
+        .get('/hello/v1/api/endpoint')
+        .query({ a: 2, b: 3, c: 10 })
+        .type('json')
+        .expect(200, { url: '/?a=2&b=3&c=10' })
     );
   });
 });
