@@ -77,7 +77,7 @@ describe('eg credentials activate', () => {
         return adminHelper.admin.credentials.info(cred1.keyId, 'key-auth')
           .then(cred => {
             assert.strictEqual(cred.isActive, true);
-            assert.strictEqual(output, cred1.keyId);
+            assert.strictEqual(output[0], cred1.keyId);
             done();
           });
       });

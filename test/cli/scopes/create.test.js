@@ -67,7 +67,7 @@ describe('eg scopes create', () => {
         return adminHelper.admin.scopes.info(scopeName)
           .then(res => {
             assert.strictEqual(res.scope, scopeName);
-            assert.strictEqual(output, res.scope);
+            assert.strictEqual(output[0], res.scope);
             done();
           });
       });

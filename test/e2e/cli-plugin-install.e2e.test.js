@@ -8,8 +8,6 @@ const rimraf = require('rimraf');
 const tmp = require('tmp');
 const yaml = require('js-yaml');
 
-require('util.promisify/shim')();
-
 const PACKAGE_NAME = 'express-gateway-plugin-test';
 
 const gatewayDirectory = path.join(__dirname, '../../lib/config');
