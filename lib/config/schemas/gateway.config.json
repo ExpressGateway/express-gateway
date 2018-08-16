@@ -184,7 +184,6 @@
             "type": "string"
           },
           "apiEndpoints": {
-            "minItems": 1,
             "type": "array",
             "items": {
               "type": "string"
@@ -192,7 +191,6 @@
           },
           "policies": {
             "type": "array",
-            "minItems": 1,
             "items": [
               {
                 "type": "object",
