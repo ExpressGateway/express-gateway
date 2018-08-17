@@ -116,6 +116,21 @@ describe('REST: pipelines', () => {
         });
     });
 
+    it('should not create a new pipeline when the a specified policy has no condition and action', () => {
+      const testPipeline = {
+        apiEndpoints: ['api'],
+        customId: idGen.v4(), // NOTE: save operation should allow custom props
+        policies: [{ proxy: null }]
+      };
+      return adminHelper.admin.config.pipelines
+        .create('invalid', testPipeline)
+        .catch(() => {
+          const data = fs.readFileSync(config.gatewayConfigPath, 'utf8');
+          const cfg = yaml.load(data);
+          should(cfg.pipelines).not.have.property('invalid');
+        });
+    });
+
     it('should update existing pipeline', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
