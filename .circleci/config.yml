@@ -1,11 +1,11 @@
 version: 2
 jobs:
-  "node-6":
+  node-6:
     docker:
       - image: circleci/node:6-browsers
     working_directory: ~/repo
 
-    steps: &steps
+    steps: &eg-checkout-install
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
@@ -16,32 +16,32 @@ jobs:
             - ./node_modules
       - run: npm test
 
-  "node-8":
+  node-8:
     docker:
       - image: circleci/node:8-browsers
     working_directory: ~/repo
 
-    steps: *steps
+    steps: *eg-checkout-install
 
-  "node-10":
+  node-10:
     docker:
       - image: circleci/node:10-browsers
     working_directory: ~/repo
 
-    steps: *steps
+    steps: *eg-checkout-install
 
-  "node-8-real-redis":
+  node-8-real-redis:
     docker:
       - image: circleci/node:8-browsers
       - image: circleci/redis
     working_directory: ~/repo
     environment:
       - EG_DB_EMULATE: false
-    steps: *steps
+    steps: *eg-checkout-install
 
-  "release-npm":
+  release-npm:
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:10
     working_directory: ~/repo
 
     steps:
@@ -49,19 +49,88 @@ jobs:
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: npm publish
 
-  "release-docker-images":
+  update-docker-repo:
     docker:
-      - image: circleci/node:8
+      - image: node:10-alpine
     working_directory: ~/repo
 
     steps:
-      - run: apk add hub
-      - run: hub clone https://github.com/ExpressGateway/docker-express-gateway.git .
-      - run: npm ci
-      - run: node index.js
-      - run: hub commit -am 'Update Express Gateway Images'
-      - run: hub push
+      - run: &setup_container
+          name: Setup container with Git, Hub, OpenSSH and trust GitHub key
+          command: |-
+            echo "http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+            apk add --update hub git openssh-client
+            mkdir ~/.ssh && ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+            git config --global user.email $GITHUB_EMAIL
+            git config --global user.name $GITHUB_NAME
+      - run:
+          name: Clone the EG's docker repository
+          command: hub clone ExpressGateway/docker-express-gateway .
+      - run:
+          name: Install automation script dependencies
+          command: npm ci
+      - run:
+          name: Generate new Helm and Docker files
+          command: node index.js
+          environment: &environment
+            CIRCLE_TAG: v1.12.0
+            HELM_CHART_VERSION: 0.3.0
+      - run:
+          name: Create new commit with the changes
+          command: hub commit -am "Update Express Gateway Images to $CIRCLE_TAG"
+          environment: *environment
+      - run:
+          name: Push changes to the upstream server
+          command: hub push -f
+      - run:
+          name: Save commit to file
+          command: git rev-parse HEAD > DockerCommit
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - Helmfile
+            - DockerCommit
 
+  update-helm-charts:
+    docker:
+      - image: alpine
+    working_directory: ~/repo
+    steps:
+      - run: *setup_container
+      - run:
+          name: Fork the official helm charts repo
+          command: |-
+            hub clone helm/charts
+            hub fork
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Copy new file in charts
+          command: cp Helmfile ./stable/express-gateway/Chart.yaml
+      - run:
+          name: Commit and push changes
+          command: hub commit -am "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
+
+  update-official-docker-image:
+    docker:
+      - image: alpine
+    working_directory: ~/repo
+    steps:
+      - run: *setup_container
+      - run:
+          name: Fork the official helm charts repo
+          command: |-
+            hub clone docker-library/official-images
+            hub fork
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Put new commit id
+          command: "val=$(cat DockerCommit) && sed -i \"s/GitCommit: .*/GitCommit: $val/g\" library/express-gateway"
+      - run:
+          name: Commit and push changes
+          command: hub add library/express-gateway && hub commit -m "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
+          environment: *environment
   packer:
     docker:
       - image: hashicorp/packer:light
@@ -93,6 +162,16 @@ workflows:
             - node-8
             - node-8-real-redis
             - node-10
-      - release-docker-images: *releaseFilters
-      - packer: *releaseFilters
+      - update-docker-repo:
+          requires:
+            release-npm
+      - update-helm-charts:
+          requires:
+            - update-docker-repo
+      - update-official-docker-image:
+          requires:
+            - update-docker-repo
+      - packer:
+          requires:
+            - release-npm
 
