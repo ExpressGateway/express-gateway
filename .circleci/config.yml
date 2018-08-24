@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  node-6:
+  "node-6":
     docker:
       - image: circleci/node:6-browsers
     working_directory: ~/repo
@@ -16,21 +16,21 @@ jobs:
             - ./node_modules
       - run: npm test
 
-  node-8:
+  "node-8":
     docker:
       - image: circleci/node:8-browsers
     working_directory: ~/repo
 
     steps: *eg-checkout-install
 
-  node-10:
+  "node-10":
     docker:
       - image: circleci/node:10-browsers
     working_directory: ~/repo
 
     steps: *eg-checkout-install
 
-  node-8-real-redis:
+  "node-8-real-redis":
     docker:
       - image: circleci/node:8-browsers
       - image: circleci/redis
@@ -39,17 +39,22 @@ jobs:
       - EG_DB_EMULATE: false
     steps: *eg-checkout-install
 
-  release-npm:
+  "release-npm-docker-image":
     docker:
       - image: circleci/node:10
     working_directory: ~/repo
 
     steps:
       - checkout
+      - setup_remote_docker
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: npm publish
+      - run: "docker login -u $DOCKER_USER --password-stdin $DOCKER_PASSWORD"
+      - run: "docker build -t expressgateway/express-gateway:${CIRCLE_TAG} -t expressgateway/express-gateway:latest --build-arg EG_VERSION=latest ."
+      - run: "docker push expressgateway/express-gateway:${CIRCLE_TAG}"
+      - run: "docker push expressgateway/express-gateway:latest"
 
-  update-docker-repo:
+  "update-docker-repo":
     docker:
       - image: node:10-alpine
     working_directory: ~/repo
@@ -87,7 +92,7 @@ jobs:
             - Helmfile
             - DockerCommit
 
-  update-helm-charts:
+  "update-helm-charts":
     docker:
       - image: alpine
     working_directory: ~/repo
@@ -107,7 +112,7 @@ jobs:
           name: Commit and push changes
           command: hub commit -am "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
 
-  update-official-docker-image:
+  "update-official-docker-image":
     docker:
       - image: alpine
     working_directory: ~/repo
@@ -126,7 +131,8 @@ jobs:
       - run:
           name: Commit and push changes
           command: hub add library/express-gateway && hub commit -m "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
-  packer:
+
+  "packer":
     docker:
       - image: hashicorp/packer:light
     working_directory: ~/repo
@@ -146,7 +152,7 @@ workflows:
       - node-8: *testingFilters
       - node-10: *testingFilters
       - node-8-real-redis: *testingFilters
-      - release-npm: &releaseFilters
+      - release-npm-docker-image: &releaseFilters
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
@@ -157,16 +163,11 @@ workflows:
             - node-8
             - node-8-real-redis
             - node-10
-      - update-docker-repo:
+      - update-docker-repo: &npm-publish-first
           requires:
-            release-npm
-      - update-helm-charts:
-          requires:
-            - update-docker-repo
-      - update-official-docker-image:
+            - release-npm-docker-image
+      - packer: *npm-publish-first
+      - update-helm-charts: &docker-repo-first
           requires:
             - update-docker-repo
-      - packer:
-          requires:
-            - release-npm
-
+      - update-official-docker-image: *docker-repo-first
