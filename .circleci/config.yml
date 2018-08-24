@@ -72,13 +72,9 @@ jobs:
       - run:
           name: Generate new Helm and Docker files
           command: node index.js
-          environment: &environment
-            CIRCLE_TAG: v1.12.0
-            HELM_CHART_VERSION: 0.3.0
       - run:
           name: Create new commit with the changes
           command: hub commit -am "Update Express Gateway Images to $CIRCLE_TAG"
-          environment: *environment
       - run:
           name: Push changes to the upstream server
           command: hub push -f
@@ -130,7 +126,6 @@ jobs:
       - run:
           name: Commit and push changes
           command: hub add library/express-gateway && hub commit -m "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
-          environment: *environment
   packer:
     docker:
       - image: hashicorp/packer:light
