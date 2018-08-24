@@ -49,15 +49,18 @@ jobs:
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: npm publish
 
-  "release-docker-branch":
+  "release-docker-images":
     docker:
       - image: circleci/node:8
     working_directory: ~/repo
 
     steps:
-      - run: git clone https://github.com/ExpressGateway/docker-express-gateway.git .
+      - run: apk add hub
+      - run: hub clone https://github.com/ExpressGateway/docker-express-gateway.git .
       - run: npm ci
       - run: node index.js
+      - run: hub commit -am 'Update Express Gateway Images'
+      - run: hub push
 
   packer:
     docker:
@@ -90,6 +93,6 @@ workflows:
             - node-8
             - node-8-real-redis
             - node-10
-      - release-docker-branch: &releaseFilters
+      - release-docker-images: *releaseFilters
       - packer: *releaseFilters
 
