@@ -140,6 +140,20 @@ describe('@proxy policy', () => {
     });
   });
 
+  describe('When proxy does not have the serviceEndpoint', () => {
+    before(() => {
+      return setupGateway(Object.assign(defaultProxyOptions, { serviceEndpoint: null })).then(apps => {
+        app = apps.app;
+      });
+    });
+
+    it('should return 404', () =>
+      request(app)
+        .get('/endpoint')
+        .expect(404)
+    );
+  });
+
   describe('requestStream property', () => {
     before(() => {
       return gateway({
@@ -273,7 +287,7 @@ const setupGateway = (proxyOptions = {}, serviceProxyOptions = {}) => {
         apiEndpoints: ['test'],
         policies: [{
           proxy: [{
-            action: Object.assign({}, proxyOptions, { serviceEndpoint: 'backend' })
+            action: Object.assign({ serviceEndpoint: 'backend' }, proxyOptions)
           }]
         }]
       }
