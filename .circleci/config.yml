@@ -111,6 +111,9 @@ jobs:
       - run:
           name: Commit and push changes
           command: hub commit -am "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
+      - run: &createPR
+          name: Create Pull Request
+          command: hub pull-request -m "Update Express Gateway Images to $CIRCLE_TAG"
 
   "update-official-docker-image":
     docker:
@@ -130,7 +133,11 @@ jobs:
           command: "val=$(cat DockerCommit) && sed -i \"s/GitCommit: .*/GitCommit: $val/g\" library/express-gateway"
       - run:
           name: Commit and push changes
-          command: hub add library/express-gateway && hub commit -m "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
+          command: |-
+            hub add library/express-gateway
+            hub commit -m "Update Express Gateway Images to $CIRCLE_TAG"
+            hub push -f -u eg-bot master
+      - run: *createPR
 
   "packer":
     docker:
@@ -170,4 +177,4 @@ workflows:
       - update-helm-charts: &docker-repo-first
           requires:
             - update-docker-repo
-      - update-official-docker-image: *docker-repo-first
+#      - update-official-docker-image: *docker-repo-first
