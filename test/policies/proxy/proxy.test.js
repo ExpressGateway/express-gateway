@@ -147,10 +147,10 @@ describe('@proxy policy', () => {
       });
     });
 
-    it('should return 404', () =>
+    it('should return 502', () =>
       request(app)
         .get('/endpoint')
-        .expect(404)
+        .expect(502)
     );
   });
 
