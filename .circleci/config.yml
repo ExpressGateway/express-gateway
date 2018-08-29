@@ -101,7 +101,7 @@ jobs:
       - run:
           name: Fork the official helm charts repo
           command: |-
-            hub clone helm/charts
+            hub clone helm/charts .
             hub fork
       - attach_workspace:
           at: ./
@@ -124,7 +124,7 @@ jobs:
       - run:
           name: Fork the official helm charts repo
           command: |-
-            hub clone docker-library/official-images
+            hub clone docker-library/official-images .
             hub fork
       - attach_workspace:
           at: ./
