@@ -79,7 +79,7 @@ jobs:
           command: node index.js
       - run:
           name: Create new commit with the changes
-          command: hub commit -am "Update Express Gateway Images to $CIRCLE_TAG"
+          command: hub commit -sam "Update Express Gateway Images to $CIRCLE_TAG"
       - run:
           name: Push changes to the upstream server
           command: hub push -f
@@ -110,7 +110,7 @@ jobs:
           command: cp Helmfile ./stable/express-gateway/Chart.yaml
       - run:
           name: Commit and push changes
-          command: hub commit -am "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
+          command: hub commit -sam "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
       - run: &createPR
           name: Create Pull Request
           command: hub pull-request -m "Update Express Gateway Images to $CIRCLE_TAG"
