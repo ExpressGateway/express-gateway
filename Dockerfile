@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:10-alpine
 
 LABEL maintainer Vincenzo Chianese, vincenzo@express-gateway.io
 
