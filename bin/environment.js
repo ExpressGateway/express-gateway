@@ -8,7 +8,9 @@ const { executeInScope } = require('./execution-scope');
 exports.bootstrap = (eg, adapter) => {
   const env = yeoman.createEnv();
 
-  executeInScope(env);
+  if (executeInScope(env)) {
+    return;
+  }
 
   env.eg = eg;
 
