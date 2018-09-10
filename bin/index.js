@@ -8,6 +8,8 @@ const eg = {
   }
 };
 
-const { program } = require('./environment').bootstrap(eg);
+const bootstraped = require('./environment').bootstrap(eg);
 
-program.parse(process.argv.slice(2));
+if (bootstraped && bootstraped.program) {
+  bootstraped.program.parse(process.argv.slice(2));
+}
