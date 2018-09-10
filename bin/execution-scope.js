@@ -12,13 +12,13 @@ exports.executeInScope = env => {
   rootPath = rootPath ? path.dirname(rootPath) : env.cwd;
 
   if (!rootPath) {
-    return;
+    return false;
   }
 
   const configPath = path.join(rootPath, 'config');
 
   if (!fs.existsSync(configPath)) {
-    return;
+    return false;
   }
 
   if (!process.env.EG_CONFIG_DIR) {
@@ -39,5 +39,8 @@ exports.executeInScope = env => {
       env: childEnv,
       stdio: 'inherit'
     });
+    return true;
   }
+
+  return false;
 };
