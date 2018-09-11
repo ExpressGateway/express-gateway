@@ -76,6 +76,8 @@ describe('eg credentials list', () => {
           createCredential(user.username, 'oauth2', { secret: 'eg1' }),
           createCredential(user.username, 'key-auth', {}, false),
           createCredential(user.username, 'key-auth', {}, false),
+          createCredential(user.username, 'jwt'),
+          createCredential(user.username, 'jwt', {}, false),
           createCredential(user.username, 'key-auth', {}, false)
         ]);
       })
@@ -213,6 +215,7 @@ describe('eg credentials list', () => {
 
       generator.once('end', () => {
         should(types).have.property('key-auth', 5);
+        should(types).have.property('jwt', 2);
         done();
       });
     });
