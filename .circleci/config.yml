@@ -162,8 +162,8 @@ workflows:
       - node-8: *testingFilters
       - node-10: *testingFilters
       - node-8-real-redis: *testingFilters
-      - release-npm-docker-image: &releaseFilters
-          filters:
+      - release-npm-docker-image:
+          filters: &releaseFilters
             tags:
               only: /v\d+(\.\d+){2}/
             branches:
@@ -173,11 +173,13 @@ workflows:
             - node-8
             - node-8-real-redis
             - node-10
-      - update-docker-repo: &npm-publish-first
+      - update-docker-repo: &postNpmPublish
           requires:
             - release-npm-docker-image
-      - packer: *npm-publish-first
+          filters: *releaseFilters
       - update-helm-charts: &docker-repo-first
           requires:
             - update-docker-repo
+          filters: *releaseFilters
 #      - update-official-docker-image: *docker-repo-first
+      - packer: *postNpmPublish
