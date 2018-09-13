@@ -5,14 +5,14 @@ const request = require('supertest');
 describe('admin with plugins', () => {
   let adminSrv, adminSrvFromEvent;
   before('fires up a new admin instance', function () {
-    eventBus.on('admin-ready', ({adminServer}) => {
+    eventBus.on('admin-ready', ({ adminServer }) => {
       adminSrvFromEvent = adminServer;
     });
     return admin({
       plugins: {
         adminRoutes: [function (adminExpressInstance) {
-          adminExpressInstance.all('/test', (req, res) => res.json({enabled: true}));
-        }]},
+          adminExpressInstance.all('/test', (req, res) => res.json({ enabled: true }));
+        }] },
       config: {
         gatewayConfig: {
           admin: {
