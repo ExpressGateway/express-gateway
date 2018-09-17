@@ -147,6 +147,16 @@ describe('REST: pipelines', () => {
         });
     });
 
+    it('should refuse a misconfigured policy in a pipeline', () => {
+      const testPipeline = {
+        apiEndpoints: ['api'],
+        customId: idGen.v4(), // NOTE: save operation should allow custom props
+        policies: [{ jwt: { action: {} } }]
+      };
+
+      return should(adminHelper.admin.config.pipelines.update('example', testPipeline)).be.rejectedWith({ response: { statusCode: 422 } });
+    });
+
     it('should delete existing pipeline', () => {
       return adminHelper.admin.config.pipelines
         .remove('example')

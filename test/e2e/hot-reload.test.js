@@ -144,7 +144,7 @@ describe('hot-reload', () => {
               done();
             });
         });
-        // make config invalid
+
         fs.writeFileSync(testGatewayConfigPath, '{er:t4');
       });
     });
