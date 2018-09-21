@@ -93,6 +93,7 @@ jobs:
           paths:
             - Helmfile
             - Helmvaluefile
+            - Helmreadme
             - DockerCommit
 
   "update-helm-charts":
@@ -110,7 +111,10 @@ jobs:
           at: ./
       - run:
           name: Copy new files in charts
-          command: cp Helmfile ./stable/express-gateway/Chart.yaml && cp Helmvaluefile ./stable/express-gateway/values.yaml
+          command: |-
+            cp Helmfile ./stable/express-gateway/Chart.yaml
+            cp Helmvaluefile ./stable/express-gateway/values.yaml
+            cp Helmreadme ./stable/express-gateway/README.md
       - run:
           name: Commit and push changes
           command: hub commit -sam "Update Express Gateway Images to $CIRCLE_TAG" && hub push -f -u eg-bot master
