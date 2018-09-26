@@ -28,7 +28,7 @@
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "engines": {
-    "node": ">= 6.0.0"
+    "node": ">= 8.0.0"
   },
   "scripts": {
     "start": "node lib/index.js",
@@ -97,7 +97,6 @@
     "superagent-logger": "^1.1.0",
     "superagent-prefix": "0.0.2",
     "swagger-ui-express": "^3.0.10",
-    "util.promisify": "^1.0.0",
     "uuid": "^3.3.2",
     "uuid62": "^1.0.0",
     "vhost": "3.0.2",

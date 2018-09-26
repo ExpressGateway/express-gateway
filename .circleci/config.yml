@@ -5,7 +5,15 @@ jobs:
       - image: circleci/node:8-browsers
     working_directory: ~/repo
 
-    steps: *eg-checkout-install
+    steps: &eg-checkout-install
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: npm ci
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
 
   "node-10":
     docker:
