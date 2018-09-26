@@ -8,36 +8,40 @@ describe('cors', () => {
     res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
   });
 
+  const setupHandler = (origin) => {
+    config.gatewayConfig = {
+      http: { port: 0 },
+      apiEndpoints: {
+        test_default: {}
+      },
+      policies: ['cors', 'test'],
+      pipelines: {
+        pipeline1: {
+          apiEndpoints: ['test_default'],
+          policies: [
+            {
+              cors: {
+                action: {
+                  origin: origin,
+                  methods: 'HEAD,PUT,PATCH,POST,DELETE',
+                  allowedHeaders: 'X-TEST'
+                }
+              }
+            },
+            {
+              test: []
+            }
+          ]
+        }
+      }
+    };
+
+    return helper.setup();
+  };
+
   describe('origin as string', () => {
     before('setup', () => {
-      config.gatewayConfig = {
-        http: { port: 0 },
-        apiEndpoints: {
-          test_default: {}
-        },
-        policies: ['cors', 'test'],
-        pipelines: {
-          pipeline1: {
-            apiEndpoints: ['test_default'],
-            policies: [
-              {
-                cors: {
-                  action: {
-                    origin: 'http://www.example.com',
-                    methods: 'HEAD,PUT,PATCH,POST,DELETE',
-                    allowedHeaders: 'X-TEST'
-                  }
-                }
-              },
-              {
-                test: []
-              }
-            ]
-          }
-        }
-      };
-
-      return helper.setup();
+      return setupHandler('http://www.example.com');
     });
 
     after('cleanup', () => {
@@ -64,34 +68,7 @@ describe('cors', () => {
 
   describe('origin as regexp', () => {
     before('setup', () => {
-      config.gatewayConfig = {
-        http: { port: 0 },
-        apiEndpoints: {
-          test_default: {}
-        },
-        policies: ['cors', 'test'],
-        pipelines: {
-          pipeline1: {
-            apiEndpoints: ['test_default'],
-            policies: [
-              {
-                cors: {
-                  action: {
-                    origin: /http:\/\/www\.example\.com/,
-                    methods: 'HEAD,PUT,PATCH,POST,DELETE',
-                    allowedHeaders: 'X-TEST'
-                  }
-                }
-              },
-              {
-                test: []
-              }
-            ]
-          }
-        }
-      };
-
-      return helper.setup();
+      return setupHandler(/http:\/\/www\.example\.com/);
     });
 
     after('cleanup', () => {
@@ -136,34 +113,7 @@ describe('cors', () => {
 
   describe('origin as array of strings', () => {
     before('setup', () => {
-      config.gatewayConfig = {
-        http: { port: 0 },
-        apiEndpoints: {
-          test_default: {}
-        },
-        policies: ['cors', 'test'],
-        pipelines: {
-          pipeline1: {
-            apiEndpoints: ['test_default'],
-            policies: [
-              {
-                cors: {
-                  action: {
-                    origin: ['http://www.example.com', 'http://www.example2.com'],
-                    methods: 'HEAD,PUT,PATCH,POST,DELETE',
-                    allowedHeaders: 'X-TEST'
-                  }
-                }
-              },
-              {
-                test: []
-              }
-            ]
-          }
-        }
-      };
-
-      return helper.setup();
+      return setupHandler(['http://www.example.com', 'http://www.example2.com']);
     });
 
     after('cleanup', () => {
@@ -208,34 +158,7 @@ describe('cors', () => {
 
   describe('origin as array of RegExp', () => {
     before('setup', () => {
-      config.gatewayConfig = {
-        http: { port: 0 },
-        apiEndpoints: {
-          test_default: {}
-        },
-        policies: ['cors', 'test'],
-        pipelines: {
-          pipeline1: {
-            apiEndpoints: ['test_default'],
-            policies: [
-              {
-                cors: {
-                  action: {
-                    origin: [/http:\/\/www\.example\.com/, /http:\/\/www\.example2\.com/],
-                    methods: 'HEAD,PUT,PATCH,POST,DELETE',
-                    allowedHeaders: 'X-TEST'
-                  }
-                }
-              },
-              {
-                test: []
-              }
-            ]
-          }
-        }
-      };
-
-      return helper.setup();
+      return setupHandler([/http:\/\/www\.example\.com/, /http:\/\/www\.example2\.com/]);
     });
 
     after('cleanup', () => {
