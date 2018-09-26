@@ -8,55 +8,129 @@ describe('cors', () => {
     res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
   });
 
-  before('setup', () => {
-    config.gatewayConfig = {
-      http: { port: 0 },
-      apiEndpoints: {
-        test_default: {}
-      },
-      policies: ['cors', 'test'],
-      pipelines: {
-        pipeline1: {
-          apiEndpoints: ['test_default'],
-          policies: [
-            {
-              cors: {
-                action: {
-                  origin: 'http://www.example.com',
-                  methods: 'HEAD,PUT,PATCH,POST,DELETE',
-                  allowedHeaders: 'X-TEST'
+  describe('origin as string', () => {
+    before('setup', () => {
+      config.gatewayConfig = {
+        http: { port: 0 },
+        apiEndpoints: {
+          test_default: {}
+        },
+        policies: ['cors', 'test'],
+        pipelines: {
+          pipeline1: {
+            apiEndpoints: ['test_default'],
+            policies: [
+              {
+                cors: {
+                  action: {
+                    origin: 'http://www.example.com',
+                    methods: 'HEAD,PUT,PATCH,POST,DELETE',
+                    allowedHeaders: 'X-TEST'
+                  }
                 }
+              },
+              {
+                test: []
               }
-            },
-            {
-              test: []
-            }
-          ]
+            ]
+          }
+        }
+      };
+
+      return helper.setup();
+    });
+
+    after('cleanup', () => {
+      config.gatewayConfig = originalGatewayConfig;
+      return helper.cleanup();
+    });
+
+    it('should allow first request for host', helper.validateOptions({
+      setup: {
+        url: '/',
+        preflight: true
+      },
+      test: {
+        url: '/',
+        statusCode: 204,
+        headers: {
+          'access-control-allow-origin': 'http://www.example.com',
+          'access-control-allow-methods': 'HEAD,PUT,PATCH,POST,DELETE',
+          'access-control-allow-headers': 'X-TEST'
         }
       }
-    };
-
-    return helper.setup();
+    }));
   });
 
-  after('cleanup', () => {
-    config.gatewayConfig = originalGatewayConfig;
-    return helper.cleanup();
-  });
+  describe('origin as regexp', () => {
+    before('setup', () => {
+      config.gatewayConfig = {
+        http: { port: 0 },
+        apiEndpoints: {
+          test_default: {}
+        },
+        policies: ['cors', 'test'],
+        pipelines: {
+          pipeline1: {
+            apiEndpoints: ['test_default'],
+            policies: [
+              {
+                cors: {
+                  action: {
+                    origin: /http:\/\/www\.example\.com/,
+                    methods: 'HEAD,PUT,PATCH,POST,DELETE',
+                    allowedHeaders: 'X-TEST'
+                  }
+                }
+              },
+              {
+                test: []
+              }
+            ]
+          }
+        }
+      };
 
-  it('should allow first request for host', helper.validateOptions({
-    setup: {
-      url: '/',
-      preflight: true
-    },
-    test: {
-      url: '/',
-      statusCode: 204,
-      headers: {
-        'access-control-allow-origin': 'http://www.example.com',
-        'access-control-allow-methods': 'HEAD,PUT,PATCH,POST,DELETE',
-        'access-control-allow-headers': 'X-TEST'
+      return helper.setup();
+    });
+
+    after('cleanup', () => {
+      config.gatewayConfig = originalGatewayConfig;
+      return helper.cleanup();
+    });
+
+    it('should have allow origin response header same as request origin when regexp matched', helper.validateOptions({
+      setup: {
+        origin: 'http://www.example.com',
+        url: '/',
+        preflight: true
+      },
+      test: {
+        url: '/',
+        statusCode: 204,
+        headers: {
+          'access-control-allow-origin': 'http://www.example.com',
+          'access-control-allow-methods': 'HEAD,PUT,PATCH,POST,DELETE',
+          'access-control-allow-headers': 'X-TEST'
+        }
       }
-    }
-  }));
+    }));
+
+    it('should have no allow origin response header when regexp didn\'t match', helper.validateOptions({
+      setup: {
+        origin: 'http://www.bad.com',
+        url: '/',
+        preflight: true
+      },
+      test: {
+        url: '/',
+        statusCode: 204,
+        headers: {
+          'access-control-allow-methods': 'HEAD,PUT,PATCH,POST,DELETE',
+          'access-control-allow-headers': 'X-TEST'
+        },
+        excludedHeaders: ['access-control-allow-origin']
+      }
+    }));
+  });
 });
