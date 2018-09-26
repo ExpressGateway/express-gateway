@@ -1,6 +1,6 @@
 {
   "name": "express-gateway",
-  "version": "1.12.2",
+  "version": "1.12.1",
   "description": "A microservices API gateway built on top of ExpressJS",
   "homepage": "https://www.express-gateway.io",
   "repository": "expressgateway/express-gateway",
@@ -63,6 +63,7 @@
   "types": "./index.d.ts",
   "dependencies": {
     "ajv": "^6.5.2",
+    "ajv-keywords": "^3.2.0",
     "bcryptjs": "^2.4.3",
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
