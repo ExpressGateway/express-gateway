@@ -1,6 +1,7 @@
 const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
 const originalGatewayConfig = config.gatewayConfig;
+const should = require('should');
 
 describe('cors', () => {
   const helper = testHelper();
@@ -199,5 +200,20 @@ describe('cors', () => {
         excludedHeaders: ['access-control-allow-origin']
       }
     }));
+  });
+
+  describe('origin as non regexp object', () => {
+    after('cleanup', () => {
+      config.gatewayConfig = originalGatewayConfig;
+    });
+
+    it('should throw exception when origin is an object but not regexp', (done) => {
+      const setup = () => {
+        return setupHandler(() => {});
+      };
+
+      should(setup).throw(/POLICY_PARAMS_VALIDATION_FAILED/);
+      done();
+    });
   });
 });
