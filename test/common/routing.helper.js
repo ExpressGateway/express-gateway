@@ -84,12 +84,22 @@ module.exports = function () {
         if (testCase.setup.host) {
           testScenario.set('Host', testCase.setup.host);
         }
+        if (testCase.setup.origin) {
+          testScenario.set('Origin', testCase.setup.origin);
+        }
         if (testCase.test.headers) {
           for (const el in testCase.test.headers) {
             const header = el;
             const value = testCase.test.headers[el];
 
             testScenario.expect(header, value);
+          }
+        }
+        if (testCase.test.excludedHeaders) {
+          for (const excludedHeader of testCase.test.excludedHeaders) {
+            testScenario.expect((res) => {
+              should(res.get(excludedHeader)).be.undefined();
+            });
           }
         }
         testScenario.expect(204)
