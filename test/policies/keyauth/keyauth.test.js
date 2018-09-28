@@ -81,8 +81,7 @@ describe('Functional Tests keyAuth Policy', () => {
             'key-auth': [{
               action: {
                 name: 'keyauth',
-                apiKeyField: 'customApiKeyParam',
-                disableHeaders: true
+                apiKeyField: 'customApiKeyParam'
               }
             }]
           },
@@ -196,16 +195,5 @@ describe('Functional Tests keyAuth Policy', () => {
       .get('/by_query?customApiKeyParam=' + apikey)
       .expect(200)
       .end(done);
-  });
-  it('should not authenticate with header of EP allows only query', function (done) {
-    const apikey = 'apiKey ' + user.keyId + ':' + user.keySecret;
-
-    request(app)
-      .get('/by_query')
-      .set(headerName, apikey)
-      .expect(401)
-      .end(function (err) {
-        done(err);
-      });
   });
 });
