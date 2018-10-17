@@ -14,6 +14,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
+      - run: npm test
 
   "node-10":
     docker:
