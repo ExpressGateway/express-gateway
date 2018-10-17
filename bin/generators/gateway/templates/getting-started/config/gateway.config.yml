@@ -12,6 +12,7 @@ serviceEndpoints:
     url: 'https://httpbin.org'
 policies:
   - basic-auth
+  - rewrite
   - cors
   - expression
   - key-auth

@@ -73,6 +73,7 @@
     "cors": "^2.8.4",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
+    "express-gateway-plugin-rewrite": "^1.2.1",
     "express-rate-limit": "^2.12.2",
     "express-session": "^1.15.6",
     "find-up": "^3.0.0",

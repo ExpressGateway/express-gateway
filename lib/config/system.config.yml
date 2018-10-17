@@ -8,7 +8,8 @@ db:
 cli:
   url: http://localhost:9876
 
-#plugins:
+plugins:
+  express-gateway-plugin-rewrite:
   # express-gateway-plugin-example:
   #   param1: 'param from system.config'
 

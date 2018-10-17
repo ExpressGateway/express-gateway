@@ -9,6 +9,7 @@ serviceEndpoints:
   # see: http://www.express-gateway.io/docs/configuration/gateway.config.yml/serviceEndpoints
 policies:
   - basic-auth
+  - rewrite
   - cors
   - expression
   - key-auth
