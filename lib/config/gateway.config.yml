@@ -14,32 +14,13 @@ serviceEndpoints:
     url: 'http://localhost:9876' # btw this is EG admin API
 policies:
   - proxy
-  - modifier
+  - key-auth
 pipelines:
   adminAPI:
     apiEndpoints:
       - api
     policies:
-      - modifier:
-          - action:
-              request:
-                headers:
-                  add:
-                    - name: x-test
-                      value: "'Clark Kent'"
-                body:
-                  add:
-                    - name: x-test
-                      value: "'Clark Kent'"
-              response:
-                headers:
-                  add:
-                    - name: x-test
-                      value: "'Clark Kent'"
-                body:
-                  add:
-                    - name: x-test
-                      value: "'Clark Kent'"
+      # - key-auth: # uncomment to enable key-auth
       - proxy:
           - action:
               serviceEndpoint: backend
