@@ -7,13 +7,7 @@ jobs:
 
     steps: &eg-checkout-install
       - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
       - run: npm ci
-      - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
       - run: npm test
 
   "node-10":
