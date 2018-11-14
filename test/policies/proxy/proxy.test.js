@@ -135,7 +135,7 @@ describe('@proxy policy', () => {
           .get('/endpoint')
           .expect(200)
           .expect('x-test', 'testValue')
-          .expect('x-forwarded-for', '::ffff:127.0.0.1')
+          .expect('x-forwarded-for', '::ffff:127.0.0.1') // '127.0.0.1')
       );
     });
   });
