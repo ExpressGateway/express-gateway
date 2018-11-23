@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:8 as builder
 
 ENV NODE_ENV production
 
@@ -6,6 +6,11 @@ WORKDIR /usr/src/app
 
 COPY package.json package-lock.json /usr/src/app/
 RUN npm install
+
+FROM node:8-alpine
+
+WORKDIR /usr/src/app
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 EXPOSE 8080 9876
 
