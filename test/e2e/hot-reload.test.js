@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const should = require('should');
-const chokidar = require('chokidar');
+const nsfw = require('nsfw');
 const cpr = require('cpr');
 const request = require('superagent');
 const rimraf = require('rimraf');
@@ -101,19 +101,15 @@ describe('hot-reload', () => {
       rimraf(testGatewayConfigPath, done);
     });
 
-    beforeEach(function (done) {
-      watcher = chokidar.watch(testGatewayConfigPath, { awaitWriteFinish: true, ignoreInitial: true });
-      watcher.on('ready', done);
-    });
-
     afterEach(function () {
-      watcher.close();
+      return watcher.then(w => w.stop());
     });
 
     describe('reloads valid gateway.config.yml', function () {
       it('will respond with a 404 - proxy policy', function (done) {
         this.timeout(TEST_TIMEOUT);
-        watcher.once('change', (evt) => {
+        testGatewayConfigData.pipelines.adminAPI.policies.shift();
+        watcher = nsfw(testGatewayConfigPath, events => {
           setTimeout(() => {
             request
               .get(`http://localhost:${originalGatewayPort}`)
@@ -124,28 +120,33 @@ describe('hot-reload', () => {
                 done();
               });
           }, GATEWAY_STARTUP_WAIT_TIME);
+        }).then(w => {
+          w.start();
+          fs.writeFileSync(testGatewayConfigPath, yaml.dump(testGatewayConfigData));
+          return w;
         });
-
-        testGatewayConfigData.pipelines.adminAPI.policies.shift();
-        fs.writeFileSync(testGatewayConfigPath, yaml.dump(testGatewayConfigData));
       });
     });
 
     describe('uses previous config on reload of invalid gateway.config.yml', function () {
       it('will respond with 404 - empty proxy', function (done) {
         this.timeout(TEST_TIMEOUT);
-        watcher.once('change', () => {
-          request
-            .get(`http://localhost:${originalGatewayPort}`)
-            .end((err, res) => {
-              should(err).not.be.undefined();
-              should(res.clientError).not.be.undefined();
-              should(res.statusCode).be.eql(404);
-              done();
-            });
+        watcher = nsfw(testGatewayConfigPath, events => {
+          setTimeout(() => {
+            request
+              .get(`http://localhost:${originalGatewayPort}`)
+              .end((err, res) => {
+                should(err).not.be.undefined();
+                should(res.clientError).not.be.undefined();
+                should(res.statusCode).be.eql(404);
+                done();
+              });
+          }, GATEWAY_STARTUP_WAIT_TIME);
+        }).then(w => {
+          w.start();
+          fs.writeFileSync(testGatewayConfigPath, '{er:t4');
+          return w;
         });
-
-        fs.writeFileSync(testGatewayConfigPath, '{er:t4');
       });
     });
   });

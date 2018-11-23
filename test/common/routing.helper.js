@@ -46,8 +46,6 @@ module.exports = function () {
       }
       policies = originalPolicies;
 
-      config.unwatch();
-
       return Promise.all([app, httpsApp].map((app) => {
         if (!app) {
           return Promise.resolve();
@@ -61,7 +59,7 @@ module.exports = function () {
             return resolve();
           });
         });
-      }));
+      }).concat(config.unwatch()));
     },
     validate404: function (testCase) {
       testCase.test = testCase.test || {};
