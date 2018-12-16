@@ -83,8 +83,7 @@ const setupGateway = () => {
                   body: {
                     add: {
                       hello: '"world"'
-                    },
-                    remove: ['url']
+                    }
                   },
                   headers: {
                     add: {
