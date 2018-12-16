@@ -22,6 +22,11 @@ describe('@modifier policy', () => {
         if (req.header('r-test')) {
           res.setHeader('r-test', req.header('r-test'));
         }
+
+        if (req.body) {
+          should(req.body).have.property('hello', 'world');
+        }
+
         res.setHeader('x-test', 'hello');
         res.status(200).json(Object.assign({ url: req.url }, req.body));
       });
@@ -38,7 +43,7 @@ describe('@modifier policy', () => {
     });
 
     it('should correctly reshape the request and response', () => {
-      return request(app).get('/').expect(res => {
+      return request(app).get('/').type('json').send({}).expect(res => {
         should(res.body).not.have.property('url');
         should(res.header).not.have.property('x-test');
 
@@ -75,6 +80,12 @@ const setupGateway = () => {
             modifier: [{
               action: {
                 request: {
+                  body: {
+                    add: {
+                      hello: '"world"'
+                    },
+                    remove: ['url']
+                  },
                   headers: {
                     add: {
                       'r-test': '"baffino"'
