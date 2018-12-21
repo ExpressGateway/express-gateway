@@ -1,5 +1,6 @@
 const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
+const db = require('../../../lib/db');
 const originalGatewayConfig = config.gatewayConfig;
 
 describe('rate-limit by host', () => {
@@ -7,7 +8,7 @@ describe('rate-limit by host', () => {
   helper.addPolicy('test', () => (req, res) => {
     res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
   });
-  const hosts = ['test.com', 'example.com', 'zu.io'];
+  const hosts = ['test.com', 'eg.io', 'zu.io'];
 
   before('setup', () => {
     config.gatewayConfig = {
@@ -40,7 +41,7 @@ describe('rate-limit by host', () => {
 
   after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    return helper.cleanup();
+    return db.flushdb().then(() => helper.cleanup());
   });
 
   hosts.forEach(host => {
