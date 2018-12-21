@@ -1,8 +1,9 @@
 const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
+const db = require('../../../lib/db');
 const originalGatewayConfig = config.gatewayConfig;
 
-describe('rate-limit policy only for example.com host', () => {
+describe('rate-limit policy only for eg-test-domain.io host', () => {
   const helper = testHelper();
   helper.addPolicy('test', () => (req, res) => {
     res.json({ result: 'test', hostname: req.hostname, url: req.url, apiEndpoint: req.egContext.apiEndpoint });
@@ -23,7 +24,7 @@ describe('rate-limit policy only for example.com host', () => {
               'rate-limit': {
                 condition: {
                   name: 'hostMatch',
-                  pattern: 'example.com'
+                  pattern: 'eg-test-domain.io'
                 },
                 action: { max: 1 }
               }
@@ -39,7 +40,7 @@ describe('rate-limit policy only for example.com host', () => {
 
   after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    return helper.cleanup();
+    return db.flushdb().then(() => helper.cleanup());
   });
 
   for (let i = 0; i < 3; i++) {
@@ -52,20 +53,20 @@ describe('rate-limit policy only for example.com host', () => {
       }
     }));
   }
-  it('should allow first request to example.com', helper.validateSuccess({
+  it('should allow first request to eg-test-domain.io', helper.validateSuccess({
     setup: {
-      host: 'example.com',
+      host: 'eg-test-domain.io',
       url: '/'
     },
     test: {
-      host: 'example.com',
+      host: 'eg-test-domain.io',
       url: '/'
     }
   }));
-  it('should rate-limit second request to example.com', helper.validateError({
+  it('should rate-limit second request to eg-test-domain.io', helper.validateError({
     setup: {
       url: '/',
-      host: 'example.com'
+      host: 'eg-test-domain.io'
     },
     test: {
       errorCode: 429

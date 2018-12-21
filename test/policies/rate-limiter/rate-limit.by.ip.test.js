@@ -1,5 +1,6 @@
 const testHelper = require('../../common/routing.helper');
 const config = require('../../../lib/config');
+const db = require('../../../lib/db');
 const originalGatewayConfig = config.gatewayConfig;
 
 describe('rate-limit policy', () => {
@@ -31,7 +32,7 @@ describe('rate-limit policy', () => {
 
   after('cleanup', () => {
     config.gatewayConfig = originalGatewayConfig;
-    return helper.cleanup();
+    return db.flushdb().then(() => helper.cleanup());
   });
 
   it('should allow first request ', helper.validateSuccess({
