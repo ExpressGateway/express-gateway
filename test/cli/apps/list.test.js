@@ -102,7 +102,7 @@ describe('eg apps list', () => {
         });
 
         generator.once('end', () => {
-          assert.equal(Object.keys(output).length, 102);
+          assert.strictEqual(Object.keys(output).length, 102);
           done();
         });
       });
