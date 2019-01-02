@@ -17,6 +17,7 @@ module.exports = function () {
     }
 
     testScenario.set('Content-Type', 'application/json');
+    testScenario.set('Accept', 'application/json');
 
     if (testCase.setup.host) {
       testScenario.set('Host', testCase.setup.host);
@@ -69,11 +70,14 @@ module.exports = function () {
       return this.validateError(testCase);
     },
     validateError: (testCase) => {
+      testCase.test = testCase.test || {};
+      // allow tests to override the default content type expected
+      testCase.test.contentType = testCase.test.contentType || 'application/json; charset=utf-8';
       return (done) => {
         const testScenario = prepareScenario(testCase);
         testScenario
           .expect(testCase.test.errorCode)
-          .expect('Content-Type', /text\/html/)
+          .expect('Content-Type', testCase.test.contentType)
           .end((err, res) => { done(err); });
       };
     },

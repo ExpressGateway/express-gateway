@@ -47,6 +47,15 @@ describe('Pipelines', () => {
     it('should return 404', () =>
       supertest(_app)
         .get('/no-clue')
+        .expect('Content-Type', /json/)
+        .expect(404)
+    );
+
+    it('should honor content negotiation', () =>
+      supertest(_app)
+        .get('/no-clue')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /html/)
         .expect(404)
     );
   });
