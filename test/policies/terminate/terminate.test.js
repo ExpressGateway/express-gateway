@@ -39,4 +39,16 @@ describe('@terminate', () => {
       errorCode: 429
     }
   }));
+
+  it('honors content negotiation: ', helper.validateError({
+    setup: {
+      url: '/',
+      accept: 'text/html'
+    },
+    test: {
+      result: 'test',
+      errorCode: 429,
+      contentType: 'text/html; charset=utf-8'
+    }
+  }));
 });

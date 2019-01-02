@@ -17,7 +17,11 @@ module.exports = function () {
     }
 
     testScenario.set('Content-Type', 'application/json');
-    testScenario.set('Accept', 'application/json');
+    if (testCase.setup.accept) {
+      testScenario.set('Accept', testCase.setup.accept);
+    } else {
+      testScenario.set('Accept', 'application/json');
+    }
 
     if (testCase.setup.host) {
       testScenario.set('Host', testCase.setup.host);
