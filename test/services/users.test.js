@@ -3,6 +3,7 @@ const uuid = require('uuid');
 const redisConfig = require('../../lib/config').systemConfig.db.redis;
 const services = require('../../lib/services');
 const userService = services.user;
+const credentialService = services.credential;
 const db = require('../../lib/db');
 
 describe('User service tests', function () {
@@ -314,7 +315,7 @@ describe('User service tests', function () {
 
   describe('Delete user tests', function () {
     let user;
-    before(() => db.flushdb().then(() => {
+    beforeEach(() => db.flushdb().then(() => {
       user = createRandomUserObject();
       return userService.insert(user);
     }).then(newUser => {
@@ -336,6 +337,23 @@ describe('User service tests', function () {
           should.exist(deleted);
           deleted.should.eql(false);
         });
+    });
+
+    describe('should delete all the related credentials', () => {
+      const credentials = [];
+      before(() =>
+        Promise.all([
+          credentialService.insertScopes(['someScope']),
+          credentialService.insertCredential(user.id, 'jwt'),
+          credentialService.insertCredential(user.id, 'jwt')]
+        ).then(([scope, jwt1, jwt2]) =>
+          Promise.all([jwt1, jwt2].map(cred => {
+            credentials.push(cred);
+            return credentialService.addScopesToCredential(cred.id, 'jwt', ['someScope']);
+          }))
+        ));
+      it('should remove the user', () => should(userService.remove(user.id)).resolvedWith(true));
+      it('should remove the credentials', () => should(credentialService.getCredential(credentials[0].id, 'jwt')).resolvedWith(null));
     });
   });
 });
