@@ -76,20 +76,13 @@ describe('User service tests', function () {
 
   describe('Get and Find User tests', function () {
     let user;
-    before(function (done) {
-      db.flushdb()
-        .then(function () {
-          user = createRandomUserObject();
-          userService
-            .insert(user)
-            .then(function (newUser) {
-              should.exist(newUser);
-              user.id = newUser.id;
-              done();
-            });
-        })
-        .catch(done);
-    });
+    before(() => db.flushdb().then(() => {
+      user = createRandomUserObject();
+      return userService.insert(user);
+    }).then(newUser => {
+      should.exist(newUser);
+      user.id = newUser.id;
+    }));
 
     it('should get user by userId', function (done) {
       userService.get(user.id)
@@ -110,6 +103,7 @@ describe('User service tests', function () {
         })
         .catch(done);
     });
+
     it('should get user all users', function () {
       return userService.findAll()
         .then(function (data) {
@@ -264,21 +258,13 @@ describe('User service tests', function () {
 
   describe('Activate and deactivate user tests', function () {
     let user;
-    before(function (done) {
-      db.flushdb()
-        .then(function () {
-          user = createRandomUserObject();
-          userService
-            .insert(user)
-            .then(function (newUser) {
-              should.exist(newUser);
-              user = Object.assign(user, newUser);
-              user.createdAt = newUser.createdAt;
-              done();
-            });
-        })
-        .catch(done);
-    });
+    before(() => db.flushdb().then(() => {
+      user = createRandomUserObject();
+      return userService.insert(user);
+    }).then(newUser => {
+      should.exist(newUser);
+      user.id = newUser.id;
+    }));
 
     it('should deactivate user', function (done) {
       userService.deactivate(user.id)
@@ -328,39 +314,28 @@ describe('User service tests', function () {
 
   describe('Delete user tests', function () {
     let user;
-    before(function (done) {
-      db.flushdb()
-        .then(function () {
-          user = createRandomUserObject();
-          userService
-            .insert(user)
-            .then(function (newUser) {
-              should.exist(newUser);
-              user.id = newUser.id;
-              done();
-            });
-        })
-        .catch(done);
-    });
+    before(() => db.flushdb().then(() => {
+      user = createRandomUserObject();
+      return userService.insert(user);
+    }).then(newUser => {
+      should.exist(newUser);
+      user.id = newUser.id;
+    }));
 
-    it('should delete user', function (done) {
-      userService.remove(user.id)
+    it('should delete user', function () {
+      return userService.remove(user.id)
         .then(function (deleted) {
           should.exist(deleted);
           deleted.should.eql(true);
-          done();
-        })
-        .catch(done);
+        });
     });
 
-    it('should not delete user with invalid id', function (done) {
-      userService.remove('invalid_id')
+    it('should not delete user with invalid id', function () {
+      return userService.remove('invalid_id')
         .then(function (deleted) {
           should.exist(deleted);
           deleted.should.eql(false);
-          done();
-        })
-        .catch(done);
+        });
     });
   });
 });
