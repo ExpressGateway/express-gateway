@@ -6,13 +6,11 @@ const userService = services.user;
 const credentialService = services.credential;
 const db = require('../../lib/db');
 
-describe('User service tests', function () {
-  describe('Insert tests', function () {
-    before(function () {
-      return db.flushdb();
-    });
+describe('User service tests', () => {
+  describe('Insert tests', () => {
+    before(() => db.flushdb());
 
-    it('should insert a user', function () {
+    it('should insert a user', () => {
       const user = {
         username: 'irfanbaqui',
         firstname: 'irfan',
@@ -35,26 +33,18 @@ describe('User service tests', function () {
         });
     });
 
-    it('should throw an error when inserting a user with missing properties', function (done) {
+    it('should throw an error when inserting a user with missing properties', () => {
       const user = {
         username: 'irfanbaqui-1',
         lastname: 'baqui',
         email: 'irfan@eg.com'
       };
 
-      userService
-        .insert(user)
-        .then(function (newUser) {
-          should.not.exist(newUser);
-        })
-        .catch(function (err) {
-          should.exist(err);
-          err.message.should.eql('data should have required property \'firstname\'');
-          done();
-        });
+      return should(userService.insert(user))
+        .be.rejectedWith('data should have required property \'firstname\'');
     });
 
-    it('should throw an error when inserting a user with existing username', function (done) {
+    it('should throw an error when inserting a user with existing username', () => {
       const user = {
         username: 'irfanbaqui',
         firstname: 'irfan',
@@ -62,20 +52,12 @@ describe('User service tests', function () {
         email: 'irfan@eg.com'
       };
 
-      userService
-        .insert(user)
-        .then(function (newUser) {
-          should.not.exist(newUser);
-        })
-        .catch(function (err) {
-          should.exist(err);
-          err.message.should.eql('username already exists');
-          done();
-        });
+      return should(userService.insert(user))
+        .be.rejectedWith('username already exists');
     });
   });
 
-  describe('Get and Find User tests', function () {
+  describe('Get and Find User tests', () => {
     let user;
     before(() => db.flushdb().then(() => {
       user = createRandomUserObject();
@@ -85,8 +67,8 @@ describe('User service tests', function () {
       user.id = newUser.id;
     }));
 
-    it('should get user by userId', function (done) {
-      userService.get(user.id)
+    it('should get user by userId', () => {
+      return userService.get(user.id)
         .then(function (_user) {
           const expectedUserProps = ['firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt'];
           should.exist(_user);
@@ -100,12 +82,10 @@ describe('User service tests', function () {
             email: user.email,
             username: user.username
           });
-          done();
-        })
-        .catch(done);
+        });
     });
 
-    it('should get user all users', function () {
+    it('should get user all users', () => {
       return userService.findAll()
         .then(function (data) {
           should.exist(data.users);
@@ -127,18 +107,16 @@ describe('User service tests', function () {
         });
     });
 
-    it('should not get user by invalid userId', function (done) {
-      userService.get(uuid.v4())
+    it('should not get user by invalid userId', () => {
+      return userService.get(uuid.v4())
         .then(function (user) {
           should.exist(user);
           user.should.eql(false);
-          done();
-        })
-        .catch(done);
+        });
     });
 
-    it('should find user by username', function (done) {
-      userService.find(user.username)
+    it('should find user by username', () => {
+      return userService.find(user.username)
         .then(function (_user) {
           const expectedUserProps = ['firstname', 'lastname', 'email', 'isActive', 'username', 'id', 'createdAt', 'updatedAt'];
           should.exist(_user);
@@ -151,43 +129,37 @@ describe('User service tests', function () {
             email: user.email,
             username: user.username
           });
-          done();
-        })
-        .catch(done);
+        });
     });
 
-    it('should not find user by invalid username', function (done) {
-      userService.find('invalid_username')
+    it('should not find user by invalid username', () => {
+      return userService.find('invalid_username')
         .then(function (user) {
           should.exist(user);
           user.should.eql(false);
-          done();
-        })
-        .catch(done);
+        });
     });
   });
 
-  describe('Update user tests', function () {
+  describe('Update user tests', () => {
     let user, updatedUser;
-    before(function (done) {
-      db.flushdb()
-        .then(function () {
+    before(() => {
+      return db.flushdb()
+        .then(() => {
           user = createRandomUserObject();
-          userService
+          return userService
             .insert(user)
             .then(function (newUser) {
               should.exist(newUser);
               user.id = newUser.id;
               user.createdAt = newUser.createdAt;
-              done();
             });
-        })
-        .catch(done);
+        });
     });
 
-    it('should update user', function (done) {
+    it('should update user', () => {
       updatedUser = createRandomUserObject();
-      userService.update(user.id, updatedUser)
+      return userService.update(user.id, updatedUser)
         .then(function (res) {
           should.exist(res);
           res.should.eql(true);
@@ -198,17 +170,16 @@ describe('User service tests', function () {
               _user.firstname.should.eql(updatedUser.firstname);
               _user.lastname.should.eql(updatedUser.lastname);
               _user.createdAt.should.eql(user.createdAt);
-              done();
-            })
-            .catch(done);
+            });
         });
     });
 
-    it('should allow update of any single user property user', function (done) {
+    it('should allow update of any single user property user', function () {
       const anotherUpdatedUser = {
         email: 'baq@eg.com'
       };
-      userService.update(user.id, anotherUpdatedUser)
+
+      return userService.update(user.id, anotherUpdatedUser)
         .then(function (res) {
           res.should.eql(true);
           return userService.get(user.id)
@@ -217,47 +188,37 @@ describe('User service tests', function () {
               _user.firstname.should.eql(updatedUser.firstname);
               _user.lastname.should.eql(updatedUser.lastname);
               _user.createdAt.should.eql(user.createdAt);
-              done();
             });
-        })
-        .catch(done);
+        });
     });
 
-    it('should not update user with unvalid id', function (done) {
+    it('should not update user with unvalid id', function () {
       const updatedUser = {
         username: 'joecamper',
         firstname: 'Joe',
         lastname: 'Camper',
         email: 'joecamper@eg.com'
       };
-      userService.update('invalid_id', updatedUser)
+
+      return userService.update('invalid_id', updatedUser)
         .then(function (res) {
           should.exist(res);
           res.should.eql(false);
-          done();
-        })
-        .catch(done);
+        });
     });
 
-    it('should not update user with invalid properties', function (done) {
+    it('should not update user with invalid properties', function () {
       const updatedUser = {
         username: 'joecamper',
         invalid_prop: 'xyz111'
       };
-      userService.update(user.id, updatedUser)
-        .then(function (res) {
-          should.not.exist(res);
-          done();
-        })
-        .catch(function (err) {
-          should.exist(err);
-          err.message.should.eql('one or more properties is invalid');
-          done();
-        });
+
+      return should(userService.update(user.id, updatedUser))
+        .be.rejectedWith('one or more properties is invalid');
     });
   });
 
-  describe('Activate and deactivate user tests', function () {
+  describe('Activate and deactivate user tests', () => {
     let user;
     before(() => db.flushdb().then(() => {
       user = createRandomUserObject();
@@ -313,7 +274,7 @@ describe('User service tests', function () {
     });
   });
 
-  describe('Delete user tests', function () {
+  describe('Delete user tests', () => {
     let user;
     beforeEach(() => db.flushdb().then(() => {
       user = createRandomUserObject();
@@ -323,7 +284,7 @@ describe('User service tests', function () {
       user.id = newUser.id;
     }));
 
-    it('should delete user', function () {
+    it('should delete user', () => {
       return userService.remove(user.id)
         .then(function (deleted) {
           should.exist(deleted);
@@ -331,7 +292,7 @@ describe('User service tests', function () {
         });
     });
 
-    it('should not delete user with invalid id', function () {
+    it('should not delete user with invalid id', () => {
       return userService.remove('invalid_id')
         .then(function (deleted) {
           should.exist(deleted);
@@ -341,7 +302,7 @@ describe('User service tests', function () {
 
     describe('should delete all the related credentials', () => {
       const credentials = [];
-      before(() =>
+      beforeEach(() =>
         Promise.all([
           credentialService.insertScopes(['someScope']),
           credentialService.insertCredential(user.id, 'jwt'),
@@ -352,8 +313,14 @@ describe('User service tests', function () {
             return credentialService.addScopesToCredential(cred.id, 'jwt', ['someScope']);
           }))
         ));
-      it('should remove the user', () => should(userService.remove(user.id)).resolvedWith(true));
-      it('should remove the credentials', () => should(credentialService.getCredential(credentials[0].id, 'jwt')).resolvedWith(null));
+
+      it('should remove the user', () => {
+        return should(userService.remove(user.id)).resolvedWith(true);
+      });
+
+      it('should remove the credentials', () => {
+        return should(credentialService.getCredential(credentials[0].id, 'jwt')).resolvedWith(null);
+      });
     });
   });
 });
