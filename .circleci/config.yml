@@ -116,7 +116,7 @@ jobs:
     steps:
       - run: *setup_container
       - run:
-          name: Fork the official helm charts repo
+          name: Fork the official docker image repository
           command: |-
             hub clone docker-library/official-images .
             hub fork
@@ -132,15 +132,6 @@ jobs:
             hub commit -m "Update Express Gateway Images to $CIRCLE_TAG"
             hub push -f -u eg-bot master
       - run: *createPR
-
-  "packer":
-    docker:
-      - image: hashicorp/packer:light
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-      - run: packer build ./.circleci/packer.json
 
 workflows:
   version: 2
@@ -170,5 +161,4 @@ workflows:
           requires:
             - update-docker-repo
           filters: *releaseFilters
-#      - update-official-docker-image: *docker-repo-first
-      - packer: *postNpmPublish
+      - update-official-docker-image: *docker-repo-first
