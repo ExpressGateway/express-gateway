@@ -71,39 +71,40 @@ const setupGateway = () => {
         url: `http://localhost:${backendServerPort}`
       }
     },
-    policies: ['proxy', 'modifier'],
+    policies: ['proxy', 'request-transformer', 'response-transformer'],
     pipelines: {
       pipeline1: {
         apiEndpoints: ['test'],
         policies: [
           {
-            modifier: [{
+            'request-transformer': [{
               action: {
-                request: {
-                  body: {
-                    add: {
-                      hello: '"world"'
-                    }
-                  },
-                  headers: {
-                    add: {
-                      'r-test': '"baffino"'
-                    }
+                body: {
+                  add: {
+                    hello: '"world"'
                   }
                 },
-                response: {
-                  body: {
-                    add: {
-                      hello: '"world"'
-                    },
-                    remove: ['url']
-                  },
-                  headers: {
-                    add: {
-                      res: '"correct"'
-                    },
-                    remove: ['x-test']
+                headers: {
+                  add: {
+                    'r-test': '"baffino"'
                   }
+                }
+              }
+            }]
+          }, {
+            'response-transformer': [{
+              action: {
+                body: {
+                  add: {
+                    hello: '"world"'
+                  },
+                  remove: ['url']
+                },
+                headers: {
+                  add: {
+                    res: '"correct"'
+                  },
+                  remove: ['x-test']
                 }
               }
             }]
