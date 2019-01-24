@@ -302,7 +302,7 @@ describe('User service tests', () => {
 
     describe('should delete all the related credentials', () => {
       const credentials = [];
-      beforeEach(() =>
+      before(() =>
         Promise.all([
           credentialService.insertScopes(['someScope']),
           credentialService.insertCredential(user.id, 'jwt'),
