@@ -75,6 +75,7 @@
     "express-rate-limit": "^2.12.2",
     "express-session": "^1.15.6",
     "find-up": "^3.0.0",
+    "form-urlencoded": "^3.0.0",
     "http-proxy": "^1.17.0",
     "ioredis": "^4.3.0",
     "ioredis-mock": "^4.6.0",

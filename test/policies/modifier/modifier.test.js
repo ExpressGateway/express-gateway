@@ -18,7 +18,7 @@ describe('@modifier policy', () => {
 
       backendServerPort = ports[0];
 
-      expressApp.all('*', express.json(), function (req, res) {
+      expressApp.all('*', express.json(), express.urlencoded(), function (req, res) {
         if (req.header('r-test')) {
           res.setHeader('r-test', req.header('r-test'));
         }
@@ -44,6 +44,17 @@ describe('@modifier policy', () => {
 
     it('should correctly reshape the request and response', () => {
       return request(app).get('/').type('json').send({}).expect(res => {
+        should(res.body).not.have.property('url');
+        should(res.header).not.have.property('x-test');
+
+        should(res.body).have.property('hello', 'world');
+        should(res.header).have.property('r-test', 'baffino');
+        should(res.header).have.property('res', 'correct');
+      });
+    });
+
+    it('should correctly reshape the request and response with url encoded payload', () => {
+      return request(app).post('/').type('form').send({ hello: 'world' }).expect(res => {
         should(res.body).not.have.property('url');
         should(res.header).not.have.property('x-test');
 
