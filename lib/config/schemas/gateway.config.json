@@ -107,8 +107,20 @@
         "port": {
           "type": "number"
         },
-        "hostname": {
-          "type": "string"
+        "properties": {
+          "oneOf": [
+            {
+              "host": {
+                "type": "string",
+                "default": "localhost"
+              }
+            },
+            {
+              "hostname": {
+                "type": "string"
+              }
+            }
+          ]
         }
       }
     },
