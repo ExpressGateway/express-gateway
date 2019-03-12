@@ -2,7 +2,7 @@ import * as express from "express";
 import { EventEmitter } from "events";
 import { JSONSchema7 } from "json-schema";
 
-declare namespace Express {
+declare module "express" {
   export interface Request {
     egContext: any
   }
