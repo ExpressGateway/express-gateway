@@ -107,22 +107,25 @@
         "port": {
           "type": "number"
         },
-        "properties": {
-          "oneOf": [
-            {
-              "host": {
-                "type": "string",
-                "default": "localhost"
-              }
-            },
-            {
-              "hostname": {
-                "type": "string"
-              }
-            }
+        "host": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "host"
+          ]
+        },
+        {
+          "required": [
+            "hostname"
           ]
         }
-      }
+      ]
     },
     "apiEndpoints": {
       "type": [
