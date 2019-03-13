@@ -4,11 +4,12 @@ import { JSONSchema7 } from "json-schema";
 
 declare module "express" {
   export interface Request {
-    egContext: any
+    egContext: unknown
   }
 }
 
 declare namespace ExpressGateway {
+
   type Policy = {
     name: string,
     policy(actionParams): express.RequestHandler,
@@ -17,7 +18,7 @@ declare namespace ExpressGateway {
 
   type Condition = {
     name: string,
-    handler(req: express.Request, conditionConfig: any): boolean,
+    handler(req: express.Request, conditionConfig: unknown): boolean,
     schema?: JSONSchema7
   }
 
@@ -26,13 +27,13 @@ declare namespace ExpressGateway {
     registerCondition(condition: Condition): void,
     registerGatewayRoute(gatewayRoutesDeclaration: (gatewayExpressApp: express.Application) => void): void,
     registerAdminRoute(adminRoutesDeclaration: (adminExpressApp: express.Application) => void): void,
-    registerCLIExtension(cliExtension): void,
+    registerCLIExtension(cliExtension: unknown): void,
     eventBus: EventEmitter
   }
 
   export type Plugin = {
     version?: string,
-    policies?: Array<string>,
+    policies?: string[],
     init(context: PluginContext): void,
     schema?: JSONSchema7
   }
