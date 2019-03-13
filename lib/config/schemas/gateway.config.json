@@ -102,136 +102,130 @@
       }
     },
     "admin": {
+      "allOf": [
+        {
+          "properties": {
+            "port": {
+              "type": "number",
+              "default": 9876
+            },
+            "host": {
+              "type": "string"
+            },
+            "hostname": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "port"
+          ]
+        }
+      ]
+    }
+  },
+  "apiEndpoints": {
+    "type": [
+      "object",
+      "null"
+    ],
+    "additionalProperties": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/baseApiEndpoint"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/baseApiEndpoint"
+          }
+        }
+      ]
+    }
+  },
+  "serviceEndpoints": {
+    "type": [
+      "object",
+      "null"
+    ],
+    "additionalProperties": {
       "type": "object",
       "properties": {
-        "port": {
-          "type": "number",
-          "default": 9876
+        "url": {
+          "type": "string",
+          "format": "uri"
         },
-        "host": {
-          "type": "string"
-        },
-        "hostname": {
-          "type": "string"
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
         }
       },
       "oneOf": [
         {
           "required": [
-            "host"
+            "url"
           ]
         },
         {
           "required": [
-            "hostname"
+            "urls"
           ]
         }
       ]
-    },
-    "apiEndpoints": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "additionalProperties": {
-        "anyOf": [
-          {
-            "$ref": "#/definitions/baseApiEndpoint"
-          },
-          {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/baseApiEndpoint"
-            }
-          }
-        ]
-      }
-    },
-    "serviceEndpoints": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "additionalProperties": {
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string",
-            "format": "uri"
-          },
-          "urls": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uri"
-            }
-          }
+    }
+  },
+  "policies": {
+    "type": "array",
+    "items": {
+      "type": "string"
+    }
+  },
+  "pipelines": {
+    "type": [
+      "object",
+      "array",
+      "null"
+    ],
+    "additionalProperties": {
+      "type": "object",
+      "properties": {
+        "apiEndpoint": {
+          "type": "string"
         },
-        "oneOf": [
-          {
-            "required": [
-              "url"
-            ]
-          },
-          {
-            "required": [
-              "urls"
-            ]
-          }
-        ]
-      }
-    },
-    "policies": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "pipelines": {
-      "type": [
-        "object",
-        "array",
-        "null"
-      ],
-      "additionalProperties": {
-        "type": "object",
-        "properties": {
-          "apiEndpoint": {
+        "apiEndpoints": {
+          "type": "array",
+          "items": {
             "type": "string"
-          },
-          "apiEndpoints": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "policies": {
-            "type": "array",
-            "items": [
-              {
-                "type": "object",
-                "maxProperties": 1,
-                "additionalProperties": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/definitions/conditionAction"
-                    },
-                    {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/definitions/conditionAction"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
           }
         },
-        "required": [
-          "policies"
-        ]
-      }
+        "policies": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "maxProperties": 1,
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/conditionAction"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/conditionAction"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "policies"
+      ]
     }
   }
 }
