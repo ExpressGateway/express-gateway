@@ -105,7 +105,8 @@
       "type": "object",
       "properties": {
         "port": {
-          "type": "number"
+          "type": "number",
+          "default": 9876
         },
         "host": {
           "type": "string"
