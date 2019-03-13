@@ -71,10 +71,10 @@ module.exports = class EgGenerator extends Generator {
       baseURL = systemConfig.cli.url;
     } else if (gatewayConfig && gatewayConfig.admin) {
       const adminConfig = gatewayConfig.admin;
-      const hostname = adminConfig.hostname || 'localhost';
+      const host = adminConfig.host || adminConfig.hostname || 'localhost';
       const port = adminConfig.port || 9876;
 
-      baseURL = `http://${hostname}:${port}`;
+      baseURL = `http://${host}:${port}`;
     }
 
     /*
