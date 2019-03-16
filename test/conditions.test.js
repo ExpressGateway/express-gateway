@@ -156,7 +156,7 @@ describe('tlsClientAuthenticated', function () {
     })).be.true();
   });
 
-  it('should return true if request is client authenticated', function () {
+  it('should return false if request is client authenticated', function () {
     req.client.authorized = false;
     should(req.matchEGCondition({
       name: 'tlsClientAuthenticated'
