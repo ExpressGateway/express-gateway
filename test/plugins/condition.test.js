@@ -40,7 +40,7 @@ describe('gateway condition with plugins', () => {
       plugins: {
         conditions: [{
           name: 'test-condition',
-          handler: function (req, conditionConfig) {
+          handler: conditionConfig => req => {
             should(conditionConfig.param1).ok();
             should(req.url).be.eql('/test');
             return (conditionConfig.param1 === req.url);
@@ -91,7 +91,7 @@ describe('gateway condition schema with plugins', () => {
             },
             required: ['param1']
           },
-          handler: function (req, conditionConfig) {
+          handler: conditionConfig => req => {
             should(conditionConfig.param1).be.ok();
             should(req.url).be.eql('/test');
             return (conditionConfig.param1 === req.url);
