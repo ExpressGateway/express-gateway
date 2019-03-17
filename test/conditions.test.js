@@ -130,7 +130,64 @@ describe('conditions', () => {
     });
   });
 
-  describe('req.matchEGCondition', function () {
+  describe('jsonSchema', function () {
+    const req = Object.create(express.request);
+
+    it('should return true if the body matches the schema', function () {
+      req.body = {
+        name: 'Clark',
+        surname: 'Kent',
+        age: 30
+      };
+
+      should(conditions['json-schema']({
+        schema: {
+          $id: 'schema1',
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string'
+            },
+            surname: {
+              type: 'string'
+            },
+            age: {
+              type: 'number'
+            }
+          },
+          required: ['name', 'surname', 'age']
+        }
+      })(req)).be.true();
+    });
+
+    it('should return false if the body does not match the schema', function () {
+      req.body = {
+        name: 'Clark',
+        surname: 'Kent'
+      };
+
+      should(conditions['json-schema']({
+        schema: {
+          $id: 'schema2',
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string'
+            },
+            surname: {
+              type: 'string'
+            },
+            age: {
+              type: 'number'
+            }
+          },
+          required: ['name', 'surname', 'age']
+        }
+      })(req)).be.false();
+    });
+  });
+
+  describe('complex conditions', function () {
     const req = Object.create(express.request);
     it('correctly handles complex conditional rule', function () {
       const control = { name: 'never' };
