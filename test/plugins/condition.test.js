@@ -91,7 +91,7 @@ describe('gateway condition schema with plugins', () => {
             },
             required: ['param1']
           },
-          handler: conditionConfig => req => {
+          handler: (req, conditionConfig) => {
             should(conditionConfig.param1).be.ok();
             should(req.url).be.eql('/test');
             return (conditionConfig.param1 === req.url);
