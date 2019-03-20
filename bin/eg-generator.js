@@ -106,7 +106,7 @@ module.exports = class EgGenerator extends Generator {
     const ArrayHeaders = Array.isArray(headers) ? headers : [headers];
 
     return ArrayHeaders.reduce((prev, header) => {
-      const [headerName, headerValue] = header.split(':');
+      const [headerName, headerValue] = header.split(/:(.+)/);
 
       if (headerValue) {
         prev[headerName] = headerValue;
