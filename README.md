@@ -1,4 +1,4 @@
-#### A Microservices API Gateway Built Using ExpressJS and Express Middleware
+#### A Microservices API Gateway Built Using Express.js and Express Middleware
 ----
 
 [![npm][npm-version-badge]][npm-package-url]
@@ -10,7 +10,11 @@
 
 [![Express-Gateway][eg-wordmark-companion]][eg-website]
 
-Express Gateway is an API Gateway that sits at the heart of any microservices architecture, regardless of what language or platform you're using. Express Gateway secures your microservices and exposes them through APIs using Node.js, ExpressJS and Express middleware. Developing microservices, orchestrating and managing them now can be done insanely fast all on one seamless platform without having to introduce additional infrastructure.
+Express Gateway is a microservices API gateway that sits at the heart of any microservices or serverless architecture, regardless of what language or platform you're using.
+
+Express Gateway secures your microservices and serverless functions and expose them through APIs using Node.js, Express and Express middleware.
+
+Developing cloud native applications, orchestrating and managing them now can be done insanely fast all on one seamless platform without having to introduce additional infrastructure.
 
 ---
 
@@ -18,13 +22,15 @@ Express Gateway is an API Gateway that sits at the heart of any microservices ar
 
 ---
 #### Main Features
-- Built Entirely on Express and Express Middleware
+- Microservices and Serverless QoS Proxy and Security
+- Built Entirely on JavaScript/Node.js using Express and Express Middleware
 - Dynamic Centralized Config
 - API Consumer and Credentials Management
 - Plugins and Plugin Framework
 - Distributed Data Store
 - CLI
 - REST API
+- Cloud Native Execution
 
 #### Installation
 If you have Node.js already installed:
@@ -47,10 +53,10 @@ Need help or have a question?
 - [Frequently Asked Questions (FAQ)][eg-faq]
 
 #### Commercial Support
-Express Gateway is commercially supported by [LunchBadger][lb-url].  For more information about support plans please contact [info@express-gateway.io][eg-support].
+Express Gateway is commercially supported by [LunchBadger][lb-url].  For more information about support plans please visit [the support page][eg-support].
 
 #### Community
-Express has a large vibrant community that we hope to extend further with Express Gateway's API gateway use case for Express and its middleware.
+Express has a large vibrant community that we hope to extend further with Express Gateway's gateway use case for Express and its middleware.
 
 - Come chat with us in [Gitter][gitter-room-url]
 - [Twitter (@express_gateway)][eg-twitter]
@@ -74,7 +80,7 @@ All contributions welcome! Please see the [contributor's guide][contributor-guid
 
 #### Sponsors
 Express Gateway is proudly sponsored by...
-- [LunchBadger][lb-url] : A Multicloud Platform for Microservices and Serverless.
+- [LunchBadger][lb-url] : Makes of Express Serverless Platform - a multi cloud platform to build microservices and serverless cloud native modern apps.
 - [Joyent Triton][joyent-url] : The Next Generation of Cloud - Modern, Hybrid and Open
 
 #### License
@@ -104,7 +110,7 @@ Copyright © LunchBadger, Inc. and Express Gateway Contributors
 [eg-twitter]: https://twitter.com/express_gateway
 [eg-newsgroup]: https://groups.google.com/a/express-gateway.io/forum/#!forum/discuss
 [eg-facebook]: https://www.facebook.com/expressjsgateway
-[eg-support]: mailto:info@express-gateway.io?subject=commercial%20support
+[eg-support]: https://goo.gl/s8eGKz?_ga=2.243837062.2081566642.1553116846-2009977705.1552945890
 [contributor-guide]: https://github.com/ExpressGateway/express-gateway/blob/master/Contributing.md
 [lb-url]: https://www.lunchbadger.com
 [joyent-url]: https://www.joyent.com
