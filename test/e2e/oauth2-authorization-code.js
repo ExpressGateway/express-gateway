@@ -35,7 +35,7 @@ describe('oauth2 authorization code grant type', () => {
           path: '/not-found'
         }
       },
-      policies: ['oauth2', 'proxy'],
+      policies: ['cors', 'jwt', 'basic-auth', 'oauth2', 'proxy'],
       pipelines: {
         ping: {
           apiEndpoints: ['ping'],
