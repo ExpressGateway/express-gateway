@@ -61,6 +61,7 @@
   },
   "types": "./index.d.ts",
   "dependencies": {
+    "acorn": "^6.1.1",
     "ajv": "6.10.0",
     "ajv-keywords": "3.4.0",
     "bcryptjs": "^2.4.3",
