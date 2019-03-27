@@ -61,13 +61,13 @@ describe('gateway condition with plugins', () => {
   it('should return false for param1 not matching url', function () {
     const req = Object.create(express.request);
     req.url = '/test';
-    should(conditions['test-condition']({ param1: true })(req)).be.false();
+    should(conditions['test-condition']({ param1: true }).handler(req)).be.false();
   });
 
   it('should return true for param1 matching url', function () {
     const req = Object.create(express.request);
     req.url = '/test';
-    should(conditions['test-condition']({ param1: '/test' })(req)).be.ok();
+    should(conditions['test-condition']({ param1: '/test' }).handler(req)).be.ok();
   });
 
   after('close gateway srv', () => {
@@ -107,7 +107,7 @@ describe('gateway condition schema with plugins', () => {
       gatewaySrv = srv.app;
       const req = Object.create(express.request);
       req.url = '/test';
-      should(conditions['test-condition-1']({ param1: true })(req)).be.false();
+      should(conditions['test-condition-1']({ param1: true }).handler(req)).be.false();
     });
   });
 
@@ -134,7 +134,7 @@ describe('gateway condition schema with plugins', () => {
       gatewaySrv = srv.app;
       const req = Object.create(express.request);
       req.url = '/test';
-      should.throws(() => conditions['test-condition-2']({ param1: true })(req));
+      should.throws(() => conditions['test-condition-2']({ param1: true }).handler(req));
     });
   });
 });
