@@ -65,7 +65,7 @@ jobs:
           name: Generate new Helm and Docker files
           command: node index.js
           environment:
-            - EG_CHART_VERSION: 1.3.0
+            - EG_CHART_VERSION: 1.4.0
       - run:
           name: Create new commit with the changes
           command: hub commit -sam "Update Express Gateway Images to $CIRCLE_TAG"
