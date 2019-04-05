@@ -35,7 +35,7 @@ describe('oauth2 authorization code grant type', () => {
           path: '/not-found'
         }
       },
-      policies: ['cors', 'jwt', 'basic-auth', 'oauth2', 'proxy'],
+      policies: ['oauth2', 'proxy'],
       pipelines: {
         ping: {
           apiEndpoints: ['ping'],
@@ -192,7 +192,7 @@ describe('oauth2 authorization code grant type', () => {
       .then(res => should(res.statusCode).be.eql(200));
   });
 
-  function createUser (args, done) {
+  function createUser(args, done) {
     return cliHelper.runCLICommand({
       cliArgs: ['users', 'create'].concat(args),
       adminPort,
@@ -200,7 +200,7 @@ describe('oauth2 authorization code grant type', () => {
     });
   }
 
-  function createCredential (args, done) {
+  function createCredential(args, done) {
     return cliHelper.runCLICommand({
       cliArgs: ['credentials', 'create'].concat(args),
       adminPort,
@@ -208,7 +208,7 @@ describe('oauth2 authorization code grant type', () => {
     });
   }
 
-  function createApp (args, done) {
+  function createApp(args, done) {
     return cliHelper.runCLICommand({
       cliArgs: ['apps', 'create'].concat(args),
       adminPort,
@@ -216,7 +216,7 @@ describe('oauth2 authorization code grant type', () => {
     });
   }
 
-  function generateRedirectServer (port) {
+  function generateRedirectServer(port) {
     const app = express();
 
     app.get('/cb', (req, res) => res.sendStatus(200));

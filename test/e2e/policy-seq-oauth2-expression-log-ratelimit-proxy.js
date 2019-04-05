@@ -39,7 +39,7 @@ describe('E2E: oauth2, proxy, log, expression, rate-limit policies', () => {
           scopes: ['authorizedScope']
         }
       },
-      policies: ['jwt', 'oauth2', 'proxy', 'log', 'expression', 'rate-limit'],
+      policies: ['oauth2', 'proxy', 'log', 'expression', 'rate-limit'],
       pipelines: {
         pipeline1: {
           apiEndpoints: ['authorizedEndpoint'],
