@@ -6,7 +6,7 @@ const _cpr = util.promisify(require('cpr'));
 
 const modulePath = path.resolve(__dirname, '..', '..', 'bin', 'index.js');
 
-module.exports.bootstrapFolder = function (options) {
+module.exports.bootstrapFolder = function () {
   return dir()
     .then(tempDir => Promise.all([
       tempDir,
@@ -30,7 +30,7 @@ module.exports.runCLICommand = function ({ adminPort, adminUrl, configDirectoryP
   cliExecOptions.env.EG_ADMIN_URL = adminUrl || `http://localhost:${adminPort}`;
   const command = ['node', modulePath].concat(cliArgs).join(' ');
   return new Promise((resolve, reject) => {
-    exec(command, cliExecOptions, (err, stdout, stderr) => {
+    exec(command, cliExecOptions, (err, stdout) => {
       if (err) {
         reject(err);
         return;
