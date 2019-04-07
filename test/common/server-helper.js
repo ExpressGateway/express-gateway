@@ -31,18 +31,15 @@ const findOpenPortNumbers = function (count = 1) {
         ports.push(server.address().port);
 
         server.once('close', () => {
-          completeCount++;
-
-          if (completeCount === count) {
+          if (completeCount++ === count) {
             resolve(ports);
           }
         });
+
         server.close();
       });
 
-      server.on('error', (err) => {
-        reject(err);
-      });
+      server.on('error', reject);
     }
   });
 };
