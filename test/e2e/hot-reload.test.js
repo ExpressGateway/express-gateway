@@ -148,5 +148,27 @@ describe('hot-reload', () => {
         fs.writeFileSync(testGatewayConfigPath, '{er:t4');
       });
     });
+
+    describe('adds the required policies in when required gateway.config.yml', function () {
+      it('will respond with a 401 - basic-auth policy', function (done) {
+        this.timeout(TEST_TIMEOUT);
+        watcher.once('change', (evt) => {
+          setTimeout(() => {
+            request
+              .get(`http://localhost:${originalGatewayPort}`)
+              .end((err, res) => {
+                should(err).not.be.undefined();
+                should(res.clientError).not.be.undefined();
+                should(res.statusCode).be.eql(401);
+                done();
+              });
+          }, GATEWAY_STARTUP_WAIT_TIME);
+        });
+
+        testGatewayConfigData.policies.push('basic-auth');
+        testGatewayConfigData.pipelines.adminAPI.policies.unshift({ 'basic-auth': {} });
+        fs.writeFileSync(testGatewayConfigPath, yaml.dump(testGatewayConfigData));
+      });
+    });
   });
 });

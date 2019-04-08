@@ -150,7 +150,7 @@ describe('oauth2 authorization code grant type', () => {
       request
         .get(`http://localhost:${gatewayPort}`)
         .end((err, res) => {
-          // Verify Unauthorized when calling without access token.
+          if (!err) reject(new Error('Error should be defined'));
           should(err).not.be.undefined();
           should(res.unauthorized).not.be.undefined();
           should(res.statusCode).be.eql(401);
@@ -192,7 +192,7 @@ describe('oauth2 authorization code grant type', () => {
       .then(res => should(res.statusCode).be.eql(200));
   });
 
-  function createUser (args, done) {
+  function createUser(args) {
     return cliHelper.runCLICommand({
       cliArgs: ['users', 'create'].concat(args),
       adminPort,
@@ -200,7 +200,7 @@ describe('oauth2 authorization code grant type', () => {
     });
   }
 
-  function createCredential (args, done) {
+  function createCredential(args) {
     return cliHelper.runCLICommand({
       cliArgs: ['credentials', 'create'].concat(args),
       adminPort,
@@ -208,7 +208,7 @@ describe('oauth2 authorization code grant type', () => {
     });
   }
 
-  function createApp (args, done) {
+  function createApp(args) {
     return cliHelper.runCLICommand({
       cliArgs: ['apps', 'create'].concat(args),
       adminPort,
@@ -216,7 +216,7 @@ describe('oauth2 authorization code grant type', () => {
     });
   }
 
-  function generateRedirectServer (port) {
+  function generateRedirectServer(port) {
     const app = express();
 
     app.get('/cb', (req, res) => res.sendStatus(200));
