@@ -150,7 +150,7 @@ describe('oauth2 authorization code grant type', () => {
       request
         .get(`http://localhost:${gatewayPort}`)
         .end((err, res) => {
-          if (err) reject(err);
+          if (!err) reject(new Error('Error should be defined'));
           should(err).not.be.undefined();
           should(res.unauthorized).not.be.undefined();
           should(res.statusCode).be.eql(401);
