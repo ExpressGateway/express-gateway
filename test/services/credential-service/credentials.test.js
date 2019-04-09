@@ -12,7 +12,7 @@ describe('Credential tests', () => {
     secret: 'password'
   };
 
-  function insertCredential(policy) {
+  function insertCredential(type) {
     return credentialService.insertCredential(username, policy, credential);
   }
 
