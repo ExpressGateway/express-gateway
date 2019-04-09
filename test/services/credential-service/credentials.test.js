@@ -13,7 +13,7 @@ describe('Credential tests', () => {
   };
 
   function insertCredential(type) {
-    return credentialService.insertCredential(username, policy, credential);
+    return credentialService.insertCredential(username, type, credential);
   }
 
   beforeEach(() => db.flushdb());
