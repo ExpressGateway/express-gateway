@@ -47,7 +47,11 @@ describe('@proxy policy', () => {
           res.setHeader('x-forwarded-for', req.header('x-forwarded-for'));
         }
 
-        res.status(200).json(Object.assign({ url: req.url }, req.body));
+        if (req.url.match(/redirect$/)) {
+          res.redirect(`http://localhost:${backendServerPort}/xxx`);
+        } else {
+          res.status(200).json(Object.assign({ url: req.url }, req.body));
+        }
       });
 
       backendServer = https.createServer({
@@ -121,6 +125,21 @@ describe('@proxy policy', () => {
       });
 
       it('passes options to proxy', () => expectResponse(app, 200, /json/));
+    });
+
+    describe('When proxy has hostRewrite set', () => {
+      before(() => {
+        return setupGateway({ hostRewrite: 'newhost' }, defaultProxyOptions).then(apps => {
+          app = apps.app;
+        });
+      });
+
+      it('response location header host re-written', () =>
+        request(app)
+          .get('/redirect')
+          .expect(302)
+          .expect('location', `http://newhost/xxx`)
+      );
     });
 
     describe('When proxy options are scattered on all the supported properties', () => {
