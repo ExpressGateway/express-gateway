@@ -19,17 +19,17 @@ describe('Credential tests', () => {
   beforeEach(() => db.flushdb());
 
   describe("'oauth2' specific cases", () => {
-    const policy = 'oauth2';
+    const type = 'oauth2';
 
     it('should not insert a credential that already exists', () => {
-      return insertCredential(policy).then(newCredential => {
-        return should(insertCredential(policy)).be.rejected();
+      return insertCredential(type).then(newCredential => {
+        return should(insertCredential(type)).be.rejected();
       });
     });
 
     it('should insert a credential without password specified if autoGeneratePassword is set to true', () => {
       return credentialService
-        .insertCredential(username, policy, {})
+        .insertCredential(username, type, {})
         .then(newCredential => {
           should.exist(newCredential);
           should.exist(newCredential.secret);
@@ -38,7 +38,7 @@ describe('Credential tests', () => {
     });
 
     it('should insert a credential with id but different type that already exists', () => {
-      return insertCredential(policy)
+      return insertCredential(type)
         .then(() => credentialService.insertCredential(username, 'basic-auth', credential))
         .then(newCredential => {
           should.exist(newCredential);
@@ -48,11 +48,11 @@ describe('Credential tests', () => {
   });
 
   describe('support for multiple credentials', () => {
-    ['key-auth', 'jwt'].forEach(policy => {
-      it(policy, () => {
+    ['key-auth', 'jwt'].forEach(type => {
+      it(type, () => {
         return Promise.all([
-          insertCredential(policy),
-          insertCredential(policy)
+          insertCredential(type),
+          insertCredential(type)
         ])
           .then(() => credentialService.getCredentials(username))
           .then(results => {
@@ -63,21 +63,21 @@ describe('Credential tests', () => {
   });
 
   const tests = [
-    { policy: 'oauth2', passwordKey: 'secret' },
-    { policy: 'basic-auth', passwordKey: 'password' },
-    { policy: 'key-auth' },
-    { policy: 'jwt' }
+    { type: 'oauth2', passwordKey: 'secret' },
+    { type: 'basic-auth', passwordKey: 'password' },
+    { type: 'key-auth' },
+    { type: 'jwt' }
   ];
 
-  tests.forEach(({ policy, passwordKey }) => {
-    describe(`policy: '${policy}'`, () => {
+  tests.forEach(({ type, passwordKey }) => {
+    describe(`credential type: '${type}'`, () => {
       it('should insert a credential', () => {
-        return insertCredential(policy);
+        return insertCredential(type);
       });
 
       it("should get a credential and strip 'passwordKey' props", () => {
-        return insertCredential(policy)
-          .then(credential => credentialService.getCredential(credential.id, policy))
+        return insertCredential(type)
+          .then(credential => credentialService.getCredential(credential.id, type))
           .then(credential => {
             should.exist(credential);
             if (passwordKey) {
@@ -89,11 +89,11 @@ describe('Credential tests', () => {
       });
 
       it('should deactivate a credential', () => {
-        return insertCredential(policy)
+        return insertCredential(type)
           .then(credential => {
-            return credentialService.deactivateCredential(credential.id, policy).then(res => {
+            return credentialService.deactivateCredential(credential.id, type).then(res => {
               should.exist(res);
-              return credentialService.getCredential(credential.id, policy);
+              return credentialService.getCredential(credential.id, type);
             });
           })
           .then(credential => {
@@ -103,11 +103,11 @@ describe('Credential tests', () => {
       });
 
       it('should reactivate a credential', () => {
-        return insertCredential(policy)
+        return insertCredential(type)
           .then(credential => {
-            return credentialService.activateCredential(credential.id, policy).then(res => {
+            return credentialService.activateCredential(credential.id, type).then(res => {
               should.exist(res);
-              return credentialService.getCredential(credential.id, policy);
+              return credentialService.getCredential(credential.id, type);
             });
           })
           .then(credential => {
