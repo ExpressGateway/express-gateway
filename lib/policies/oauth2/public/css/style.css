@@ -1,0 +1,69 @@
+.main-container {
+  font-family: “Helvetica Neue”, Helvetica, Open Sans, Lato, “Univers”, Arial,
+    sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+img {
+  width: 400px;
+  height: 150px;
+  position: absolute;
+  top: 10px;
+}
+
+.form-row {
+  margin: 18px;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border-radius: 5px;
+  box-shadow: 10px 10px 25px rgba(0, 0, 0, 0.281);
+}
+
+.login-form {
+  height: 250px;
+  width: 400px;
+}
+
+.dialog-form {
+  height: 400px;
+  width: 600px;
+}
+
+input {
+  width: 200px;
+  height: 28px;
+  font-size: 18px;
+}
+
+button {
+  background-color: #34a8c3;
+  border: none;
+  color: white;
+  padding: 10px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 18px;
+  width: 150px;
+}
+
+button:hover {
+  background-color: #0c6c7b;
+  cursor: pointer;
+}
