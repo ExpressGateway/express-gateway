@@ -159,7 +159,7 @@ describe('oauth2 authorization code grant type', () => {
     });
 
     return checkUnauthorized
-      .then(() => puppeteer.launch({ slowMo: 50 }))
+      .then(() => puppeteer.launch())
       .then(browser => Promise.all([browser, browser.pages()]))
       .then(([browser, [page]]) => Promise.all([browser, page, page.goto(authURL)]))
       .then(([browser, page]) => Promise.all([browser, page, page.type('[name="username"]', username)]))
