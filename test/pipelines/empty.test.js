@@ -48,7 +48,7 @@ describe('Pipelines', () => {
       supertest(_app)
         .get('/no-clue')
         .expect('Content-Type', /json/)
-        .expect(404, '{"error":"resource not found"}')
+        .expect(404, { status: 404 })
     );
 
     it('should honor content negotiation', () =>
