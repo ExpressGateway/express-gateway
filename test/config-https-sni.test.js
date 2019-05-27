@@ -113,7 +113,8 @@ describe('sni', () => {
       .then(_servers => {
         servers = _servers;
 
-        servers.httpsApp.on('tlsClientError', function (err) {
+        servers.httpsApp.on('tlsClientError', function (err, tlsSocket) {
+          console.log(err);
           serverResult = null;
           serverError = err.message;
         });
@@ -135,6 +136,9 @@ describe('sni', () => {
       options.port = servers.httpsApp.address().port;
 
       const client = tls.connect(options, function () {
+        console.log(client.authorized);
+        console.log(client.authorizationError);
+
         actual.clientResult =
           /Hostname\/IP doesn't/.test(client.authorizationError) || client.authorizationError === 'ERR_TLS_CERT_ALTNAME_INVALID';
         client.destroy();
