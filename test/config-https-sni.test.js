@@ -117,6 +117,7 @@ describe('sni', () => {
           serverResult = null;
           serverError = err.message;
         });
+
         servers.httpsApp.on('secureConnection', (tlsSocket) => {
           serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized };
         });
@@ -127,8 +128,11 @@ describe('sni', () => {
     const options = tc.clientOptions;
     tc.actual = {};
     it('sni ' + options.testTitle, () => {
-      serverError = null;
-      serverResult = null;
+      beforeEach(() => {
+        serverError = null;
+        serverResult = null;
+      });
+
       options.port = servers.httpsApp.address().port;
 
       return new Promise(resolve => {
@@ -157,6 +161,7 @@ describe('sni', () => {
       });
     });
   });
+
   after('check', () => {
     config.gatewayConfig = originalGatewayConfig;
     return helper.cleanup();
