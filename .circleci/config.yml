@@ -17,6 +17,14 @@ jobs:
 
     steps: *eg-checkout-install
 
+  "node-12":
+    docker:
+      - image: circleci/node:12-browsers
+    working_directory: ~/repo
+
+    steps: *eg-checkout-install
+
+
   "node-8-real-redis":
     docker:
       - image: circleci/node:8-browsers
@@ -142,6 +150,7 @@ workflows:
             tags:
               only: /v\d+(\.\d+){2}/
       - node-10: *testingFilters
+      - node-12: *testingFilters
       - node-8-real-redis: *testingFilters
       - release-npm-docker-image:
           filters: &releaseFilters
@@ -153,6 +162,7 @@ workflows:
             - node-8
             - node-8-real-redis
             - node-10
+            - node-12
       - update-docker-repo: &postNpmPublish
           requires:
             - release-npm-docker-image
