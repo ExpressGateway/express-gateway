@@ -126,41 +126,43 @@ describe('sni', () => {
   testCases.forEach(tc => {
     const options = tc.clientOptions;
     tc.actual = {};
-    it('sni ' + options.testTitle, (done) => {
+    it('sni ' + options.testTitle, () => {
       serverError = null;
       serverResult = null;
       options.port = servers.httpsApp.address().port;
-      const client = tls.connect(options, function () {
-        tc.actual.clientResult =
-          /Hostname\/IP doesn't/.test(client.authorizationError) || client.authorizationError === 'ERR_TLS_CERT_ALTNAME_INVALID';
-        client.destroy();
-        tc.actual.serverResult = serverResult;
-        tc.actual.clientError = null;
-        tc.actual.serverError = serverError;
-        done();
-      });
 
-      client.on('error', function (err) {
-        tc.actual.clientResult = false;
-        tc.actual.clientError = err.code;
-        tc.actual.serverError = serverError;
-        tc.actual.serverResult = serverResult;
-        done();
+      return new Promise(resolve => {
+        const client = tls.connect(options, function () {
+          tc.actual.clientResult =
+            /Hostname\/IP doesn't/.test(client.authorizationError) || client.authorizationError === 'ERR_TLS_CERT_ALTNAME_INVALID';
+          client.destroy();
+          tc.actual.serverResult = serverResult;
+          tc.actual.clientError = null;
+          tc.actual.serverError = serverError;
+          resolve();
+        });
+
+        client.on('error', function (err) {
+          tc.actual.clientResult = false;
+          tc.actual.clientError = err.code;
+          tc.actual.serverError = serverError;
+          tc.actual.serverResult = serverResult;
+          resolve();
+        });
+      }).then(() => {
+        assert.deepStrictEqual(tc.actual.serverResult, tc.expected.serverResult);
+        assert.strictEqual(tc.actual.clientResult, tc.expected.clientResult);
+        assert.strictEqual(tc.actual.clientError, tc.expected.clientError);
+        assert.strictEqual(tc.actual.serverError, tc.expected.serverError);
       });
     });
   });
   after('check', () => {
-    testCases.forEach((tc) => {
-      assert.deepStrictEqual(tc.actual.serverResult, tc.expected.serverResult);
-      assert.strictEqual(tc.actual.clientResult, tc.expected.clientResult);
-      assert.strictEqual(tc.actual.clientError, tc.expected.clientError);
-      assert.strictEqual(tc.actual.serverError, tc.expected.serverError);
-    });
     config.gatewayConfig = originalGatewayConfig;
     return helper.cleanup();
   });
 });
 
-function loadPEM (n) {
+function loadPEM(n) {
   return fs.readFileSync(path.join(__dirname, './fixtures', `${n}.pem`));
 }
