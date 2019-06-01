@@ -67,8 +67,8 @@ const testCases = [{
   }
 }];
 
-let serverResult;
-let serverError;
+let serverResult = null;
+let serverError = null;
 
 describe('sni', () => {
   let servers, helper, originalGatewayConfig;
@@ -112,15 +112,6 @@ describe('sni', () => {
     return helper.setup()
       .then(_servers => {
         servers = _servers;
-
-        servers.httpsApp.on('tlsClientError', function (err) {
-          serverResult = null;
-          serverError = err.message;
-        });
-
-        servers.httpsApp.on('secureConnection', (tlsSocket) => {
-          serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized };
-        });
       });
   });
 
@@ -136,22 +127,42 @@ describe('sni', () => {
       options.port = servers.httpsApp.address().port;
 
       return new Promise(resolve => {
+        const clientErrorPromise = new Promise(resolve => {
+          servers.httpsApp.once('tlsClientError', function (err) {
+            serverResult = null;
+            serverError = err.message;
+            resolve();
+          });
+        });
+
+        const secureConnectionPromise = new Promise(resolve => {
+          servers.httpsApp.once('secureConnection', (tlsSocket) => {
+            serverResult = { sni: tlsSocket.servername, authorized: tlsSocket.authorized };
+            resolve();
+          });
+        });
+
         const client = tls.connect(options, function () {
-          tc.actual.clientResult =
-            /Hostname\/IP doesn't/.test(client.authorizationError) || client.authorizationError === 'ERR_TLS_CERT_ALTNAME_INVALID';
-          client.destroy();
-          tc.actual.serverResult = serverResult;
-          tc.actual.clientError = null;
-          tc.actual.serverError = serverError;
-          resolve();
+          Promise.race([clientErrorPromise, secureConnectionPromise]).then(() => {
+            tc.actual.clientResult =
+              /Hostname\/IP doesn't/.test(client.authorizationError) || client.authorizationError === 'ERR_TLS_CERT_ALTNAME_INVALID';
+            tc.actual.serverResult = serverResult;
+            tc.actual.clientError = null;
+            tc.actual.serverError = serverError;
+            client.end();
+            resolve();
+          });
         });
 
         client.on('error', function (err) {
-          tc.actual.clientResult = false;
-          tc.actual.clientError = err.code;
-          tc.actual.serverError = serverError;
-          tc.actual.serverResult = serverResult;
-          resolve();
+          Promise.race([clientErrorPromise, secureConnectionPromise]).then(() => {
+            tc.actual.clientResult = false;
+            tc.actual.clientError = err.code;
+            tc.actual.serverError = serverError;
+            tc.actual.serverResult = serverResult;
+            client.destroy(err);
+            resolve();
+          });
         });
       }).then(() => {
         assert.deepStrictEqual(tc.actual.serverResult, tc.expected.serverResult);
