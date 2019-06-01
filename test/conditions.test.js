@@ -140,7 +140,7 @@ describe('conditions', () => {
         age: 30
       };
 
-      should(conditions['json-schema']({
+      const conditionP = conditions['json-schema']({
         schema: {
           $id: 'schema1',
           type: 'object',
@@ -157,7 +157,11 @@ describe('conditions', () => {
           },
           required: ['name', 'surname', 'age']
         }
-      })(req)).be.true();
+      });
+
+      return should(conditionP).be.resolved().then(fn => {
+        should(fn(req)).be.true();
+      });
     });
 
     it('should return false if the body does not match the schema', function () {
@@ -166,7 +170,7 @@ describe('conditions', () => {
         surname: 'Kent'
       };
 
-      should(conditions['json-schema']({
+      const conditionP = conditions['json-schema']({
         schema: {
           $id: 'schema2',
           type: 'object',
@@ -183,7 +187,11 @@ describe('conditions', () => {
           },
           required: ['name', 'surname', 'age']
         }
-      })(req)).be.false();
+      });
+
+      return should(conditionP).be.resolved().then(fn => {
+        should(fn(req)).be.false();
+      });
     });
   });
 
