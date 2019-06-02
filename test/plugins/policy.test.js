@@ -128,6 +128,6 @@ describe('gateway policy schema with plugins', () => {
         }]
       },
       config
-    })).rejectedWith();
+    })).rejected();
   });
 });
