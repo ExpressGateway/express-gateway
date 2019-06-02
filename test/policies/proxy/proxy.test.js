@@ -96,6 +96,16 @@ describe('@proxy policy', () => {
       it('passes options to proxy', () => expectResponse(app, 200, /json/));
     });
 
+    describe('if there is no matching route', () => {
+      before(() => {
+        return setupGateway(defaultProxyOptions).then(apps => {
+          app = apps.app;
+        });
+      });
+
+      it('returns 404', () => request(app).get('/hahaha').expect(404));
+    });
+
     describe('When proxy options are specified on the proxyOptions deprecated parameter', () => {
       let loggerSpy;
       before(() => {
@@ -273,7 +283,9 @@ const setupGateway = (proxyOptions = {}, serviceProxyOptions = {}) => {
   config.gatewayConfig = {
     http: { port: 0 },
     apiEndpoints: {
-      test: {}
+      test: {
+        paths: ['/endpoint']
+      }
     },
     serviceEndpoints: {
       backend: {
