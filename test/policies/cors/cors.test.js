@@ -207,13 +207,8 @@ describe('cors', () => {
       config.gatewayConfig = originalGatewayConfig;
     });
 
-    it('should throw exception when origin is an object but not regexp', (done) => {
-      const setup = () => {
-        return setupHandler(() => {});
-      };
-
-      should(setup).throw(/POLICY_PARAMS_VALIDATION_FAILED/);
-      done();
+    it('should throw exception when origin is an object but not regexp', () => {
+      return should(setupHandler(() => { })).rejectedWith(/POLICY_PARAMS_VALIDATION_FAILED/);
     });
   });
 });
