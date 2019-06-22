@@ -3,7 +3,8 @@
 
 [![npm][npm-version-badge]][npm-package-url]
 [![CircleCI][circleci-badge]][circleci-master-url]
-[![AppVeyor][appveyor-badge]][appveyor-master-url]
+[![Azure Pipelines][azure-badge]][azure-master-url]
+
 [![CodeCov][codecov-badge]][codecov-master-url]
 [![Gitter][gitter-badge]][gitter-room-url]
 [![Module LTS Adopted'](https://img.shields.io/badge/Module%20LTS-Adopted-brightgreen.svg?style=flat)](http://github.com/CloudNativeJS/ModuleLTS)
@@ -92,9 +93,9 @@ Copyright © LunchBadger, Inc. and Express Gateway Contributors
 [npm-version-badge]: https://img.shields.io/npm/v/express-gateway.svg
 [npm-package-url]: https://www.npmjs.com/package/express-gateway
 [circleci-badge]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master.svg?style=shield&circle-token=ac6b0e86b46220da43a5ae63a267d12e81ccb2d5
+[azure-badge]: https://dev.azure.com/vncz/vncz/_apis/build/status/ExpressGateway.express-gateway?branchName=master
 [circleci-master-url]: https://circleci.com/gh/ExpressGateway/express-gateway/tree/master
-[appveyor-badge]: https://img.shields.io/appveyor/ci/kevinswiber/express-gateway/master.svg
-[appveyor-master-url]: https://ci.appveyor.com/project/kevinswiber/express-gateway
+[azure-master-url]: https://dev.azure.com/vncz/vncz/_build?definitionId=2&_a=summary
 [codecov-badge]: https://img.shields.io/codecov/c/github/ExpressGateway/express-gateway/master.svg
 [codecov-master-url]: https://codecov.io/gh/ExpressGateway/express-gateway
 [gitter-badge]: https://img.shields.io/gitter/room/expressgateway/express-gateway.svg
