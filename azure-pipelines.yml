@@ -1,15 +1,15 @@
 strategy:
   matrix:
-    mac_node_10:
+    mac_10:
       imageName: 'macOS-10.14'
       node_version: 10.x
-    windows_node_10:
+    windows_10:
       imageName: 'vs2017-win2016'
       node_version: 10.x
-    mac_node_12:
+    mac_12:
       imageName: 'macOS-10.14'
       node_version: 12.x
-    windows_node_12:
+    windows_12:
       imageName: 'vs2017-win2016'
       node_version: 12.x
 
