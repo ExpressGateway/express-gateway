@@ -22,5 +22,5 @@ pipelines:
     policies:
       # - key-auth: # uncomment to enable key-auth
       - proxy:
-            action:
-              serviceEndpoint: backend
+          action:
+            serviceEndpoint: backend

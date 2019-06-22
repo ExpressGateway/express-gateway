@@ -73,7 +73,7 @@ describe('@proxy policy', () => {
     it('raises an error when incorrect TLS file paths are provided', () => {
       const serviceOptions = { target: { keyFile: '/non/existent/file.key' } };
 
-      return should(() => setupGateway(serviceOptions)).throw(/no such file or directory/);
+      return should(setupGateway(serviceOptions)).rejectedWith(/no such file or directory/);
     });
 
     describe('when incorrect proxy options are provided', () => {
@@ -94,6 +94,16 @@ describe('@proxy policy', () => {
       });
 
       it('passes options to proxy', () => expectResponse(app, 200, /json/));
+    });
+
+    describe('if there is no matching route', () => {
+      before(() => {
+        return setupGateway(defaultProxyOptions).then(apps => {
+          app = apps.app;
+        });
+      });
+
+      it('returns 404', () => request(app).get('/hahaha').expect(404));
     });
 
     describe('When proxy options are specified on the proxyOptions deprecated parameter', () => {
@@ -273,7 +283,9 @@ const setupGateway = (proxyOptions = {}, serviceProxyOptions = {}) => {
   config.gatewayConfig = {
     http: { port: 0 },
     apiEndpoints: {
-      test: {}
+      test: {
+        paths: ['/endpoint']
+      }
     },
     serviceEndpoints: {
       backend: {

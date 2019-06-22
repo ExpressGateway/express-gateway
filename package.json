@@ -36,9 +36,9 @@
     "lint": "eslint --fix .",
     "pretest": "eslint .",
     "test": "npm run mocha:istanbul",
-    "test:all": "cross-env EG_HTTP_PORT=0 EG_CONFIG_DIR=lib/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive test --timeout 60000 --exit",
-    "test:unit": "cross-env EG_HTTP_PORT=0 EG_CONFIG_DIR=lib/config EG_DISABLE_CONFIG_WATCH=true mocha --recursive \"./test/{,!(e2e)/**/}*.test.js\" --timeout 5000 --exit",
-    "test:e2e": "mocha --recursive test/e2e --timeout 60000 --exit",
+    "test:all": "cross-env EG_HTTP_PORT=0 EG_CONFIG_DIR=lib/config EG_DISABLE_CONFIG_WATCH=true mocha test",
+    "test:unit": "cross-env EG_HTTP_PORT=0 EG_CONFIG_DIR=lib/config EG_DISABLE_CONFIG_WATCH=true mocha \"./test/{,!(e2e)/**/}*.test.js\"",
+    "test:e2e": "mocha test/e2e",
     "mocha:istanbul": "nyc --reporter=lcov npm run test:all && nyc report --report=lcov > coverage.lcov && codecov"
   },
   "lint-staged": {

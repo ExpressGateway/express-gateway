@@ -133,57 +133,89 @@ describe('conditions', () => {
   describe('jsonSchema', function () {
     const req = Object.create(express.request);
 
-    it('should return true if the body matches the schema', function () {
-      req.body = {
-        name: 'Clark',
-        surname: 'Kent',
-        age: 30
-      };
+    describe('with a local schema', function () {
+      let conditionPromise;
 
-      should(conditions['json-schema']({
-        schema: {
-          $id: 'schema1',
-          type: 'object',
-          properties: {
-            name: {
-              type: 'string'
+      before(() => {
+        conditionPromise = conditions['json-schema']({
+          schema: {
+            $id: 'schema1',
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string'
+              },
+              surname: {
+                type: 'string'
+              },
+              age: {
+                type: 'number'
+              }
             },
-            surname: {
-              type: 'string'
-            },
-            age: {
-              type: 'number'
-            }
-          },
-          required: ['name', 'surname', 'age']
-        }
-      })(req)).be.true();
+            required: ['name', 'surname', 'age']
+          }
+        });
+      });
+
+      it('should return true if the body matches the schema', () => {
+        req.body = {
+          name: 'Clark',
+          surname: 'Kent',
+          age: 30
+        };
+
+        return should(conditionPromise).be.resolved().then(fn => should(fn(req)).be.true());
+      });
+
+      it('should return false if the body does not match the schema', function () {
+        req.body = {
+          name: 'Clark',
+          surname: 'Kent'
+        };
+
+        return should(conditionPromise).be.resolved().then(fn => {
+          should(fn(req)).be.false();
+        });
+      });
     });
 
-    it('should return false if the body does not match the schema', function () {
-      req.body = {
-        name: 'Clark',
-        surname: 'Kent'
-      };
+    describe('with a remote schema', function () {
+      let conditionPromise;
 
-      should(conditions['json-schema']({
-        schema: {
-          $id: 'schema2',
-          type: 'object',
-          properties: {
-            name: {
-              type: 'string'
-            },
-            surname: {
-              type: 'string'
-            },
-            age: {
-              type: 'number'
-            }
+      before(() => {
+        conditionPromise = conditions['json-schema']({
+          schema: {
+            $id: 'oas',
+            $ref: 'https://raw.githack.com/OAI/OpenAPI-Specification/master/schemas/v3.0/schema.json'
+          }
+        });
+      });
+
+      it('should match if the body matches the schema', () => {
+        req.body = {
+          openapi: '3.0.0',
+          info: {
+            version: '1',
+            title: 'Nasino'
           },
-          required: ['name', 'surname', 'age']
-        }
-      })(req)).be.false();
+          paths: {}
+        };
+
+        return should(conditionPromise).be.resolved().then(fn => {
+          should(fn(req)).be.true();
+        });
+      });
+
+      it('should not match if the body does not matches the schema', () => {
+        req.body = {
+          info: {},
+          paths: {}
+        };
+
+        return should(conditionPromise).be.resolved().then(fn => {
+          should(fn(req)).be.false();
+        });
+      });
     });
   });
 

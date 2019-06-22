@@ -20,7 +20,7 @@ describe('Missing policies', () => {
       };
     });
 
-    it('should prevent the gateway from starting', () => should(() => helper.setup({ config })).throw('POLICY_NOT_FOUND'));
+    it('should prevent the gateway from starting', () => should(helper.setup({ config })).rejectedWith('POLICY_NOT_FOUND'));
   });
 
   describe('Using a policy that is not listed in policies array', () => {
@@ -43,7 +43,7 @@ describe('Missing policies', () => {
       };
     });
 
-    it('should prevent the gateway from starting', () => should(() => helper.setup({ config })).throw('POLICY_NOT_DECLARED'));
+    it('should prevent the gateway from starting', () => should(helper.setup({ config })).rejectedWith('POLICY_NOT_DECLARED'));
   });
 
   afterEach('cleanup', () => {
