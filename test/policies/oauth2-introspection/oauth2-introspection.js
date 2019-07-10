@@ -59,7 +59,7 @@ describe('oAuth2 Introspection Policy', () => {
             res.json({ active: true });
           })
           .callsFake(res => {
-            res.json({ active: true, scopes: 'read write' });
+            res.json({ active: true, scope: 'read write' });
           });
 
         introspectEndpointSpy = sinon.spy((req, res) => {
