@@ -225,4 +225,74 @@ describe('Functional Test Authorization Code grant', function () {
           });
       });
   });
+
+  it('should not grant access token if code is expired', function (done) {
+    const config = require('../../lib/config');
+    config.systemConfig.authorizationCodes.timeToExpiry = 0;
+    const request = session(app);
+    request
+      .get('/oauth2/authorize')
+      .query({
+        redirect_uri: fromDbApp.redirectUri,
+        response_type: 'code',
+        client_id: fromDbApp.id
+      })
+      .redirects(1)
+      .expect(200)
+      .end(function (err, res) {
+        should.not.exist(err);
+        res.redirects.length.should.equal(1);
+        res.redirects[0].should.containEql('/login');
+        request
+          .post('/login')
+          .query({
+            username: fromDbUser.username,
+            password: 'user-secret'
+          })
+          .expect(302)
+          .end(function (err, res) {
+            should.not.exist(err);
+            should.exist(res.headers.location);
+            res.headers.location.should.containEql('/oauth2/authorize');
+            request
+              .get('/oauth2/authorize')
+              .query({
+                redirect_uri: fromDbApp.redirectUri,
+                response_type: 'code',
+                client_id: fromDbApp.id
+              })
+              .expect(200)
+              .end(function (err, res) {
+                should.not.exist(err);
+                request
+                  .post('/oauth2/authorize/decision')
+                  .query({
+                    transaction_id: res.headers.transaction_id
+                  })
+                  .expect(302)
+                  .end(function (err, res) {
+                    should.not.exist(err);
+                    should.exist(res.headers.location);
+                    res.headers.location.should.containEql(fromDbApp.redirectUri);
+                    const params = qs.parse(url.parse(res.headers.location).search.slice(1));
+                    should.exist(params.code);
+                    request
+                      .post('/oauth2/token')
+                      .send({
+                        grant_type: 'authorization_code',
+                        redirect_uri: fromDbApp.redirectUri,
+                        client_id: fromDbApp.id,
+                        client_secret: 'app-secret',
+                        code: params.code
+                      })
+                      .expect(403)
+                      .end(function (err, res) {
+                        if (err) return done(err);
+                        done();
+                      });
+                  });
+              });
+          });
+      });
+  });
 });
