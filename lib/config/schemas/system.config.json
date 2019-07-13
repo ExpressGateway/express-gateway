@@ -11,10 +11,15 @@
             "emulate": {
               "type": "boolean",
               "default": false
+            },
+            "namespace": {
+              "type": "string",
+              "default": "EG"
             }
           },
           "required": [
-            "emulate"
+            "emulate",
+            "namespace"
           ]
         }
       },
