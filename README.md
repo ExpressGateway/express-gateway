@@ -78,16 +78,11 @@ The Express Gateway roadmap consists of three parts:
 #### Contribution
 All contributions welcome! Please see the [contributor's guide][contributor-guide]
 
-#### Sponsors
-Express Gateway is proudly sponsored by...
-- [LunchBadger][lb-url] : Makes of Express Serverless Platform - a multi cloud platform to build microservices and serverless cloud native modern apps.
-- [Joyent Triton][joyent-url] : The Next Generation of Cloud - Modern, Hybrid and Open
-
 #### License
 
 [Apache-2.0 License][apache-license]
 
-Copyright © LunchBadger, Inc. and Express Gateway Contributors
+Copyright © Express Gateway Contributors
 
 [npm-version-badge]: https://img.shields.io/npm/v/express-gateway.svg
 [npm-package-url]: https://www.npmjs.com/package/express-gateway
@@ -112,6 +107,4 @@ Copyright © LunchBadger, Inc. and Express Gateway Contributors
 [eg-facebook]: https://www.facebook.com/expressjsgateway
 [eg-support]: https://goo.gl/s8eGKz?_ga=2.243837062.2081566642.1553116846-2009977705.1552945890
 [contributor-guide]: https://github.com/ExpressGateway/express-gateway/blob/master/Contributing.md
-[lb-url]: https://www.lunchbadger.com
-[joyent-url]: https://www.joyent.com
 [apache-license]: https://github.com/expressgateway/express-gateway/blob/master/LICENSE
