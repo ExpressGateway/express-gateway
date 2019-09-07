@@ -12,7 +12,8 @@ describe('admin with plugins', () => {
       plugins: {
         adminRoutes: [function (adminExpressInstance) {
           adminExpressInstance.all('/test', (req, res) => res.json({ enabled: true }));
-        }] },
+        }]
+      },
       config: {
         gatewayConfig: {
           admin: {

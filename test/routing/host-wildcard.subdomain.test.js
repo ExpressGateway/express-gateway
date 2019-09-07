@@ -12,8 +12,8 @@ describe('exact host name configuration', () => {
     config.gatewayConfig = {
       http: { port: 9084 },
       apiEndpoints: {
-        'test_domain': { 'host': '*.acme.com' }, // path defaults to *
-        'test_second_level_domain': { 'host': '*.*.example.com' } // path defaults to *
+        test_domain: { host: '*.acme.com' }, // path defaults to *
+        test_second_level_domain: { host: '*.*.example.com' } // path defaults to *
       },
       policies: ['test'],
       pipelines: {

@@ -151,7 +151,7 @@ describe('eg apps update', () => {
       });
     });
 
-    env.argv = program.parse(`apps update asdf ` +
+    env.argv = program.parse('apps update asdf ' +
       '-p "name=AppName" -p "redirectUri=http://example.com/cb"');
   });
 
