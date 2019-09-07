@@ -14,9 +14,9 @@ module.exports = class extends eg.Generator {
         yargs
           .usage(`Usage: $0 ${process.argv[2]} create [options]`)
           .example(`$0 ${process.argv[2]} create -c jdoe -t key-auth`)
-          .example(`echo '{"consumer":"jdoe", "type": "key-auth"}'` +
+          .example('echo \'{"consumer":"jdoe", "type": "key-auth"}\'' +
             `| $0 ${process.argv[2]} create --stdin`)
-          .example(`echo '{"consumer":"jdoe", "type": "key-auth", "scopes":["existingScope"]}'` +
+          .example('echo \'{"consumer":"jdoe", "type": "key-auth", "scopes":["existingScope"]}\'' +
             `| $0 ${process.argv[2]} create --stdin`)
           .example(`cat all_apps.json | $0 ${process.argv[2]} create --stdin`)
           .example(`$0 ${process.argv[2]} create -u jdoe -p 'scopes=existingScope'`)

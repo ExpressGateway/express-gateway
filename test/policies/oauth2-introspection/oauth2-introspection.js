@@ -93,28 +93,28 @@ describe('oAuth2 Introspection Policy', () => {
   it('should return 401 when an invalid token is sent', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `Bearer nasino`)
+      .set('Authorization', 'Bearer nasino')
       .expect(401)
   );
 
   it('should return 401 when a valid token is sent, but not sufficient scopes', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `Bearer token_value_1`)
+      .set('Authorization', 'Bearer token_value_1')
       .expect(401)
   );
 
   it('should return 200 when valid token and sufficient scopes are provided', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `Bearer token_value_2`)
+      .set('Authorization', 'Bearer token_value_2')
       .expect(200)
   );
 
   it('should not call the introspection endpoint again because the token is valid already', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `Bearer token_value_2`)
+      .set('Authorization', 'Bearer token_value_2')
       .expect(200)
       .then(() => should(introspectEndpointSpy.callCount).equal(3))
   );
@@ -122,7 +122,7 @@ describe('oAuth2 Introspection Policy', () => {
   it('should call the introspection endpoint again because a different token is sent', () =>
     request(gateway)
       .get('/')
-      .set('Authorization', `Bearer hola`)
+      .set('Authorization', 'Bearer hola')
       .expect(401)
       .then(() => should(introspectEndpointSpy.callCount).equal(4))
   );

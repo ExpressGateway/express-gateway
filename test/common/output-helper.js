@@ -17,7 +17,7 @@ exports.checkOutput = function (f, argv, cb) {
 
   process.exit = function () { exit = true; };
   process.env = Object.assign(process.env, { _: 'node' });
-  process.argv = argv || [ './usage' ];
+  process.argv = argv || ['./usage'];
 
   const errors = [];
   const logs = [];

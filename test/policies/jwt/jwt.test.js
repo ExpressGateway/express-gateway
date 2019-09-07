@@ -42,7 +42,7 @@ const jwtConfigGet = (jwtConfig, backendPort) => {
       pipeline1: {
         apiEndpoints: ['api'],
         policies: [
-          { 'jwt': { action: jwtConfig } },
+          { jwt: { action: jwtConfig } },
           {
             proxy: [
               {
@@ -212,7 +212,7 @@ describe('JWT policy', () => {
             apiEndpoints: ['anotherApi'],
             policies: [
               {
-                'jwt': {
+                jwt: {
                   action: {
                     secretOrPublicKey: 'anotherSuperSecret',
                     checkCredentialExistence: false

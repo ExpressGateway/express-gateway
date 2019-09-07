@@ -94,7 +94,7 @@ describe('oAuth2 policy', () => {
           email: 'test@example.com'
         }))
         .then(user => credentialService.insertCredential(user.id, 'basic-auth', {}).then(cred => { Object.assign(userCred, { password: cred.password, username: user.username }); return user; }))
-        .then(user => appService.insert({ name: 'appy', 'redirectUri': 'http://haha.com' }, user.id))
+        .then(user => appService.insert({ name: 'appy', redirectUri: 'http://haha.com' }, user.id))
         .then(app => credentialService.insertCredential(app.id, 'oauth2', appCredential))
         .then(credential => credentialService.addScopesToCredential(credential.id, 'oauth2', ['read', 'write']).then(() => credential))
         .then(credential => Object.assign(appCredential, credential))

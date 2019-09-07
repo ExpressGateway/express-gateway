@@ -56,7 +56,7 @@ describe('Functional Tests @auth Policies @passthrough', () => {
             }]
           },
           {
-            'oauth2': [{
+            oauth2: [{
               action: {
                 passThrough: true
               }

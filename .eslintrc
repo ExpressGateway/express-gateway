@@ -26,6 +26,7 @@
       "always"
     ],
     "no-console": "warn",
+    "no-prototype-builtins": "off",
     "prefer-const": "error",
     "node/no-deprecated-api": [
       "error",

@@ -14,7 +14,7 @@ describe('exact host name configuration host:acme.com paths:default(*)', () => {
     config.gatewayConfig = {
       http: { port: 9082 },
       apiEndpoints: {
-        'test_domain': { 'host': 'acme.com' } // path defaults to *
+        test_domain: { host: 'acme.com' } // path defaults to *
       },
       policies: ['test'],
       pipelines: {

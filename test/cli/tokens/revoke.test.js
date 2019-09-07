@@ -83,7 +83,7 @@ describe('eg tokens revoke', () => {
       });
     });
 
-    env.argv = program.parse(`tokens revoke ` + accessToken);
+    env.argv = program.parse('tokens revoke ' + accessToken);
   });
   it('revokes token -q', done => {
     env.hijack(namespace, generator => {
@@ -107,6 +107,6 @@ describe('eg tokens revoke', () => {
       });
     });
 
-    env.argv = program.parse(`tokens revoke -q ` + accessToken);
+    env.argv = program.parse('tokens revoke -q ' + accessToken);
   });
 });

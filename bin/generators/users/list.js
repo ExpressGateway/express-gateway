@@ -14,6 +14,7 @@ module.exports = class extends eg.Generator {
           .example(`$0 ${process.argv[2]} list`)
     });
   }
+
   prompting () {
     return this.admin.users.list({ all: this.argv.a })
       .then(data => {

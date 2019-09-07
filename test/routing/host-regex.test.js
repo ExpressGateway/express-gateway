@@ -14,7 +14,7 @@ describe("When configured to capture hostRegex: '[a-z]{3}.parrots.com'", () => {
     config.gatewayConfig = {
       http: { port: 9083 },
       apiEndpoints: {
-        'parrots': { hostRegex: '[a-z]{3}.parrots.com' }
+        parrots: { hostRegex: '[a-z]{3}.parrots.com' }
       },
       policies: ['test'],
       pipelines: {

@@ -9,8 +9,8 @@ const pluginDirectory = path.join(__dirname, '../fixtures', pluginName);
 const testPlugin = require(pluginDirectory);
 
 testPlugin.schema = {
-  '$id': `http://express-gateway.io/schemas/plugin/${pluginName}.json`,
-  'required': ['schema-test-param']
+  $id: `http://express-gateway.io/schemas/plugin/${pluginName}.json`,
+  required: ['schema-test-param']
 };
 
 testPlugin.init = (pluginContext) => {
@@ -20,11 +20,11 @@ testPlugin.init = (pluginContext) => {
 describe('Plugin schema validation on load', () => {
   it('fails loading when parameter undefined', () => {
     const missingParameterConfig = {
-      'config': {
-        'systemConfig': {
-          'plugins': {
-            'test': {
-              'package': pluginDirectory
+      config: {
+        systemConfig: {
+          plugins: {
+            test: {
+              package: pluginDirectory
             }
           }
         }
@@ -37,11 +37,11 @@ describe('Plugin schema validation on load', () => {
 
   it('loads plugin and registers policy successfully', () => {
     const config = {
-      'config': {
-        'systemConfig': {
-          'plugins': {
-            'test': {
-              'package': pluginDirectory,
+      config: {
+        systemConfig: {
+          plugins: {
+            test: {
+              package: pluginDirectory,
               'schema-test-param': 'defined'
             }
           }

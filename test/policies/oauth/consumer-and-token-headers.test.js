@@ -43,14 +43,14 @@ describe('Request @headers @proxy downstream @auth @key-auth', () => {
           policies: [
             { oauth2: {} },
             {
-              'headers': [{
+              headers: [{
                 action: {
                   headersPrefix: 'eg-',
                   forwardHeaders: {
-                    'id': 'consumer.id',
+                    id: 'consumer.id',
                     'consumer-name': 'consumer.name',
                     'consumer-type': 'consumer.type',
-                    'scopes': 'consumer.token.scopes'
+                    scopes: 'consumer.token.scopes'
                   }
                 }
               }]
