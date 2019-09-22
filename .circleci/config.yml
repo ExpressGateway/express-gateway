@@ -8,7 +8,7 @@ jobs:
     steps: &eg-checkout-install
       - checkout
       - run: npm ci
-      - run: npm test
+      - run: npm run test
 
   "node-10":
     docker:
