@@ -76,7 +76,7 @@
     "express-session": "^1.16.2",
     "find-up": "^3.0.0",
     "form-urlencoded": "^4.0.0",
-    "http-proxy": "^1.17.0",
+    "http-proxy": "^1.18.0",
     "ioredis": "^4.14.0",
     "ioredis-mock": "^4.16.3",
     "js-yaml": "^3.13.1",
