@@ -301,17 +301,16 @@ describe('@proxy policy', () => {
         .type('json')
         .expect(200, { url: '/something' })
         .end((err, res) => {
-          if (err) done(err)
+          if (err) done(err);
           else {
             request(app)
-            .get('/hello/v1/api/endpointSlashedStar/something')
-            .type('json')
-            .expect(200, { url: '/something' })
-            .end((err, res) => done(err))
+              .get('/hello/v1/api/endpointSlashedStar/something')
+              .type('json')
+              .expect(200, { url: '/something' })
+              .end((err, res) => done(err));
           }
-        })
+        });
     });
-
   });
 });
 
