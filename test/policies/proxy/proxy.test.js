@@ -229,6 +229,8 @@ describe('@proxy policy', () => {
             http: { port: 0 },
             apiEndpoints: {
               testStar: { path: '/hello/v1/api/endpointStar*' },
+              testStarSlash: { path: '/hello/v1/api/endpointSlashedStar/*' },
+              testTwoStars: { path: '/hello/v1/api/endpointTwoStar/*/then/*' },
               test: { path: '/hello/v1/api/endpoint' }
             },
             serviceEndpoints: {
@@ -239,7 +241,7 @@ describe('@proxy policy', () => {
             policies: ['proxy'],
             pipelines: {
               pipeline1: {
-                apiEndpoints: ['testStar'],
+                apiEndpoints: ['testStar', 'testStarSlash', 'testTwoStars'],
                 policies: [{
                   proxy: [{
                     action: Object.assign({ stripPath: true }, defaultProxyOptions, { serviceEndpoint: 'backend' })
@@ -276,6 +278,39 @@ describe('@proxy policy', () => {
         .type('json')
         .expect(200, { url: '/?a=2&b=3&c=10' })
     );
+
+    it('should be proxied without URL decoding the path', () =>
+      request(app)
+        .get('/hello/v1/api/endpointStar/something/foo%2Fbar/index')
+        .query({ a: 2, b: 3, c: 10 })
+        .type('json')
+        .expect(200, { url: '/something/foo%2Fbar/index?a=2&b=3&c=10' })
+    );
+
+    it('should be proxied stripping path up to first wildcard', () =>
+      request(app)
+        .get('/hello/v1/api/endpointTwoStar/something/foo%2Fbar/then/index')
+        .query({ a: 2, b: 3, c: 10 })
+        .type('json')
+        .expect(200, { url: '/something/foo%2Fbar/then/index?a=2&b=3&c=10' })
+    );
+
+    it('endpoint* and endpoint/* should be equivalent', (done) => {
+      request(app)
+        .get('/hello/v1/api/endpointStar/something')
+        .type('json')
+        .expect(200, { url: '/something' })
+        .end((err, res) => {
+          if (err) done(err);
+          else {
+            request(app)
+              .get('/hello/v1/api/endpointSlashedStar/something')
+              .type('json')
+              .expect(200, { url: '/something' })
+              .end((err, res) => done(err));
+          }
+        });
+    });
   });
 });
 
