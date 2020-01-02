@@ -128,7 +128,8 @@ module.exports = class extends eg.Generator {
   }
 
   install () {
-    this.npmInstall(['express-gateway'], { save: true });
+    const { version: installedVersion } = require('../../../package.json');
+    this.npmInstall([`express-gateway@${installedVersion}`], { save: true });
   }
 
   end () {
