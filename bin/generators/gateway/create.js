@@ -4,6 +4,9 @@ const chalk = require('chalk');
 const path = require('path');
 const os = require('os');
 const eg = require('../../eg');
+const pacote = require('pacote');
+const semver = require('semver');
+const { version: installedVersion } = require('../../../package.json');
 
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
@@ -128,7 +131,6 @@ module.exports = class extends eg.Generator {
   }
 
   install () {
-    const { version: installedVersion } = require('../../../package.json');
     this.npmInstall([`express-gateway@${installedVersion}`], { save: true });
   }
 
@@ -141,5 +143,20 @@ module.exports = class extends eg.Generator {
     console.log(os.EOL);
     console.log(`To receive additional support, visit our ${chalk.hex('D32E59')('Gitter channel')}:
                   ${chalk.green('https://gitter.im/ExpressGateway/express-gateway')}`);
+
+    try {
+      const response = pacote.manifest('express-gateway');
+      response.then(manifest => {
+        const { version: latestVersion } = manifest;
+        if (semver.lt(installedVersion, latestVersion)) {
+          console.log(`You are using older version ${chalk.red(installedVersion)} .`);
+          console.log(`Express Gateway ${chalk.hex('0e8696')(latestVersion)} has been released!`);
+        }
+      }).catch(err => {
+        console.log(err);
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 };

@@ -86,6 +86,7 @@
     "lodash.flatmap": "^4.5.0",
     "minimatch": "^3.0.4",
     "oauth2orize": "^1.11.0",
+    "pacote": "^10.3.0",
     "parent-require": "^1.0.0",
     "passport": "^0.4.0",
     "passport-http": "0.3.0",
