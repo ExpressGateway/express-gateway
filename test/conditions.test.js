@@ -125,7 +125,7 @@ describe('conditions', () => {
     });
 
     it('should return false if request is client authenticated', function () {
-      req.client.authorized = false;
+      req.client = { authorized: false };
       should(conditions.tlsClientAuthenticated()(req)).be.false();
     });
   });
