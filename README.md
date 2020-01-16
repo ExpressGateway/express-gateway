@@ -12,9 +12,9 @@
 
 Express Gateway is a microservices API gateway that sits at the heart of any microservices or serverless architecture, regardless of what language or platform you're using.
 
-Express Gateway secures your microservices and serverless functions and expose them through APIs using Node.js, Express and Express middleware.
+Express Gateway secures your microservices and serverless functions and exposes them through APIs using Node.js, Express and Express middleware.
 
-Developing cloud native applications, orchestrating and managing them now can be done insanely fast all on one seamless platform without having to introduce additional infrastructure.
+Developing cloud-native applications, orchestrating and managing them now can be done insanely fast all on one seamless platform without having to introduce additional infrastructure.
 
 ---
 
