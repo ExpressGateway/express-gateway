@@ -147,11 +147,11 @@ describe('REST: pipelines', () => {
         });
     });
 
-    it('should refuse a misconfigured policy in a pipeline', () => {
+    it('should accept a policy without secret in a pipeline', () => {
       const testPipeline = {
         apiEndpoints: ['api'],
         customId: idGen.v4(), // NOTE: save operation should allow custom props
-        policies: [{ jwt: { action: {} } }]
+        policies: [{ jwt: { action: { checkCredentialExistence: true } } }]
       };
       return should(adminHelper.admin.config.pipelines.update('example', testPipeline)).be.ok();
     });
