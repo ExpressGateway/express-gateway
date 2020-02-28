@@ -153,8 +153,7 @@ describe('REST: pipelines', () => {
         customId: idGen.v4(), // NOTE: save operation should allow custom props
         policies: [{ jwt: { action: {} } }]
       };
-
-      return should(adminHelper.admin.config.pipelines.update('example', testPipeline)).be.rejectedWith({ response: { statusCode: 422 } });
+      return should(adminHelper.admin.config.pipelines.update('example', testPipeline)).be.ok();
     });
 
     it('should delete existing pipeline', () => {
