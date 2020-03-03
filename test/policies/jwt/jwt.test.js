@@ -75,6 +75,11 @@ describe('JWT policy', () => {
       jwtExtractor: 'query',
       jwtExtractorField: 'jwtKey'
     }
+  }, {
+    description: 'Secret string',
+    jwtSecret: false,
+    jwtSignOptions: {},
+    actionConfig: {}
   }].forEach((jwtSecretTestCase) => {
     describe(jwtSecretTestCase.description, () => {
       before('setup', () => {
@@ -85,7 +90,10 @@ describe('JWT policy', () => {
             lastname: 'Kent',
             email: 'test@example.com'
           }))
-          .then((user) => credentialService.insertCredential(user.id, 'jwt')).then((credential) => { jwtCredential = credential; })
+          .then((user) => credentialService.insertCredential(user.id, 'jwt')).then((credential) => {
+            jwtCredential = credential;
+            jwtSecretTestCase.jwtSecret = jwtSecretTestCase.jwtSecret === false ? credential.keySecret : jwtSecretTestCase.jwtSecret;
+          })
           .then(() => serverHelper.findOpenPortNumbers(1))
           .then(([port]) => {
             config.gatewayConfig = jwtConfigGet(jwtSecretTestCase.actionConfig, port);
