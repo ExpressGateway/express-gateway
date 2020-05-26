@@ -164,6 +164,45 @@ describe('@proxy policy', () => {
     );
   });
 
+  describe('When errorAction is set', () => {
+    before(() => {
+      return gateway({
+        config: {
+          gatewayConfig: {
+            http: { port: 0 },
+            apiEndpoints: {
+              test: {
+                paths: ['/endpoint']
+              }
+            },
+            serviceEndpoints: {
+              backend: {
+                url: 'http://unavailablehost'
+              }
+            },
+            policies: ['proxy'],
+            pipelines: {
+              pipeline1: {
+                apiEndpoints: ['test'],
+                policies: [{
+                  proxy: [{
+                    action: { serviceEndpoint: 'backend', errorAction: { message: 'Gateway Bad!', headers: { 'Content-Type': 'text/plain' } } }
+                  }]
+                }]
+              }
+            }
+          }
+        }
+      }).then(apps => { app = apps.app; });
+    });
+
+    it('should return 502 with error message', () =>
+      request(app)
+        .get('/endpoint')
+        .expect(502, 'Gateway Bad!')
+    );
+  });
+
   describe('requestStream property', () => {
     before(() => {
       return gateway({
