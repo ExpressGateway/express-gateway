@@ -48,6 +48,7 @@ describe('@modifier policy', () => {
         should(res.header).not.have.property('x-test');
 
         should(res.body).have.property('hello', 'world');
+        should(res.body.foo).have.property('url', '/');
         should(res.header).have.property('r-test', 'baffino');
         should(res.header).have.property('res', 'correct');
       });
@@ -59,6 +60,7 @@ describe('@modifier policy', () => {
         should(res.header).not.have.property('x-test');
 
         should(res.body).have.property('hello', 'world');
+        should(res.body.foo).have.property('url', '/');
         should(res.header).have.property('r-test', 'baffino');
         should(res.header).have.property('res', 'correct');
       });
@@ -116,6 +118,14 @@ const setupGateway = () => {
                     res: '"correct"'
                   },
                   remove: ['x-test']
+                }
+              }
+            }, {
+              action: {
+                body: {
+                  add: {
+                    'foo.url': 'res.body.url'
+                  }
                 }
               }
             }]
