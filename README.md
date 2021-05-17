@@ -10,6 +10,9 @@
 
 [![Express-Gateway][eg-wordmark-companion]][eg-website]
 
+> **DEPRECATION NOTICE**
+ This Project is no longer maintained. Read [here](https://github.com/ExpressGateway/express-gateway/issues/1011#issuecomment-748354599) for more details or if you're interested in taking over that project.
+
 Express Gateway is a microservices API gateway that sits at the heart of any microservices or serverless architecture, regardless of what language or platform you're using.
 
 Express Gateway secures your microservices and serverless functions and expose them through APIs using Node.js, Express and Express middleware.
