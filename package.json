@@ -1,9 +1,9 @@
 {
-  "name": "express-gateway",
-  "version": "2.0.0",
+  "name": "@mappedin/express-gateway",
+  "version": "2.0.1",
   "description": "A microservices API gateway built on top of ExpressJS",
   "homepage": "https://www.express-gateway.io",
-  "repository": "expressgateway/express-gateway",
+  "repository": "MappedIn/express-gateway",
   "keywords": [
     "microservices",
     "apis",
