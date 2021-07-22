@@ -28,7 +28,7 @@
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "engines": {
-    "node": ">= 8.3.0"
+    "node": ">= 14.0.0"
   },
   "scripts": {
     "start": "node lib/index.js",
@@ -103,10 +103,7 @@
     "uuid62": "1.0.1",
     "vhost": "3.0.2",
     "winston": "3.2.1",
-    "yargs": "^14.2.3",
-    "yawn-yaml": "1.4.0",
-    "yeoman-environment": "^2.10.3",
-    "yeoman-generator": "^3.2.0"
+    "yawn-yaml": "1.4.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
@@ -123,7 +120,7 @@
     "find-free-port": "2.0.0",
     "husky": "^3.1.0",
     "istanbul": "0.4.5",
-    "lint-staged": "^9.5.0",
+    "lint-staged": "^11.0.1",
     "mocha": "^6.2.3",
     "mocha-lcov-reporter": "1.3.0",
     "nyc": "^14.1.1",
@@ -133,8 +130,7 @@
     "sinon": "^7.5.0",
     "supertest": "^4.0.2",
     "supertest-session": "^4.1.0",
-    "tmp": "^0.1.0",
-    "yeoman-test": "^1.9.1"
+    "tmp": "^0.1.0"
   },
   "yargs": {
     "boolean-negation": false
@@ -143,5 +139,8 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
+  },
+  "volta": {
+    "node": "14.17.3"
   }
 }
