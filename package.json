@@ -70,7 +70,7 @@
     "color-convert": "^1.9.3",
     "connect-ensure-login": "0.1.1",
     "cors": "^2.8.5",
-    "ejs": "^2.7.4",
+    "ejs": "^3.1.8",
     "express": "^4.17.1",
     "express-rate-limit": "^2.14.2",
     "express-session": "^1.17.2",
@@ -141,6 +141,7 @@
     }
   },
   "volta": {
-    "node": "14.17.3"
+    "node": "16.15.1",
+    "npm": "8.12.1"
   }
 }
