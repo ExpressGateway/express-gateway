@@ -27,7 +27,7 @@ describe('Missing policies', () => {
     before('setup', () => {
       config.gatewayConfig = {
         http: { port: 0 },
-        policies: ['basic-auth'],
+        policies: ['cors'],
         apiEndpoints: {
           authorizedEndpoint: {
             host: '*',
