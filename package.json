@@ -1,6 +1,6 @@
 {
   "name": "@mappedin/express-gateway",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "description": "A microservices API gateway built on top of ExpressJS",
   "homepage": "https://www.express-gateway.io",
   "repository": "MappedIn/express-gateway",
