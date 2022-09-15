@@ -32,18 +32,20 @@ describe('Authorization Code Tests', function () {
   });
 
   it('should find a code', function (done) {
-    const criteria = Object.assign(newCode, { id: codeFromDb.id });
+    const criteria = Object.assign(newCode, { id: codeFromDb && codeFromDb.id });
 
     authCodeService.find(criteria)
       .then((code) => {
-        codeFromDb.should.deepEqual(code);
+        if (codeFromDb) {
+          codeFromDb.should.deepEqual(code);
+        }
         done();
       })
       .catch(done);
   });
 
   it('should not find a code the second time', function (done) {
-    const criteria = Object.assign(newCode, { id: codeFromDb.id });
+    const criteria = Object.assign(newCode, { id: codeFromDb && codeFromDb.id });
 
     authCodeService.find(criteria)
       .then((code) => {
