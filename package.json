@@ -93,7 +93,7 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "1.0.0",
     "passport-oauth2-client-password": "0.1.2",
-    "proxy-agent": "^4.0.1",
+    "proxy-agent": "^5.0.0",
     "rate-limit-redis": "^1.6.0",
     "semver": "^6.3.0",
     "superagent": "^5.1.0",
