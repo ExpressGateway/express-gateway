@@ -82,7 +82,7 @@
     "js-yaml": "^3.13.1",
     "json-schema-merge-allof": "^0.6.0",
     "json-schema-ref-parser": "^7.1.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash.flatmap": "^4.5.0",
     "minimatch": "^3.0.4",
     "oauth2orize": "^1.11.0",
