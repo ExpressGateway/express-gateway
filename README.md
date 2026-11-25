@@ -37,7 +37,7 @@ Developing cloud native applications, orchestrating and managing them now can be
 
 #### Installation
 
-This fork requires Node.js 22.13.0 or later.
+This fork requires Node.js 22.18.0 or later, or Node.js 24.11.0 or later.
 
 If you have Node.js already installed:
 

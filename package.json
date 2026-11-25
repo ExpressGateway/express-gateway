@@ -3,7 +3,10 @@
   "version": "1.16.12",
   "description": "A microservices API gateway built on top of ExpressJS",
   "homepage": "https://www.express-gateway.io",
-  "repository": "expressgateway/express-gateway",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/expressgateway/express-gateway.git"
+  },
   "keywords": [
     "microservices",
     "apis",
@@ -18,17 +21,35 @@
     "oauth2"
   ],
   "contributors": [
-    "Roman Lisagor <rlisagor@gmail.com>",
-    "Serhii Kuts <sergeykuc@gmail.com>",
-    "Irfan Baqui <irfan.baqui@gmail.com>",
-    "Kevin Swiber <kswiber@gmail.com>",
-    "Al Tsang <agilecto@gmail.com>",
-    "Vincenzo Chianese <vincenz.chianese@icloud.com>"
+    {
+      "name": "Roman Lisagor",
+      "email": "rlisagor@gmail.com"
+    },
+    {
+      "name": "Serhii Kuts",
+      "email": "sergeykuc@gmail.com"
+    },
+    {
+      "name": "Irfan Baqui",
+      "email": "irfan.baqui@gmail.com"
+    },
+    {
+      "name": "Kevin Swiber",
+      "email": "kswiber@gmail.com"
+    },
+    {
+      "name": "Al Tsang",
+      "email": "agilecto@gmail.com"
+    },
+    {
+      "name": "Vincenzo Chianese",
+      "email": "vincenz.chianese@icloud.com"
+    }
   ],
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "engines": {
-    "node": ">=22.13.0"
+    "node": "^22.18.0 || >=24.11.0"
   },
   "scripts": {
     "vendor:redis-mock": "node vendor/repack-ioredis-mock.js",
@@ -40,7 +61,7 @@
     "test:all": "cross-env EG_HTTP_PORT=0 EG_CONFIG_DIR=lib/config EG_DISABLE_CONFIG_WATCH=true mocha test",
     "test:unit": "cross-env EG_HTTP_PORT=0 EG_CONFIG_DIR=lib/config EG_DISABLE_CONFIG_WATCH=true mocha \"./test/{,!(e2e)/**/}*.test.js\"",
     "test:e2e": "mocha test/e2e",
-    "mocha:istanbul": "nyc --reporter=lcov npm run test:all && nyc report --report=lcov > coverage.lcov && codecov"
+    "mocha:istanbul": "nyc --reporter=lcov npm run test:all && nyc report --report=lcov > coverage.lcov"
   },
   "lint-staged": {
     "*.js": [
@@ -49,7 +70,7 @@
     ]
   },
   "bin": {
-    "eg": "./bin/index.js"
+    "eg": "bin/index.js"
   },
   "nyc": {
     "exclude": [
@@ -85,7 +106,7 @@
     "js-yaml": "^3.13.1",
     "json-schema-merge-allof": "^0.6.0",
     "json-schema-ref-parser": "^7.1.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.3",
     "lodash.flatmap": "^4.5.0",
     "minimatch": "^3.0.4",
     "npm-package-arg": "^13.0.0",
@@ -97,7 +118,7 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "1.0.0",
     "passport-oauth2-client-password": "0.1.2",
-    "proxy-agent": "^5.0.0",
+    "proxy-agent": "^8.0.3",
     "rate-limit-redis": "^3.0.1",
     "semver": "^6.3.0",
     "superagent": "^5.1.0",
@@ -109,12 +130,11 @@
     "yargs": "^16.2.0",
     "yawn-yaml": "1.4.0",
     "yeoman-environment": "^6.3.0",
-    "yeoman-generator": "^8.4.0"
+    "yeoman-generator": "^10.3.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.1",
     "@types/json-schema": "7.0.3",
-    "codecov": "^3.5.0",
     "cpr": "^3.0.1",
     "cross-env": "^5.2.1",
     "eslint": "^6.3.0",
@@ -127,20 +147,32 @@
     "husky": "^3.0.5",
     "istanbul": "0.4.5",
     "lint-staged": "^9.2.5",
-    "mocha": "^6.2.0",
+    "mocha": "^12.0.3",
     "mocha-lcov-reporter": "1.3.0",
     "nyc": "^18.0.0",
-    "puppeteer": "^1.19.0",
+    "puppeteer": "^25.18.1",
     "rimraf": "^3.0.0",
     "should": "^13.2.3",
     "sinon": "^7.4.2",
     "supertest": "^4.0.2",
     "supertest-session": "^4.0.0",
-    "tmp": "^0.1.0",
+    "tmp": "^0.2.7",
     "yeoman-test": "^11.8.2"
   },
-  "bundleDependencies": ["ioredis-mock"],
+  "bundleDependencies": [
+    "ioredis-mock"
+  ],
   "overrides": {
+    "glob@>=9 <14.0.2": "^14.0.6",
+    "minimatch@>=7 <11": "^11.0.9",
+    "flatted": "^3.4.2",
+    "external-editor": {
+      "tmp": "^0.2.7"
+    },
+    "@tootallnate/once": "^2.0.1",
+    "sinon": {
+      "diff": "^3.5.1"
+    },
     "teeny-request": {
       "uuid": "$uuid"
     }
@@ -152,5 +184,13 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/expressgateway/express-gateway/issues"
   }
 }
