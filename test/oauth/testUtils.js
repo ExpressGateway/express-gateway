@@ -1,5 +1,5 @@
 const should = require('should');
-const uuid = require('uuid62');
+const uuid = require('../../lib/uuid62');
 
 const services = require('../../lib/services');
 const db = require('../../lib/db');

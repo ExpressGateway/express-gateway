@@ -1,4 +1,4 @@
-const { TestAdapter } = require('yeoman-test/lib/adapter');
+const { TestAdapter } = require('yeoman-test');
 const environment = require('../../../bin/environment');
 
 const defaultEg = {
@@ -36,9 +36,13 @@ exports.bootstrap = (eg, adapter) => {
       const generator = env._originalCreate.bind(env)(namespace, options);
 
       const namespaces = Object.keys(env._hijackers);
-      if (namespaces.indexOf(namespace) !== -1) {
+      const generatorOptions = options && options.generatorOptions;
+      if (namespaces.indexOf(namespace) !== -1 && !(generatorOptions && generatorOptions.help)) {
         const hijacker = env._hijackers[namespace];
-        hijacker(generator);
+        return Promise.resolve(generator).then(instance => {
+          hijacker(instance);
+          return instance;
+        });
       }
 
       return generator;

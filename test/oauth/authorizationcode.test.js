@@ -4,6 +4,7 @@ const url = require('url');
 const qs = require('querystring');
 
 const app = require('./bootstrap');
+const config = require('../../lib/config');
 const services = require('../../lib/services');
 const { checkTokenResponse, createOAuthScenario } = require('./testUtils');
 
@@ -11,8 +12,34 @@ const tokenService = services.token;
 
 describe('Functional Test Authorization Code grant', function () {
   let fromDbApp, fromDbUser, refreshToken;
+  let codeExpiry;
 
   before(() => createOAuthScenario().then(([user, app]) => { fromDbUser = user; fromDbApp = app; }));
+  beforeEach(() => { codeExpiry = config.systemConfig.authorizationCodes.timeToExpiry; });
+  afterEach(() => { config.systemConfig.authorizationCodes.timeToExpiry = codeExpiry; });
+
+  it('rotates the session on login and logout', async () => {
+    const request = session(app);
+    const authorize = () => request.get('/oauth2/authorize').query({
+      redirect_uri: fromDbApp.redirectUri,
+      response_type: 'code',
+      client_id: fromDbApp.id
+    });
+    const sessionCookie = response => response.headers['set-cookie']
+      .find(cookie => cookie.startsWith('connect.sid=')).split(';')[0];
+
+    const beforeLogin = await authorize().expect(302).expect('Location', '/login');
+    const afterLogin = await request.post('/login')
+      .send({ username: fromDbUser.username, password: 'user-secret' })
+      .expect(302).expect('Location', /^\/oauth2\/authorize\?/);
+    sessionCookie(afterLogin).should.not.equal(sessionCookie(beforeLogin));
+
+    await authorize().expect(200);
+    const logout = await request.get('/logout').expect(302).expect('Location', '/');
+    const afterLogout = await authorize().expect(302).expect('Location', '/login');
+    const renewed = logout.headers['set-cookie'] ? logout : afterLogout;
+    sessionCookie(renewed).should.not.equal(sessionCookie(afterLogin));
+  });
 
   it('should grant access token if requesting without scopes', function (done) {
     const request = session(app);
@@ -227,7 +254,6 @@ describe('Functional Test Authorization Code grant', function () {
   });
 
   it('should not grant access token if code is expired', function (done) {
-    const config = require('../../lib/config');
     config.systemConfig.authorizationCodes.timeToExpiry = 0;
     const request = session(app);
     request

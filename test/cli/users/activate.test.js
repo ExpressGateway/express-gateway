@@ -2,7 +2,7 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:users:activate';
-const idGen = require('uuid62');
+const idGen = require('../../../lib/uuid62');
 
 describe('eg users activate', () => {
   let program, env, userId, userName, userName2;

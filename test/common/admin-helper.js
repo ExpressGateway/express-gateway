@@ -6,8 +6,9 @@ module.exports = function () {
       return rest({ config }).then((srv) => {
         this.adminSrv = srv;
         const srvInfo = srv.address();
+        const host = srvInfo.family === 'IPv6' ? `[${srvInfo.address}]` : srvInfo.address;
         this.admin = adminClient({
-          baseUrl: `http://${srvInfo.address}:${srvInfo.port}`
+          baseUrl: `http://${host}:${srvInfo.port}`
         });
         return this.adminSrv;
       });

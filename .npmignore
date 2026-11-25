@@ -5,3 +5,4 @@ Docker*
 C*.md
 appveyor.yml
 README.md
+vendor/

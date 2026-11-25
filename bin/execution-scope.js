@@ -1,4 +1,4 @@
-const { execFileSync } = require('child_process');
+const { sync: spawnSync } = require('cross-spawn');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -31,14 +31,13 @@ exports.executeInScope = env => {
 
   // intercept CLI command and forward to local installation
   if (!process.env.EG_LOCAL_EXEC && fs.existsSync(localBin)) {
-    const childEnv = process.env;
-    childEnv.EG_LOCAL_EXEC = true;
-
-    execFileSync(localBin, process.argv.slice(2), {
+    const result = spawnSync(localBin, process.argv.slice(2), {
       cwd: env.cwd,
-      env: childEnv,
+      env: { ...process.env, EG_LOCAL_EXEC: 'true' },
       stdio: 'inherit'
     });
+    if (result.error) throw result.error;
+    process.exitCode = result.status === null ? 1 : result.status;
     return true;
   }
 

@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  "node-8":
+  "node-22":
     docker:
-      - image: circleci/node:8-browsers
+      - image: cimg/node:22.22-browsers
     working_directory: ~/repo
 
     steps: &eg-checkout-install
@@ -10,25 +10,17 @@ jobs:
       - run: npm ci
       - run: npm test
 
-  "node-10":
+  "node-24":
     docker:
-      - image: circleci/node:10-browsers
+      - image: cimg/node:24.15-browsers
     working_directory: ~/repo
 
     steps: *eg-checkout-install
 
-  "node-12":
+  "node-22-real-redis":
     docker:
-      - image: circleci/node:12-browsers
-    working_directory: ~/repo
-
-    steps: *eg-checkout-install
-
-
-  "node-10-real-redis":
-    docker:
-      - image: circleci/node:10-browsers
-      - image: circleci/redis
+      - image: cimg/node:22.22-browsers
+      - image: redis:7-alpine
     working_directory: ~/repo
     environment:
       - EG_DB_EMULATE: false
@@ -36,7 +28,7 @@ jobs:
 
   "release-npm-docker-image":
     docker:
-      - image: circleci/node:10
+      - image: cimg/node:22.22
     working_directory: ~/repo
 
     steps:
@@ -145,13 +137,12 @@ workflows:
   version: 2
   build:
     jobs:
-      - node-8: &testingFilters
+      - node-22: &testingFilters
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
-      - node-10: *testingFilters
-      - node-12: *testingFilters
-      - node-10-real-redis: *testingFilters
+      - node-24: *testingFilters
+      - node-22-real-redis: *testingFilters
       - release-npm-docker-image:
           filters: &releaseFilters
             tags:
@@ -159,10 +150,9 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - node-8
-            - node-10-real-redis
-            - node-10
-            - node-12
+            - node-22
+            - node-22-real-redis
+            - node-24
       - update-docker-repo: &postNpmPublish
           requires:
             - release-npm-docker-image

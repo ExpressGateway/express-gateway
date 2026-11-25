@@ -6,17 +6,13 @@ const yeoman = require('yeoman-environment');
 const { executeInScope } = require('./execution-scope');
 
 exports.bootstrap = (eg, adapter) => {
-  const env = yeoman.createEnv();
+  const env = yeoman.createEnv({ adapter });
 
   if (executeInScope(env)) {
     return;
   }
 
   env.eg = eg;
-
-  if (adapter) {
-    env.adapter = adapter;
-  }
 
   const program = yargs;
 
@@ -55,8 +51,9 @@ exports.bootstrap = (eg, adapter) => {
     files.forEach(file => {
       if (file === 'index.js') {
         const namespace = `${prefix}:${dir}`;
-        commands.push({ namespace: namespace, path: directoryPath });
-        env.register(directoryPath, namespace);
+        commands.push(namespace);
+        const resolved = path.join(directoryPath, file);
+        env.register(require(resolved), { namespace, resolved });
         return;
       }
 
@@ -67,12 +64,9 @@ exports.bootstrap = (eg, adapter) => {
         subCommands[dir] = [];
       }
 
-      subCommands[dir].push({
-        namespace: namespace,
-        path: filePath
-      });
+      subCommands[dir].push(namespace);
 
-      env.register(filePath, namespace);
+      env.register(require(filePath), { namespace, resolved: filePath });
     });
   });
 
@@ -81,8 +75,8 @@ exports.bootstrap = (eg, adapter) => {
   //       'user': 'users',
   //       'users': 'users'
   //     }
-  commands.forEach(command => {
-    const generator = env.create(command.namespace);
+  commands.forEach(namespace => {
+    const generator = env.create(namespace, { generatorOptions: { help: true } });
 
     let aliases = generator._configuration.command;
     if (!Array.isArray(aliases)) {
@@ -93,7 +87,7 @@ exports.bootstrap = (eg, adapter) => {
       return alias.split(/\s/)[0];
     });
 
-    const commandName = command.namespace.split(':')[1];
+    const commandName = namespace.split(':')[1];
 
     aliases.forEach(a => {
       commandAliases[a] = commandName;
@@ -114,8 +108,8 @@ exports.bootstrap = (eg, adapter) => {
 
     subCommandAliases[key] = {};
 
-    subCommandArray.forEach(s => {
-      const generator = env.create(s.namespace);
+    subCommandArray.forEach(namespace => {
+      const generator = env.create(namespace, { generatorOptions: { help: true } });
 
       let aliases = generator._configuration.command;
 
@@ -127,7 +121,7 @@ exports.bootstrap = (eg, adapter) => {
         return alias.split(/\s/)[0];
       });
 
-      const commandName = s.namespace.split(':')[2];
+      const commandName = namespace.split(':')[2];
 
       aliases.forEach(a => {
         subCommandAliases[key][a] = commandName;

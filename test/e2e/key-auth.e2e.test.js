@@ -1,7 +1,7 @@
 const request = require('supertest');
 const cliHelper = require('../common/cli.helper');
 const gwHelper = require('../common/gateway.helper');
-const idGen = require('uuid62');
+const idGen = require('../../lib/uuid62');
 
 const username = idGen.v4();
 const headerName = 'Authorization';

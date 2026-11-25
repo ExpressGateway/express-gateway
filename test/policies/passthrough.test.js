@@ -1,4 +1,4 @@
-const idGen = require('uuid62');
+const idGen = require('../../lib/uuid62');
 const request = require('supertest');
 
 const services = require('../../lib/services');

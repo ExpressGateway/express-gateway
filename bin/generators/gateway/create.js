@@ -4,6 +4,7 @@ const chalk = require('chalk');
 const path = require('path');
 const os = require('os');
 const eg = require('../../eg');
+const { name: gatewayPackage, version: gatewayVersion } = require('../../../package.json');
 module.exports = class extends eg.Generator {
   constructor (args, opts) {
     super(args, opts);
@@ -114,21 +115,17 @@ module.exports = class extends eg.Generator {
 
   writing () {
     this.sourceRoot(path.join(this.sourceRoot(), this.type));
-    this.destinationRoot(this.directory);
+    this.env.cwd = this.destinationRoot(this.directory);
 
     const packageJSON = this.fs.readJSON(this.templatePath('./package.json'));
     packageJSON.name = this.name;
+    packageJSON.dependencies = { ...packageJSON.dependencies, [gatewayPackage]: gatewayVersion };
 
     this.fs.writeJSON(this.destinationPath('./package.json'), packageJSON);
     this.fs.writeJSON(this.destinationPath('./.yo-rc.json'), {});
     this.fs.copy(this.templatePath('server.js'), this.destinationPath('server.js'));
     this.fs.copy(this.templatePath('config'), this.destinationPath('config'));
     this.fs.copy(path.join(__dirname, '../../../lib/config/models'), this.destinationPath('config/models'));
-  }
-
-  install () {
-    const { version: installedVersion } = require('../../../package.json');
-    this.addDependencies({ '@sansitech/express-gateway': installedVersion });
   }
 
   end () {

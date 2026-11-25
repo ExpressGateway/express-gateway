@@ -1,8 +1,8 @@
 const assert = require('assert');
 const PassThrough = require('stream').PassThrough;
-const helpers = require('yeoman-test');
+const helpers = require('yeoman-test').default;
 const adminHelper = require('../../common/admin-helper')();
-const idGen = require('uuid62');
+const idGen = require('../../../lib/uuid62');
 const environment = require('../../fixtures/cli/environment');
 const namespace = 'express-gateway:credentials:create';
 

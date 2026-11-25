@@ -1,4 +1,4 @@
-const Generator = require('yeoman-generator');
+const Generator = require('yeoman-generator').default;
 const chalk = require('chalk');
 const config = require('../lib/config');
 const { validate, find } = require('../lib/schemas');
@@ -23,13 +23,14 @@ module.exports = class EgGenerator extends Generator {
       return this._wrapConfig(builder(yargs));
     };
 
-    configuration.handler = argv => {
+    configuration.handler = async argv => {
       this.env.argv = argv;
 
-      const command = this.options.env.commandAliases[0][argv._[0]];
-      const subCommand = this.options.env.commandAliases[1][command][argv._[1]];
+      const command = this.env.commandAliases[0][argv._[0]];
+      const subCommand = this.env.commandAliases[1][command][argv._[1]];
 
-      this.env.run(`express-gateway:${command}:${subCommand}`);
+      const generator = await this.env.create(`express-gateway:${command}:${subCommand}`);
+      return this.env.runGenerator(generator);
     };
 
     this._configuration = configuration;
@@ -42,7 +43,7 @@ module.exports = class EgGenerator extends Generator {
 
   createSubCommand (name) {
     const generatorName = `${this.constructor.namespace}:${name}`;
-    return this.env.create(generatorName)._configuration;
+    return this.env.create(generatorName, { generatorOptions: { help: true } })._configuration;
   }
 
   // configuration defaults

@@ -2,9 +2,9 @@ const assert = require('assert');
 const environment = require('../../fixtures/cli/environment');
 const adminHelper = require('../../common/admin-helper')();
 const namespace = 'express-gateway:apps:update';
-const idGen = require('uuid62');
+const idGen = require('../../../lib/uuid62');
 const util = require('util');
-const helpers = require('yeoman-test');
+const helpers = require('yeoman-test').default;
 
 describe('eg apps update', () => {
   let program, env, user, app1;

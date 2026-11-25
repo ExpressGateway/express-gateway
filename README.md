@@ -36,11 +36,14 @@ Developing cloud native applications, orchestrating and managing them now can be
 - Cloud Native Execution
 
 #### Installation
+
+This fork requires Node.js 22.13.0 or later.
+
 If you have Node.js already installed:
 
 ```bash
 # install Express Gateway
-$ npm install -g express-gateway
+$ npm install -g @sansitech/express-gateway
 ```
 
 #### Creating a Gateway

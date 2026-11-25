@@ -1,4 +1,4 @@
-const idGen = require('uuid62');
+const idGen = require('../../../lib/uuid62');
 const fs = require('fs');
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
