@@ -159,15 +159,21 @@ describe('oauth2 authorization code grant type', () => {
     });
 
     return checkUnauthorized
-      .then(() => puppeteer.launch())
-      .then(browser => Promise.all([browser, browser.pages()]))
-      .then(([browser, [page]]) => Promise.all([browser, page, page.goto(authURL)]))
-      .then(([browser, page]) => Promise.all([browser, page, page.type('[name="username"]', username)]))
-      .then(([browser, page]) => Promise.all([browser, page, page.type('[name="password"]', password)]))
-      .then(([browser, page]) => Promise.all([browser, page, page.click('[type="submit"]')]))
-      .then(([browser, page]) => Promise.all([browser, page, page.click('#allow')]))
-      .then(([browser, page]) => Promise.all([page.url(), browser.close()]))
-      .then(([pageUrl]) => {
+      .then(async () => {
+        const browser = await puppeteer.launch();
+        try {
+          const [page] = await browser.pages();
+          await page.goto(authURL);
+          await page.type('[name="username"]', username);
+          await page.type('[name="password"]', password);
+          await Promise.all([page.waitForNavigation(), page.click('[type="submit"]')]);
+          await Promise.all([page.waitForNavigation(), page.click('#allow')]);
+          return page.url();
+        } finally {
+          await browser.close();
+        }
+      })
+      .then(pageUrl => {
         const parsedPageUrl = url.parse(pageUrl, true);
         const { code } = parsedPageUrl.query;
 
